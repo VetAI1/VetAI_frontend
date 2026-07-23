@@ -23,6 +23,7 @@ export const authService = {
   me: () =>
     httpClient<User>('auth/me', {
       method: 'GET',
+      skipToast: true,
     }),
 
   refresh: (refresh_token: string) =>

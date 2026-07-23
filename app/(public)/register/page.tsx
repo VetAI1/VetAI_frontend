@@ -170,23 +170,23 @@ export default function RegisterPage() {
         ...(inviteToken
           ? { invite_token: inviteToken }
           : {
-              plan_id: selectedPlan!.id,
-              hospital_name: data.hospitalName!,
-              cnpj: data.cnpj!,
-              address: {
-                zip_code: data.address!.zipCode ?? '',
-                street: data.address!.street ?? '',
-                number: data.address!.number ?? '',
-                neighborhood: data.address!.neighborhood ?? '',
-                city: data.address!.city ?? '',
-                state: data.address!.state ?? '',
-                ...(data.address!.complement ? { complement: data.address!.complement } : {}),
-              },
-              responsible: {
-                name: data.responsible!.name ?? '',
-                crmv: data.responsible!.crmv ?? '',
-              },
-            }),
+            plan_id: selectedPlan!.id,
+            hospital_name: data.hospitalName!,
+            cnpj: data.cnpj!,
+            address: {
+              zip_code: data.address!.zipCode ?? '',
+              street: data.address!.street ?? '',
+              number: data.address!.number ?? '',
+              neighborhood: data.address!.neighborhood ?? '',
+              city: data.address!.city ?? '',
+              state: data.address!.state ?? '',
+              ...(data.address!.complement ? { complement: data.address!.complement } : {}),
+            },
+            responsible: {
+              name: data.responsible!.name ?? '',
+              crmv: data.responsible!.crmv ?? '',
+            },
+          }),
       };
       await register(payload);
     } finally {

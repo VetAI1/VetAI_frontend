@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 import { STORAGE_KEYS } from '@/constants';
-import { setToken, removeToken } from '@/infra/http-client';
+import { ApiError, setToken, removeToken } from '@/infra/http-client';
 import { authService } from '@/services/auth.service';
 import type { User } from '@/types/auth';
 
@@ -29,7 +29,22 @@ export function useAuthProvider() {
     if (storedUser && token) {
       try {
         const user = JSON.parse(storedUser) as User;
-        setState({ user, isLoading: false, isAuthenticated: true });
+        void authService
+          .me()
+          .then((currentUser) => {
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(currentUser));
+            setState({ user: currentUser, isLoading: false, isAuthenticated: true });
+          })
+          .catch((error: unknown) => {
+            if (error instanceof ApiError && [401, 403].includes(error.status)) {
+              removeToken();
+              localStorage.removeItem(STORAGE_KEYS.USER);
+              setState({ user: null, isLoading: false, isAuthenticated: false });
+              return;
+            }
+
+            setState({ user, isLoading: false, isAuthenticated: true });
+          });
       } catch {
         removeToken();
         localStorage.removeItem(STORAGE_KEYS.USER);
