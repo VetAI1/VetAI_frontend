@@ -45,7 +45,9 @@ export function VaccineFormModal({
     handleSubmit,
     formState: { errors },
   } = useForm<VaccineCatalogFormData>({
-    resolver: yupResolver(vaccineCatalogSchema) as Resolver<VaccineCatalogFormData>,
+    resolver: yupResolver(
+      vaccineCatalogSchema,
+    ) as Resolver<VaccineCatalogFormData>,
     defaultValues: {
       name: vaccine?.name ?? '',
       period: vaccine?.revaccination_period_days,
@@ -85,19 +87,19 @@ export function VaccineFormModal({
           : 'Adicione uma nova vacina ao catálogo do workspace'
       }
       onClose={onClose}
-      maxWidth='sm'
+      maxWidth="sm"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Controller
-          name='name'
+          name="name"
           control={control}
           render={({ field }) => (
             <InputWithLabel
-              label='Nome'
+              label="Nome"
               required
               value={field.value}
               onChange={field.onChange}
-              placeholder='Ex: Raiva, V8, Giárdia...'
+              placeholder="Ex: Raiva, V8, Giárdia..."
               error={errors.name?.message}
               autoFocus
             />
@@ -106,11 +108,11 @@ export function VaccineFormModal({
 
         <div>
           <Controller
-            name='period'
+            name="period"
             control={control}
             render={({ field }) => (
               <SelectInput
-                label='Período de Revacinação'
+                label="Período de Revacinação"
                 value={field.value !== null ? String(field.value) : ''}
                 onChange={(v) => field.onChange(v ? Number(v) : null)}
                 options={PERIOD_OPTIONS.map((opt) => ({
@@ -120,38 +122,38 @@ export function VaccineFormModal({
               />
             )}
           />
-          <p className='text-xs text-slate-500 dark:text-slate-400 mt-1'>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Usado para calcular automaticamente a próxima revacinação ao
             registrar uma dose.
           </p>
         </div>
 
         {isEdit && (
-          <div className='p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg'>
-            <p className='text-xs text-slate-500 dark:text-slate-400'>
+          <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Código:{' '}
-              <span className='font-mono font-medium text-slate-700 dark:text-slate-300'>
+              <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
                 {vaccine.code}
               </span>
             </p>
           </div>
         )}
-        <div className='flex gap-3 justify-end pt-2'>
+        <div className="flex gap-3 justify-end pt-2">
           <Button
-            type='button'
-            variant='outline'
+            type="button"
+            variant="outline"
             onClick={onClose}
             disabled={saving}
           >
             Cancelar
           </Button>
           <Button
-            type='submit'
+            type="submit"
             disabled={saving}
-            className='bg-teal-600 text-white hover:bg-teal-700'
+            className="bg-teal-600 text-white hover:bg-teal-700"
           >
             {saving ? (
-              <Loader2 size={16} className='animate-spin' />
+              <Loader2 size={16} className="animate-spin" />
             ) : isEdit ? (
               'Salvar'
             ) : (

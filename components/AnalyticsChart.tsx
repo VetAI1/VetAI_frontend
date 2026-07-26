@@ -93,10 +93,10 @@ export function AnalyticsChart({
     if (loading) {
       return (
         <div
-          className='flex items-center justify-center w-full'
+          className="flex items-center justify-center w-full"
           style={{ height }}
         >
-          <Loader2 className='h-8 w-8 animate-spin text-teal-600' />
+          <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
         </div>
       );
     }
@@ -114,8 +114,12 @@ export function AnalyticsChart({
   };
 
   return (
-    <SectionCard title={title} {...(subtitle ? { subtitle } : {})} {...(className ? { className } : {})}>
-      <div className='w-full mt-4' style={{ height }}>
+    <SectionCard
+      title={title}
+      {...(subtitle ? { subtitle } : {})}
+      {...(className ? { className } : {})}
+    >
+      <div className="w-full mt-4" style={{ height }}>
         {renderChart()}
       </div>
     </SectionCard>

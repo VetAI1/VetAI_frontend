@@ -1,4 +1,5 @@
-export type EventType = 'consultation' | 'surgery' | 'vaccine' | 'exam' | 'other';
+export type EventType =
+  'consultation' | 'surgery' | 'vaccine' | 'exam' | 'other';
 
 export interface ScheduleEvent {
   id: string;
@@ -12,7 +13,10 @@ export interface ScheduleEvent {
   tutorName?: string;
 }
 
-export const EVENT_TYPE_MAP: Record<EventType, { label: string; color: string; bg: string; dot: string }> = {
+export const EVENT_TYPE_MAP: Record<
+  EventType,
+  { label: string; color: string; bg: string; dot: string }
+> = {
   consultation: {
     label: 'Consulta',
     color: 'text-blue-700 dark:text-blue-300',

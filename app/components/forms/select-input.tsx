@@ -71,15 +71,15 @@ function Dropdown({
         e.preventDefault();
         e.stopPropagation();
       }}
-      className='rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-slate-900/60 py-1.5 animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden'
+      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-slate-900/60 py-1.5 animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden"
     >
-      <div className='overflow-y-auto' style={{ maxHeight: MAX_HEIGHT }}>
+      <div className="overflow-y-auto" style={{ maxHeight: MAX_HEIGHT }}>
         {options.map((opt) => {
           const isSelected = opt.value === value;
           return (
             <button
               key={opt.value}
-              type='button'
+              type="button"
               onClick={() => {
                 onSelect(opt.value);
                 onClose();
@@ -93,7 +93,7 @@ function Dropdown({
             >
               <span>{opt.label}</span>
               {isSelected && (
-                <Check size={14} className='shrink-0 text-teal-500' />
+                <Check size={14} className="shrink-0 text-teal-500" />
               )}
             </button>
           );
@@ -171,19 +171,19 @@ function SelectInputInner({
       {label && (
         <label
           htmlFor={inputId}
-          className='text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block'
+          className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block"
         >
           {label}
-          {required && <span className='text-red-500 ml-0.5'>*</span>}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
 
       <div
         id={inputId}
         ref={triggerRef}
-        role='combobox'
+        role="combobox"
         aria-expanded={open}
-        aria-haspopup='listbox'
+        aria-haspopup="listbox"
         tabIndex={disabled ? -1 : 0}
         onClick={toggle}
         onKeyDown={(e) => {
@@ -221,7 +221,7 @@ function SelectInputInner({
       </div>
 
       {error && (
-        <p className='text-xs text-red-500 dark:text-red-400 mt-1'>{error}</p>
+        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{error}</p>
       )}
 
       {mounted &&

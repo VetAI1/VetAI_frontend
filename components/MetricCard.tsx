@@ -60,29 +60,29 @@ export function MetricCard({
         className,
       )}
     >
-      <div className='flex items-start justify-between'>
-        <div className='space-y-2'>
-          <div className='flex items-center gap-2'>
-            <span className='text-sm font-medium text-muted-foreground'>
+      <div className="flex items-start justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-muted-foreground">
               {title}
             </span>
             {tooltip && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <HelpCircle className='h-3.5 w-3.5 text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors' />
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors" />
                 </TooltipTrigger>
-                <TooltipContent side='top' align='center'>
-                  <p className='max-w-[200px] leading-relaxed'>{tooltip}</p>
+                <TooltipContent side="top" align="center">
+                  <p className="max-w-[200px] leading-relaxed">{tooltip}</p>
                 </TooltipContent>
               </Tooltip>
             )}
           </div>
 
-          <div className='flex items-baseline gap-1'>
+          <div className="flex items-baseline gap-1">
             {loading ? (
-              <div className='h-9 w-24 animate-pulse rounded-md bg-muted' />
+              <div className="h-9 w-24 animate-pulse rounded-md bg-muted" />
             ) : (
-              <h3 className='text-3xl font-bold tracking-tight text-foreground'>
+              <h3 className="text-3xl font-bold tracking-tight text-foreground">
                 {value}
               </h3>
             )}
@@ -100,13 +100,13 @@ export function MetricCard({
             color,
           }}
         >
-          <IconComponent className='h-6 w-6' strokeWidth={2.5} />
+          <IconComponent className="h-6 w-6" strokeWidth={2.5} />
         </div>
       </div>
 
       {/* Subtle bottom gradient sweep */}
       <div
-        className='absolute bottom-0 left-0 h-1.5 w-full opacity-40 transition-opacity group-hover:opacity-70'
+        className="absolute bottom-0 left-0 h-1.5 w-full opacity-40 transition-opacity group-hover:opacity-70"
         style={{ backgroundColor: color }}
       />
     </div>

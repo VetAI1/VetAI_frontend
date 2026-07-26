@@ -46,6 +46,7 @@ export const registerSchema = yup.object({
     city: yup.string().optional(),
     state: yup.string().optional(),
   }),
+  isUserResponsible: yup.boolean().optional(),
   responsible: yup.object({
     name: yup.string().optional(),
     crmv: yup.string().optional(),

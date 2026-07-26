@@ -3,7 +3,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Loader2, Plus, X } from 'lucide-react';
 import { useState } from 'react';
-import { Controller, useFieldArray, useForm, type Resolver } from 'react-hook-form';
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  type Resolver,
+} from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
 import { DateInput } from '@/app/components/forms/date-input';
@@ -24,7 +29,11 @@ interface AddPrescriptionModalProps {
   onSuccess: () => void;
 }
 
-export function AddPrescriptionModal({ patientId, onClose, onSuccess }: AddPrescriptionModalProps) {
+export function AddPrescriptionModal({
+  patientId,
+  onClose,
+  onSuccess,
+}: AddPrescriptionModalProps) {
   const [saving, setSaving] = useState(false);
 
   const {
@@ -68,7 +77,12 @@ export function AddPrescriptionModal({ patientId, onClose, onSuccess }: AddPresc
   };
 
   return (
-    <Modal title="Nova Receita" description="Adicione medicamentos e posologia" onClose={onClose} maxWidth="lg">
+    <Modal
+      title="Nova Receita"
+      description="Adicione medicamentos e posologia"
+      onClose={onClose}
+      maxWidth="lg"
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="flex items-end gap-4">
           <div className="flex-1">
@@ -107,7 +121,9 @@ export function AddPrescriptionModal({ patientId, onClose, onSuccess }: AddPresc
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => append({ drug: '', form: '', quantity: '', posology: '' })}
+              onClick={() =>
+                append({ drug: '', form: '', quantity: '', posology: '' })
+              }
               className="gap-1.5 text-xs text-teal-600 hover:bg-teal-50 hover:text-teal-700 dark:text-teal-400 dark:hover:bg-teal-900/20 dark:hover:text-teal-300"
             >
               <Plus size={14} /> Adicionar medicamento
@@ -115,7 +131,10 @@ export function AddPrescriptionModal({ patientId, onClose, onSuccess }: AddPresc
           </div>
 
           {fields.map((field, index) => (
-            <div key={field.id} className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
+            <div
+              key={field.id}
+              className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30"
+            >
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Medicamento {index + 1}
@@ -195,11 +214,24 @@ export function AddPrescriptionModal({ patientId, onClose, onSuccess }: AddPresc
           ))}
         </div>
         <div className="flex justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={saving}
+          >
             Cancelar
           </Button>
-          <Button type="submit" disabled={saving} className="bg-teal-600 text-white hover:bg-teal-700">
-            {saving ? <Loader2 size={16} className="animate-spin" /> : 'Salvar Receita'}
+          <Button
+            type="submit"
+            disabled={saving}
+            className="bg-teal-600 text-white hover:bg-teal-700"
+          >
+            {saving ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              'Salvar Receita'
+            )}
           </Button>
         </div>
       </form>

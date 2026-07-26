@@ -56,10 +56,10 @@ const InputWithLabelInner = React.forwardRef<
         return (
           <div className={cn('w-full', containerClassName)}>
             {label && (
-              <div className='mb-2 flex items-center gap-2'>
+              <div className="mb-2 flex items-center gap-2">
                 <Label
                   {...(required ? { required } : {})}
-                  className='text-sm font-medium text-slate-700 dark:text-slate-300'
+                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   {label}
                 </Label>
@@ -68,13 +68,13 @@ const InputWithLabelInner = React.forwardRef<
                     <Tooltip open={open} onOpenChange={setOpen}>
                       <TooltipTrigger asChild>
                         <button
-                          type='button'
-                          className='inline-flex'
+                          type="button"
+                          className="inline-flex"
                           onClick={() => setOpen(!open)}
                           onMouseEnter={() => setOpen(true)}
                           onMouseLeave={() => setOpen(false)}
                         >
-                          <Info className='h-4 w-4 cursor-help text-slate-400 dark:text-slate-500' />
+                          <Info className="h-4 w-4 cursor-help text-slate-400 dark:text-slate-500" />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
@@ -85,7 +85,7 @@ const InputWithLabelInner = React.forwardRef<
                 )}
               </div>
             )}
-            <div className='relative'>
+            <div className="relative">
               <Input
                 className={cn(
                   error &&
@@ -98,13 +98,13 @@ const InputWithLabelInner = React.forwardRef<
                 {...props}
               />
               {endAdornment && (
-                <div className='absolute inset-y-0 right-3 flex items-center'>
+                <div className="absolute inset-y-0 right-3 flex items-center">
                   {endAdornment}
                 </div>
               )}
             </div>
             {error && (
-              <p className='mt-1 text-xs text-red-500 dark:text-red-400'>{error}</p>
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
             )}
           </div>
         );

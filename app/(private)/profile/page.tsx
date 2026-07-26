@@ -7,10 +7,10 @@ import { SectionCard } from '@/app/components/data/section-card';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { STORAGE_KEYS } from '@/constants';
-import type { User as AuthUser } from '@/types/auth';
+import { useAuth } from '@/infra/auth-context';
 
 export default function Profile() {
+  const { user } = useAuth();
   const [profile, setProfile] = useState({
     name: '',
     email: '',
@@ -18,20 +18,12 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    if (!storedUser) return;
-
-    try {
-      const user = JSON.parse(storedUser) as AuthUser;
-      setProfile({
-        name: user.name ?? '',
-        email: user.email ?? '',
-        crmv: user.crmv ?? '',
-      });
-    } catch {
-      setProfile({ name: '', email: '', crmv: '' });
-    }
-  }, []);
+    setProfile({
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      crmv: user?.crmv ?? '',
+    });
+  }, [user]);
 
   return (
     <div className="space-y-6">
@@ -53,21 +45,27 @@ export default function Profile() {
               type="text"
               value={profile.name}
               tooltip="Nome completo do profissional"
-              onChange={(event) => setProfile({ ...profile, name: event.target.value })}
+              onChange={(event) =>
+                setProfile({ ...profile, name: event.target.value })
+              }
             />
             <InputWithLabel
               label="CRMV"
               type="text"
               value={profile.crmv}
               tooltip="Conselho Regional de Medicina Veterinária"
-              onChange={(event) => setProfile({ ...profile, crmv: event.target.value })}
+              onChange={(event) =>
+                setProfile({ ...profile, crmv: event.target.value })
+              }
             />
             <InputWithLabel
               label="E-mail"
               type="email"
               value={profile.email}
               tooltip="Endereço de e-mail da conta"
-              onChange={(event) => setProfile({ ...profile, email: event.target.value })}
+              onChange={(event) =>
+                setProfile({ ...profile, email: event.target.value })
+              }
               containerClassName="md:col-span-2"
             />
           </div>
@@ -75,10 +73,16 @@ export default function Profile() {
 
         <SectionCard title="Segurança" subtitle="Proteja sua conta pessoal">
           <div className="space-y-3">
-            <Button variant="outline" className="h-12 w-full justify-start gap-3">
+            <Button
+              variant="outline"
+              className="h-12 w-full justify-start gap-3"
+            >
               <Lock size={20} /> Alterar senha
             </Button>
-            <Button variant="outline" className="h-12 w-full justify-start gap-3">
+            <Button
+              variant="outline"
+              className="h-12 w-full justify-start gap-3"
+            >
               <Shield size={20} /> Autenticação 2FA
             </Button>
           </div>

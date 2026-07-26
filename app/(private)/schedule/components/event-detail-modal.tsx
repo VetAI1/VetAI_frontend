@@ -1,4 +1,11 @@
-import { CalendarDays, Clock, Pencil, PawPrint, Trash2, User } from 'lucide-react';
+import {
+  CalendarDays,
+  Clock,
+  Pencil,
+  PawPrint,
+  Trash2,
+  User,
+} from 'lucide-react';
 
 import { Modal } from '@/app/components/common/modal';
 import { Button } from '@/components/ui/button';
@@ -13,7 +20,12 @@ interface EventDetailModalProps {
   onEdit: (event: ScheduleEvent) => void;
 }
 
-export function EventDetailModal({ event, onClose, onDelete, onEdit }: EventDetailModalProps) {
+export function EventDetailModal({
+  event,
+  onClose,
+  onDelete,
+  onEdit,
+}: EventDetailModalProps) {
   const typeInfo = EVENT_TYPE_MAP[event.type];
 
   async function handleDelete() {
@@ -26,24 +38,32 @@ export function EventDetailModal({ event, onClose, onDelete, onEdit }: EventDeta
   const labelCls = 'text-slate-500 dark:text-slate-400 min-w-[80px]';
   const valueCls = 'text-slate-900 dark:text-white font-medium';
 
-  const dateFormatted = new Date(`${event.date}T00:00:00`).toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const dateFormatted = new Date(`${event.date}T00:00:00`).toLocaleDateString(
+    'pt-BR',
+    {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    },
+  );
 
   return (
     <Modal title={event.title} onClose={onClose} maxWidth="md">
       <div className="flex flex-col gap-4">
-        <span className={`inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-full text-xs font-semibold border ${typeInfo.bg} ${typeInfo.color}`}>
+        <span
+          className={`inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-full text-xs font-semibold border ${typeInfo.bg} ${typeInfo.color}`}
+        >
           <span className={`w-1.5 h-1.5 rounded-full ${typeInfo.dot}`} />
           {typeInfo.label}
         </span>
 
         <div className="flex flex-col gap-3">
           <div className={rowCls}>
-            <CalendarDays size={16} className="text-slate-400 mt-0.5 shrink-0" />
+            <CalendarDays
+              size={16}
+              className="text-slate-400 mt-0.5 shrink-0"
+            />
             <div>
               <span className={labelCls}>Data</span>
               <p className={`${valueCls} capitalize`}>{dateFormatted}</p>
@@ -55,7 +75,8 @@ export function EventDetailModal({ event, onClose, onDelete, onEdit }: EventDeta
             <div>
               <span className={labelCls}>Horário</span>
               <p className={valueCls}>
-                {event.startTime}{event.endTime ? ` – ${event.endTime}` : ''}
+                {event.startTime}
+                {event.endTime ? ` – ${event.endTime}` : ''}
               </p>
             </div>
           </div>
@@ -98,9 +119,14 @@ export function EventDetailModal({ event, onClose, onDelete, onEdit }: EventDeta
             <Trash2 size={15} /> Excluir
           </Button>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={onClose}>Fechar</Button>
+            <Button variant="outline" onClick={onClose}>
+              Fechar
+            </Button>
             <Button
-              onClick={() => { onEdit(event); onClose(); }}
+              onClick={() => {
+                onEdit(event);
+                onClose();
+              }}
               className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600 gap-1.5"
             >
               <Pencil size={14} /> Editar

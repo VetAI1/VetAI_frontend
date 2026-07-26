@@ -52,11 +52,13 @@ export function AddEventModal({
   const isEditing = !!editingEvent;
   const [patientOpen, setPatientOpen] = useState(false);
   const [tutorOpen, setTutorOpen] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState<(ComboBoxItem & { tutorId?: string }) | null>(
-    editingEvent?.patientName
-      ? { id: editingEvent.patientName, label: editingEvent.patientName }
-      : null,
-  );
+  const [selectedPatient, setSelectedPatient] = useState<
+    (ComboBoxItem & { tutorId?: string }) | null
+      >(
+      editingEvent?.patientName
+        ? { id: editingEvent.patientName, label: editingEvent.patientName }
+        : null,
+      );
   const [selectedTutor, setSelectedTutor] = useState<ComboBoxItem | null>(
     editingEvent?.tutorName
       ? { id: editingEvent.tutorName, label: editingEvent.tutorName }
@@ -93,7 +95,9 @@ export function AddEventModal({
     setValue,
     formState: { errors },
   } = useForm<ScheduleEventFormData>({
-    resolver: yupResolver(scheduleEventSchema) as Resolver<ScheduleEventFormData>,
+    resolver: yupResolver(
+      scheduleEventSchema,
+    ) as Resolver<ScheduleEventFormData>,
     defaultValues: {
       title: editingEvent?.title ?? '',
       description: editingEvent?.description ?? '',
@@ -140,7 +144,9 @@ export function AddEventModal({
   const onSubmit = async (data: ScheduleEventFormData) => {
     const payload = {
       title: data.title.trim(),
-      ...(data.description?.trim() ? { description: data.description.trim() } : {}),
+      ...(data.description?.trim()
+        ? { description: data.description.trim() }
+        : {}),
       date: data.date,
       startTime: data.startTime,
       ...(data.endTime ? { endTime: data.endTime } : {}),
@@ -158,19 +164,19 @@ export function AddEventModal({
   return (
     <Modal
       title={isEditing ? 'Editar Evento' : 'Novo Evento'}
-      description='Preencha os dados do agendamento'
+      description="Preencha os dados do agendamento"
       onClose={onClose}
-      maxWidth='md'
+      maxWidth="md"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <Controller
-          name='title'
+          name="title"
           control={control}
           render={({ field }) => (
             <InputWithLabel
-              label='Título'
+              label="Título"
               required
-              placeholder='Ex: Consulta de rotina'
+              placeholder="Ex: Consulta de rotina"
               value={field.value}
               onChange={field.onChange}
               error={errors.title?.message}
@@ -178,15 +184,15 @@ export function AddEventModal({
           )}
         />
 
-        <div className='grid grid-cols-2 gap-3'>
+        <div className="grid grid-cols-2 gap-3">
           <Controller
-            name='date'
+            name="date"
             control={control}
             render={({ field }) => (
               <InputWithLabel
-                label='Data'
+                label="Data"
                 required
-                placeholder='aaaa-mm-dd'
+                placeholder="aaaa-mm-dd"
                 value={field.value}
                 onChange={field.onChange}
                 error={errors.date?.message}
@@ -195,31 +201,33 @@ export function AddEventModal({
           />
 
           <Controller
-            name='type'
+            name="type"
             control={control}
             render={({ field }) => (
               <SelectInput
-                label='Tipo'
+                label="Tipo"
                 required
                 value={field.value}
                 onChange={(value) => field.onChange(value as EventType)}
-                options={(Object.keys(EVENT_TYPE_MAP) as EventType[]).map((type) => ({
-                  value: type,
-                  label: EVENT_TYPE_MAP[type].label,
-                }))}
+                options={(Object.keys(EVENT_TYPE_MAP) as EventType[]).map(
+                  (type) => ({
+                    value: type,
+                    label: EVENT_TYPE_MAP[type].label,
+                  }),
+                )}
                 error={errors.type?.message}
               />
             )}
           />
         </div>
 
-        <div className='grid grid-cols-2 gap-3'>
+        <div className="grid grid-cols-2 gap-3">
           <Controller
-            name='startTime'
+            name="startTime"
             control={control}
             render={({ field }) => (
               <TimeInput
-                label='Horário início'
+                label="Horário início"
                 required
                 value={field.value}
                 onChange={field.onChange}
@@ -231,11 +239,11 @@ export function AddEventModal({
           />
 
           <Controller
-            name='endTime'
+            name="endTime"
             control={control}
             render={({ field }) => (
               <TimeInput
-                label='Horário fim'
+                label="Horário fim"
                 value={field.value ?? ''}
                 onChange={field.onChange}
                 minHour={minHour}
@@ -247,9 +255,9 @@ export function AddEventModal({
         </div>
 
         <SearchSelect
-          label='Paciente'
+          label="Paciente"
           required
-          placeholder='Buscar paciente...'
+          placeholder="Buscar paciente..."
           search={patientSearch}
           onSearchChange={setPatientSearch}
           options={patients.map((patient) => ({
@@ -269,13 +277,13 @@ export function AddEventModal({
             setValue('patientName', '', { shouldValidate: true });
           }}
           error={errors.patientName?.message}
-          emptyMessage='Nenhum paciente encontrado'
+          emptyMessage="Nenhum paciente encontrado"
         />
 
         <SearchSelect
-          label='Tutor'
+          label="Tutor"
           required
-          placeholder='Buscar tutor...'
+          placeholder="Buscar tutor..."
           search={tutorSearch}
           onSearchChange={setTutorSearch}
           options={tutors.map((tutor) => ({
@@ -297,28 +305,31 @@ export function AddEventModal({
             setValue('tutorName', '', { shouldValidate: true });
           }}
           error={errors.tutorName?.message}
-          emptyMessage='Nenhum tutor encontrado'
+          emptyMessage="Nenhum tutor encontrado"
         />
 
         <Controller
-          name='description'
+          name="description"
           control={control}
           render={({ field }) => (
             <FormTextarea
-              label='Descrição'
+              label="Descrição"
               rows={3}
-              placeholder='Observações adicionais...'
+              placeholder="Observações adicionais..."
               value={field.value ?? ''}
               onChange={field.onChange}
               error={errors.description?.message}
             />
           )}
         />
-        <div className='flex justify-end gap-2 pt-1'>
-          <Button type='button' variant='outline' onClick={onClose}>
+        <div className="flex justify-end gap-2 pt-1">
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type='submit' className='border-teal-600 bg-teal-600 text-white hover:bg-teal-700'>
+          <Button
+            type="submit"
+            className="border-teal-600 bg-teal-600 text-white hover:bg-teal-700"
+          >
             {isEditing ? 'Salvar alterações' : 'Salvar evento'}
           </Button>
         </div>

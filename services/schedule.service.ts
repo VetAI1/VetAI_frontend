@@ -22,7 +22,10 @@ export const scheduleService = {
     return this.list({ date, size: 500, sort: 'startTime', direction: 'asc' });
   },
 
-  async listByPatient(patientName: string, fromDate?: string): Promise<ScheduleEvent[]> {
+  async listByPatient(
+    patientName: string,
+    fromDate?: string,
+  ): Promise<ScheduleEvent[]> {
     const params: ScheduleListParams = {
       patientName,
       size: 500,

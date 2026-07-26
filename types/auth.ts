@@ -11,7 +11,6 @@ export interface User {
 
 export interface AuthResponse {
   access_token: string;
-  refresh_token: string;
   user: User;
   message?: string;
   checkout_url?: string | null;
@@ -19,7 +18,6 @@ export interface AuthResponse {
 
 export interface RefreshResponse {
   access_token: string;
-  refresh_token: string;
   user: User;
 }
 
@@ -49,9 +47,4 @@ export interface RegisterPayload {
     name: string;
     crmv: string;
   };
-}
-
-export interface AuthTokens {
-  access_token: string;
-  refresh_token: string;
 }

@@ -48,7 +48,9 @@ export function useConsultation({
   consultationId,
   initialMessages,
 }: UseConsultationOptions) {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages ?? []);
+  const [messages, setMessages] = useState<ChatMessage[]>(
+    initialMessages ?? [],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const [diseases, setDiseases] = useState<ConsultationDisease[]>([]);
@@ -83,9 +85,12 @@ export function useConsultation({
         ];
       });
 
-      if (payload.diseases?.length > 0) setDiseases(sortDiseases(payload.diseases));
-      if (payload.suggestedInfo?.length > 0) setSuggestedInfo(payload.suggestedInfo);
-      if (payload.suggestedTreatments?.length > 0) setSuggestedTreatments(payload.suggestedTreatments);
+      if (payload.diseases?.length > 0)
+        setDiseases(sortDiseases(payload.diseases));
+      if (payload.suggestedInfo?.length > 0)
+        setSuggestedInfo(payload.suggestedInfo);
+      if (payload.suggestedTreatments?.length > 0)
+        setSuggestedTreatments(payload.suggestedTreatments);
 
       setIsLoading(false);
     };
@@ -94,8 +99,10 @@ export function useConsultation({
       setIsFinished(true);
       setIsFinishing(false);
       setSummary(payload.summary);
-      if (payload.diseases?.length > 0) setDiseases(sortDiseases(payload.diseases));
-      if (payload.suggestedTreatments?.length > 0) setSuggestedTreatments(payload.suggestedTreatments);
+      if (payload.diseases?.length > 0)
+        setDiseases(sortDiseases(payload.diseases));
+      if (payload.suggestedTreatments?.length > 0)
+        setSuggestedTreatments(payload.suggestedTreatments);
       setIsLoading(false);
     };
 
@@ -111,7 +118,8 @@ export function useConsultation({
           {
             id: nextIdRef.current,
             role: 'assistant' as const,
-            content: 'Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.',
+            content:
+              'Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.',
             timestamp: new Date(),
           },
         ];
@@ -119,12 +127,16 @@ export function useConsultation({
       setIsLoading(false);
     };
 
-    const handleAutoFinished = (payload: ConsultationFinishedPayload & { consultationId: string }) => {
+    const handleAutoFinished = (
+      payload: ConsultationFinishedPayload & { consultationId: string },
+    ) => {
       setIsFinished(true);
       setIsFinishing(false);
       setSummary(payload.summary);
-      if (payload.diseases?.length > 0) setDiseases(sortDiseases(payload.diseases));
-      if (payload.suggestedTreatments?.length > 0) setSuggestedTreatments(payload.suggestedTreatments);
+      if (payload.diseases?.length > 0)
+        setDiseases(sortDiseases(payload.diseases));
+      if (payload.suggestedTreatments?.length > 0)
+        setSuggestedTreatments(payload.suggestedTreatments);
       setIsLoading(false);
       setError('Consulta finalizada automaticamente por inatividade.');
     };
@@ -199,7 +211,11 @@ export function useConsultation({
     ) => {
       setMessages(newMessages);
       nextIdRef.current = newMessages.length;
-      setDiseases(initialDiagnosis?.diseases?.length ? sortDiseases(initialDiagnosis.diseases) : []);
+      setDiseases(
+        initialDiagnosis?.diseases?.length
+          ? sortDiseases(initialDiagnosis.diseases)
+          : [],
+      );
       setSuggestedInfo(initialDiagnosis?.suggestedQuestions ?? []);
       setSuggestedTreatments(initialDiagnosis?.suggestedTreatments ?? []);
       setIsFinished(false);

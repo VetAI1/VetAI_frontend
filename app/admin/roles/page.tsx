@@ -5,7 +5,10 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { DataTable, type DataTableColumn } from '@/app/components/data/data-table';
+import {
+  DataTable,
+  type DataTableColumn,
+} from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -44,7 +47,7 @@ export default function AdminRoles() {
       key: 'name',
       header: 'Nome',
       render: (role) => (
-        <span className='font-medium text-slate-900 dark:text-white'>
+        <span className="font-medium text-slate-900 dark:text-white">
           {role.name}
         </span>
       ),
@@ -53,7 +56,7 @@ export default function AdminRoles() {
       key: 'description',
       header: 'Descrição',
       render: (role) => (
-        <span className='text-sm text-slate-500'>
+        <span className="text-sm text-slate-500">
           {role.description || '-'}
         </span>
       ),
@@ -62,14 +65,14 @@ export default function AdminRoles() {
       key: 'permissions',
       header: 'Permissões',
       render: (role) => (
-        <span className='text-sm'>{role.permissions.length}</span>
+        <span className="text-sm">{role.permissions.length}</span>
       ),
     },
     {
       key: 'collaborators_count',
       header: 'Colaboradores',
       render: (role) => (
-        <span className='text-sm'>{role.collaborators_count}</span>
+        <span className="text-sm">{role.collaborators_count}</span>
       ),
     },
     {
@@ -77,20 +80,20 @@ export default function AdminRoles() {
       header: 'Ações',
       align: 'right',
       render: (role) => (
-        <div className='flex justify-end gap-2'>
-          <Button asChild variant='outline' size='sm'>
+        <div className="flex justify-end gap-2">
+          <Button asChild variant="outline" size="sm">
             <Link href={`/admin/roles/${role.id}`}>Abrir</Link>
           </Button>
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onClick={() => removeRole(role)}
             disabled={
               !canEdit || role.is_default || role.permissions?.includes('*')
             }
-            className='text-red-600'
+            className="text-red-600"
           >
-            <Trash2 className='h-4 w-4' />
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -98,34 +101,34 @@ export default function AdminRoles() {
   ];
 
   return (
-    <div className='mx-auto flex w-full max-w-7xl flex-col gap-8 pb-12'>
-      <Header title='Papel administrativo' showStorage={false} />
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 pb-12">
+      <Header title="Papel administrativo" showStorage={false} />
 
       <SectionCard
-        title='Listagem de papéis administrativos'
-        subtitle='Crie, visualize e edite permissões e colaboradores'
+        title="Listagem de papéis administrativos"
+        subtitle="Crie, visualize e edite permissões e colaboradores"
         headerAction={
           <Button
             asChild
             disabled={!canEdit}
-            className='bg-teal-600 text-white hover:bg-teal-700'
+            className="bg-teal-600 text-white hover:bg-teal-700"
           >
-            <Link href='/admin/roles/new'>
-              <Plus className='h-4 w-4' /> Novo papel
+            <Link href="/admin/roles/new">
+              <Plus className="h-4 w-4" /> Novo papel
             </Link>
           </Button>
         }
       >
         {loading ? (
-          <div className='flex justify-center py-10 text-slate-500'>
-            <Loader2 className='animate-spin' />
+          <div className="flex justify-center py-10 text-slate-500">
+            <Loader2 className="animate-spin" />
           </div>
         ) : (
           <DataTable
             columns={columns}
             data={roles}
             getRowKey={(role) => role.id}
-            emptyState='Nenhum papel administrativo criado.'
+            emptyState="Nenhum papel administrativo criado."
           />
         )}
       </SectionCard>

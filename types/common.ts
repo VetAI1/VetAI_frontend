@@ -20,5 +20,6 @@ export interface QueryParams {
   search?: string | undefined;
 }
 
-export type PaginatedQueryParams<TFilters extends object = Record<string, never>> =
-  QueryParams & TFilters;
+export type PaginatedQueryParams<
+  TFilters extends object = Record<string, never>,
+> = QueryParams & TFilters;

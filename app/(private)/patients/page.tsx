@@ -24,7 +24,11 @@ export default function PatientsPage() {
   const fetchPatients = useCallback(async (searchQuery?: string, page = 1) => {
     setLoading(true);
     try {
-      const response = await patientsService.list({ page, size: 10, search: searchQuery });
+      const response = await patientsService.list({
+        page,
+        size: 10,
+        search: searchQuery,
+      });
       setPatients(response.data);
       setMeta(response.meta);
     } catch {
@@ -34,7 +38,9 @@ export default function PatientsPage() {
     }
   }, []);
 
-  useEffect(() => { void fetchPatients(); }, [fetchPatients]);
+  useEffect(() => {
+    void fetchPatients();
+  }, [fetchPatients]);
 
   const handleSearch = (value: string) => {
     setSearch(value);
@@ -44,7 +50,9 @@ export default function PatientsPage() {
   const handleCreateSuccess = (patient: Patient) => {
     setShowCreateModal(false);
     setPatients((prev) => [patient, ...prev]);
-    setMeta((prev) => prev ? { ...prev, total_elements: prev.total_elements + 1 } : prev);
+    setMeta((prev) =>
+      prev ? { ...prev, total_elements: prev.total_elements + 1 } : prev,
+    );
   };
 
   return (
@@ -54,7 +62,9 @@ export default function PatientsPage() {
 
         <SectionCard
           title="Pacientes cadastrados"
-          subtitle={meta ? `${meta.total_elements} pacientes no total` : 'Carregando...'}
+          subtitle={
+            meta ? `${meta.total_elements} pacientes no total` : 'Carregando...'
+          }
           headerAction={
             <Button
               onClick={() => setShowCreateModal(true)}
@@ -73,15 +83,23 @@ export default function PatientsPage() {
             {loading ? (
               <tr>
                 <td colSpan={5} className="p-8 text-center">
-                  <Loader2 size={24} className="animate-spin text-teal-600 mx-auto" />
+                  <Loader2
+                    size={24}
+                    className="animate-spin text-teal-600 mx-auto"
+                  />
                 </td>
               </tr>
             ) : patients.length === 0 ? (
               <tr>
                 <td colSpan={5} className="p-8 text-center">
-                  <PawPrint size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                  <PawPrint
+                    size={32}
+                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                  />
                   <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    {search ? 'Nenhum paciente encontrado.' : 'Nenhum paciente cadastrado ainda.'}
+                    {search
+                      ? 'Nenhum paciente encontrado.'
+                      : 'Nenhum paciente cadastrado ainda.'}
                   </p>
                 </td>
               </tr>
@@ -92,11 +110,19 @@ export default function PatientsPage() {
                   className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
                 >
                   <td className="p-4">
-                    <Link href={`/patients/detail?id=${patient.id}`} className="flex items-center gap-3">
+                    <Link
+                      href={`/patients/detail?id=${patient.id}`}
+                      className="flex items-center gap-3"
+                    >
                       <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
-                        <PawPrint size={18} className="text-teal-600 dark:text-teal-400" />
+                        <PawPrint
+                          size={18}
+                          className="text-teal-600 dark:text-teal-400"
+                        />
                       </div>
-                      <p className="font-medium text-slate-900 dark:text-white">{patient.name}</p>
+                      <p className="font-medium text-slate-900 dark:text-white">
+                        {patient.name}
+                      </p>
                     </Link>
                   </td>
                   <td className="p-4 text-slate-600 dark:text-slate-300">
@@ -110,7 +136,10 @@ export default function PatientsPage() {
                   </td>
                   <td className="p-4 text-right">
                     <Link href={`/patients/detail?id=${patient.id}`}>
-                      <ChevronRight className="inline text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors" size={20} />
+                      <ChevronRight
+                        className="inline text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors"
+                        size={20}
+                      />
                     </Link>
                   </td>
                 </tr>

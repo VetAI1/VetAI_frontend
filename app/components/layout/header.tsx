@@ -13,7 +13,13 @@ interface HeaderProps {
   headerAction?: React.ReactNode;
 }
 
-export function Header({ title, usedGB = 0, totalGB = 0, showStorage = true, headerAction }: HeaderProps) {
+export function Header({
+  title,
+  usedGB = 0,
+  totalGB = 0,
+  showStorage = true,
+  headerAction,
+}: HeaderProps) {
   const percentage = (usedGB / totalGB) * 100;
   const [isDark, setIsDark] = useState(false);
 
@@ -36,8 +42,15 @@ export function Header({ title, usedGB = 0, totalGB = 0, showStorage = true, hea
     <div className="mb-8 mt-16 md:mt-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex justify-between items-center w-full md:w-auto">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{title}</h1>
-          <Button variant="outline" size="icon" onClick={toggleTheme} className="md:hidden">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+            {title}
+          </h1>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleTheme}
+            className="md:hidden"
+          >
             {isDark ? <Sun /> : <Moon />}
           </Button>
         </div>
@@ -51,7 +64,12 @@ export function Header({ title, usedGB = 0, totalGB = 0, showStorage = true, hea
               <Progress value={percentage} className="h-2.5" />
             </div>
           )}
-          <Button variant="outline" size="icon" onClick={toggleTheme} className="hidden md:flex">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleTheme}
+            className="hidden md:flex"
+          >
             {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </Button>
         </div>

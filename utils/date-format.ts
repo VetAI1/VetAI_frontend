@@ -3,7 +3,10 @@ export function fmtDate(iso: string): string {
 }
 
 export function fmtDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+  return new Date(iso).toLocaleString('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
 }
 
 export function normalizeProb(p: number): number {

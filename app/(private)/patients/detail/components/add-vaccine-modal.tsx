@@ -69,7 +69,10 @@ export function AddVaccineModal({
 
   const date = watch('date');
 
-  const calcRevaccinationDate = (appDate: string, periodDays?: number): string => {
+  const calcRevaccinationDate = (
+    appDate: string,
+    periodDays?: number,
+  ): string => {
     if (!appDate || !periodDays) return '';
     const nextDate = new Date(appDate);
     nextDate.setDate(nextDate.getDate() + periodDays);
@@ -78,7 +81,10 @@ export function AddVaccineModal({
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setShowVaccineDropdown(false);
       }
     };
@@ -94,10 +100,15 @@ export function AddVaccineModal({
     setLoadingPrevDose(true);
 
     try {
-      const last = await healthRecordsService.getLastVaccine(patientId, vaccine.id);
+      const last = await healthRecordsService.getLastVaccine(
+        patientId,
+        vaccine.id,
+      );
       if (last) {
         const meta = last.metadata as VaccineMetadata;
-        setValue('previousDoseDate', last.date.slice(0, 10), { shouldValidate: true });
+        setValue('previousDoseDate', last.date.slice(0, 10), {
+          shouldValidate: true,
+        });
         const doseMap: Record<string, string> = {
           '1ª Dose': '2ª Dose',
           '2ª Dose': '3ª Dose',
@@ -105,7 +116,9 @@ export function AddVaccineModal({
           '4ª Dose': 'Reforço',
         };
         if (meta.dose_number && doseMap[meta.dose_number]) {
-          setValue('doseNumber', doseMap[meta.dose_number]!, { shouldValidate: true });
+          setValue('doseNumber', doseMap[meta.dose_number]!, {
+            shouldValidate: true,
+          });
         }
       } else {
         setValue('previousDoseDate', '', { shouldValidate: true });
@@ -135,8 +148,10 @@ export function AddVaccineModal({
           batch: data.batch || undefined,
           dose_number: data.doseNumber,
           revaccination_date:
-            calcRevaccinationDate(data.date, selectedVaccine.revaccination_period_days) ||
-            undefined,
+            calcRevaccinationDate(
+              data.date,
+              selectedVaccine.revaccination_period_days,
+            ) || undefined,
           previous_dose_date: data.previousDoseDate || undefined,
           applied_by: data.appliedBy || undefined,
         },
@@ -156,9 +171,9 @@ export function AddVaccineModal({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <SearchSelect
-          label='Vacina'
+          label="Vacina"
           required
-          placeholder='Buscar vacina no catálogo...'
+          placeholder="Buscar vacina no catálogo..."
           search={vaccineSearch}
           onSearchChange={setVaccineSearch}
           options={catalogVaccines.map((vaccine) => ({
@@ -169,15 +184,19 @@ export function AddVaccineModal({
           loading={loadingCatalog}
           open={showVaccineDropdown}
           onOpenChange={setShowVaccineDropdown}
-          selectedOption={selectedVaccine
-            ? {
-              id: selectedVaccine.id,
-              label: selectedVaccine.name,
-              description: selectedVaccine.code,
-            }
-            : null}
+          selectedOption={
+            selectedVaccine
+              ? {
+                id: selectedVaccine.id,
+                label: selectedVaccine.name,
+                description: selectedVaccine.code,
+              }
+              : null
+          }
           onSelect={(option) => {
-            const vaccine = catalogVaccines.find((item) => item.id === option.id);
+            const vaccine = catalogVaccines.find(
+              (item) => item.id === option.id,
+            );
             if (!vaccine) return;
             void handleSelectVaccine(vaccine);
           }}
@@ -187,12 +206,13 @@ export function AddVaccineModal({
             setValue('previousDoseDate', '', { shouldValidate: true });
           }}
           error={errors.vaccineId?.message}
-          emptyMessage='Nenhuma vacina no catálogo'
+          emptyMessage="Nenhuma vacina no catálogo"
         />
 
         {loadingPrevDose && (
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <Loader2 size={12} className="animate-spin" /> Buscando dose anterior...
+            <Loader2 size={12} className="animate-spin" /> Buscando dose
+            anterior...
           </div>
         )}
 
@@ -269,20 +289,28 @@ export function AddVaccineModal({
               Próxima Revacinação (calculada automaticamente)
             </p>
             <p className="text-sm font-semibold text-teal-900 dark:text-teal-300">
-              {calcRevaccinationDate(date, selectedVaccine.revaccination_period_days)
+              {calcRevaccinationDate(
+                date,
+                selectedVaccine.revaccination_period_days,
+              )
                 ? new Date(
-                  calcRevaccinationDate(date, selectedVaccine.revaccination_period_days),
+                  calcRevaccinationDate(
+                    date,
+                    selectedVaccine.revaccination_period_days,
+                  ),
                 ).toLocaleDateString('pt-BR')
                 : '—'}
             </p>
             <p className="mt-0.5 text-xs text-teal-600 dark:text-teal-500">
-              Baseado no período de {selectedVaccine.revaccination_period_days} dias da vacina
+              Baseado no período de {selectedVaccine.revaccination_period_days}{' '}
+              dias da vacina
             </p>
           </div>
         ) : selectedVaccine ? (
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-700/50">
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Esta vacina não possui período de revacinação definido no catálogo.
+              Esta vacina não possui período de revacinação definido no
+              catálogo.
             </p>
           </div>
         ) : null}
@@ -316,10 +344,19 @@ export function AddVaccineModal({
           )}
         />
         <div className="flex justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={saving}
+          >
             Cancelar
           </Button>
-          <Button type="submit" disabled={saving} className="bg-teal-600 text-white hover:bg-teal-700">
+          <Button
+            type="submit"
+            disabled={saving}
+            className="bg-teal-600 text-white hover:bg-teal-700"
+          >
             {saving ? <Loader2 size={16} className="animate-spin" /> : 'Salvar'}
           </Button>
         </div>

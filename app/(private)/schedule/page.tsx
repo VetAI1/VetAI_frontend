@@ -1,12 +1,21 @@
 'use client';
 
-import { CalendarDays, ChevronLeft, ChevronRight, LayoutGrid, Plus } from 'lucide-react';
+import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
+  Plus,
+} from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { AddEventModal } from './components/add-event-modal';
 import { Calendar } from './components/calendar';
 import { EventDetailModal } from './components/event-detail-modal';
-import { ScheduleSettings, loadScheduleSettings } from './components/schedule-settings';
+import {
+  ScheduleSettings,
+  loadScheduleSettings,
+} from './components/schedule-settings';
 import type { ScheduleSettingsState } from './components/schedule-settings';
 import { TodayEventsList } from './components/today-events-list';
 import { WeekCalendar } from './components/week-calendar';
@@ -49,22 +58,31 @@ export default function SchedulePage() {
   const now = new Date();
 
   const [viewMode, setViewMode] = useState<ViewMode>('month');
-  const [scheduleSettings, setScheduleSettings] = useState<ScheduleSettingsState>(() => loadScheduleSettings());
+  const [scheduleSettings, setScheduleSettings] =
+    useState<ScheduleSettingsState>(() => loadScheduleSettings());
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(now.getMonth());
-  const [weekStart, setWeekStart] = useState<Date>(() => getWeekStart(todayStr));
+  const [weekStart, setWeekStart] = useState<Date>(() =>
+    getWeekStart(todayStr),
+  );
   const [events, setEvents] = useState<ScheduleEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [detailEvent, setDetailEvent] = useState<ScheduleEvent | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addInitialDate, setAddInitialDate] = useState<string | undefined>(undefined);
+  const [addInitialDate, setAddInitialDate] = useState<string | undefined>(
+    undefined,
+  );
   const [editingEvent, setEditingEvent] = useState<ScheduleEvent | null>(null);
 
   const loadEvents = useCallback(async () => {
     setLoadingEvents(true);
     try {
-      const nextEvents = await scheduleService.list({ size: 500, sort: 'date', direction: 'asc' });
+      const nextEvents = await scheduleService.list({
+        size: 500,
+        sort: 'date',
+        direction: 'asc',
+      });
       setEvents(nextEvents);
     } finally {
       setLoadingEvents(false);
@@ -77,8 +95,10 @@ export default function SchedulePage() {
 
   function prevPeriod() {
     if (viewMode === 'month') {
-      if (currentMonth === 0) { setCurrentYear((y) => y - 1); setCurrentMonth(11); }
-      else setCurrentMonth((m) => m - 1);
+      if (currentMonth === 0) {
+        setCurrentYear((y) => y - 1);
+        setCurrentMonth(11);
+      } else setCurrentMonth((m) => m - 1);
     } else {
       setWeekStart((ws) => {
         const prev = new Date(ws);
@@ -90,8 +110,10 @@ export default function SchedulePage() {
 
   function nextPeriod() {
     if (viewMode === 'month') {
-      if (currentMonth === 11) { setCurrentYear((y) => y + 1); setCurrentMonth(0); }
-      else setCurrentMonth((m) => m + 1);
+      if (currentMonth === 11) {
+        setCurrentYear((y) => y + 1);
+        setCurrentMonth(0);
+      } else setCurrentMonth((m) => m + 1);
     } else {
       setWeekStart((ws) => {
         const next = new Date(ws);
@@ -125,9 +147,10 @@ export default function SchedulePage() {
 
   const selectedEvents = events.filter((e) => e.date === selectedDate);
 
-  const periodLabel = viewMode === 'month'
-    ? `${MONTH_NAMES[currentMonth]} ${currentYear}`
-    : formatWeekRange(weekStart);
+  const periodLabel =
+    viewMode === 'month'
+      ? `${MONTH_NAMES[currentMonth]} ${currentYear}`
+      : formatWeekRange(weekStart);
 
   return (
     <main className="flex min-h-screen flex-col items-start gap-4">
@@ -143,7 +166,10 @@ export default function SchedulePage() {
                     onClick={prevPeriod}
                     className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                   >
-                    <ChevronLeft size={18} className="text-slate-600 dark:text-slate-300" />
+                    <ChevronLeft
+                      size={18}
+                      className="text-slate-600 dark:text-slate-300"
+                    />
                   </button>
 
                   <h2 className="text-base font-bold text-slate-900 dark:text-white min-w-40 text-center">
@@ -154,7 +180,10 @@ export default function SchedulePage() {
                     onClick={nextPeriod}
                     className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                   >
-                    <ChevronRight size={18} className="text-slate-600 dark:text-slate-300" />
+                    <ChevronRight
+                      size={18}
+                      className="text-slate-600 dark:text-slate-300"
+                    />
                   </button>
                 </div>
 

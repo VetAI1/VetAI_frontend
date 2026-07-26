@@ -101,37 +101,37 @@ export function UploadExamModal({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className='absolute inset-0 bg-black/50 backdrop-blur-sm'
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className='relative w-full max-w-lg animate-in rounded-xl bg-white shadow-2xl fade-in zoom-in-95 duration-200 dark:bg-slate-800'>
-        <div className='flex items-center justify-between border-b border-slate-200 p-5 dark:border-slate-700'>
+      <div className="relative w-full max-w-lg animate-in rounded-xl bg-white shadow-2xl fade-in zoom-in-95 duration-200 dark:bg-slate-800">
+        <div className="flex items-center justify-between border-b border-slate-200 p-5 dark:border-slate-700">
           <div>
-            <h2 className='text-lg font-bold text-slate-900 dark:text-white'>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
               Enviar Exame
             </h2>
-            <p className='mt-0.5 text-sm text-slate-500 dark:text-slate-400'>
+            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
               Faça o upload do PDF do exame para análise automática
             </p>
           </div>
           <Button
-            variant='ghost'
-            size='icon-sm'
+            variant="ghost"
+            size="icon-sm"
             onClick={onClose}
-            className='text-slate-500'
+            className="text-slate-500"
           >
             <X size={18} />
           </Button>
         </div>
 
-        <div className='space-y-4 p-5'>
+        <div className="space-y-4 p-5">
           {!preselectedPatient && (
             <SearchSelect
-              label='Paciente'
+              label="Paciente"
               required
-              placeholder='Buscar paciente por nome...'
+              placeholder="Buscar paciente por nome..."
               search={patientSearch}
               onSearchChange={setPatientSearch}
               options={patients.map((patient) => ({
@@ -163,36 +163,36 @@ export function UploadExamModal({
                 setValue('patientId', '', { shouldValidate: true });
               }}
               error={errors.patientId?.message}
-              emptyMessage='Nenhum paciente encontrado'
+              emptyMessage="Nenhum paciente encontrado"
             />
           )}
 
           {preselectedPatient && (
             <div>
-              <label className='mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300'>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Paciente
               </label>
-              <div className='rounded-lg border border-teal-200 bg-teal-50 p-3 dark:border-teal-700 dark:bg-teal-900/20'>
-                <span className='text-sm font-medium text-teal-800 dark:text-teal-300'>
+              <div className="rounded-lg border border-teal-200 bg-teal-50 p-3 dark:border-teal-700 dark:bg-teal-900/20">
+                <span className="text-sm font-medium text-teal-800 dark:text-teal-300">
                   {preselectedPatient.name}
                 </span>
               </div>
             </div>
           )}
 
-          <div className='grid grid-cols-2 gap-3'>
+          <div className="grid grid-cols-2 gap-3">
             <InputWithLabel
-              label='Título do exame'
+              label="Título do exame"
               required
               value={title}
               onChange={(e) =>
                 setValue('title', e.target.value, { shouldValidate: true })
               }
-              placeholder='Ex: Hemograma Completo'
+              placeholder="Ex: Hemograma Completo"
               error={errors.title?.message}
             />
             <DateInput
-              label='Data do exame'
+              label="Data do exame"
               value={examDate}
               onChange={(value) =>
                 setValue('examDate', value, { shouldValidate: true })
@@ -203,30 +203,30 @@ export function UploadExamModal({
           </div>
 
           <FileDropzone
-            label='Arquivo PDF do exame'
+            label="Arquivo PDF do exame"
             required
             file={file}
-            accept='application/pdf'
-            helperText='Apenas arquivos PDF são aceitos'
+            accept="application/pdf"
+            helperText="Apenas arquivos PDF são aceitos"
             error={errors.file?.message}
             onFileSelect={handleFileChange}
           />
         </div>
 
-        <div className='flex items-center justify-end gap-3 border-t border-slate-200 px-5 py-4 dark:border-slate-700'>
-          <Button variant='outline' onClick={onClose} disabled={uploading}>
+        <div className="flex items-center justify-end gap-3 border-t border-slate-200 px-5 py-4 dark:border-slate-700">
+          <Button variant="outline" onClick={onClose} disabled={uploading}>
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
             loading={uploading}
-            className='min-w-[120px] bg-teal-600 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-800'
+            className="min-w-[120px] bg-teal-600 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-800"
           >
             {uploading ? (
               <>Enviando...</>
             ) : (
               <>
-                <Upload size={16} className='mr-2' />
+                <Upload size={16} className="mr-2" />
                 Enviar Exame
               </>
             )}

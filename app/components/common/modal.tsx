@@ -45,9 +45,13 @@ export function Modal({
       >
         <div className="flex items-start justify-between p-5 border-b border-slate-200 dark:border-slate-700 shrink-0">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              {title}
+            </h3>
             {description && (
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                {description}
+              </p>
             )}
           </div>
           <Button

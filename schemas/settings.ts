@@ -7,7 +7,9 @@ export const inviteCollaboratorSchema = yup.object({
     .string()
     .defined()
     .required('Email é obrigatório')
-    .test('valid-email', 'Email inválido', (value) => validateEmail(value ?? '')),
+    .test('valid-email', 'Email inválido', (value) =>
+      validateEmail(value ?? ''),
+    ),
 });
 
 export type InviteCollaboratorFormData = yup.InferType<

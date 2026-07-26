@@ -13,7 +13,15 @@ interface CalendarProps {
   onEventClick: (event: ScheduleEvent) => void;
 }
 
-export function Calendar({ year, month, events, selectedDate, today, onSelectDate, onEventClick }: CalendarProps) {
+export function Calendar({
+  year,
+  month,
+  events,
+  selectedDate,
+  today,
+  onSelectDate,
+  onEventClick,
+}: CalendarProps) {
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month);
 
@@ -33,7 +41,10 @@ export function Calendar({ year, month, events, selectedDate, today, onSelectDat
     <div className="w-full">
       <div className="grid grid-cols-7 mb-1">
         {DAY_NAMES.map((d) => (
-          <div key={d} className="text-center text-xs font-semibold text-slate-500 dark:text-slate-400 py-2">
+          <div
+            key={d}
+            className="text-center text-xs font-semibold text-slate-500 dark:text-slate-400 py-2"
+          >
             {d}
           </div>
         ))}
@@ -74,10 +85,15 @@ export function Calendar({ year, month, events, selectedDate, today, onSelectDat
                 {dayEvents.slice(0, 2).map((ev) => (
                   <button
                     key={ev.id}
-                    onClick={(e) => { e.stopPropagation(); onEventClick(ev); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEventClick(ev);
+                    }}
                     className={`w-full truncate text-[10px] font-medium px-1 py-0.5 rounded flex items-center gap-1 border ${EVENT_TYPE_MAP[ev.type].bg} ${EVENT_TYPE_MAP[ev.type].color} hover:opacity-80 transition-opacity`}
                   >
-                    <span className={`w-1 h-1 rounded-full shrink-0 ${EVENT_TYPE_MAP[ev.type].dot}`} />
+                    <span
+                      className={`w-1 h-1 rounded-full shrink-0 ${EVENT_TYPE_MAP[ev.type].dot}`}
+                    />
                     <span className="truncate">{ev.title}</span>
                   </button>
                 ))}

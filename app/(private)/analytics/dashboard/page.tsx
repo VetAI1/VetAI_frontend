@@ -68,21 +68,21 @@ export default function Dashboard() {
   }, [fetchData]);
 
   return (
-    <div className='flex flex-col gap-8 w-full max-w-7xl mx-auto pb-12'>
-      <header className='flex items-center justify-between'>
+    <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto pb-12">
+      <header className="flex items-center justify-between">
         <div>
-          <h1 className='text-3xl font-bold tracking-tight text-slate-800 dark:text-white'>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white">
             Dashboard Analytics
           </h1>
-          <p className='text-slate-500 text-sm mt-1'>
+          <p className="text-slate-500 text-sm mt-1">
             Visualize o desempenho e estatísticas da sua clínica.
           </p>
         </div>
         <Button
-          variant='outline'
+          variant="outline"
           onClick={fetchData}
           disabled={loading}
-          className='gap-2 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5'
+          className="gap-2 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5"
         >
           <RefreshCcw className={cn('h-4 w-4', loading && 'animate-spin')} />
           Atualizar
@@ -90,51 +90,51 @@ export default function Dashboard() {
       </header>
 
       {/* Metrics Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
-          title='Total de Pacientes'
+          title="Total de Pacientes"
           value={data?.total_patients ?? 0}
-          icon='Users'
-          color='#42A5F5'
+          icon="Users"
+          color="#42A5F5"
           loading={loading}
-          tooltip='Número total de pacientes cadastrados na clínica.'
+          tooltip="Número total de pacientes cadastrados na clínica."
         />
         <MetricCard
-          title='Total de Laudos'
+          title="Total de Laudos"
           value={data?.total_studies ?? 0}
-          icon='ClipboardList'
-          color='#FFA726'
+          icon="ClipboardList"
+          color="#FFA726"
           loading={loading}
-          tooltip='Total de exames e laudos realizados.'
+          tooltip="Total de exames e laudos realizados."
         />
         <MetricCard
-          title='Hoje'
+          title="Hoje"
           value={data?.total_consultations_today ?? 0}
-          icon='Calendar'
-          color='#AB47BC'
+          icon="Calendar"
+          color="#AB47BC"
           loading={loading}
-          tooltip='Consultas agendadas ou realizadas no dia de hoje.'
+          tooltip="Consultas agendadas ou realizadas no dia de hoje."
         />
         <MetricCard
-          title='Total de Consultas'
+          title="Total de Consultas"
           value={data?.total_consultations ?? 0}
-          icon='Stethoscope'
-          color='#66BB6A'
+          icon="Stethoscope"
+          color="#66BB6A"
           loading={loading}
-          tooltip='Total histórico de consultas médicas concluídas.'
+          tooltip="Total histórico de consultas médicas concluídas."
         />
       </div>
 
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Overtime Chart + Today Activities */}
-        <div className='lg:col-span-2 grid grid-cols-1 lg:grid-cols-3 gap-8'>
+        <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-3 gap-8">
           {data?.growth_overtime && (
             <AnalyticsChart
-              type='line'
-              title='Crescimento ao Longo do Tempo'
-              subtitle='Comparativo de novos pacientes e consultas realizadas'
+              type="line"
+              title="Crescimento ao Longo do Tempo"
+              subtitle="Comparativo de novos pacientes e consultas realizadas"
               data={data.growth_overtime}
-              className='lg:col-span-2'
+              className="lg:col-span-2"
               height={310}
               loading={loading}
             />
@@ -142,19 +142,22 @@ export default function Dashboard() {
 
           {/* Today's Activities */}
           <SectionCard
-            title='Atividades de Hoje'
-            subtitle='Eventos agendados para o dia de hoje'
+            title="Atividades de Hoje"
+            subtitle="Eventos agendados para o dia de hoje"
           >
-            <div className='h-[260px] overflow-y-auto mt-2'>
+            <div className="h-[260px] overflow-y-auto mt-2">
               {todayEvents.length === 0 ? (
-                <div className='flex flex-col items-center justify-center h-full text-center py-4'>
-                  <CalendarCheck size={32} className='text-slate-300 dark:text-slate-600 mb-2' />
-                  <p className='text-sm text-slate-500 dark:text-slate-400'>
+                <div className="flex flex-col items-center justify-center h-full text-center py-4">
+                  <CalendarCheck
+                    size={32}
+                    className="text-slate-300 dark:text-slate-600 mb-2"
+                  />
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Nenhuma atividade para hoje.
                   </p>
                 </div>
               ) : (
-                <div className='flex flex-col gap-2'>
+                <div className="flex flex-col gap-2">
                   {todayEvents.map((event) => {
                     const typeInfo = EVENT_TYPE_MAP[event.type];
                     return (
@@ -165,23 +168,34 @@ export default function Dashboard() {
                           typeInfo.bg,
                         )}
                       >
-                        <span className={cn('mt-1 h-2 w-2 shrink-0 rounded-full', typeInfo.dot)} />
-                        <div className='min-w-0 flex-1'>
-                          <div className='flex items-center justify-between gap-2'>
-                            <span className={cn('font-medium truncate', typeInfo.color)}>
+                        <span
+                          className={cn(
+                            'mt-1 h-2 w-2 shrink-0 rounded-full',
+                            typeInfo.dot,
+                          )}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <span
+                              className={cn(
+                                'font-medium truncate',
+                                typeInfo.color,
+                              )}
+                            >
                               {event.title}
                             </span>
-                            <span className='shrink-0 text-xs text-slate-500 dark:text-slate-400'>
-                              {event.startTime}{event.endTime ? ` – ${event.endTime}` : ''}
+                            <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
+                              {event.startTime}
+                              {event.endTime ? ` – ${event.endTime}` : ''}
                             </span>
                           </div>
                           {event.patientName && (
-                            <p className='mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400'>
+                            <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
                               {event.patientName}
                             </p>
                           )}
                           {event.description && (
-                            <p className='mt-0.5 truncate text-xs text-slate-400 dark:text-slate-500'>
+                            <p className="mt-0.5 truncate text-xs text-slate-400 dark:text-slate-500">
                               {event.description}
                             </p>
                           )}
@@ -198,9 +212,9 @@ export default function Dashboard() {
         {/* Species Distribution */}
         {data?.patients_by_specie && (
           <AnalyticsChart
-            type='doughnut'
-            title='Distribuição por Espécie'
-            subtitle='Quais animais são mais atendidos'
+            type="doughnut"
+            title="Distribuição por Espécie"
+            subtitle="Quais animais são mais atendidos"
             data={data.patients_by_specie}
             loading={loading}
           />
@@ -209,9 +223,9 @@ export default function Dashboard() {
         {/* Consultations Status */}
         {data?.consultations_status && (
           <AnalyticsChart
-            type='bar'
-            title='Status das Consultas'
-            subtitle='Acompanhamento do progresso clínico'
+            type="bar"
+            title="Status das Consultas"
+            subtitle="Acompanhamento do progresso clínico"
             data={data.consultations_status}
             loading={loading}
           />
@@ -219,22 +233,22 @@ export default function Dashboard() {
 
         {/* Latest Exams Table */}
         <SectionCard
-          title='Exames recentes'
-          subtitle='Últimos resultados enviados.'
-          className='flex flex-col h-[440px]'
+          title="Exames recentes"
+          subtitle="Últimos resultados enviados."
+          className="flex flex-col h-[440px]"
         >
           <DataTable
             headers={['Data', 'Paciente', 'Título', 'Status', 'Ações']}
-            className='h-full'
+            className="h-full"
           >
             {studies.length === 0 ? (
               <tr>
-                <td colSpan={5} className='p-8 text-center'>
+                <td colSpan={5} className="p-8 text-center">
                   <Microscope
                     size={32}
-                    className='text-slate-300 dark:text-slate-600 mx-auto mb-2'
+                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
                   />
-                  <p className='text-sm text-slate-500 dark:text-slate-400'>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Nenhum exame ainda.
                   </p>
                 </td>
@@ -248,28 +262,30 @@ export default function Dashboard() {
                 return (
                   <tr
                     key={study.id}
-                    className='hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors'
+                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                   >
-                    <td className='p-4 text-slate-600 dark:text-slate-300 text-sm'>
+                    <td className="p-4 text-slate-600 dark:text-slate-300 text-sm">
                       {fmtDate(study.created_at)}
                     </td>
-                    <td className='p-4'>
-                      <span className='font-medium text-slate-900 dark:text-white text-sm'>
+                    <td className="p-4">
+                      <span className="font-medium text-slate-900 dark:text-white text-sm">
                         {study.patient?.name ?? '-'}
                       </span>
                     </td>
-                    <td className='p-4 text-slate-600 dark:text-slate-300 text-sm'>
+                    <td className="p-4 text-slate-600 dark:text-slate-300 text-sm">
                       {study.title ?? 'Sem título'}
                     </td>
-                    <td className='p-4'>
+                    <td className="p-4">
                       <Badge color={statusInfo.color}>{statusInfo.label}</Badge>
                     </td>
-                    <td className='p-4 text-right'>
+                    <td className="p-4 text-right">
                       <Button
                         variant="link"
                         size="sm"
-                        onClick={() => router.push(`/exams/detail?id=${study.id}`)}
-                        className='text-teal-600 h-auto p-0'
+                        onClick={() =>
+                          router.push(`/exams/detail?id=${study.id}`)
+                        }
+                        className="text-teal-600 h-auto p-0"
                       >
                         Abrir
                       </Button>
@@ -283,46 +299,48 @@ export default function Dashboard() {
 
         {/* Latest Patients Card List */}
         <SectionCard
-          title='Últimos Pacientes'
-          subtitle='Pacientes adicionados recentemente'
-          className='flex flex-col h-[440px]'
+          title="Últimos Pacientes"
+          subtitle="Pacientes adicionados recentemente"
+          className="flex flex-col h-[440px]"
         >
-          <div className='flex-1 overflow-y-auto min-h-0'>
-            <div className='flex flex-col gap-3 mt-4'>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="flex flex-col gap-3 mt-4">
               {patients.length === 0 ? (
-                <div className='text-center py-8'>
+                <div className="text-center py-8">
                   <PawPrint
                     size={32}
-                    className='text-slate-300 dark:text-slate-600 mx-auto mb-2'
+                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
                   />
-                  <p className='text-sm text-slate-500 dark:text-slate-400'>
-                  Nenhum paciente ainda.
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Nenhum paciente ainda.
                   </p>
                 </div>
               ) : (
                 patients.map((patient) => (
                   <Card
                     key={patient.id}
-                    className='p-4 shadow-sm border-slate-100 dark:border-white/5'
+                    className="p-4 shadow-sm border-slate-100 dark:border-white/5"
                   >
-                    <div className='flex items-center justify-between'>
-                      <div className='flex items-center gap-3'>
-                        <div className='w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center'>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center">
                           <PawPrint
                             size={18}
-                            className='text-teal-600 dark:text-teal-400'
+                            className="text-teal-600 dark:text-teal-400"
                           />
                         </div>
                         <div>
-                          <h3 className='font-semibold text-gray-900 dark:text-white text-sm'>
+                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
                             {patient.name}
                           </h3>
-                          <p className='text-xs text-slate-500 dark:text-slate-400'>
-                            {SPECIE_LABELS[patient.specie as keyof typeof SPECIE_LABELS] ?? patient.specie}
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {SPECIE_LABELS[
+                              patient.specie as keyof typeof SPECIE_LABELS
+                            ] ?? patient.specie}
                           </p>
                         </div>
                       </div>
-                      <span className='text-xs text-gray-500 dark:text-slate-400'>
+                      <span className="text-xs text-gray-500 dark:text-slate-400">
                         {fmtDate(patient.created_at)}
                       </span>
                     </div>

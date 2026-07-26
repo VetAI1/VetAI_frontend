@@ -9,8 +9,8 @@ import {
   useState,
 } from 'react';
 
-import { STORAGE_KEYS } from '@/constants';
-import { ApiError, setToken, removeToken } from '@/infra/http-client';
+import { refreshAccessToken, removeToken, setToken } from '@/infra/http-client';
+import { disconnectSocket } from '@/infra/socket';
 import { authService } from '@/services/auth.service';
 import type { User } from '@/types/auth';
 
@@ -23,52 +23,39 @@ export function useAuthProvider() {
   });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-
-    if (storedUser && token) {
-      try {
-        const user = JSON.parse(storedUser) as User;
-        void authService
-          .me()
-          .then((currentUser) => {
-            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(currentUser));
-            setState({ user: currentUser, isLoading: false, isAuthenticated: true });
-          })
-          .catch((error: unknown) => {
-            if (error instanceof ApiError && [401, 403].includes(error.status)) {
-              removeToken();
-              localStorage.removeItem(STORAGE_KEYS.USER);
-              setState({ user: null, isLoading: false, isAuthenticated: false });
-              return;
-            }
-
-            setState({ user, isLoading: false, isAuthenticated: true });
-          });
-      } catch {
+    void refreshAccessToken()
+      .then(({ user }) => {
+        setState({ user, isLoading: false, isAuthenticated: true });
+      })
+      .catch(() => {
         removeToken();
-        localStorage.removeItem(STORAGE_KEYS.USER);
         setState({ user: null, isLoading: false, isAuthenticated: false });
-      }
-    } else {
-      setState({ user: null, isLoading: false, isAuthenticated: false });
-    }
+      });
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const response = await authService.login({ email, password });
-    setToken(response.access_token);
-    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
-    setState({ user: response.user, isLoading: false, isAuthenticated: true });
-    router.push('/analytics/dashboard');
-  }, [router]);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const response = await authService.login({ email, password });
+      setToken(response.access_token);
+      setState({
+        user: response.user,
+        isLoading: false,
+        isAuthenticated: true,
+      });
+      router.push('/analytics/dashboard');
+    },
+    [router],
+  );
 
   const register = useCallback(
     async (data: Parameters<typeof authService.register>[0]) => {
       const response = await authService.register(data);
       setToken(response.access_token);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
-      setState({ user: response.user, isLoading: false, isAuthenticated: true });
+      setState({
+        user: response.user,
+        isLoading: false,
+        isAuthenticated: true,
+      });
       if (response.checkout_url) {
         window.location.assign(response.checkout_url);
         return;
@@ -78,9 +65,10 @@ export function useAuthProvider() {
     [router],
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await authService.logout().catch(() => undefined);
     removeToken();
-    localStorage.removeItem(STORAGE_KEYS.USER);
+    disconnectSocket();
     setState({ user: null, isLoading: false, isAuthenticated: false });
   }, []);
 
@@ -112,7 +100,7 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (data: Parameters<typeof authService.register>[0]) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   can: (permission: string) => boolean;
 }
 

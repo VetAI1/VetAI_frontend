@@ -1,6 +1,12 @@
 'use client';
 
-import { AlertTriangle, CheckCircle2, Lightbulb, ShieldCheck, X } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Lightbulb,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
 import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -35,7 +41,10 @@ export function PreventionModal({
         <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-5 flex items-start justify-between gap-3 z-10">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-700">
-              <ShieldCheck size={20} className="text-teal-600 dark:text-teal-400" />
+              <ShieldCheck
+                size={20}
+                className="text-teal-600 dark:text-teal-400"
+              />
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -68,9 +77,16 @@ export function PreventionModal({
               {altered.problems.length > 0 && (
                 <div className="space-y-1.5 mb-2">
                   {altered.problems.map((problem, i) => (
-                    <div key={i} className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-lg">
-                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
-                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{problem}</p>
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-lg"
+                    >
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">
+                        {i + 1}
+                      </span>
+                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                        {problem}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -78,9 +94,17 @@ export function PreventionModal({
               {altered.recommendations.length > 0 && (
                 <div className="space-y-1.5">
                   {altered.recommendations.map((rec, i) => (
-                    <div key={i} className="flex items-start gap-2 p-2.5 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/40 rounded-lg">
-                      <CheckCircle2 size={15} className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
-                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{rec}</p>
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 p-2.5 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/40 rounded-lg"
+                    >
+                      <CheckCircle2
+                        size={15}
+                        className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5"
+                      />
+                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                        {rec}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -95,9 +119,17 @@ export function PreventionModal({
               </h3>
               <div className="space-y-2">
                 {prevention.generalRecommendations.map((rec, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/50 rounded-lg">
-                    <CheckCircle2 size={16} className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
-                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{rec}</p>
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 p-3 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/50 rounded-lg"
+                  >
+                    <CheckCircle2
+                      size={16}
+                      className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5"
+                    />
+                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                      {rec}
+                    </p>
                   </div>
                 ))}
               </div>

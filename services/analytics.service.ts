@@ -31,10 +31,16 @@ export interface DashboardData {
  * Maps the snake_case properties from the backend API (background_color, border_color)
  * to camelCase (backgroundColor, borderColor) required by Chart.js.
  */
-type RawDataset = ChartDataset & { background_color?: string | string[]; border_color?: string | string[] };
+type RawDataset = ChartDataset & {
+  background_color?: string | string[];
+  border_color?: string | string[];
+};
 type RawChartData = Omit<ChartData, 'datasets'> & { datasets: RawDataset[] };
 
-function mapChartData(data: RawChartData, formatLabels?: (labels: string[]) => string[]): ChartData {
+function mapChartData(
+  data: RawChartData,
+  formatLabels?: (labels: string[]) => string[],
+): ChartData {
   if (!data || !data.datasets) return data;
 
   return {
@@ -43,8 +49,16 @@ function mapChartData(data: RawChartData, formatLabels?: (labels: string[]) => s
     datasets: data.datasets.map((ds) => ({
       label: ds.label,
       data: ds.data,
-      ...(ds.background_color !== undefined ? { backgroundColor: ds.background_color } : ds.backgroundColor !== undefined ? { backgroundColor: ds.backgroundColor } : {}),
-      ...(ds.border_color !== undefined ? { borderColor: ds.border_color } : ds.borderColor !== undefined ? { borderColor: ds.borderColor } : {}),
+      ...(ds.background_color !== undefined
+        ? { backgroundColor: ds.background_color }
+        : ds.backgroundColor !== undefined
+          ? { backgroundColor: ds.backgroundColor }
+          : {}),
+      ...(ds.border_color !== undefined
+        ? { borderColor: ds.border_color }
+        : ds.borderColor !== undefined
+          ? { borderColor: ds.borderColor }
+          : {}),
     })),
   };
 }
@@ -59,18 +73,29 @@ function formatDateLabels(labels: string[]): string[] {
 }
 
 export const analyticsService = {
-  getDashboard: async (params?: { start_date?: string; end_date?: string }): Promise<DashboardData> => {
+  getDashboard: async (params?: {
+    start_date?: string;
+    end_date?: string;
+  }): Promise<DashboardData> => {
     const query = params
       ? `?${new URLSearchParams(params as Record<string, string>).toString()}`
       : '';
 
-    type RawDashboard = Omit<DashboardData, 'patients_by_specie' | 'studies_status' | 'consultations_status' | 'growth_overtime'> & {
+    type RawDashboard = Omit<
+      DashboardData,
+      | 'patients_by_specie'
+      | 'studies_status'
+      | 'consultations_status'
+      | 'growth_overtime'
+    > & {
       patients_by_specie: RawChartData;
       studies_status: RawChartData;
       consultations_status: RawChartData;
       growth_overtime: RawChartData;
     };
-    const data = await httpClient<RawDashboard>(`analytics/reports/dashboard${query}`);
+    const data = await httpClient<RawDashboard>(
+      `analytics/reports/dashboard${query}`,
+    );
 
     return {
       total_patients: data.total_patients,

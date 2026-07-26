@@ -8,9 +8,13 @@ export const formatCPF = (value: string): string => {
 };
 
 export const formatCNPJ = (value: string): string => {
-  const characters = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 14);
+  const characters = value
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toUpperCase()
+    .slice(0, 14);
   if (characters.length <= 2) return characters;
-  if (characters.length <= 5) return `${characters.slice(0, 2)}.${characters.slice(2)}`;
+  if (characters.length <= 5)
+    return `${characters.slice(0, 2)}.${characters.slice(2)}`;
   if (characters.length <= 8)
     return `${characters.slice(0, 2)}.${characters.slice(2, 5)}.${characters.slice(5)}`;
   if (characters.length <= 12)
@@ -20,7 +24,9 @@ export const formatCNPJ = (value: string): string => {
 
 export const formatCEP = (value: string): string => {
   const digits = value.replace(/\D/g, '').slice(0, 8);
-  return digits.length <= 5 ? digits : `${digits.slice(0, 5)}-${digits.slice(5)}`;
+  return digits.length <= 5
+    ? digits
+    : `${digits.slice(0, 5)}-${digits.slice(5)}`;
 };
 
 export const formatPhone = (value: string): string => {

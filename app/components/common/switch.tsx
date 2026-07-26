@@ -7,9 +7,20 @@ interface SwitchProps {
   disabled?: boolean;
 }
 
-export function Switch({ checked, onChange, className, disabled = false }: SwitchProps) {
+export function Switch({
+  checked,
+  onChange,
+  className,
+  disabled = false,
+}: SwitchProps) {
   return (
-    <label className={cn('relative inline-flex items-center cursor-pointer', disabled && 'opacity-50 cursor-not-allowed', className)}>
+    <label
+      className={cn(
+        'relative inline-flex items-center cursor-pointer',
+        disabled && 'opacity-50 cursor-not-allowed',
+        className,
+      )}
+    >
       <input
         type="checkbox"
         checked={checked}

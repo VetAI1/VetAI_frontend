@@ -26,7 +26,7 @@ const TooltipContent = React.forwardRef<
       {...props}
     >
       {props.children}
-      <TooltipPrimitive.Arrow className='fill-slate-900' />
+      <TooltipPrimitive.Arrow className="fill-slate-900" />
     </TooltipPrimitive.Content>
   </TooltipPrimitive.Portal>
 ));

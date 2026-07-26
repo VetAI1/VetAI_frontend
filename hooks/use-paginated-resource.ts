@@ -30,7 +30,10 @@ interface FetchOptions {
   keepItems?: boolean;
 }
 
-export function usePaginatedResource<TItem, TFilters extends object = Record<string, never>>({
+export function usePaginatedResource<
+  TItem,
+  TFilters extends object = Record<string, never>,
+>({
   fetcher,
   initialFilters,
   initialPage = 1,
@@ -61,7 +64,11 @@ export function usePaginatedResource<TItem, TFilters extends object = Record<str
   const isEmpty = !loading && items.length === 0;
 
   const executeFetch = useCallback(
-    async ({ page: nextPage = page, append, keepItems = false }: FetchOptions = {}) => {
+    async ({
+      page: nextPage = page,
+      append,
+      keepItems = false,
+    }: FetchOptions = {}) => {
       const requestId = ++requestIdRef.current;
       const shouldAppend = append ?? mode === 'append';
 
@@ -87,7 +94,9 @@ export function usePaginatedResource<TItem, TFilters extends object = Record<str
         }
 
         setItems((prev) =>
-          shouldAppend && keepItems ? [...prev, ...response.data] : response.data,
+          shouldAppend && keepItems
+            ? [...prev, ...response.data]
+            : response.data,
         );
         setMeta(response.meta);
         setPage(response.meta.page);
@@ -134,15 +143,19 @@ export function usePaginatedResource<TItem, TFilters extends object = Record<str
 
   const setSearch = useCallback(
     (value: string) => {
-      setFilters((prev) => ({ ...prev, search: value } as TFilters));
+      setFilters((prev) => ({ ...prev, search: value }) as TFilters);
     },
     [setFilters],
   );
 
-  const refresh = useCallback(() => executeFetch({ page, append: false }), [executeFetch, page]);
+  const refresh = useCallback(
+    () => executeFetch({ page, append: false }),
+    [executeFetch, page],
+  );
 
   const fetch = useCallback(
-    (nextPage?: number) => executeFetch({ page: nextPage ?? page, append: false }),
+    (nextPage?: number) =>
+      executeFetch({ page: nextPage ?? page, append: false }),
     [executeFetch, page],
   );
 

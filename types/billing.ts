@@ -3,6 +3,7 @@ export interface Plan {
   name: string;
   description?: string;
   monthlyPrice: number;
+  pricePerUser: number;
   userLimit: number;
   aiCredits: number;
   highlighted: boolean;
@@ -13,4 +14,10 @@ export interface Plan {
     label: string;
     description?: string;
   }>;
+}
+
+export interface AdditionalUserSeatPurchase {
+  additional_user_seats: number;
+  user_limit: number;
+  price_per_user: number;
 }

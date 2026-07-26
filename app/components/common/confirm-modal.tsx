@@ -26,12 +26,12 @@ export function ConfirmModal({
   onClose,
 }: ConfirmModalProps) {
   return (
-    <Modal title={title} onClose={onClose} maxWidth='sm'>
-      <p className='text-sm text-slate-600 dark:text-slate-300 mb-6'>
+    <Modal title={title} onClose={onClose} maxWidth="sm">
+      <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
         {description}
       </p>
-      <div className='flex gap-3 justify-end'>
-        <Button variant='outline' onClick={onClose} disabled={loading}>
+      <div className="flex gap-3 justify-end">
+        <Button variant="outline" onClick={onClose} disabled={loading}>
           {cancelLabel}
         </Button>
         <Button

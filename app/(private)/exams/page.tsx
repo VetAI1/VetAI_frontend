@@ -53,7 +53,9 @@ export default function ExamsPage() {
   const handleUploadSuccess = (study: Study) => {
     setShowUploadModal(false);
     setStudies((prev) => [study, ...prev]);
-    setMeta((prev) => prev ? { ...prev, total_elements: prev.total_elements + 1 } : prev);
+    setMeta((prev) =>
+      prev ? { ...prev, total_elements: prev.total_elements + 1 } : prev,
+    );
   };
 
   return (
@@ -63,7 +65,9 @@ export default function ExamsPage() {
 
         <SectionCard
           title="Lista de exames"
-          subtitle={meta ? `${meta.total_elements} exames no total` : 'Carregando...'}
+          subtitle={
+            meta ? `${meta.total_elements} exames no total` : 'Carregando...'
+          }
           headerAction={
             <Button
               onClick={() => setShowUploadModal(true)}
@@ -82,21 +86,32 @@ export default function ExamsPage() {
             {loading ? (
               <tr>
                 <td colSpan={5} className="p-8 text-center">
-                  <Loader2 size={24} className="animate-spin text-teal-600 mx-auto" />
+                  <Loader2
+                    size={24}
+                    className="animate-spin text-teal-600 mx-auto"
+                  />
                 </td>
               </tr>
             ) : studies.length === 0 ? (
               <tr>
                 <td colSpan={5} className="p-8 text-center">
-                  <Microscope size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                  <Microscope
+                    size={32}
+                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                  />
                   <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    {search ? 'Nenhum exame encontrado.' : 'Nenhum exame cadastrado ainda.'}
+                    {search
+                      ? 'Nenhum exame encontrado.'
+                      : 'Nenhum exame cadastrado ainda.'}
                   </p>
                 </td>
               </tr>
             ) : (
               studies.map((study) => {
-                const statusInfo = STATUS_MAP[study.status] ?? { label: study.status, color: 'yellow' as const };
+                const statusInfo = STATUS_MAP[study.status] ?? {
+                  label: study.status,
+                  color: 'yellow' as const,
+                };
                 return (
                   <tr
                     key={study.id}
@@ -114,12 +129,21 @@ export default function ExamsPage() {
                     <td className="p-4 text-slate-600 dark:text-slate-300">
                       {study.examDate
                         ? new Date(study.examDate).toLocaleDateString('pt-BR')
-                        : new Date(study.created_at).toLocaleDateString('pt-BR')}
+                        : new Date(study.created_at).toLocaleDateString(
+                          'pt-BR',
+                        )}
                     </td>
                     <td className="p-4 text-end">
                       <Link href={`/exams/detail?id=${study.id}`}>
-                        <Button variant="ghost" size="icon-sm" title="Ver detalhes">
-                          <Eye size={16} className="text-slate-600 dark:text-slate-300" />
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          title="Ver detalhes"
+                        >
+                          <Eye
+                            size={16}
+                            className="text-slate-600 dark:text-slate-300"
+                          />
                         </Button>
                       </Link>
                     </td>

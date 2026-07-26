@@ -11,8 +11,7 @@ export const studiesService = {
     return httpClient<PaginatedResponse<Study>>(`study${base}${patientParam}`);
   },
 
-  get: (id: string) =>
-    httpClient<Study>(`study/${id}`),
+  get: (id: string) => httpClient<Study>(`study/${id}`),
 
   upload: (patientId: string, file: File, title: string, examDate?: string) => {
     const formData = new FormData();
@@ -31,6 +30,5 @@ export const studiesService = {
       method: 'POST',
     }),
 
-  getPdf: (id: string) =>
-    httpClient<{ pdfBase64: string }>(`study/${id}/pdf`),
+  getPdf: (id: string) => httpClient<{ pdfBase64: string }>(`study/${id}/pdf`),
 };

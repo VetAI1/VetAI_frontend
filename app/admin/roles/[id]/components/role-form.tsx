@@ -146,34 +146,34 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
   }
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       <SectionCard
-        title='Dados do papel administrativo'
-        subtitle='Nome e descrição exibidos no administrativo'
+        title="Dados do papel administrativo"
+        subtitle="Nome e descrição exibidos no administrativo"
       >
-        <div className='grid gap-4 md:grid-cols-2'>
+        <div className="grid gap-4 md:grid-cols-2">
           <Input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder='Nome do papel administrativo'
+            placeholder="Nome do papel administrativo"
             disabled={readonly}
           />
           <Input
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder='Descrição'
+            placeholder="Descrição"
             disabled={readonly}
           />
         </div>
       </SectionCard>
 
       <SectionCard
-        title='Permissões'
-        subtitle='Marcar edição também libera visualização'
+        title="Permissões"
+        subtitle="Marcar edição também libera visualização"
         headerAction={
           <Button
-            type='button'
-            variant='outline'
+            type="button"
+            variant="outline"
             onClick={toggleAll}
             disabled={readonly}
           >
@@ -183,20 +183,20 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
           </Button>
         }
       >
-        <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {PERMISSION_CATEGORIES.map((category) => (
             <div
               key={category.key}
-              className='rounded-xl border border-slate-200 p-4 dark:border-slate-700'
+              className="rounded-xl border border-slate-200 p-4 dark:border-slate-700"
             >
-              <div className='mb-3 flex items-center justify-between gap-3'>
-                <h3 className='font-semibold text-slate-900 dark:text-white'>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="font-semibold text-slate-900 dark:text-white">
                   {category.label}
                 </h3>
                 <Button
-                  type='button'
-                  size='sm'
-                  variant='outline'
+                  type="button"
+                  size="sm"
+                  variant="outline"
                   onClick={() => toggleCategory(category.permissions)}
                   disabled={readonly}
                 >
@@ -208,7 +208,7 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
                   categoria
                 </Button>
               </div>
-              <div className='space-y-2'>
+              <div className="space-y-2">
                 {category.permissions.map((permission) => (
                   <Checkbox
                     key={permission}
@@ -228,17 +228,17 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
       </SectionCard>
 
       <SectionCard
-        title='Colaboradores'
-        subtitle='Busque e adicione usuários que receberão este papel administrativo'
+        title="Colaboradores"
+        subtitle="Busque e adicione usuários que receberão este papel administrativo"
       >
         {loadingCollaborators ? (
-          <div className='flex justify-center py-8 text-slate-500'>
-            <Loader2 className='animate-spin' />
+          <div className="flex justify-center py-8 text-slate-500">
+            <Loader2 className="animate-spin" />
           </div>
         ) : (
-          <div className='space-y-4'>
-            <div className='relative max-w-xl'>
-              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400' />
+          <div className="space-y-4">
+            <div className="relative max-w-xl">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={collaboratorSearch}
                 onChange={(event) => {
@@ -246,28 +246,28 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
                   setShowCollaboratorOptions(true);
                 }}
                 onFocus={() => setShowCollaboratorOptions(true)}
-                placeholder='Buscar colaborador por nome ou e-mail'
+                placeholder="Buscar colaborador por nome ou e-mail"
                 disabled={readonly}
-                className='pl-9'
+                className="pl-9"
               />
               {showCollaboratorOptions && !readonly && (
-                <div className='absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-900'>
+                <div className="absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-900">
                   {collaboratorOptions.length === 0 ? (
-                    <div className='px-3 py-4 text-center text-sm text-slate-500'>
+                    <div className="px-3 py-4 text-center text-sm text-slate-500">
                       Nenhum colaborador encontrado.
                     </div>
                   ) : (
                     collaboratorOptions.map((collaborator) => (
                       <button
                         key={collaborator.id}
-                        type='button'
+                        type="button"
                         onClick={() => addCollaborator(collaborator.id)}
-                        className='flex w-full flex-col rounded-lg px-3 py-2 text-left hover:bg-teal-50 dark:hover:bg-teal-950/30'
+                        className="flex w-full flex-col rounded-lg px-3 py-2 text-left hover:bg-teal-50 dark:hover:bg-teal-950/30"
                       >
-                        <span className='font-medium text-slate-900 dark:text-white'>
+                        <span className="font-medium text-slate-900 dark:text-white">
                           {collaborator.name}
                         </span>
-                        <span className='text-xs text-slate-500'>
+                        <span className="text-xs text-slate-500">
                           {collaborator.email}
                         </span>
                       </button>
@@ -277,25 +277,25 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
               )}
             </div>
 
-            <div className='flex flex-wrap gap-2'>
+            <div className="flex flex-wrap gap-2">
               {selectedCollaborators.length === 0 ? (
-                <span className='text-sm text-slate-500'>
+                <span className="text-sm text-slate-500">
                   Nenhum colaborador adicionado.
                 </span>
               ) : (
                 selectedCollaborators.map((collaborator) => (
                   <span
                     key={collaborator.id}
-                    className='inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1.5 text-sm text-teal-800 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-200'
+                    className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1.5 text-sm text-teal-800 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-200"
                   >
                     {collaborator.name ?? collaborator.email}
                     {!readonly && (
                       <button
-                        type='button'
+                        type="button"
                         onClick={() => removeCollaborator(collaborator.id)}
-                        className='rounded-full hover:bg-teal-100 dark:hover:bg-teal-900'
+                        className="rounded-full hover:bg-teal-100 dark:hover:bg-teal-900"
                       >
-                        <X className='h-3.5 w-3.5' />
+                        <X className="h-3.5 w-3.5" />
                       </button>
                     )}
                   </span>
@@ -306,16 +306,16 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
         )}
       </SectionCard>
 
-      <div className='flex justify-end'>
+      <div className="flex justify-end">
         <Button
           onClick={submit}
           disabled={readonly || saving || !name.trim()}
-          className='bg-teal-600 text-white hover:bg-teal-700'
+          className="bg-teal-600 text-white hover:bg-teal-700"
         >
           {saving ? (
-            <Loader2 className='h-4 w-4 animate-spin' />
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Save className='h-4 w-4' />
+            <Save className="h-4 w-4" />
           )}{' '}
           Salvar papel
         </Button>

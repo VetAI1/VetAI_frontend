@@ -17,7 +17,10 @@ export const validateCPF = (cpf: string): boolean => {
     return remainder < 2 ? 0 : 11 - remainder;
   };
 
-  return calculateDigit(9) === Number(digits[9]) && calculateDigit(10) === Number(digits[10]);
+  return (
+    calculateDigit(9) === Number(digits[9]) &&
+    calculateDigit(10) === Number(digits[10])
+  );
 };
 
 export const validateCNPJ = (cnpj: string): boolean => {
@@ -46,11 +49,14 @@ export const validateCNPJ = (cnpj: string): boolean => {
   );
 };
 
-export const validateCEP = (cep: string): boolean => /^\d{8}$/.test(cep.replace(/\D/g, ''));
+export const validateCEP = (cep: string): boolean =>
+  /^\d{8}$/.test(cep.replace(/\D/g, ''));
 
 export const validatePhone = (phone: string): boolean => {
   const digits = phone.replace(/\D/g, '');
-  return (digits.length === 10 || digits.length === 11) && Number(digits[0]) >= 2;
+  return (
+    (digits.length === 10 || digits.length === 11) && Number(digits[0]) >= 2
+  );
 };
 
 export const validateEmail = (email: string): boolean => {
@@ -65,18 +71,24 @@ export const emailSchema = yup
 
 export const cpfSchema = yup
   .string()
-  .test('cpf-valid', 'CPF inválido', (value) => Boolean(value && validateCPF(value)))
+  .test('cpf-valid', 'CPF inválido', (value) =>
+    Boolean(value && validateCPF(value)),
+  )
   .required('CPF é obrigatório');
 
 export const phoneSchema = yup
   .string()
-  .test('phone-valid', 'Telefone inválido', (value) => Boolean(value && validatePhone(value)))
+  .test('phone-valid', 'Telefone inválido', (value) =>
+    Boolean(value && validatePhone(value)),
+  )
   .required('Telefone é obrigatório');
 
 export const dateSchema = yup
   .string()
   .matches(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida')
-  .test('valid-date', 'Data inválida', (value) => Boolean(value && !isNaN(new Date(value).getTime())));
+  .test('valid-date', 'Data inválida', (value) =>
+    Boolean(value && !isNaN(new Date(value).getTime())),
+  );
 
 export const passwordSchema = yup
   .string()

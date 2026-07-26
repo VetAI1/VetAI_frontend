@@ -14,8 +14,7 @@ export const consultationsService = {
       `consultations${buildQuery(params)}`,
     ),
 
-  get: (id: string) =>
-    httpClient<Consultation>(`consultations/${id}`),
+  get: (id: string) => httpClient<Consultation>(`consultations/${id}`),
 
   getInProgress: () =>
     httpClient<Consultation | null>('consultations/in-progress'),

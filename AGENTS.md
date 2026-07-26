@@ -65,11 +65,11 @@ All forms **must** follow these conventions:
 
    ```tsx
    <Controller
-     name='cpf'
+     name="cpf"
      control={control}
      render={({ field }) => (
        <InputWithLabel
-         label='CPF'
+         label="CPF"
          value={field.value}
          onChange={(e) => field.onChange(formatCPF(e.target.value))}
          error={errors.cpf?.message}

@@ -65,36 +65,36 @@ export function SearchSelect({
   return (
     <FieldShell label={label} required={required} error={error}>
       {selectedOption ? (
-        <div className='flex items-center justify-between rounded-lg border border-teal-200 bg-teal-50 p-3 dark:border-teal-700 dark:bg-teal-900/20'>
+        <div className="flex items-center justify-between rounded-lg border border-teal-200 bg-teal-50 p-3 dark:border-teal-700 dark:bg-teal-900/20">
           <div>
-            <p className='text-sm font-medium text-teal-800 dark:text-teal-300'>
+            <p className="text-sm font-medium text-teal-800 dark:text-teal-300">
               {selectedOption.label}
             </p>
             {selectedOption.description && (
-              <p className='text-xs text-slate-500 dark:text-slate-400'>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {selectedOption.description}
               </p>
             )}
           </div>
           <Button
-            type='button'
-            variant='ghost'
-            size='icon-sm'
+            type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={onClear}
-            className='text-teal-600 hover:text-teal-800 dark:text-teal-400'
+            className="text-teal-600 hover:text-teal-800 dark:text-teal-400"
           >
             <X size={14} />
           </Button>
         </div>
       ) : (
-        <div ref={containerRef} className='relative'>
-          <div className='relative'>
+        <div ref={containerRef} className="relative">
+          <div className="relative">
             <Search
               size={16}
-              className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
-              type='text'
+              type="text"
               placeholder={placeholder}
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
@@ -104,31 +104,31 @@ export function SearchSelect({
           </div>
 
           {open && (
-            <div className='absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700'>
+            <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
               {loading ? (
-                <div className='flex items-center justify-center p-4'>
-                  <Loader2 size={16} className='animate-spin text-teal-600' />
+                <div className="flex items-center justify-center p-4">
+                  <Loader2 size={16} className="animate-spin text-teal-600" />
                 </div>
               ) : options.length === 0 ? (
-                <p className='p-3 text-center text-sm text-slate-500 dark:text-slate-400'>
+                <p className="p-3 text-center text-sm text-slate-500 dark:text-slate-400">
                   {emptyMessage}
                 </p>
               ) : (
                 options.map((option) => (
                   <Button
                     key={option.id}
-                    type='button'
-                    variant='ghost'
+                    type="button"
+                    variant="ghost"
                     onClick={() => {
                       onSelect(option);
                       onOpenChange(false);
                     }}
-                    className='h-auto w-full justify-start rounded-none border-b border-slate-100 px-3 py-2.5 text-sm text-slate-900 last:border-0 dark:border-slate-600 dark:text-white'
+                    className="h-auto w-full justify-start rounded-none border-b border-slate-100 px-3 py-2.5 text-sm text-slate-900 last:border-0 dark:border-slate-600 dark:text-white"
                   >
-                    <div className='text-left'>
-                      <p className='font-medium'>{option.label}</p>
+                    <div className="text-left">
+                      <p className="font-medium">{option.label}</p>
                       {option.description && (
-                        <p className='text-xs text-slate-500 dark:text-slate-400'>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
                           {option.description}
                         </p>
                       )}

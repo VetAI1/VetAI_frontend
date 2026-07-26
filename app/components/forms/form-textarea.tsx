@@ -22,7 +22,16 @@ const FormTextareaInner = React.forwardRef<
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
       }
       >(function FormTextareaInnerComponent(
-        { className, label, required, error, containerClassName, value, onChange, ...props },
+        {
+          className,
+          label,
+          required,
+          error,
+          containerClassName,
+          value,
+          onChange,
+          ...props
+        },
         ref,
       ) {
         const inputId = React.useId();
@@ -32,10 +41,10 @@ const FormTextareaInner = React.forwardRef<
             {label && (
               <label
                 htmlFor={inputId}
-                className='mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300'
+                className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
                 {label}
-                {required && <span className='ml-0.5 text-red-500'>*</span>}
+                {required && <span className="ml-0.5 text-red-500">*</span>}
               </label>
             )}
             <textarea
@@ -53,40 +62,41 @@ const FormTextareaInner = React.forwardRef<
               {...props}
             />
             {error && (
-              <p className='mt-1 text-xs text-red-500 dark:text-red-400'>{error}</p>
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
             )}
           </div>
         );
       });
 FormTextareaInner.displayName = 'FormTextareaInner';
 
-export const FormTextarea = React.forwardRef<HTMLTextAreaElement, FormTextareaProps>(
-  ({ value, onChange, control, name, ...props }, ref) => {
-    if (control && name) {
-      return (
-        <Controller
-          name={name}
-          control={control}
-          render={({ field }) => (
-            <FormTextareaInner
-              value={String(field.value ?? '')}
-              onChange={field.onChange}
-              {...props}
-              ref={ref}
-            />
-          )}
-        />
-      );
-    }
-
+export const FormTextarea = React.forwardRef<
+  HTMLTextAreaElement,
+  FormTextareaProps
+>(({ value, onChange, control, name, ...props }, ref) => {
+  if (control && name) {
     return (
-      <FormTextareaInner
-        value={String(value ?? '')}
-        onChange={onChange ?? (() => {})}
-        {...props}
-        ref={ref}
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <FormTextareaInner
+            value={String(field.value ?? '')}
+            onChange={field.onChange}
+            {...props}
+            ref={ref}
+          />
+        )}
       />
     );
-  },
-);
+  }
+
+  return (
+    <FormTextareaInner
+      value={String(value ?? '')}
+      onChange={onChange ?? (() => {})}
+      {...props}
+      ref={ref}
+    />
+  );
+});
 FormTextarea.displayName = 'FormTextarea';
