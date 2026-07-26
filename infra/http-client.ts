@@ -18,6 +18,7 @@ export class ApiError extends Error {
 
 let token: string | null = null;
 let refreshPromise: Promise<RefreshResponse> | null = null;
+const sessionExpiredListeners = new Set<() => void>();
 
 export function getToken(): string | null {
   return token;
@@ -29,6 +30,16 @@ export function setToken(accessToken: string): void {
 
 export function removeToken(): void {
   token = null;
+}
+
+export function onSessionExpired(listener: () => void): () => void {
+  sessionExpiredListeners.add(listener);
+  return () => sessionExpiredListeners.delete(listener);
+}
+
+function notifySessionExpired(): void {
+  removeToken();
+  sessionExpiredListeners.forEach((listener) => listener());
 }
 
 export interface HttpClientOptions extends RequestInit {
@@ -57,6 +68,15 @@ export async function refreshAccessToken(): Promise<RefreshResponse> {
       .then((response) => {
         setToken(response.access_token);
         return response;
+      })
+      .catch((error: unknown) => {
+        if (
+          error instanceof ApiError &&
+          (error.status === 401 || error.status === 403)
+        ) {
+          notifySessionExpired();
+        }
+        throw error;
       })
       .finally(() => {
         refreshPromise = null;

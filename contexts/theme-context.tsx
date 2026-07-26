@@ -40,6 +40,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setThemeState(getInitialTheme());
     setMounted(true);
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === STORAGE_KEYS.THEME || event.key === null) {
+        setThemeState(getInitialTheme());
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   useEffect(() => {
@@ -61,10 +70,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => {
     setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
-
-  if (!mounted) {
-    return <>{children}</>;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>

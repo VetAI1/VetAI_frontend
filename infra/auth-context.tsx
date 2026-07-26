@@ -9,7 +9,12 @@ import {
   useState,
 } from 'react';
 
-import { refreshAccessToken, removeToken, setToken } from '@/infra/http-client';
+import {
+  onSessionExpired,
+  refreshAccessToken,
+  removeToken,
+  setToken,
+} from '@/infra/http-client';
 import { disconnectSocket } from '@/infra/socket';
 import { authService } from '@/services/auth.service';
 import type { User } from '@/types/auth';
@@ -22,16 +27,28 @@ export function useAuthProvider() {
     isAuthenticated: false,
   });
 
+  const clearSession = useCallback(() => {
+    removeToken();
+    disconnectSocket();
+    setState({ user: null, isLoading: false, isAuthenticated: false });
+  }, []);
+
+  useEffect(() => {
+    return onSessionExpired(() => {
+      clearSession();
+      void authService.logout().catch(() => undefined);
+    });
+  }, [clearSession]);
+
   useEffect(() => {
     void refreshAccessToken()
       .then(({ user }) => {
         setState({ user, isLoading: false, isAuthenticated: true });
       })
       .catch(() => {
-        removeToken();
-        setState({ user: null, isLoading: false, isAuthenticated: false });
+        clearSession();
       });
-  }, []);
+  }, [clearSession]);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -67,10 +84,8 @@ export function useAuthProvider() {
 
   const logout = useCallback(async () => {
     await authService.logout().catch(() => undefined);
-    removeToken();
-    disconnectSocket();
-    setState({ user: null, isLoading: false, isAuthenticated: false });
-  }, []);
+    clearSession();
+  }, [clearSession]);
 
   const can = useCallback(
     (permission: string): boolean => {
