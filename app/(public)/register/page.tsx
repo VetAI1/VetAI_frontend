@@ -24,7 +24,7 @@ import { useAuth } from '@/infra/auth-context';
 import { billingService } from '@/services/billing.service';
 import type { RegisterPayload } from '@/types/auth';
 import type { Plan } from '@/types/billing';
-import { formatCEP, formatCNPJ } from '@/utils/masks';
+import { formatCEP, formatCNPJ, unmaskCEP, unmaskCNPJ } from '@/utils/masks';
 import { validateCEP, validateCNPJ } from '@/utils/validations';
 
 interface RegisterPageFormData {
@@ -226,9 +226,9 @@ function RegisterForm() {
         crmv: data.crmv ?? '',
         plan_id: selectedPlan.id,
         hospital_name: data.hospitalName,
-        cnpj: data.cnpj,
+        cnpj: unmaskCNPJ(data.cnpj),
         address: {
-          zip_code: data.address.zipCode ?? '',
+          zip_code: unmaskCEP(data.address.zipCode ?? ''),
           street: data.address.street ?? '',
           number: data.address.number ?? '',
           neighborhood: data.address.neighborhood ?? '',

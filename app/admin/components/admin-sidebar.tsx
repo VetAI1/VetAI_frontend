@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Menu,
   Moon,
+  Settings,
   ShieldCheck,
   Sun,
   Users,
@@ -30,6 +31,12 @@ const items = [
     label: 'Papel administrativo',
     icon: ShieldCheck,
     permission: 'roles:view',
+  },
+  {
+    href: '/admin/settings',
+    label: 'Configurações da clínica',
+    icon: Settings,
+    permission: 'settings:view',
   },
 ];
 

@@ -29,6 +29,12 @@ export const formatCEP = (value: string): string => {
     : `${digits.slice(0, 5)}-${digits.slice(5)}`;
 };
 
+export const unmaskCNPJ = (value: string): string =>
+  value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 14);
+
+export const unmaskCEP = (value: string): string =>
+  value.replace(/\D/g, '').slice(0, 8);
+
 export const formatPhone = (value: string): string => {
   const digits = value.replace(/\D/g, '').slice(0, 11);
   if (digits.length <= 2) return digits;
