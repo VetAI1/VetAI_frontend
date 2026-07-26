@@ -130,7 +130,10 @@ const InputWithLabel = React.forwardRef(
           render={({ field }) => (
             <InputWithLabelInner
               value={field.value}
-              onChange={(e) => field.onChange(e)}
+              onChange={(event) => {
+                field.onChange(event);
+                onChange?.(event);
+              }}
               {...props}
               ref={ref}
             />

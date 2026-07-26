@@ -32,6 +32,7 @@ interface RegisterPageFormData {
   email: string;
   password: string;
   confirmPassword: string;
+  crmv?: string;
   planId?: string;
   hospitalName?: string;
   cnpj?: string;
@@ -69,6 +70,8 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
+  const [cepLookupLoading, setCepLookupLoading] = useState(false);
+  const [cepLookupError, setCepLookupError] = useState<string | null>(null);
 
   const {
     control,
@@ -143,6 +146,10 @@ function RegisterForm() {
         hasError = true;
       }
     }
+    if (!data.crmv) {
+      setError('crmv', { message: 'CRMV é obrigatório' });
+      hasError = true;
+    }
     const addressFields: Array<
       keyof NonNullable<RegisterPageFormData['address']>
     > = ['state', 'city', 'street', 'number', 'neighborhood'];
@@ -154,6 +161,45 @@ function RegisterForm() {
     });
 
     return !hasError;
+  }
+
+  async function lookupAddress(zipCode: string) {
+    const cep = zipCode.replace(/\D/g, '');
+    if (cep.length !== 8) return;
+
+    setCepLookupLoading(true);
+    setCepLookupError(null);
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      if (!response.ok) throw new Error('CEP não encontrado');
+
+      const address: {
+        erro?: boolean;
+        uf?: string;
+        localidade?: string;
+        logradouro?: string;
+        bairro?: string;
+      } = await response.json();
+      if (address.erro) throw new Error('CEP não encontrado');
+      if (getValues('address.zipCode') !== formatCEP(cep)) return;
+
+      setValue('address.state', address.uf ?? '', { shouldValidate: true });
+      setValue('address.city', address.localidade ?? '', {
+        shouldValidate: true,
+      });
+      setValue('address.street', address.logradouro ?? '', {
+        shouldValidate: true,
+      });
+      setValue('address.neighborhood', address.bairro ?? '', {
+        shouldValidate: true,
+      });
+    } catch {
+      if (getValues('address.zipCode') === formatCEP(cep)) {
+        setCepLookupError('Não foi possível localizar este CEP.');
+      }
+    } finally {
+      setCepLookupLoading(false);
+    }
   }
 
   function nextStep() {
@@ -177,6 +223,7 @@ function RegisterForm() {
         name: data.name,
         email: data.email,
         password: data.password,
+        crmv: data.crmv ?? '',
         plan_id: selectedPlan.id,
         hospital_name: data.hospitalName,
         cnpj: data.cnpj,
@@ -195,7 +242,9 @@ function RegisterForm() {
           name: data.isUserResponsible
             ? data.name
             : (data.responsible?.name ?? ''),
-          crmv: data.isUserResponsible ? '' : (data.responsible?.crmv ?? ''),
+          crmv: data.isUserResponsible
+            ? (data.crmv ?? '')
+            : (data.responsible?.crmv ?? ''),
         },
       };
       await register(payload);
@@ -208,7 +257,7 @@ function RegisterForm() {
   const data = getValues();
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen lg:h-dvh lg:overflow-hidden">
       <AuthPanel
         title={isInvite ? 'Você foi convidado' : 'Cadastre sua clínica'}
         description={
@@ -219,7 +268,7 @@ function RegisterForm() {
         gradient="from-emerald-600 via-teal-700 to-cyan-800"
       />
 
-      <div className="flex-1 bg-white p-6 dark:bg-slate-950 sm:p-8">
+      <div className="flex-1 bg-white p-6 dark:bg-slate-950 sm:p-8 lg:overflow-y-auto">
         <div className="mx-auto w-full max-w-3xl">
           <div className="mb-8 flex items-center gap-2 lg:hidden">
             <Activity className="text-teal-600" size={28} />
@@ -268,8 +317,8 @@ function RegisterForm() {
                 </div>
 
                 {!isInvite && (
-                  <section className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
+                  <section className="space-y-6">
+                    <div className="grid gap-5 sm:grid-cols-2">
                       <InputWithLabel
                         label="Nome da clínica"
                         name="hospitalName"
@@ -289,7 +338,7 @@ function RegisterForm() {
                         maxLength={18}
                         required
                       />
-                      <div className="flex items-center gap-2 sm:col-span-2 pt-1 pb-1">
+                      <div className="flex items-center gap-2 pt-2 sm:col-span-2">
                         <input
                           type="checkbox"
                           id="isUserResponsible"
@@ -322,70 +371,86 @@ function RegisterForm() {
                         </>
                       )}
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      <InputWithLabel
-                        label="CEP"
-                        name="address.zipCode"
-                        control={control}
-                        error={errors.address?.zipCode?.message}
-                        onChange={(event) =>
-                          setValue(
-                            'address.zipCode',
-                            formatCEP(event.target.value),
-                          )
-                        }
-                        inputMode="numeric"
-                        maxLength={9}
-                        required
-                      />
-                      <InputWithLabel
-                        label="Estado"
-                        name="address.state"
-                        control={control}
-                        error={errors.address?.state?.message}
-                        maxLength={2}
-                        required
-                      />
-                      <InputWithLabel
-                        label="Cidade"
-                        name="address.city"
-                        control={control}
-                        error={errors.address?.city?.message}
-                        required
-                      />
-                      <InputWithLabel
-                        label="Rua"
-                        name="address.street"
-                        control={control}
-                        error={errors.address?.street?.message}
-                        containerClassName="sm:col-span-2"
-                        required
-                      />
-                      <InputWithLabel
-                        label="Número"
-                        name="address.number"
-                        control={control}
-                        error={errors.address?.number?.message}
-                        required
-                      />
-                      <InputWithLabel
-                        label="Bairro"
-                        name="address.neighborhood"
-                        control={control}
-                        error={errors.address?.neighborhood?.message}
-                        required
-                      />
-                      <InputWithLabel
-                        label="Complemento"
-                        name="address.complement"
-                        control={control}
-                      />
+                    <div className="border-t border-slate-200 pt-6 dark:border-slate-800">
+                      <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
+                        Endereço da clínica
+                      </h2>
+                      <div className="grid gap-5 sm:grid-cols-3">
+                        <InputWithLabel
+                          label="CEP"
+                          name="address.zipCode"
+                          control={control}
+                          error={errors.address?.zipCode?.message}
+                          onChange={(event) => {
+                            const zipCode = formatCEP(event.target.value);
+                            setValue('address.zipCode', zipCode, {
+                              shouldValidate: true,
+                            });
+                            void lookupAddress(zipCode);
+                          }}
+                          inputMode="numeric"
+                          maxLength={9}
+                          required
+                        />
+                        <InputWithLabel
+                          label="Estado"
+                          name="address.state"
+                          control={control}
+                          error={errors.address?.state?.message}
+                          maxLength={2}
+                          required
+                        />
+                        <InputWithLabel
+                          label="Cidade"
+                          name="address.city"
+                          control={control}
+                          error={errors.address?.city?.message}
+                          required
+                        />
+                        <InputWithLabel
+                          label="Rua"
+                          name="address.street"
+                          control={control}
+                          error={errors.address?.street?.message}
+                          containerClassName="sm:col-span-2"
+                          required
+                        />
+                        <InputWithLabel
+                          label="Número"
+                          name="address.number"
+                          control={control}
+                          error={errors.address?.number?.message}
+                          required
+                        />
+                        <InputWithLabel
+                          label="Bairro"
+                          name="address.neighborhood"
+                          control={control}
+                          error={errors.address?.neighborhood?.message}
+                          required
+                        />
+                        <InputWithLabel
+                          label="Complemento"
+                          name="address.complement"
+                          control={control}
+                        />
+                      </div>
+                      {(cepLookupLoading || cepLookupError) && (
+                        <p
+                          className={`mt-3 text-sm ${cepLookupError ? 'text-red-500' : 'text-slate-500'}`}
+                        >
+                          {cepLookupError ?? 'Buscando endereço...'}
+                        </p>
+                      )}
                     </div>
                   </section>
                 )}
 
-                <section className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
+                <section className="border-t border-slate-200 pt-6 dark:border-slate-800">
+                  <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
+                    Dados de acesso
+                  </h2>
+                  <div className="grid gap-5 sm:grid-cols-2">
                     <InputWithLabel
                       label="Nome completo"
                       name="name"
@@ -401,6 +466,14 @@ function RegisterForm() {
                       control={control}
                       error={errors.email?.message}
                       autoComplete="email"
+                      required
+                    />
+                    <InputWithLabel
+                      label="Seu CRMV"
+                      name="crmv"
+                      control={control}
+                      error={errors.crmv?.message}
+                      containerClassName="sm:col-span-2"
                       required
                     />
                     <InputWithLabel

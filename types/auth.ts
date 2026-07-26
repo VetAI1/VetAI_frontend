@@ -30,6 +30,7 @@ export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
+  crmv?: string;
   invite_token?: string;
   plan_id?: string;
   hospital_name?: string;
