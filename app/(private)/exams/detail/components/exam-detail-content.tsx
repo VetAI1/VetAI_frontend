@@ -1,6 +1,15 @@
 'use client';
 
-import { AlertTriangle, ArrowLeft, CheckCircle2, FileText, Loader2, Microscope, ShieldCheck, X } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  Microscope,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -11,6 +20,7 @@ import { Badge } from '@/app/components/common/badge';
 import { Card } from '@/app/components/common/card';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { STUDY_STATUS_MAP } from '@/constants';
 import { studiesService } from '@/services/studies.service';
 import type { AlteredValueInfo, Study } from '@/types/study';
@@ -23,7 +33,9 @@ export function ExamDetailContent() {
   const id = searchParams.get('id');
   const [study, setStudy] = useState<Study | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedValue, setSelectedValue] = useState<AlteredValueInfo | null>(null);
+  const [selectedValue, setSelectedValue] = useState<AlteredValueInfo | null>(
+    null,
+  );
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loadingPdf, setLoadingPdf] = useState(false);
 
@@ -63,9 +75,10 @@ export function ExamDetailContent() {
     return () => clearInterval(interval);
   }, [study?.id, study?.status]);
 
-  const hasAlteredValues = study?.results.some((r) =>
-    r.values.some((v) => v.status === 'HIGHER' || v.status === 'LOWER'),
-  ) ?? false;
+  const hasAlteredValues =
+    study?.results.some((r) =>
+      r.values.some((v) => v.status === 'HIGHER' || v.status === 'LOWER'),
+    ) ?? false;
 
   const openPdf = async () => {
     if (!id) return;
@@ -92,8 +105,35 @@ export function ExamDetailContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 size={32} className="animate-spin text-teal-600" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-9 w-24" />
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-6 shadow space-y-4">
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-64" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Skeleton className="h-9 w-32" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
+            <Skeleton className="h-64 w-full rounded-xl" />
+            <Skeleton className="h-48 w-full rounded-xl" />
+          </div>
+          <div className="space-y-4">
+            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-40 w-full rounded-xl" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -101,8 +141,13 @@ export function ExamDetailContent() {
   if (!study) {
     return (
       <div className="text-center py-20">
-        <Microscope size={48} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-        <p className="text-slate-500 dark:text-slate-400">Exame não encontrado.</p>
+        <Microscope
+          size={48}
+          className="text-slate-300 dark:text-slate-600 mx-auto mb-4"
+        />
+        <p className="text-slate-500 dark:text-slate-400">
+          Exame não encontrado.
+        </p>
         <Link href="/exams" className="mt-4 inline-block">
           <Button variant="outline">Voltar aos exames</Button>
         </Link>
@@ -123,7 +168,10 @@ export function ExamDetailContent() {
     );
   }
 
-  const statusInfo = STATUS_MAP[study.status] ?? { label: study.status, color: 'yellow' as const };
+  const statusInfo = STATUS_MAP[study.status] ?? {
+    label: study.status,
+    color: 'yellow' as const,
+  };
 
   return (
     <>
@@ -146,11 +194,17 @@ export function ExamDetailContent() {
         <div className="flex items-center gap-2 flex-wrap sm:ml-auto sm:flex-nowrap">
           <Button
             variant="outline"
-            onClick={() => { void openPdf(); }}
+            onClick={() => {
+              void openPdf();
+            }}
             disabled={loadingPdf}
             className="gap-2 text-sm"
           >
-            {loadingPdf ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
+            {loadingPdf ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <FileText size={16} />
+            )}
             Visualizar exame
           </Button>
           {study.status === 'COMPLETED' && hasAlteredValues && (
@@ -168,28 +222,41 @@ export function ExamDetailContent() {
 
       {study.results.length > 0 ? (
         study.results
-          .filter((result) => !/^(comentários|observações|obs\.?|notas|laudo)$/i.test(result.title.trim()))
+          .filter(
+            (result) =>
+              !/^(comentários|observações|obs\.?|notas|laudo)$/i.test(
+                result.title.trim(),
+              ),
+          )
           .map((result, i) => {
             const { prevention } = study;
             const hasSubgroups = result.values.some((v) => v.subgroup);
             const subgroups = hasSubgroups
-              ? [...new Set(result.values.map((v) => v.subgroup).filter(Boolean))] as string[]
+              ? ([
+                ...new Set(
+                  result.values.map((v) => v.subgroup).filter(Boolean),
+                ),
+              ] as string[])
               : [];
 
             const renderValues = (values: typeof result.values) =>
               values.map((val, j) => {
                 const isNA = val.value === 'N/A';
-                const isAltered = !isNA && (val.status === 'HIGHER' || val.status === 'LOWER');
+                const isAltered =
+                  !isNA && (val.status === 'HIGHER' || val.status === 'LOWER');
                 const referenceText = formatReference(val);
                 const alteredInfo = isAltered
                   ? prevention?.alteredValues.find((a) => a.name === val.title)
                   : undefined;
                 const isClickable = !!alteredInfo;
                 const isQualitative = !isNA && isNaN(Number(val.value));
+
                 return (
                   <Card
                     key={j}
-                    {...(isClickable ? { onClick: () => setSelectedValue(alteredInfo) } : {})}
+                    {...(isClickable
+                      ? { onClick: () => setSelectedValue(alteredInfo) }
+                      : {})}
                     className={`p-4 transition-colors ${
                       isAltered
                         ? 'border-red-300 dark:border-red-700/60 bg-red-50/50 dark:bg-red-900/10'
@@ -201,7 +268,9 @@ export function ExamDetailContent() {
                     {isQualitative ? (
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between gap-2">
-                          <p className={`font-medium text-sm ${isAltered ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>
+                          <p
+                            className={`font-medium text-sm ${isAltered ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}
+                          >
                             {val.title}
                           </p>
                           {!isNA && (
@@ -210,39 +279,49 @@ export function ExamDetailContent() {
                             </Badge>
                           )}
                         </div>
-                        <p className={`text-sm ${isAltered ? 'text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-300'}`}>
+                        <p
+                          className={`text-sm ${isAltered ? 'text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-300'}`}
+                        >
                           {val.value}
                         </p>
                         {referenceText && (
                           <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Referência: {referenceText}
+                            Referência: {referenceText}
                           </p>
                         )}
                       </div>
                     ) : (
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
-                          <p className={`font-medium text-sm truncate ${isAltered ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>
+                          <p
+                            className={`font-medium text-sm truncate ${isAltered ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}
+                          >
                             {val.title}
                           </p>
                           {val.unit && (
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            Unidade: {val.unit}
+                              Unidade: {val.unit}
                             </p>
                           )}
                           {referenceText && (
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            Referência: {referenceText}
+                              Referência: {referenceText}
                             </p>
                           )}
                         </div>
                         <div className="text-right shrink-0">
-                          <p className={`text-lg font-bold ${isAltered ? 'text-red-600 dark:text-red-400' : isNA ? 'text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'}`}>
+                          <p
+                            className={`text-lg font-bold ${isAltered ? 'text-red-600 dark:text-red-400' : isNA ? 'text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'}`}
+                          >
                             {val.value}
                           </p>
                           {!isNA && (
                             <Badge color={isAltered ? 'red' : 'green'}>
-                              {val.status === 'HIGHER' ? 'Alto' : val.status === 'LOWER' ? 'Baixo' : 'Normal'}
+                              {val.status === 'HIGHER'
+                                ? 'Alto'
+                                : val.status === 'LOWER'
+                                  ? 'Baixo'
+                                  : 'Normal'}
                             </Badge>
                           )}
                         </div>
@@ -253,7 +332,9 @@ export function ExamDetailContent() {
               });
 
             const renderMixed = (values: typeof result.values) => {
-              const qualitative = values.filter((v) => v.value !== 'N/A' && isNaN(Number(v.value)));
+              const qualitative = values.filter(
+                (v) => v.value !== 'N/A' && isNaN(Number(v.value)),
+              );
               const numeric = values.filter((v) => !qualitative.includes(v));
               return (
                 <div className="flex flex-col gap-3">
@@ -272,7 +353,12 @@ export function ExamDetailContent() {
             };
 
             return (
-              <SectionCard key={i} title={result.title} subtitle="Resultados do exame" className="mb-4">
+              <SectionCard
+                key={i}
+                title={result.title}
+                subtitle="Resultados do exame"
+                className="mb-4"
+              >
                 {hasSubgroups ? (
                   <div className="space-y-4">
                     {subgroups.map((sg) => (
@@ -280,7 +366,9 @@ export function ExamDetailContent() {
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2 px-1">
                           {sg}
                         </p>
-                        {renderMixed(result.values.filter((v) => v.subgroup === sg))}
+                        {renderMixed(
+                          result.values.filter((v) => v.subgroup === sg),
+                        )}
                       </div>
                     ))}
                   </div>
@@ -292,7 +380,10 @@ export function ExamDetailContent() {
           })
       ) : (
         <Card className="p-8 text-center">
-          <Microscope size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+          <Microscope
+            size={32}
+            className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+          />
           <p className="text-slate-500 dark:text-slate-400">
             {study.status === 'PENDING' || study.status === 'PROCESSING'
               ? 'O exame está sendo processado. Os resultados aparecerão aqui em breve.'
@@ -303,11 +394,21 @@ export function ExamDetailContent() {
 
       {pdfUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closePdf} />
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={closePdf}
+          />
           <div className="relative flex flex-col bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh]">
             <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
-              <p className="font-semibold text-sm text-slate-900 dark:text-white truncate">{study.title ?? 'Exame'}</p>
-              <Button variant="ghost" size="icon-sm" onClick={closePdf} className="text-slate-500 hover:text-slate-900 dark:hover:text-white shrink-0">
+              <p className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                {study.title ?? 'Exame'}
+              </p>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={closePdf}
+                className="text-slate-500 hover:text-slate-900 dark:hover:text-white shrink-0"
+              >
                 <X size={18} />
               </Button>
             </div>
@@ -322,20 +423,31 @@ export function ExamDetailContent() {
 
       {selectedValue && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedValue(null)} />
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setSelectedValue(null)}
+          />
           <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
             <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-5 py-4 flex items-start justify-between gap-3 z-10">
               <div>
                 <div className="flex items-center gap-2 mb-0.5">
                   <AlertTriangle size={16} className="text-red-500 shrink-0" />
-                  <h3 className="font-bold text-slate-900 dark:text-white">{selectedValue.name}</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white">
+                    {selectedValue.name}
+                  </h3>
                   <Badge color="red">{selectedValue.status}</Badge>
                 </div>
                 <p className="text-sm text-red-600 dark:text-red-400 font-medium">
-                  {selectedValue.value}{selectedValue.unit ? ` ${selectedValue.unit}` : ''}
+                  {selectedValue.value}
+                  {selectedValue.unit ? ` ${selectedValue.unit}` : ''}
                 </p>
               </div>
-              <Button variant="ghost" size="icon-sm" onClick={() => setSelectedValue(null)} className="text-slate-500 shrink-0">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setSelectedValue(null)}
+                className="text-slate-500 shrink-0"
+              >
                 <X size={18} />
               </Button>
             </div>
@@ -343,12 +455,21 @@ export function ExamDetailContent() {
             <div className="p-5 space-y-4">
               {selectedValue.problems.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-2">Problemas</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-2">
+                    Problemas
+                  </p>
                   <div className="space-y-2">
                     {selectedValue.problems.map((p, i) => (
-                      <div key={i} className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-lg">
-                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
-                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{p}</p>
+                      <div
+                        key={i}
+                        className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-lg"
+                      >
+                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">
+                          {i + 1}
+                        </span>
+                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                          {p}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -356,12 +477,22 @@ export function ExamDetailContent() {
               )}
               {selectedValue.recommendations.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-teal-600 dark:text-teal-400 mb-2">Recomendações</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-teal-600 dark:text-teal-400 mb-2">
+                    Recomendações
+                  </p>
                   <div className="space-y-2">
                     {selectedValue.recommendations.map((r, i) => (
-                      <div key={i} className="flex items-start gap-2 p-2.5 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/40 rounded-lg">
-                        <CheckCircle2 size={15} className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
-                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{r}</p>
+                      <div
+                        key={i}
+                        className="flex items-start gap-2 p-2.5 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/40 rounded-lg"
+                      >
+                        <CheckCircle2
+                          size={15}
+                          className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5"
+                        />
+                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                          {r}
+                        </p>
                       </div>
                     ))}
                   </div>

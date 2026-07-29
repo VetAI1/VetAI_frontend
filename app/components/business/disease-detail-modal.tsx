@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  AlertCircle,
-  Pill,
-  Stethoscope,
-  X,
-} from 'lucide-react';
+import { AlertCircle, Pill, Stethoscope, X } from 'lucide-react';
 import { useEffect } from 'react';
 
 import { Badge } from '@/app/components/common/badge';
@@ -43,13 +38,16 @@ export function DiseaseDetailModal({
 
   const severityBg = {
     red: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
-    yellow: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800',
-    green: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
+    yellow:
+      'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800',
+    green:
+      'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
   };
 
-  const probability = disease.probability <= 1
-    ? Math.round(disease.probability * 100)
-    : Math.round(disease.probability);
+  const probability =
+    disease.probability <= 1
+      ? Math.round(disease.probability * 100)
+      : Math.round(disease.probability);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -61,11 +59,16 @@ export function DiseaseDetailModal({
         <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-5 flex items-start justify-between gap-3 z-10">
           <div className="flex items-start gap-3">
             <div className={`p-2 rounded-lg ${severityBg[disease.severity]}`}>
-              <AlertCircle size={20} className={
-                disease.severity === 'red' ? 'text-red-600 dark:text-red-400' :
-                  disease.severity === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
-                    'text-green-600 dark:text-green-400'
-              } />
+              <AlertCircle
+                size={20}
+                className={
+                  disease.severity === 'red'
+                    ? 'text-red-600 dark:text-red-400'
+                    : disease.severity === 'yellow'
+                      ? 'text-yellow-600 dark:text-yellow-400'
+                      : 'text-green-600 dark:text-green-400'
+                }
+              />
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -81,7 +84,12 @@ export function DiseaseDetailModal({
               </div>
             </div>
           </div>
-          <Button variant="ghost" size="icon-sm" onClick={onClose} className="text-slate-500">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onClose}
+            className="text-slate-500"
+          >
             <X size={18} />
           </Button>
         </div>
@@ -95,9 +103,11 @@ export function DiseaseDetailModal({
             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
               <div
                 className={`h-2.5 rounded-full transition-all duration-700 ${
-                  disease.severity === 'red' ? 'bg-red-500' :
-                    disease.severity === 'yellow' ? 'bg-yellow-500' :
-                      'bg-green-500'
+                  disease.severity === 'red'
+                    ? 'bg-red-500'
+                    : disease.severity === 'yellow'
+                      ? 'bg-yellow-500'
+                      : 'bg-green-500'
                 }`}
                 style={{ width: `${probability}%` }}
               />

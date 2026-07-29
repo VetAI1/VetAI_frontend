@@ -1,13 +1,16 @@
 import { httpClient, buildQuery } from '@/infra/http-client';
 import type { PaginatedResponse, QueryParams } from '@/types/common';
-import type { Vaccine, CreateVaccinePayload, UpdateVaccinePayload } from '@/types/vaccine';
+import type {
+  Vaccine,
+  CreateVaccinePayload,
+  UpdateVaccinePayload,
+} from '@/types/vaccine';
 
 export const vaccinesService = {
   list: (params?: QueryParams) =>
     httpClient<PaginatedResponse<Vaccine>>(`vaccines${buildQuery(params)}`),
 
-  get: (id: string) =>
-    httpClient<Vaccine>(`vaccines/${id}`),
+  get: (id: string) => httpClient<Vaccine>(`vaccines/${id}`),
 
   create: (data: CreateVaccinePayload) =>
     httpClient<Vaccine>('vaccines', {

@@ -5,12 +5,17 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Modal } from '@/app/components/common/modal';
-import { DataTable, type DataTableColumn } from '@/app/components/data/data-table';
+import {
+  DataTable,
+  type DataTableColumn,
+} from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/infra/auth-context';
+import { ApiError } from '@/infra/http-client';
+import { billingService } from '@/services/billing.service';
 import { collaboratorsService } from '@/services/collaborators.service';
 import { rolesService } from '@/services/roles.service';
 import type { Collaborator, Role } from '@/types/settings';
@@ -24,6 +29,10 @@ export default function AdminCollaborators() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [userLimitError, setUserLimitError] = useState<{
+    pricePerUser: number;
+    planName: string;
+  } | null>(null);
   const canEdit = can('collaborators:edit');
 
   async function load() {
@@ -41,21 +50,59 @@ export default function AdminCollaborators() {
     }
   }
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    void load();
+  }, []);
 
   async function invite() {
     if (!email.trim() || !roleId) return;
     setSaving(true);
     try {
-      await collaboratorsService.invite({ email: email.trim(), role_id: roleId });
+      await collaboratorsService.invite({
+        email: email.trim(),
+        role_id: roleId,
+      });
       toast.success('Convite enviado.');
       setEmail('');
       setRoleId(roles[0]?.id || '');
       setIsInviteOpen(false);
       await load();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        const data = error.data as {
+          code?: string;
+          pricePerUser?: number;
+          planName?: string;
+        };
+        if (data.code === 'USER_LIMIT_REACHED') {
+          setUserLimitError({
+            pricePerUser: data.pricePerUser ?? 0,
+            planName: data.planName ?? 'seu plano',
+          });
+        }
+      }
     } finally {
       setSaving(false);
     }
+  }
+
+  async function purchaseSeat() {
+    setSaving(true);
+    try {
+      await billingService.purchaseAdditionalUserSeats(1);
+      setUserLimitError(null);
+      toast.success('Usuário adicional contratado na assinatura Stripe.');
+      await invite();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function formatPrice(cents: number) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(cents / 100);
   }
 
   async function updateRole(collaboratorId: string, nextRoleId: string) {
@@ -69,7 +116,9 @@ export default function AdminCollaborators() {
       key: 'name',
       header: 'Nome',
       render: (c) => (
-        <span className="font-medium text-slate-900 dark:text-white">{c.name ?? 'Convite pendente'}</span>
+        <span className="font-medium text-slate-900 dark:text-white">
+          {c.name ?? 'Convite pendente'}
+        </span>
       ),
     },
     {
@@ -81,7 +130,9 @@ export default function AdminCollaborators() {
       key: 'status',
       header: 'Status',
       render: (c) => (
-        <span className="text-sm">{c.status === 'pending' ? 'Pendente' : 'Ativo'}</span>
+        <span className="text-sm">
+          {c.status === 'pending' ? 'Pendente' : 'Ativo'}
+        </span>
       ),
     },
     {
@@ -96,12 +147,20 @@ export default function AdminCollaborators() {
               disabled={!canEdit}
               className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
             >
-              <option value="" disabled>Selecione</option>
-              {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
+              <option value="" disabled>
+                Selecione
+              </option>
+              {roles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))}
             </select>
           );
         }
-        return <span className="text-sm text-slate-500">{c.role_name ?? '-'}</span>;
+        return (
+          <span className="text-sm text-slate-500">{c.role_name ?? '-'}</span>
+        );
       },
     },
   ];
@@ -113,24 +172,27 @@ export default function AdminCollaborators() {
         showStorage={false}
         headerAction={
           canEdit ? (
-            <Button onClick={() => setIsInviteOpen(true)} className="bg-teal-600 text-white hover:bg-teal-700">
+            <Button
+              onClick={() => setIsInviteOpen(true)}
+              className="bg-teal-600 text-white hover:bg-teal-700"
+            >
               <UserPlus className="h-4 w-4" /> Convidar colaborador
             </Button>
           ) : undefined
         }
       />
 
-      <SectionCard title="Equipe" subtitle="Colaboradores ativos e convites pendentes">
-        {loading ? (
-          <div className="flex justify-center py-10 text-slate-500"><Loader2 className="animate-spin" /></div>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={collaborators}
-            getRowKey={(c) => c.id}
-            emptyState="Nenhum colaborador encontrado."
-          />
-        )}
+      <SectionCard
+        title="Equipe"
+        subtitle="Colaboradores ativos e convites pendentes"
+      >
+        <DataTable
+          columns={columns}
+          data={collaborators}
+          getRowKey={(c) => c.id}
+          emptyState="Nenhum colaborador encontrado."
+          loading={loading}
+        />
       </SectionCard>
 
       {isInviteOpen && (
@@ -162,15 +224,65 @@ export default function AdminCollaborators() {
                 disabled={saving}
                 className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
               >
-                {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
+                {roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setIsInviteOpen(false)} disabled={saving}>
+              <Button
+                variant="outline"
+                onClick={() => setIsInviteOpen(false)}
+                disabled={saving}
+              >
                 Cancelar
               </Button>
-              <Button onClick={invite} disabled={saving || !email.trim() || !roleId} className="bg-teal-600 text-white hover:bg-teal-700">
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Enviar convite
+              <Button
+                onClick={invite}
+                disabled={saving || !email.trim() || !roleId}
+                className="bg-teal-600 text-white hover:bg-teal-700"
+              >
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}{' '}
+                Enviar convite
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {userLimitError && (
+        <Modal
+          title="Limite de usuários atingido"
+          description={`${userLimitError.planName} não possui vagas disponíveis para este convite.`}
+          maxWidth="sm"
+          onClose={() => setUserLimitError(null)}
+        >
+          <div className="space-y-5">
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Contrate mais um usuário por{' '}
+              {formatPrice(userLimitError.pricePerUser)}/mês. O valor será
+              adicionado à sua assinatura Stripe.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setUserLimitError(null)}
+                disabled={saving}
+              >
+                Agora não
+              </Button>
+              <Button
+                onClick={purchaseSeat}
+                loading={saving}
+                className="bg-teal-600 text-white hover:bg-teal-700"
+              >
+                Contratar usuário
               </Button>
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 
+import { notifyInsufficientAiCredits } from '@/infra/http-client';
 import { getSocket } from '@/infra/socket';
 import type { ConsultationDisease } from '@/types/consultation';
 
@@ -48,7 +49,9 @@ export function useConsultation({
   consultationId,
   initialMessages,
 }: UseConsultationOptions) {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages ?? []);
+  const [messages, setMessages] = useState<ChatMessage[]>(
+    initialMessages ?? [],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const [diseases, setDiseases] = useState<ConsultationDisease[]>([]);
@@ -83,9 +86,12 @@ export function useConsultation({
         ];
       });
 
-      if (payload.diseases?.length > 0) setDiseases(sortDiseases(payload.diseases));
-      if (payload.suggestedInfo?.length > 0) setSuggestedInfo(payload.suggestedInfo);
-      if (payload.suggestedTreatments?.length > 0) setSuggestedTreatments(payload.suggestedTreatments);
+      if (payload.diseases?.length > 0)
+        setDiseases(sortDiseases(payload.diseases));
+      if (payload.suggestedInfo?.length > 0)
+        setSuggestedInfo(payload.suggestedInfo);
+      if (payload.suggestedTreatments?.length > 0)
+        setSuggestedTreatments(payload.suggestedTreatments);
 
       setIsLoading(false);
     };
@@ -94,24 +100,47 @@ export function useConsultation({
       setIsFinished(true);
       setIsFinishing(false);
       setSummary(payload.summary);
-      if (payload.diseases?.length > 0) setDiseases(sortDiseases(payload.diseases));
-      if (payload.suggestedTreatments?.length > 0) setSuggestedTreatments(payload.suggestedTreatments);
+      if (payload.diseases?.length > 0)
+        setDiseases(sortDiseases(payload.diseases));
+      if (payload.suggestedTreatments?.length > 0)
+        setSuggestedTreatments(payload.suggestedTreatments);
       setIsLoading(false);
     };
 
-    const handleError = (payload: { message: string }) => {
-      setError(payload.message);
+    const handleError = (payload: unknown) => {
+      const errObj = typeof payload === 'object' && payload !== null ? (payload as Record<string, unknown>) : {};
+      const responseObj = typeof errObj.response === 'object' && errObj.response !== null ? (errObj.response as Record<string, unknown>) : undefined;
+
+      const code = String(errObj.code ?? responseObj?.code ?? '');
+      const msg = String(errObj.message ?? responseObj?.message ?? (typeof payload === 'string' ? payload : ''));
+      const status = Number(errObj.status ?? errObj.statusCode ?? responseObj?.statusCode ?? responseObj?.status ?? 0);
+
+      const isInsufficientCredits =
+        code === 'INSUFFICIENT_AI_CREDITS' ||
+        status === 403 ||
+        msg.toLowerCase().includes('insufficient ai credits') ||
+        msg.toLowerCase().includes('créditos de ia insuficientes');
+
+      if (isInsufficientCredits) {
+        notifyInsufficientAiCredits();
+        setIsLoading(false);
+        setIsFinishing(false);
+        return;
+      }
+
+      setError(msg || 'Erro ao processar mensagem.');
       setIsFinishing(false);
 
       setMessages((prev) => {
-        const withoutTyping = prev.filter((msg) => !msg.isTyping);
+        const withoutTyping = prev.filter((msgItem) => !msgItem.isTyping);
         nextIdRef.current += 1;
         return [
           ...withoutTyping,
           {
             id: nextIdRef.current,
             role: 'assistant' as const,
-            content: 'Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.',
+            content:
+              'Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.',
             timestamp: new Date(),
           },
         ];
@@ -119,12 +148,16 @@ export function useConsultation({
       setIsLoading(false);
     };
 
-    const handleAutoFinished = (payload: ConsultationFinishedPayload & { consultationId: string }) => {
+    const handleAutoFinished = (
+      payload: ConsultationFinishedPayload & { consultationId: string },
+    ) => {
       setIsFinished(true);
       setIsFinishing(false);
       setSummary(payload.summary);
-      if (payload.diseases?.length > 0) setDiseases(sortDiseases(payload.diseases));
-      if (payload.suggestedTreatments?.length > 0) setSuggestedTreatments(payload.suggestedTreatments);
+      if (payload.diseases?.length > 0)
+        setDiseases(sortDiseases(payload.diseases));
+      if (payload.suggestedTreatments?.length > 0)
+        setSuggestedTreatments(payload.suggestedTreatments);
       setIsLoading(false);
       setError('Consulta finalizada automaticamente por inatividade.');
     };
@@ -199,7 +232,11 @@ export function useConsultation({
     ) => {
       setMessages(newMessages);
       nextIdRef.current = newMessages.length;
-      setDiseases(initialDiagnosis?.diseases?.length ? sortDiseases(initialDiagnosis.diseases) : []);
+      setDiseases(
+        initialDiagnosis?.diseases?.length
+          ? sortDiseases(initialDiagnosis.diseases)
+          : [],
+      );
       setSuggestedInfo(initialDiagnosis?.suggestedQuestions ?? []);
       setSuggestedTreatments(initialDiagnosis?.suggestedTreatments ?? []);
       setIsFinished(false);

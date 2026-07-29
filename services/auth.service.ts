@@ -2,7 +2,6 @@ import { httpClient } from '@/infra/http-client';
 import type {
   AuthResponse,
   LoginPayload,
-  RefreshResponse,
   RegisterPayload,
   TeamMember,
   User,
@@ -21,23 +20,27 @@ export const authService = {
     httpClient<AuthResponse>('auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
+      skipAuthRefresh: true,
     }),
 
   register: (data: RegisterPayload) =>
     httpClient<AuthResponse>('auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
+      skipAuthRefresh: true,
     }),
 
   me: () =>
     httpClient<User>('auth/me', {
       method: 'GET',
+      skipToast: true,
     }),
 
-  refresh: (refresh_token: string) =>
-    httpClient<RefreshResponse>('auth/refresh', {
+  logout: () =>
+    httpClient<void>('auth/logout', {
       method: 'POST',
-      body: JSON.stringify({ refresh_token }),
+      skipToast: true,
+      skipAuthRefresh: true,
     }),
 
   listTeam: () =>

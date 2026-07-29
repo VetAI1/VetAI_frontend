@@ -32,3 +32,35 @@ export interface RolePayload {
   permissions: string[];
   collaborator_ids?: string[];
 }
+
+export interface HospitalAddress {
+  zip_code: string;
+  street: string;
+  number: string;
+  complement?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+}
+
+export interface HospitalResponsible {
+  name: string;
+  crmv: string;
+}
+
+export interface Hospital {
+  id: string;
+  name: string;
+  cnpj?: string;
+  crmv?: string;
+  address?: HospitalAddress;
+  responsible?: HospitalResponsible;
+}
+
+export interface UpdateHospitalPayload {
+  name: string;
+  cnpj: string;
+  crmv?: string;
+  address: HospitalAddress;
+  responsible: HospitalResponsible;
+}

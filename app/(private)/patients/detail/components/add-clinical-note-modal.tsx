@@ -22,7 +22,11 @@ interface AddClinicalNoteModalProps {
   onSuccess: () => void;
 }
 
-export function AddClinicalNoteModal({ patientId, onClose, onSuccess }: AddClinicalNoteModalProps) {
+export function AddClinicalNoteModal({
+  patientId,
+  onClose,
+  onSuccess,
+}: AddClinicalNoteModalProps) {
   const [saving, setSaving] = useState(false);
 
   const {
@@ -104,10 +108,19 @@ export function AddClinicalNoteModal({ patientId, onClose, onSuccess }: AddClini
         />
 
         <div className="flex justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={saving}
+          >
             Cancelar
           </Button>
-          <Button type="submit" disabled={saving} className="bg-teal-600 text-white hover:bg-teal-700">
+          <Button
+            type="submit"
+            disabled={saving}
+            className="bg-teal-600 text-white hover:bg-teal-700"
+          >
             {saving ? <Loader2 size={16} className="animate-spin" /> : 'Salvar'}
           </Button>
         </div>

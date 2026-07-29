@@ -3,7 +3,7 @@ import type { PaginatedResponse, QueryParams } from '@/types/common';
 import type { Payment, CreatePaymentPayload, UpdatePaymentPayload } from '@/types/payment';
 
 export const paymentsService = {
-  list: (params?: QueryParams & { tutor_id?: string; patient_id?: string; status?: string }) => {
+  list: (params?: QueryParams & { tutor_id?: string | undefined; patient_id?: string | undefined; status?: string | undefined }) => {
     const base = buildQuery(params);
     const extra: string[] = [];
     if (params?.tutor_id) extra.push(`tutor_id=${params.tutor_id}`);

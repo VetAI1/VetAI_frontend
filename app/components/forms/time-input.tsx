@@ -22,7 +22,8 @@ export interface TimeInputProps {
   name?: string;
 }
 
-function splitTime(value: string): { h: number | null; m: number | null } {
+function splitTime(value?: string): { h: number | null; m: number | null } {
+  if (!value) return { h: null, m: null };
   const match = value.match(/^(\d{2}):(\d{2})$/);
   if (!match) return { h: null, m: null };
   return { h: parseInt(match[1]!, 10), m: parseInt(match[2]!, 10) };
@@ -88,16 +89,16 @@ function PartDropdown({
         e.preventDefault();
         e.stopPropagation();
       }}
-      className='rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-slate-900/60 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150'
+      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-slate-900/60 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150"
     >
-      <div className='text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide text-center py-1.5 border-b border-slate-100 dark:border-slate-700 select-none'>
+      <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide text-center py-1.5 border-b border-slate-100 dark:border-slate-700 select-none">
         {header}
       </div>
-      <div ref={listRef} className='h-[184px] overflow-y-auto py-1'>
+      <div ref={listRef} className="h-[184px] overflow-y-auto py-1">
         {items.map((n) => (
           <button
             key={n}
-            type='button'
+            type="button"
             onClick={() => {
               onSelect(n);
               onClose();
@@ -208,11 +209,11 @@ function PartInput({
   };
 
   return (
-    <div ref={containerRef} className='relative flex-1'>
+    <div ref={containerRef} className="relative flex-1">
       <input
         id={id}
-        type='text'
-        inputMode='numeric'
+        type="text"
+        inputMode="numeric"
         value={display}
         placeholder={placeholder}
         maxLength={2}
@@ -304,26 +305,26 @@ function TimeInputInner({
       {label && (
         <label
           htmlFor={`${inputId}-h`}
-          className='text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block'
+          className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block"
         >
           {label}
-          {required && <span className='text-red-500 ml-0.5'>*</span>}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
 
-      <div className='flex items-center gap-1.5'>
+      <div className="flex items-center gap-1.5">
         <PartInput
           id={`${inputId}-h`}
           value={localH}
           max={maxHour}
-          placeholder='HH'
+          placeholder="HH"
           items={HOURS.filter((h) => h >= minHour && h <= maxHour)}
-          dropdownHeader='Hora'
+          dropdownHeader="Hora"
           {...(disabled !== undefined ? { disabled } : {})}
           onChange={handleHourChange}
         />
 
-        <span className='text-lg font-semibold text-slate-400 dark:text-slate-500 select-none leading-none pb-0.5'>
+        <span className="text-lg font-semibold text-slate-400 dark:text-slate-500 select-none leading-none pb-0.5">
           :
         </span>
 
@@ -331,16 +332,16 @@ function TimeInputInner({
           id={`${inputId}-m`}
           value={localM}
           max={59}
-          placeholder='MM'
+          placeholder="MM"
           items={MINUTES}
-          dropdownHeader='Minuto'
+          dropdownHeader="Minuto"
           {...(disabled !== undefined ? { disabled } : {})}
           onChange={handleMinChange}
         />
       </div>
 
       {error && (
-        <p className='mt-1 text-xs text-red-500 dark:text-red-400'>{error}</p>
+        <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
       )}
     </div>
   );
@@ -360,7 +361,7 @@ export function TimeInput({
         control={control}
         render={({ field }) => (
           <TimeInputInner
-            value={field.value}
+            value={field.value ?? ''}
             onChange={field.onChange}
             {...rest}
           />

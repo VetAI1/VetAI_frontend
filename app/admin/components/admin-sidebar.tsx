@@ -1,16 +1,50 @@
 'use client';
 
-import { ArrowLeft, LayoutDashboard, Menu, ShieldCheck, Users, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  CreditCard,
+  LayoutDashboard,
+  Menu,
+  Moon,
+  Settings,
+  ShieldCheck,
+  Sun,
+  Users,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { useTheme } from '@/contexts/theme-context';
 import { useAuth } from '@/infra/auth-context';
 
 const items = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/collaborators', label: 'Colaboradores', icon: Users, permission: 'collaborators:view' },
-  { href: '/admin/roles', label: 'Papel administrativo', icon: ShieldCheck, permission: 'roles:view' },
+  {
+    href: '/admin/subscription',
+    label: 'Plano & Assinatura',
+    icon: CreditCard,
+    permission: 'billing:view',
+  },
+  {
+    href: '/admin/collaborators',
+    label: 'Colaboradores',
+    icon: Users,
+    permission: 'collaborators:view',
+  },
+  {
+    href: '/admin/roles',
+    label: 'Papel administrativo',
+    icon: ShieldCheck,
+    permission: 'roles:view',
+  },
+  {
+    href: '/admin/settings',
+    label: 'Configurações da clínica',
+    icon: Settings,
+    permission: 'settings:view',
+  },
 ];
 
 export function AdminSidebar() {
@@ -18,6 +52,7 @@ export function AdminSidebar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { can } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
@@ -29,7 +64,10 @@ export function AdminSidebar() {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setIsOpen(false)} />
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
       )}
 
       <aside
@@ -50,7 +88,8 @@ export function AdminSidebar() {
         <nav className="flex-1 space-y-2 p-4">
           {items.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const isActive =
+              pathname === item.href || pathname.startsWith(`${item.href}/`);
             const disabled = item.permission ? !can(item.permission) : false;
             const className = `flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
               disabled
@@ -62,21 +101,37 @@ export function AdminSidebar() {
 
             if (disabled) {
               return (
-                <span key={item.href} className={className} aria-disabled="true">
+                <span
+                  key={item.href}
+                  className={className}
+                  aria-disabled="true"
+                >
                   <Icon size={19} /> {item.label}
                 </span>
               );
             }
 
             return (
-              <Link key={item.href} href={item.href} className={className} onClick={() => setIsOpen(false)}>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={className}
+                onClick={() => setIsOpen(false)}
+              >
                 <Icon size={19} /> {item.label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-slate-800 p-4">
+        <div className="border-t border-slate-800 p-4 space-y-2">
+          <button
+            onClick={toggleTheme}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-900"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+          </button>
           <button
             onClick={() => router.push('/analytics/dashboard')}
             className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-900"

@@ -21,7 +21,12 @@ export function loadScheduleSettings(): ScheduleSettingsState {
   if (typeof window === 'undefined') return DEFAULT_SCHEDULE_SETTINGS;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? { ...DEFAULT_SCHEDULE_SETTINGS, ...(JSON.parse(raw) as Partial<ScheduleSettingsState>) } : DEFAULT_SCHEDULE_SETTINGS;
+    return raw
+      ? {
+        ...DEFAULT_SCHEDULE_SETTINGS,
+        ...(JSON.parse(raw) as Partial<ScheduleSettingsState>),
+      }
+      : DEFAULT_SCHEDULE_SETTINGS;
   } catch {
     return DEFAULT_SCHEDULE_SETTINGS;
   }
@@ -36,14 +41,19 @@ interface ScheduleSettingsProps {
   onChange: (s: ScheduleSettingsState) => void;
 }
 
-export function ScheduleSettings({ settings, onChange }: ScheduleSettingsProps) {
+export function ScheduleSettings({
+  settings,
+  onChange,
+}: ScheduleSettingsProps) {
   const [open, setOpen] = useState(false);
 
   function update(field: keyof ScheduleSettingsState, value: number) {
     const next = { ...settings, [field]: value };
     // Keep start < end
-    if (field === 'weekStartHour' && value >= next.weekEndHour) next.weekEndHour = Math.min(value + 1, 24);
-    if (field === 'weekEndHour' && value <= next.weekStartHour) next.weekStartHour = Math.max(value - 1, 0);
+    if (field === 'weekStartHour' && value >= next.weekEndHour)
+      next.weekEndHour = Math.min(value + 1, 24);
+    if (field === 'weekEndHour' && value <= next.weekStartHour)
+      next.weekStartHour = Math.max(value - 1, 0);
     onChange(next);
     saveScheduleSettings(next);
   }
@@ -79,7 +89,9 @@ export function ScheduleSettings({ settings, onChange }: ScheduleSettingsProps) 
             </p>
             <div className="flex items-center gap-2">
               <div className="flex flex-col gap-0.5 flex-1">
-                <label className="text-[10px] text-slate-400 dark:text-slate-500">Início</label>
+                <label className="text-[10px] text-slate-400 dark:text-slate-500">
+                  Início
+                </label>
                 <SelectInput
                   compact
                   value={String(settings.weekStartHour)}
@@ -89,7 +101,9 @@ export function ScheduleSettings({ settings, onChange }: ScheduleSettingsProps) 
               </div>
               <span className="text-xs text-slate-400 mt-3"> – </span>
               <div className="flex flex-col gap-0.5 flex-1">
-                <label className="text-[10px] text-slate-400 dark:text-slate-500">Fim</label>
+                <label className="text-[10px] text-slate-400 dark:text-slate-500">
+                  Fim
+                </label>
                 <SelectInput
                   compact
                   value={String(settings.weekEndHour)}

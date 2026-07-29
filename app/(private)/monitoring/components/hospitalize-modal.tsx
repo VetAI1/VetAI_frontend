@@ -5,13 +5,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
+import { Autocomplete } from '@/app/components/forms/autocomplete';
 import { DateInput } from '@/app/components/forms/date-input';
 import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
-import { SearchSelect } from '@/app/components/forms/search-select';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
 import { MONITORING_INTERVAL_OPTIONS } from '@/constants';
+import { useAutoComplete } from '@/hooks/use-auto-complete';
 import {
   hospitalizeSchema,
   type HospitalizeFormData,
@@ -40,11 +41,6 @@ export function HospitalizeModal({
   const [vets, setVets] = useState<Collaborator[]>([]);
   const [boxes, setBoxes] = useState<Box[]>([]);
 
-  const [patientSearch, setPatientSearch] = useState('');
-  const [patientOptions, setPatientOptions] = useState<
-    Array<{ id: string; label: string; description?: string | undefined }>
-  >([]);
-  const [patientsLoading, setPatientsLoading] = useState(false);
   const [patientOpen, setPatientOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<{
     id: string;
@@ -88,6 +84,20 @@ export function HospitalizeModal({
     hospitalization?.allergies.join(', ') ?? '',
   );
 
+  const {
+    items: patients,
+    search: patientSearch,
+    loading: patientsLoading,
+    loadingMore: patientsLoadingMore,
+    hasMorePage: hasMorePatients,
+    setSearch: setPatientSearch,
+    loadNextPage: loadNextPatientPage,
+  } = useAutoComplete({
+    fetcher: patientsService.list,
+    pageSize: 10,
+    enabled: !isEdit,
+  });
+
   useEffect(() => {
     void Promise.all([
       authService.me().catch(() => null),
@@ -113,29 +123,6 @@ export function HospitalizeModal({
       .then(setBoxes)
       .catch(() => undefined);
   }, []);
-
-  useEffect(() => {
-    if (isEdit) return;
-    const timeout = window.setTimeout(async () => {
-      setPatientsLoading(true);
-      try {
-        const response = await patientsService.list({
-          search: patientSearch || undefined,
-          size: 10,
-        });
-        setPatientOptions(
-          response.data.map((patient) => ({
-            id: patient.id,
-            label: patient.name,
-            description: patient.breed || undefined,
-          })),
-        );
-      } finally {
-        setPatientsLoading(false);
-      }
-    }, 300);
-    return () => window.clearTimeout(timeout);
-  }, [patientSearch, isEdit]);
 
   const boxOptions = useMemo(() => {
     const currentBoxId = hospitalization?.box?.id;
@@ -224,20 +211,25 @@ export function HospitalizeModal({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {!isEdit && (
-          <SearchSelect
+          <Autocomplete
             label="Paciente"
             required
             placeholder="Buscar paciente pelo nome..."
             search={patientSearch}
             onSearchChange={setPatientSearch}
-            options={patientOptions}
+            items={patients}
+            getOptionLabel={(patient) => patient.name}
+            getOptionDescription={(patient) => patient.breed || undefined}
             loading={patientsLoading}
+            loadingMore={patientsLoadingMore}
+            hasMorePage={hasMorePatients}
+            onLoadNextPage={loadNextPatientPage}
             open={patientOpen}
             onOpenChange={setPatientOpen}
             selectedOption={selectedPatient}
-            onSelect={(option) => {
-              setSelectedPatient(option);
-              setValue('patient_id', option.id, { shouldValidate: true });
+            onSelect={(patient) => {
+              setSelectedPatient({ id: patient.id, label: patient.name });
+              setValue('patient_id', patient.id, { shouldValidate: true });
               setPatientOpen(false);
             }}
             onClear={() => {

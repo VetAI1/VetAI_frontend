@@ -1,8 +1,5 @@
 import { httpClient } from '@/infra/http-client';
-import type {
-  Collaborator,
-  InviteCollaboratorPayload,
-} from '@/types/settings';
+import type { Collaborator, InviteCollaboratorPayload } from '@/types/settings';
 
 export const collaboratorsService = {
   findAll: () => httpClient<Collaborator[]>('collaborators'),

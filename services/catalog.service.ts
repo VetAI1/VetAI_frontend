@@ -3,7 +3,7 @@ import type { CatalogItem, CatalogCategory, CreateCatalogItemPayload, UpdateCata
 import type { PaginatedResponse, QueryParams } from '@/types/common';
 
 export const catalogService = {
-  list: (params?: QueryParams & { category?: CatalogCategory; active?: boolean }) => {
+  list: (params?: QueryParams & { category?: CatalogCategory | undefined; active?: boolean | undefined }) => {
     const base = buildQuery(params);
     const extra: string[] = [];
     if (params?.category) extra.push(`category=${params.category}`);

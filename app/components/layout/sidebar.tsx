@@ -38,8 +38,8 @@ export function Sidebar() {
   const { theme, toggleTheme } = useTheme();
   const { logout, can } = useAuth();
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     router.push('/login');
   }
 
@@ -108,19 +108,19 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className='md:hidden print:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg'
+        className="md:hidden print:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg"
       >
         {isOpen ? (
-          <X size={24} className='text-slate-900 dark:text-white' />
+          <X size={24} className="text-slate-900 dark:text-white" />
         ) : (
-          <Menu size={24} className='text-slate-900 dark:text-white' />
+          <Menu size={24} className="text-slate-900 dark:text-white" />
         )}
       </button>
 
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className='md:hidden fixed inset-0 bg-black/50 z-40'
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
         />
       )}
 
@@ -129,14 +129,14 @@ export function Sidebar() {
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         } md:flex`}
       >
-        <div className='h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800'>
-          <div className='flex items-center'>
-            <Activity className='text-teal-600 mr-2' />
-            <span className='font-bold text-lg tracking-tight'>VetAI</span>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center">
+            <Activity className="text-teal-600 mr-2" />
+            <span className="font-bold text-lg tracking-tight">VetAI</span>
           </div>
           <NotificationBell />
         </div>
-        <nav className='flex-1 p-4 space-y-2'>
+        <nav className="flex-1 p-4 space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -155,7 +155,7 @@ export function Sidebar() {
               <>
                 <Icon size={20} /> {item.label}
                 {item.label === 'Consulta' && (
-                  <span className='ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300'>
+                  <span className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300">
                     BETA
                   </span>
                 )}
@@ -167,7 +167,7 @@ export function Sidebar() {
                 <span
                   key={item.href}
                   className={className}
-                  aria-disabled='true'
+                  aria-disabled="true"
                 >
                   {content}
                 </span>
@@ -186,17 +186,17 @@ export function Sidebar() {
             );
           })}
         </nav>
-        <div className='p-4 border-t border-slate-200 dark:border-slate-800 space-y-2'>
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
           <button
             onClick={toggleTheme}
-            className='flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg w-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg w-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
           </button>
           <button
             onClick={handleLogout}
-            className='flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg w-full text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+            className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg w-full text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
           >
             <LogOut size={18} /> Sair
           </button>

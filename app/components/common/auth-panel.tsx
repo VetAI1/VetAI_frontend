@@ -1,6 +1,12 @@
 'use client';
 
-import { Activity, Microscope, PawPrint, Stethoscope, Users } from 'lucide-react';
+import {
+  Activity,
+  Microscope,
+  PawPrint,
+  Stethoscope,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
 
 import { Counter } from '@/app/components/common/counter';
@@ -15,7 +21,12 @@ interface StatItem {
 const STATS: StatItem[] = [
   { icon: Users, value: 2500, suffix: '+', label: 'Veterinários ativos' },
   { icon: Microscope, value: 18000, suffix: '+', label: 'Exames analisados' },
-  { icon: Stethoscope, value: 45000, suffix: '+', label: 'Consultas realizadas' },
+  {
+    icon: Stethoscope,
+    value: 45000,
+    suffix: '+',
+    label: 'Consultas realizadas',
+  },
   { icon: PawPrint, value: 32000, suffix: '+', label: 'Pets registrados' },
 ];
 
@@ -43,8 +54,14 @@ export function AuthPanel({
       />
 
       <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/5 animate-pulse" />
-      <div className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full bg-white/5 animate-pulse" style={{ animationDelay: '1s' }} />
-      <div className="absolute top-1/2 right-1/4 w-48 h-48 rounded-full bg-white/5 animate-pulse" style={{ animationDelay: '2s' }} />
+      <div
+        className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full bg-white/5 animate-pulse"
+        style={{ animationDelay: '1s' }}
+      />
+      <div
+        className="absolute top-1/2 right-1/4 w-48 h-48 rounded-full bg-white/5 animate-pulse"
+        style={{ animationDelay: '2s' }}
+      />
 
       <div className="relative z-10 flex flex-col justify-between px-12 xl:px-16 py-12 w-full">
         <Link href="/" className="flex items-center gap-3">
@@ -74,9 +91,15 @@ export function AuthPanel({
                 >
                   <Icon size={20} className="text-teal-200 mb-2" />
                   <div className="text-2xl font-bold text-white">
-                    <Counter target={stat.value} duration={2000} suffix={stat.suffix} />
+                    <Counter
+                      target={stat.value}
+                      duration={2000}
+                      suffix={stat.suffix}
+                    />
                   </div>
-                  <p className="text-xs text-teal-200/80 mt-0.5">{stat.label}</p>
+                  <p className="text-xs text-teal-200/80 mt-0.5">
+                    {stat.label}
+                  </p>
                 </div>
               );
             })}
@@ -89,7 +112,10 @@ export function AuthPanel({
             Criptografia de ponta a ponta
           </div>
           <div className="flex items-center gap-2 text-teal-200/70 text-xs">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" style={{ animationDelay: '500ms' }} />
+            <div
+              className="w-2 h-2 rounded-full bg-green-400 animate-pulse"
+              style={{ animationDelay: '500ms' }}
+            />
             LGPD Compliant
           </div>
         </div>

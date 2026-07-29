@@ -161,42 +161,42 @@ function CalendarDropdown({
         e.preventDefault();
         e.stopPropagation();
       }}
-      className='rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-slate-900/60 p-3 animate-in fade-in-0 zoom-in-95 duration-150'
+      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-slate-900/60 p-3 animate-in fade-in-0 zoom-in-95 duration-150"
     >
-      <div className='flex items-center justify-between mb-3 px-1'>
+      <div className="flex items-center justify-between mb-3 px-1">
         <button
-          type='button'
+          type="button"
           onClick={prevMonth}
-          className='p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors'
+          className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
         >
           <ChevronLeft size={16} />
         </button>
 
-        <span className='text-sm font-semibold text-slate-800 dark:text-slate-100 select-none'>
+        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 select-none">
           {MONTHS[viewMonth]} {viewYear}
         </span>
 
         <button
-          type='button'
+          type="button"
           onClick={nextMonth}
-          className='p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors'
+          className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
         >
           <ChevronRight size={16} />
         </button>
       </div>
 
-      <div className='grid grid-cols-7 mb-1'>
+      <div className="grid grid-cols-7 mb-1">
         {DAYS_SHORT.map((d) => (
           <div
             key={d}
-            className='text-center text-[11px] font-medium text-slate-400 dark:text-slate-500 py-1 select-none'
+            className="text-center text-[11px] font-medium text-slate-400 dark:text-slate-500 py-1 select-none"
           >
             {d}
           </div>
         ))}
       </div>
 
-      <div className='grid grid-cols-7 gap-y-0.5'>
+      <div className="grid grid-cols-7 gap-y-0.5">
         {cells.map((day, idx) => {
           if (!day) return <div key={idx} />;
 
@@ -214,7 +214,7 @@ function CalendarDropdown({
           return (
             <button
               key={idx}
-              type='button'
+              type="button"
               onClick={() => handleDay(day)}
               className={cn(
                 'mx-auto flex h-8 w-8 items-center justify-center rounded-full text-sm transition-all duration-100 select-none',
@@ -231,21 +231,21 @@ function CalendarDropdown({
         })}
       </div>
 
-      <div className='mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between'>
+      <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
         <button
-          type='button'
+          type="button"
           onClick={() => {
             onSelect('');
             onClose();
           }}
-          className='text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-1'
+          className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-1"
         >
           Limpar
         </button>
         <button
-          type='button'
+          type="button"
           onClick={goToToday}
-          className='text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors px-1'
+          className="text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors px-1"
         >
           Hoje
         </button>
@@ -333,16 +333,16 @@ function DateInputInner({
       {label && (
         <label
           htmlFor={inputId}
-          className='text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block'
+          className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block"
         >
           {label}
-          {required && <span className='text-red-500 ml-0.5'>*</span>}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
-      <div className='relative' ref={containerRef}>
+      <div className="relative" ref={containerRef}>
         <input
           id={inputId}
-          type='text'
+          type="text"
           value={display}
           onChange={handleTextChange}
           placeholder={placeholder}
@@ -358,7 +358,7 @@ function DateInputInner({
           )}
         />
         <button
-          type='button'
+          type="button"
           tabIndex={-1}
           onClick={toggleCalendar}
           disabled={disabled}
@@ -388,7 +388,7 @@ function DateInputInner({
         )}
 
       {error && (
-        <p className='text-xs text-red-500 dark:text-red-400 mt-1'>{error}</p>
+        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{error}</p>
       )}
     </div>
   );
@@ -408,7 +408,7 @@ export function DateInput({
         control={control}
         render={({ field }) => (
           <DateInputInner
-            value={field.value}
+            value={field.value ?? ''}
             onChange={field.onChange}
             {...rest}
           />

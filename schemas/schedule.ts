@@ -35,7 +35,10 @@ export const scheduleEventSchema = yup.object({
     .string()
     .required('O horário de início é obrigatório.')
     .matches(/^\d{2}:\d{2}$/, 'Horário inválido.'),
-  endTime: yup.string().optional().matches(/^$|^\d{2}:\d{2}$/, 'Horário inválido.'),
+  endTime: yup
+    .string()
+    .optional()
+    .matches(/^$|^\d{2}:\d{2}$/, 'Horário inválido.'),
   type: yup
     .mixed<EventType>()
     .oneOf(['consultation', 'surgery', 'vaccine', 'exam', 'other'])

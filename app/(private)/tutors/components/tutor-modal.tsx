@@ -80,91 +80,91 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className='absolute inset-0 bg-black/50 backdrop-blur-sm'
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className='relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200'>
-        <div className='flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700'>
+      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700">
           <div>
-            <h2 className='text-lg font-bold text-slate-900 dark:text-white'>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
               {isEdit ? 'Editar Tutor' : 'Novo Tutor'}
             </h2>
-            <p className='text-sm text-slate-500 dark:text-slate-400 mt-0.5'>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
               {isEdit ? 'Atualize os dados do tutor' : 'Cadastre um novo tutor'}
             </p>
           </div>
           <Button
-            variant='ghost'
-            size='icon-sm'
+            variant="ghost"
+            size="icon-sm"
             onClick={onClose}
-            className='text-slate-500'
+            className="text-slate-500"
           >
             <X size={18} />
           </Button>
         </div>
 
-        <div className='p-5 space-y-4'>
+        <div className="p-5 space-y-4">
           <Controller
-            name='name'
+            name="name"
             control={control}
             render={({ field }) => (
               <InputWithLabel
-                label='Nome'
+                label="Nome"
                 required
-                type='text'
+                type="text"
                 value={field.value}
                 onChange={field.onChange}
-                placeholder='Ex: João Silva'
+                placeholder="Ex: João Silva"
                 error={errors.name?.message}
               />
             )}
           />
 
           <Controller
-            name='cpf'
+            name="cpf"
             control={control}
             render={({ field }) => (
               <InputWithLabel
-                label='CPF'
+                label="CPF"
                 required
-                type='text'
+                type="text"
                 value={field.value}
                 onChange={(e) => field.onChange(formatCPF(e.target.value))}
-                placeholder='Ex: 123.456.789-09'
+                placeholder="Ex: 123.456.789-09"
                 error={errors.cpf?.message}
               />
             )}
           />
 
           <Controller
-            name='phone'
+            name="phone"
             control={control}
             render={({ field }) => (
               <InputWithLabel
-                label='Telefone'
+                label="Telefone"
                 required
-                type='tel'
+                type="tel"
                 value={field.value}
                 onChange={field.onChange}
-                placeholder='Ex: (11) 99999-9999'
+                placeholder="Ex: (11) 99999-9999"
                 error={errors.phone?.message}
               />
             )}
           />
 
           <Controller
-            name='email'
+            name="email"
             control={control}
             render={({ field }) => (
               <InputWithLabel
-                label='E-mail'
+                label="E-mail"
                 required
-                type='email'
+                type="email"
                 value={field.value}
                 onChange={field.onChange}
-                placeholder='Ex: joao@email.com'
+                placeholder="Ex: joao@email.com"
                 error={errors.email?.message}
               />
             )}
@@ -186,17 +186,17 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
           />
         </div>
 
-        <div className='flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-200 dark:border-slate-700'>
-          <Button variant='outline' onClick={onClose} disabled={saving}>
+        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-200 dark:border-slate-700">
+          <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
             disabled={saving}
-            className='bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800 min-w-[100px]'
+            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800 min-w-[100px]"
           >
             {saving ? (
-              <Loader2 size={16} className='animate-spin' />
+              <Loader2 size={16} className="animate-spin" />
             ) : isEdit ? (
               'Salvar'
             ) : (

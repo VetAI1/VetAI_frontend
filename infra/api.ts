@@ -261,7 +261,10 @@ export const api = {
   },
 
   healthRecords: {
-    list: (patientId: string, params?: QueryParams & { type?: HealthRecordType }) => {
+    list: (
+      patientId: string,
+      params?: QueryParams & { type?: HealthRecordType },
+    ) => {
       const query = buildQuery(params);
       const sep = query ? '&' : '?';
       const typeParam = params?.type ? `${sep}type=${params.type}` : '';
@@ -309,8 +312,7 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify(data),
       }),
-    delete: (id: string) =>
-      request<void>(`tutors/${id}`, { method: 'DELETE' }),
+    delete: (id: string) => request<void>(`tutors/${id}`, { method: 'DELETE' }),
   },
 
   consultations: {

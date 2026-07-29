@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 
 import '@/app/globals.css';
+import { BillingProvider } from '@/contexts/billing-context';
+import { ConfirmationProvider } from '@/contexts/confirmation-context';
+import { ModalProvider } from '@/contexts/modal-context';
 import { ThemeProvider } from '@/contexts/theme-context';
 import { AuthProvider } from '@/infra/auth-context';
 
@@ -34,7 +37,13 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <BillingProvider>
+              <ModalProvider>
+                <ConfirmationProvider>{children}</ConfirmationProvider>
+              </ModalProvider>
+            </BillingProvider>
+          </AuthProvider>
         </ThemeProvider>
         <Toaster position='top-right' richColors />
       </body>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { VaccineFormModal } from './components/vaccine-form-modal';
@@ -55,11 +55,18 @@ export default function VaccinesPage() {
         <Header title="Catálogo de Vacinas" showStorage={false} />
 
         <DataTable
-          headers={['Nome', 'Código', 'Período de Revacinação', 'Criado em', 'Ações']}
+          headers={[
+            'Nome',
+            'Código',
+            'Período de Revacinação',
+            'Criado em',
+            'Ações',
+          ]}
           showSearch
           searchPlaceholder="Buscar vacina..."
           onSearch={setSearch}
           columnWidths={['flex-1', 'w-32', 'w-44', 'w-36', 'w-24']}
+          loading={loading}
           actions={
             <Button
               onClick={() => setShowCreateModal(true)}
@@ -69,18 +76,17 @@ export default function VaccinesPage() {
             </Button>
           }
         >
-          {loading ? (
+          {vaccines.length === 0 ? (
             <tr>
               <td colSpan={5} className="py-12 text-center">
-                <Loader2 size={24} className="animate-spin text-teal-600 mx-auto" />
-              </td>
-            </tr>
-          ) : vaccines.length === 0 ? (
-            <tr>
-              <td colSpan={5} className="py-12 text-center">
-                <Syringe size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                <Syringe
+                  size={32}
+                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                />
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {search ? 'Nenhuma vacina encontrada.' : 'Nenhuma vacina cadastrada ainda.'}
+                  {search
+                    ? 'Nenhuma vacina encontrada.'
+                    : 'Nenhuma vacina cadastrada ainda.'}
                 </p>
               </td>
             </tr>
@@ -93,9 +99,14 @@ export default function VaccinesPage() {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                      <Syringe size={14} className="text-green-600 dark:text-green-400" />
+                      <Syringe
+                        size={14}
+                        className="text-green-600 dark:text-green-400"
+                      />
                     </div>
-                    <span className="text-sm font-medium text-slate-900 dark:text-white">{vaccine.name}</span>
+                    <span className="text-sm font-medium text-slate-900 dark:text-white">
+                      {vaccine.name}
+                    </span>
                   </div>
                 </td>
                 <td className="px-4 py-3">
@@ -109,7 +120,9 @@ export default function VaccinesPage() {
                       {fmtPeriod(vaccine.revaccination_period_days)}
                     </span>
                   ) : (
-                    <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
+                      —
+                    </span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
@@ -142,7 +155,10 @@ export default function VaccinesPage() {
 
         {(meta?.total_pages ?? 1) > 1 && (
           <div className="flex justify-center gap-2 mt-4">
-            {Array.from({ length: meta?.total_pages ?? 1 }, (_, i) => i + 1).map((p) => (
+            {Array.from(
+              { length: meta?.total_pages ?? 1 },
+              (_, i) => i + 1,
+            ).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
@@ -162,7 +178,10 @@ export default function VaccinesPage() {
       {showCreateModal && (
         <VaccineFormModal
           onClose={() => setShowCreateModal(false)}
-          onSuccess={() => { setShowCreateModal(false); void refresh(); }}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            void refresh();
+          }}
         />
       )}
 
@@ -170,7 +189,10 @@ export default function VaccinesPage() {
         <VaccineFormModal
           vaccine={editVaccine}
           onClose={() => setEditVaccine(null)}
-          onSuccess={() => { setEditVaccine(null); void refresh(); }}
+          onSuccess={() => {
+            setEditVaccine(null);
+            void refresh();
+          }}
         />
       )}
 
@@ -180,7 +202,9 @@ export default function VaccinesPage() {
           description={`A vacina "${deleteVaccine.name}" (${deleteVaccine.code}) será removida permanentemente do catálogo.`}
           confirmLabel="Excluir"
           loading={deleting}
-          onConfirm={() => { void handleDelete(); }}
+          onConfirm={() => {
+            void handleDelete();
+          }}
           onClose={() => setDeleteVaccine(null)}
         />
       )}

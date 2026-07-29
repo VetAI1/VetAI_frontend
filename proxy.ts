@@ -5,7 +5,7 @@ const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password'];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get('vetai_token')?.value;
+  const token = request.cookies.get('vetai_refresh_token')?.value;
 
   const isPublicRoute = PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),

@@ -6,6 +6,8 @@ import { useState } from 'react';
 
 import { Card } from '../common/card';
 
+import { Skeleton } from '@/components/ui/skeleton';
+
 export interface DataTableColumn<T> {
   key: string;
   header: ReactNode;
@@ -21,6 +23,8 @@ interface DataTableProps<T> {
   data?: T[];
   getRowKey?: (row: T, index: number) => string;
   emptyState?: ReactNode;
+  loading?: boolean;
+  skeletonRows?: number;
   showSearch?: boolean;
   onSearch?: (value: string) => void;
   searchPlaceholder?: string;
@@ -38,6 +42,8 @@ export function DataTable<T>({
   data,
   getRowKey,
   emptyState = 'Nenhum registro encontrado.',
+  loading = false,
+  skeletonRows = 5,
   showSearch = false,
   onSearch,
   searchPlaceholder = 'Buscar...',
@@ -61,31 +67,31 @@ export function DataTable<T>({
       className={`overflow-hidden flex flex-col min-h-0${className ? ` ${className}` : ''}`}
     >
       {(showSearch || actions) && (
-        <div className='p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0'>
+        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0">
           {actions && <div>{actions}</div>}
           {showSearch && (
-            <div className='relative w-85'>
+            <div className="relative w-85">
               <Search
-                className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500'
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                 size={18}
               />
               <input
-                type='text'
+                type="text"
                 value={searchValue}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder={searchPlaceholder}
-                className='w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600'
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
               />
             </div>
           )}
         </div>
       )}
       <div
-        className='overflow-x-auto overflow-y-auto flex-1'
+        className="overflow-x-auto overflow-y-auto flex-1"
         style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}
       >
-        <table className='w-full text-left text-sm'>
-          <thead className='bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 sticky top-0 z-10'>
+        <table className="w-full text-left text-sm">
+          <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 sticky top-0 z-10">
             <tr>
               {tableHeaders.map((header, index) => {
                 const column = columns?.[index];
@@ -107,13 +113,29 @@ export function DataTable<T>({
               })}
             </tr>
           </thead>
-          <tbody className='divide-y divide-slate-200 dark:divide-slate-700 [&>tr:last-child]:border-b [&>tr:last-child]:border-slate-200 dark:[&>tr:last-child]:border-slate-700'>
-            {columns && data ? (
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-700 [&>tr:last-child]:border-b [&>tr:last-child]:border-slate-200 dark:[&>tr:last-child]:border-slate-700">
+            {loading ? (
+              Array.from({ length: skeletonRows }).map((_, rIdx) => (
+                <tr key={`skel-row-${rIdx}`}>
+                  {tableHeaders.length > 0 ? (
+                    tableHeaders.map((_, cIdx) => (
+                      <td key={`skel-cell-${cIdx}`} className="p-4">
+                        <Skeleton className="h-5 w-full dark:bg-slate-700" />
+                      </td>
+                    ))
+                  ) : (
+                    <td className="p-4">
+                      <Skeleton className="h-5 w-full dark:bg-slate-700" />
+                    </td>
+                  )}
+                </tr>
+              ))
+            ) : columns && data ? (
               data.length > 0 ? (
                 data.map((row, rowIndex) => (
                   <tr
                     key={getRowKey?.(row, rowIndex) ?? rowIndex}
-                    className='hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
                   >
                     {columns.map((column) => (
                       <td
@@ -132,7 +154,7 @@ export function DataTable<T>({
                 <tr>
                   <td
                     colSpan={colSpan}
-                    className='p-8 text-center text-sm text-slate-500 dark:text-slate-400'
+                    className="p-8 text-center text-sm text-slate-500 dark:text-slate-400"
                   >
                     {emptyState}
                   </td>

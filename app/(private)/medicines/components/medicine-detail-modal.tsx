@@ -20,135 +20,51 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { InfoCard } from '@/app/components/common/info-card';
+import { ListSection } from '@/app/components/common/list-section';
 import { Modal } from '@/app/components/common/modal';
-import type { DoseEntry, Medicine } from '@/types/medicine';
+import { TextBlock } from '@/app/components/common/text-block';
+import type { DoseEntry, Medicine, ReferenceDose } from '@/types/medicine';
+
+type Tab = 'sobre' | 'indicacoes' | 'administracao' | 'apresentacoes';
+type SpeciesKey = keyof ReferenceDose;
+
+function parseDoseRange(entry?: DoseEntry): { min: number; max: number } | null {
+  if (!entry?.dose) return null;
+  const matches = entry.dose.match(/([\d.,]+)\s*(?:a|-)\s*([\d.,]+)/);
+  if (matches?.[1] && matches[2]) {
+    return {
+      min: parseFloat(matches[1].replace(',', '.')),
+      max: parseFloat(matches[2].replace(',', '.')),
+    };
+  }
+  const single = parseFloat(entry.dose.replace(',', '.'));
+  if (!isNaN(single)) return { min: single, max: single };
+  return null;
+}
+
+function formatDose(val: number): string {
+  return val.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+}
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: 'sobre', label: 'Visão Geral' },
+  { key: 'indicacoes', label: 'Indicações' },
+  { key: 'administracao', label: 'Administração' },
+  { key: 'apresentacoes', label: 'Apresentações' },
+];
+
+const SPECIES_OPTIONS: { key: SpeciesKey; label: string }[] = [
+  { key: 'dogs', label: 'Cães' },
+  { key: 'cats', label: 'Gatos' },
+  { key: 'cattle', label: 'Bovinos' },
+  { key: 'horses', label: 'Equinos' },
+  { key: 'general', label: 'Geral' },
+];
 
 interface MedicineDetailModalProps {
   medicine: Medicine;
   onClose: () => void;
-}
-
-const TABS = [
-  { key: 'sobre', label: 'Sobre' },
-  { key: 'indicacoes', label: 'IndicaÃ§Ãµes e ContraindicaÃ§Ãµes' },
-  { key: 'administracao', label: 'AdministraÃ§Ã£o e Doses' },
-  { key: 'apresentacoes', label: 'ApresentaÃ§Ãµes e ConcentraÃ§Ãµes' },
-] as const;
-
-type Tab = (typeof TABS)[number]['key'];
-type SpeciesKey = 'dogs' | 'cats' | 'cattle' | 'horses';
-
-const SPECIES_OPTIONS: { key: SpeciesKey; label: string }[] = [
-  { key: 'dogs', label: 'CÃ£o' },
-  { key: 'cats', label: 'Gato' },
-  { key: 'cattle', label: 'Bovino' },
-  { key: 'horses', label: 'Equino' },
-];
-
-function parseDoseRange(entry: DoseEntry | undefined): { min: number; max: number } | null {
-  if (!entry?.dose || !entry?.unit) return null;
-  if (!entry.unit.toLowerCase().includes('/kg')) return null;
-  const match = entry.dose.match(/(\d+(?:[.,]\d+)?)\s*(?:a\s*(\d+(?:[.,]\d+)?))?/);
-  if (!match) return null;
-  const min = parseFloat(match[1]!.replace(',', '.'));
-  const max = match[2] ? parseFloat(match[2].replace(',', '.')) : min;
-  if (isNaN(min)) return null;
-  return { min, max };
-}
-
-function formatDose(mg: number): string {
-  return mg >= 1000
-    ? `${(mg / 1000).toFixed(2).replace(/\.?0+$/, '')} g`
-    : `${mg % 1 === 0 ? mg : mg.toFixed(2)} mg`;
-}
-
-function ListSection({
-  icon: Icon,
-  label,
-  items,
-  iconColor,
-  bgColor,
-}: {
-  icon: React.ElementType;
-  label: string;
-  items: string[];
-  iconColor: string;
-  bgColor: string;
-}) {
-  if (!items.length) return null;
-  return (
-    <div className={`rounded-xl border p-4 ${bgColor}`}>
-      <div className="flex items-center gap-2 mb-3">
-        <Icon size={15} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-          {label}
-        </span>
-      </div>
-      <ul className="space-y-2">
-        {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-300">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${iconColor.replace('text-', 'bg-')}`} />
-            {item}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function InfoCard({
-  icon: Icon,
-  label,
-  value,
-  iconColor,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string | undefined;
-  iconColor: string;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-      <div className="flex items-center gap-2">
-        <Icon size={14} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-          {label}
-        </span>
-      </div>
-      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-        {value || <span className="text-slate-400 dark:text-slate-500 font-normal">â€”</span>}
-      </p>
-    </div>
-  );
-}
-
-function TextBlock({
-  icon: Icon,
-  label,
-  value,
-  iconColor,
-  borderColor,
-  bgColor,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string | undefined;
-  iconColor: string;
-  borderColor: string;
-  bgColor: string;
-}) {
-  if (!value) return null;
-  return (
-    <div className={`rounded-xl border p-4 ${borderColor} ${bgColor}`}>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon size={14} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-          {label}
-        </span>
-      </div>
-      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{value}</p>
-    </div>
-  );
 }
 
 export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalProps) {
@@ -211,7 +127,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
             <>
               <TextBlock
                 icon={BookOpen}
-                label="IndicaÃ§Ãµes"
+                label="Indicações"
                 value={medicine.fullIndications}
                 iconColor="text-teal-500"
                 borderColor="border-teal-200 dark:border-teal-800"
@@ -220,7 +136,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
 
               <ListSection
                 icon={AlertTriangle}
-                label="ContraindicaÃ§Ãµes e PrecauÃ§Ãµes"
+                label="Contraindicações e Precauções"
                 items={medicine.contraindicationsPrecautions ?? []}
                 iconColor="text-red-500"
                 bgColor="border-red-200 dark:border-red-800/50 bg-red-50/50 dark:bg-red-900/10"
@@ -245,7 +161,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
 
               <TextBlock
                 icon={Info}
-                label="ReproduÃ§Ã£o, GestaÃ§Ã£o e LactaÃ§Ã£o"
+                label="Reprodução, Gestação e Lactação"
                 value={medicine.reproductionPregnancyLactation}
                 iconColor="text-slate-400 dark:text-slate-500"
                 borderColor="border-slate-200 dark:border-slate-700"
@@ -260,7 +176,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-6 text-center">
                   <AlertTriangle size={24} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                   <p className="text-sm text-slate-400 dark:text-slate-500">
-                      Nenhuma informaÃ§Ã£o disponÃ­vel.
+                      Nenhuma informação disponível.
                   </p>
                 </div>
               )}
@@ -276,7 +192,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   <div className="flex items-center gap-2">
                     <Route size={14} className="text-emerald-500" />
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      Vias de AdministraÃ§Ã£o
+                      Vias de Administração
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -296,13 +212,13 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <InfoCard
                   icon={Clock}
-                  label="FrequÃªncia de Uso"
+                  label="Frequência de Uso"
                   value={medicine.usageFrequency}
                   iconColor="text-blue-500"
                 />
                 <InfoCard
                   icon={Clock}
-                  label="DuraÃ§Ã£o do Tratamento"
+                  label="Duração do Tratamento"
                   value={medicine.treatmentDuration}
                   iconColor="text-indigo-500"
                 />
@@ -314,7 +230,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   <div className="flex items-center gap-2 mb-3">
                     <Pill size={14} className="text-violet-500" />
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      Doses de ReferÃªncia
+                      Doses de Referência
                     </span>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -338,7 +254,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                               )}
                             </>
                           ) : (
-                            <span className="text-xs text-slate-400 dark:text-slate-500">â€”</span>
+                            <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                           )}
                         </div>
                       );
@@ -346,7 +262,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                     {medicine.referenceDose.general && (
                       <div className="col-span-2 sm:col-span-4 flex flex-col gap-1 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
                         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                          Geral (todas as espÃ©cies)
+                          Geral (todas as espécies)
                         </span>
                         <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                           {medicine.referenceDose.general.dose}
@@ -365,7 +281,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               {/* Dosage notes */}
               <TextBlock
                 icon={Info}
-                label="ObservaÃ§Ãµes de Dosagem"
+                label="Observações de Dosagem"
                 value={medicine.dosageNotes}
                 iconColor="text-blue-400"
                 borderColor="border-blue-200 dark:border-blue-800/50"
@@ -382,7 +298,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 </div>
                 <div className="p-4 space-y-4">
                   <div>
-                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">EspÃ©cie</p>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Espécie</p>
                     <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden w-fit">
                       {SPECIES_OPTIONS.map((opt) => (
                         <button
@@ -433,7 +349,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                             </p>
                             <p className="text-base font-bold text-teal-700 dark:text-teal-300">
                               {calculatedResult.isRange
-                                ? `${formatDose(calculatedResult.min)} â€“ ${formatDose(calculatedResult.max)}`
+                                ? `${formatDose(calculatedResult.min)} – ${formatDose(calculatedResult.max)}`
                                 : formatDose(calculatedResult.min)}
                             </p>
                           </div>
@@ -442,8 +358,8 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                         <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3">
                           <p className="text-xs text-amber-700 dark:text-amber-400">
                             {activeEntry
-                              ? 'Dose disponÃ­vel mas nÃ£o calculÃ¡vel automaticamente. Consulte a bula.'
-                              : 'Dose nÃ£o informada para esta espÃ©cie. Consulte a bula.'}
+                              ? 'Dose disponível mas não calculável automaticamente. Consulte a bula.'
+                              : 'Dose não informada para esta espécie. Consulte a bula.'}
                           </p>
                         </div>
                       )}
@@ -462,7 +378,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   <div className="flex items-center gap-2 mb-3">
                     <Layers size={15} className="text-teal-500" />
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      ApresentaÃ§Ãµes e ConcentraÃ§Ãµes
+                      Apresentações e Concentrações
                     </span>
                   </div>
                   <ul className="space-y-2">
@@ -481,7 +397,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-6 text-center">
                   <FlaskConical size={24} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                   <p className="text-sm text-slate-400 dark:text-slate-500">
-                    Nenhuma apresentaÃ§Ã£o disponÃ­vel.
+                    Nenhuma apresentação disponível.
                   </p>
                 </div>
               )}
@@ -503,7 +419,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
 
               <TextBlock
                 icon={MessageSquare}
-                label="InformaÃ§Ãµes ao Cliente"
+                label="Informações ao Cliente"
                 value={medicine.clientInformation}
                 iconColor="text-slate-400 dark:text-slate-500"
                 borderColor="border-slate-200 dark:border-slate-700"
@@ -518,13 +434,13 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <InfoCard
                   icon={Pill}
-                  label="PrincÃ­pios Ativos"
+                  label="Princípios Ativos"
                   value={medicine.activeIngredients}
                   iconColor="text-teal-500"
                 />
                 <InfoCard
                   icon={Archive}
-                  label="ClassificaÃ§Ã£o"
+                  label="Classificação"
                   value={medicine.classification}
                   iconColor="text-indigo-500"
                 />
@@ -535,7 +451,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   <div className="flex items-center gap-2">
                     <User size={14} className="text-slate-400" />
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      EspÃ©cies Recomendadas
+                      Espécies Recomendadas
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -557,7 +473,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-6 text-center">
                   <FlaskConical size={24} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                   <p className="text-sm text-slate-400 dark:text-slate-500">
-                      Nenhuma informaÃ§Ã£o disponÃ­vel.
+                      Nenhuma informação disponível.
                   </p>
                 </div>
               )}

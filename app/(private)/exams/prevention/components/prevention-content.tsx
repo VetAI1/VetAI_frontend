@@ -1,6 +1,14 @@
 'use client';
 
-import { AlertTriangle, ArrowLeft, CheckCircle2, ClipboardList, Lightbulb, Loader2, Microscope, ShieldCheck } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  ClipboardList,
+  Lightbulb,
+  Microscope,
+  ShieldCheck,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -9,6 +17,7 @@ import { Badge } from '@/app/components/common/badge';
 import { Card } from '@/app/components/common/card';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { studiesService } from '@/services/studies.service';
 import type { Study } from '@/types/study';
 
@@ -37,9 +46,18 @@ export function PreventionContent() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <Loader2 size={32} className="animate-spin text-teal-600" />
-        <p className="text-sm text-slate-500 dark:text-slate-400">Carregando…</p>
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-9 w-24" />
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-6 shadow space-y-3">
+          <Skeleton className="h-7 w-64" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Skeleton className="h-48 w-full rounded-xl" />
+          <Skeleton className="h-48 w-full rounded-xl" />
+        </div>
       </div>
     );
   }
@@ -47,8 +65,13 @@ export function PreventionContent() {
   if (!study) {
     return (
       <div className="text-center py-20">
-        <Microscope size={48} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-        <p className="text-slate-500 dark:text-slate-400">Exame não encontrado.</p>
+        <Microscope
+          size={48}
+          className="text-slate-300 dark:text-slate-600 mx-auto mb-4"
+        />
+        <p className="text-slate-500 dark:text-slate-400">
+          Exame não encontrado.
+        </p>
         <Link href="/exams" className="mt-4 inline-block">
           <Button variant="outline">Voltar aos exames</Button>
         </Link>
@@ -61,11 +84,17 @@ export function PreventionContent() {
   if (!prevention) {
     return (
       <div className="text-center py-20">
-        <ShieldCheck size={48} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+        <ShieldCheck
+          size={48}
+          className="text-slate-300 dark:text-slate-600 mx-auto mb-4"
+        />
         <p className="text-slate-500 dark:text-slate-400">
           Nenhuma análise de prevenção disponível para este exame.
         </p>
-        <Link href={`/exams/detail?id=${study.id}`} className="mt-4 inline-block">
+        <Link
+          href={`/exams/detail?id=${study.id}`}
+          className="mt-4 inline-block"
+        >
           <Button variant="outline">Voltar ao exame</Button>
         </Link>
       </div>
@@ -82,7 +111,10 @@ export function PreventionContent() {
         </Link>
         <div className="flex-1">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <ShieldCheck size={20} className="text-teal-600 dark:text-teal-400" />
+            <ShieldCheck
+              size={20}
+              className="text-teal-600 dark:text-teal-400"
+            />
             Análise de Prevenção
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -120,12 +152,16 @@ export function PreventionContent() {
               >
                 <div className="flex items-center justify-between px-4 py-3 bg-red-50 dark:bg-red-900/20">
                   <div className="flex items-center gap-3">
-                    <AlertTriangle size={16} className="text-red-500 shrink-0" />
+                    <AlertTriangle
+                      size={16}
+                      className="text-red-500 shrink-0"
+                    />
                     <span className="font-semibold text-sm text-slate-900 dark:text-white">
                       {item.name}
                     </span>
                     <span className="text-sm text-red-700 dark:text-red-400 font-medium">
-                      {item.value}{item.unit ? ` ${item.unit}` : ''}
+                      {item.value}
+                      {item.unit ? ` ${item.unit}` : ''}
                     </span>
                   </div>
                   <Badge color="red">
@@ -135,7 +171,9 @@ export function PreventionContent() {
 
                 {item.problems.length > 0 && (
                   <div className="px-4 pt-3 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-1">Problemas</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-1">
+                      Problemas
+                    </p>
                     {item.problems.map((problem, j) => (
                       <div key={j} className="flex items-start gap-2">
                         <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-xs font-bold shrink-0 mt-0.5">
@@ -151,11 +189,18 @@ export function PreventionContent() {
 
                 {item.recommendations?.length > 0 && (
                   <div className="px-4 pt-3 pb-3 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-teal-600 dark:text-teal-400 mb-1">Recomendações</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-teal-600 dark:text-teal-400 mb-1">
+                      Recomendações
+                    </p>
                     {item.recommendations.map((rec, j) => (
                       <div key={j} className="flex items-start gap-2">
-                        <CheckCircle2 size={14} className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
-                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{rec}</p>
+                        <CheckCircle2
+                          size={14}
+                          className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5"
+                        />
+                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                          {rec}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -177,7 +222,10 @@ export function PreventionContent() {
                 key={i}
                 className="flex items-start gap-3 p-3 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/50 rounded-lg"
               >
-                <CheckCircle2 size={16} className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+                <CheckCircle2
+                  size={16}
+                  className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5"
+                />
                 <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                   {rec}
                 </p>
@@ -187,11 +235,15 @@ export function PreventionContent() {
         </SectionCard>
       )}
 
-      {prevention.alteredValues.length === 0 && !prevention.generalRecommendations?.length && (
+      {prevention.alteredValues.length === 0 &&
+        !prevention.generalRecommendations?.length && (
         <Card className="p-8 text-center">
-          <Lightbulb size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+          <Lightbulb
+            size={32}
+            className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+          />
           <p className="text-slate-500 dark:text-slate-400">
-            Nenhuma recomendação disponível.
+              Nenhuma recomendação disponível.
           </p>
         </Card>
       )}

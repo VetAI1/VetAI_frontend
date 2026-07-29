@@ -66,7 +66,13 @@ export interface HealthRecord {
   type: HealthRecordType;
   date: string;
   notes?: string;
-  metadata: WeightMetadata | VaccineMetadata | ClinicalNoteMetadata | NoteMetadata | Record<string, unknown>;
+  metadata:
+    | WeightMetadata
+    | VaccineMetadata
+    | ClinicalNoteMetadata
+    | NoteMetadata
+    | PrescriptionMetadata
+    | Record<string, unknown>;
   recorded_by?: RecordAuthor;
   created_at: string;
 }
@@ -75,7 +81,12 @@ export interface CreateHealthRecordPayload {
   type: HealthRecordType;
   date: string;
   notes?: string;
-  metadata: WeightMetadata | VaccineMetadata | ClinicalNoteMetadata | NoteMetadata | Record<string, unknown>;
+  metadata:
+    | WeightMetadata
+    | VaccineMetadata
+    | ClinicalNoteMetadata
+    | NoteMetadata
+    | Record<string, unknown>;
 }
 
 export interface PatientDocument {

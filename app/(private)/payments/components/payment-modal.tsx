@@ -1,13 +1,19 @@
 'use client';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Check, ChevronDown, Loader2, Plus, Search, User, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Modal } from '@/app/components/common/modal';
 import { DateInput } from '@/app/components/forms/date-input';
+import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { useAutoComplete } from '@/hooks/use-auto-complete';
+import { paymentSchema, type PaymentFormData } from '@/schemas/payment';
 import { catalogService } from '@/services/catalog.service';
 import { paymentsService } from '@/services/payments.service';
 import { tutorsService } from '@/services/tutors.service';
@@ -15,7 +21,6 @@ import type { CatalogItem } from '@/types/catalog';
 import { CATALOG_CATEGORY_LABELS } from '@/types/catalog';
 import {
   PAYMENT_STATUS_LABELS,
-  type ChargeItem,
   type Payment,
   type PaymentStatus,
 } from '@/types/payment';
@@ -28,14 +33,21 @@ interface PaymentModalProps {
   onSuccess: (payment: Payment) => void;
 }
 
-const inputCls = 'w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500';
+const inputCls =
+  'w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500';
 
-const STATUS_OPTIONS = (Object.keys(PAYMENT_STATUS_LABELS) as PaymentStatus[]).map((s) => ({
+const STATUS_OPTIONS = (
+  Object.keys(PAYMENT_STATUS_LABELS) as PaymentStatus[]
+).map((s) => ({
   value: s,
   label: PAYMENT_STATUS_LABELS[s],
 }));
 
-interface TutorItem { id: string; name: string; phone?: string }
+interface TutorItem {
+  id: string;
+  name: string;
+  phone?: string;
+}
 
 function TutorComboBox({
   value,
@@ -48,40 +60,50 @@ function TutorComboBox({
   onClear: () => void;
   disabled?: boolean;
 }) {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<TutorItem[]>([]);
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  const {
+    items: results,
+    search: query,
+    loading,
+    setSearch: setQuery,
+  } = useAutoComplete<Tutor>({
+    fetcher: tutorsService.list,
+    pageSize: 8,
+    enabled: open,
+  });
+
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  useEffect(() => {
-    if (query.length < 2) { setResults([]); return; }
-    setLoading(true);
-    const timer = setTimeout(async () => {
-      try {
-        const res = await tutorsService.list({ search: query, size: 8 });
-        setResults(res.data.map((t: Tutor) => ({ id: t.id, name: t.name, ...(t.phone ? { phone: t.phone } : {}) })));
-      } catch { /* silently */ } finally { setLoading(false); }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query]);
-
   if (value) {
     return (
       <div className="flex items-center gap-2 w-full rounded-lg border border-teal-400 dark:border-teal-600 bg-teal-50 dark:bg-teal-900/20 px-3 py-2">
         <User size={14} className="text-teal-600 dark:text-teal-400 shrink-0" />
-        <span className="flex-1 text-sm font-medium text-slate-900 dark:text-white truncate">{value.name}</span>
-        {value.phone && <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0 truncate">{value.phone}</span>}
+        <span className="flex-1 text-sm font-medium text-slate-900 dark:text-white truncate">
+          {value.name}
+        </span>
+        {value.phone && (
+          <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0 truncate">
+            {value.phone}
+          </span>
+        )}
         {!disabled && (
-          <Button type="button" variant="ghost" size="icon-sm" onClick={onClear} className="shrink-0 text-slate-400 hover:text-red-500">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={onClear}
+            className="shrink-0 text-slate-400 hover:text-red-500"
+          >
             <X size={14} />
           </Button>
         )}
@@ -92,16 +114,25 @@ function TutorComboBox({
   return (
     <div ref={ref} className="relative">
       <div className="relative">
-        <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+        <User
+          size={14}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+        />
         <input
           className={`${inputCls} pl-8 pr-8`}
           placeholder="Buscar tutor pelo nome..."
           value={query}
           disabled={disabled}
-          onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
           onFocus={() => setOpen(true)}
         />
-        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+        <ChevronDown
+          size={14}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+        />
       </div>
       {open && (
         <div className="absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-lg max-h-52 overflow-y-auto">
@@ -109,20 +140,37 @@ function TutorComboBox({
             <p className="text-xs text-slate-400 px-3 py-2">Buscando...</p>
           ) : results.length === 0 ? (
             <p className="text-xs text-slate-400 px-3 py-2">
-              {query.length < 2 ? 'Digite ao menos 2 caracteres...' : 'Nenhum tutor encontrado'}
+              {query.length < 2
+                ? 'Digite ao menos 2 caracteres...'
+                : 'Nenhum tutor encontrado'}
             </p>
           ) : (
             results.map((t) => (
               <button
                 key={t.id}
                 type="button"
-                onMouseDown={(e) => { e.preventDefault(); onSelect(t); setOpen(false); setQuery(''); }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onSelect({
+                    id: t.id,
+                    name: t.name,
+                    ...(t.phone ? { phone: t.phone } : {}),
+                  });
+                  setOpen(false);
+                  setQuery('');
+                }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
                 <Check size={12} className="text-teal-500 opacity-0" />
                 <div className="min-w-0">
-                  <p className="text-slate-900 dark:text-white truncate">{t.name}</p>
-                  {t.phone && <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{t.phone}</p>}
+                  <p className="text-slate-900 dark:text-white truncate">
+                    {t.name}
+                  </p>
+                  {t.phone && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      {t.phone}
+                    </p>
+                  )}
                 </div>
               </button>
             ))
@@ -137,24 +185,49 @@ function fmtCurrency(value: number): string {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: PaymentModalProps) {
+export function PaymentModal({
+  payment,
+  defaultTutor,
+  onClose,
+  onSuccess,
+}: PaymentModalProps) {
   const isEditing = !!payment;
 
   const [tutor, setTutor] = useState<TutorItem | null>(
     defaultTutor ? { id: defaultTutor.id, name: defaultTutor.name } : null,
   );
-  const [notes, setNotes] = useState(payment?.notes ?? '');
-  const [dueDate, setDueDate] = useState(payment?.due_date ?? '');
-  const [status, setStatus] = useState<PaymentStatus>(payment?.status ?? 'PENDING');
-  const [paidAt, setPaidAt] = useState(payment?.paid_at ?? '');
-  const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const [items, setItems] = useState<ChargeItem[]>(payment?.items ?? []);
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([]);
   const [catalogSearch, setCatalogSearch] = useState('');
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<PaymentFormData>({
+    resolver: yupResolver(paymentSchema) as any,
+    defaultValues: {
+      tutor_id: payment?.tutor_id ?? defaultTutor?.id ?? '',
+      patient_id: payment?.patient_id ?? '',
+      due_date: payment?.due_date ?? '',
+      status: payment?.status ?? 'PENDING',
+      paid_at: payment?.paid_at ?? '',
+      notes: payment?.notes ?? '',
+      items: payment?.items ?? [],
+    },
+  });
+
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: 'items',
+  });
+
+  const watchedItems = watch('items') ?? [];
+  const watchedStatus = watch('status');
 
   useEffect(() => {
     const load = async () => {
@@ -163,7 +236,7 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
         const res = await catalogService.list({ size: 200, active: true });
         setCatalogItems(res.data);
       } catch {
-        // silently fail
+        /* silently fail */
       } finally {
         setCatalogLoading(false);
       }
@@ -176,117 +249,145 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
   );
 
   const addFromCatalog = (item: CatalogItem) => {
-    const existing = items.findIndex((i) => i.catalog_item_id === item.id);
-    if (existing >= 0) {
-      setItems((prev) =>
-        prev.map((i, idx) => idx === existing ? { ...i, quantity: i.quantity + 1 } : i),
-      );
+    const existingIndex = watchedItems.findIndex(
+      (i) => i.catalog_item_id === item.id,
+    );
+    if (existingIndex >= 0) {
+      const existing = watchedItems[existingIndex];
+      if (existing) {
+        update(existingIndex, {
+          ...existing,
+          quantity: (existing.quantity || 1) + 1,
+        });
+      }
     } else {
-      setItems((prev) => [...prev, {
+      append({
         name: item.name,
         quantity: 1,
         unit_price: item.price,
         catalog_item_id: item.id,
-      }]);
+      });
     }
     setShowCatalog(false);
     setCatalogSearch('');
   };
 
   const addCustomItem = () => {
-    setItems((prev) => [...prev, { name: '', quantity: 1, unit_price: 0 }]);
+    append({ name: '', quantity: 1, unit_price: 0 });
   };
 
-  const updateItem = (index: number, field: keyof ChargeItem, value: string | number) => {
-    setItems((prev) => prev.map((item, i) => i === index ? { ...item, [field]: value } : item));
-  };
+  const total = watchedItems.reduce(
+    (sum, i) => sum + (Number(i.quantity) || 0) * (Number(i.unit_price) || 0),
+    0,
+  );
 
-  const removeItem = (index: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-  };
+  const onSubmit = async (data: PaymentFormData) => {
+    const targetTutorId = isEditing ? payment.tutor_id : tutor?.id;
+    if (!targetTutorId) {
+      toast.error('Selecione um tutor');
+      return;
+    }
 
-  const total = items.reduce((sum, i) => sum + i.quantity * i.unit_price, 0);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs: Record<string, string> = {};
-    if (!isEditing && !tutor) errs.tutor = 'Selecione um tutor';
-    if (items.length === 0) errs.items = 'Adicione pelo menos um item';
-    const hasInvalidItem = items.some((i) => !i.name.trim() || i.unit_price <= 0 || i.quantity < 1);
-    if (hasInvalidItem) errs.items = 'Preencha nome, quantidade e valor de todos os itens';
-    if (!dueDate) errs.dueDate = 'Data de vencimento Ã© obrigatÃ³ria';
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    setErrors({});
-    setSaving(true);
     try {
       let result: Payment;
-      const mappedItems = items.map((i) => ({
+      const mappedItems = data.items.map((i) => ({
         name: i.name.trim(),
         quantity: Number(i.quantity),
         unit_price: Number(i.unit_price),
         ...(i.catalog_item_id ? { catalog_item_id: i.catalog_item_id } : {}),
       }));
+
       if (isEditing) {
         result = await paymentsService.update(payment.id, {
-          ...(notes.trim() ? { notes: notes.trim() } : {}),
+          ...(data.notes?.trim() ? { notes: data.notes.trim() } : {}),
           items: mappedItems,
-          status,
-          due_date: dueDate,
-          ...(status === 'PAID' ? { paid_at: paidAt || new Date().toISOString().split('T')[0]! } : {}),
+          status: data.status as PaymentStatus,
+          due_date: data.due_date,
+          ...(data.status === 'PAID'
+            ? {
+              paid_at:
+                  data.paid_at || new Date().toISOString().split('T')[0]!,
+            }
+            : {}),
         });
+        toast.success('Cobrança atualizada com sucesso!');
       } else {
         result = await paymentsService.create({
-          ...(notes.trim() ? { notes: notes.trim() } : {}),
+          ...(data.notes?.trim() ? { notes: data.notes.trim() } : {}),
           items: mappedItems,
-          status,
-          due_date: dueDate,
-          ...(status === 'PAID' ? { paid_at: paidAt || new Date().toISOString().split('T')[0]! } : {}),
-          tutor_id: tutor!.id,
+          status: data.status as PaymentStatus,
+          due_date: data.due_date,
+          ...(data.status === 'PAID'
+            ? {
+              paid_at:
+                  data.paid_at || new Date().toISOString().split('T')[0]!,
+            }
+            : {}),
+          tutor_id: targetTutorId,
         });
+        toast.success('Cobrança registrada com sucesso!');
       }
       onSuccess(result);
     } catch {
-      setErrors({ general: 'Erro ao salvar. Tente novamente.' });
-    } finally {
-      setSaving(false);
+      toast.error('Erro ao salvar cobrança. Tente novamente.');
     }
   };
 
   return (
     <Modal
-      title={isEditing ? 'Editar CobranÃ§a' : 'Nova CobranÃ§a'}
-      description={isEditing ? 'Atualize os itens e dados da cobranÃ§a' : 'Adicione produtos e serviÃ§os para gerar a cobranÃ§a'}
+      title={isEditing ? 'Editar Cobrança' : 'Nova Cobrança'}
+      description={
+        isEditing
+          ? 'Atualize os itens e dados da cobrança'
+          : 'Adicione produtos e serviços para gerar a cobrança'
+      }
       onClose={onClose}
       maxWidth="lg"
     >
-      <form onSubmit={(e) => { void handleSubmit(e); }} className="flex flex-col gap-4">
-
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
         {!isEditing && (
           <div>
-            <Label required className="mb-1.5">Tutor</Label>
+            <Label required className="mb-1.5">
+              Tutor
+            </Label>
             <TutorComboBox
               value={tutor}
-              onSelect={(t) => setTutor(t)}
-              onClear={() => setTutor(null)}
+              onSelect={(t) => {
+                setTutor(t);
+                setValue('tutor_id', t.id, { shouldValidate: true });
+              }}
+              onClear={() => {
+                setTutor(null);
+                setValue('tutor_id', '', { shouldValidate: true });
+              }}
             />
-            {errors.tutor && <p className="mt-1 text-xs text-red-500">{errors.tutor}</p>}
+            {errors.tutor_id?.message && (
+              <p className="mt-1 text-xs text-red-500">
+                {errors.tutor_id.message}
+              </p>
+            )}
           </div>
         )}
 
-        {/* Items section */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <Label required>Itens da cobranÃ§a</Label>
+            <Label required>Itens da cobrança</Label>
             <div className="flex gap-2">
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
-                onClick={() => { setShowCatalog((v) => !v); setCatalogSearch(''); }}
+                onClick={() => {
+                  setShowCatalog((v) => !v);
+                  setCatalogSearch('');
+                }}
                 className="gap-1.5 text-xs h-7"
               >
                 <Search size={12} />
-                Do catÃ¡logo
+                Do catálogo
               </Button>
               <Button
                 type="button"
@@ -301,7 +402,6 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
             </div>
           </div>
 
-          {/* Catalog picker */}
           {showCatalog && (
             <div className="mb-3 border border-slate-200 dark:border-slate-600 rounded-lg overflow-hidden">
               <div className="p-2 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800">
@@ -309,7 +409,7 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
                   type="text"
                   value={catalogSearch}
                   onChange={(e) => setCatalogSearch(e.target.value)}
-                  placeholder="Buscar produto ou serviÃ§o..."
+                  placeholder="Buscar produto ou serviço..."
                   className="w-full px-3 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   autoFocus
                 />
@@ -317,11 +417,16 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
               <div className="max-h-44 overflow-y-auto">
                 {catalogLoading ? (
                   <div className="flex items-center justify-center py-6">
-                    <Loader2 size={16} className="animate-spin text-slate-400" />
+                    <Loader2
+                      size={16}
+                      className="animate-spin text-slate-400"
+                    />
                   </div>
                 ) : filteredCatalog.length === 0 ? (
                   <p className="text-sm text-slate-400 text-center py-4">
-                    {catalogItems.length === 0 ? 'Nenhum item no catÃ¡logo.' : 'Nenhum resultado.'}
+                    {catalogItems.length === 0
+                      ? 'Nenhum item no catálogo.'
+                      : 'Nenhum resultado.'}
                   </p>
                 ) : (
                   filteredCatalog.map((item) => (
@@ -332,10 +437,16 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
                       className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors text-left border-b border-slate-100 dark:border-slate-700 last:border-0"
                     >
                       <div>
-                        <span className="font-medium text-slate-900 dark:text-white">{item.name}</span>
-                        <span className="ml-2 text-xs text-slate-400">{CATALOG_CATEGORY_LABELS[item.category]}</span>
+                        <span className="font-medium text-slate-900 dark:text-white">
+                          {item.name}
+                        </span>
+                        <span className="ml-2 text-xs text-slate-400">
+                          {CATALOG_CATEGORY_LABELS[item.category]}
+                        </span>
                       </div>
-                      <span className="text-teal-600 dark:text-teal-400 font-medium shrink-0 ml-3">{fmtCurrency(item.price)}</span>
+                      <span className="text-teal-600 dark:text-teal-400 font-medium shrink-0 ml-3">
+                        {fmtCurrency(item.price)}
+                      </span>
                     </button>
                   ))
                 )}
@@ -343,27 +454,27 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
             </div>
           )}
 
-          {/* Items list */}
-          {items.length === 0 ? (
+          {fields.length === 0 ? (
             <div className="border border-dashed border-slate-300 dark:border-slate-600 rounded-lg py-6 text-center text-sm text-slate-400 dark:text-slate-500">
-              Adicione itens do catÃ¡logo ou crie avulsos
+              Adicione itens do catálogo ou crie avulsos
             </div>
           ) : (
             <div className="space-y-2">
-              {items.map((item, idx) => (
-                <div key={idx} className="grid grid-cols-[1fr_80px_100px_32px] gap-2 items-center">
+              {fields.map((field, idx) => (
+                <div
+                  key={field.id}
+                  className="grid grid-cols-[1fr_80px_100px_32px] gap-2 items-center"
+                >
                   <input
                     type="text"
-                    value={item.name}
-                    onChange={(e) => updateItem(idx, 'name', e.target.value)}
+                    {...register(`items.${idx}.name`)}
                     placeholder="Nome do item"
                     className={inputCls}
                   />
                   <input
                     type="number"
                     min={1}
-                    value={item.quantity}
-                    onChange={(e) => updateItem(idx, 'quantity', Number(e.target.value))}
+                    {...register(`items.${idx}.quantity`)}
                     placeholder="Qtd"
                     className={inputCls}
                   />
@@ -371,14 +482,13 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
                     type="number"
                     min={0}
                     step={0.01}
-                    value={item.unit_price}
-                    onChange={(e) => updateItem(idx, 'unit_price', Number(e.target.value))}
+                    {...register(`items.${idx}.unit_price`)}
                     placeholder="R$ 0,00"
                     className={inputCls}
                   />
                   <button
                     type="button"
-                    onClick={() => removeItem(idx)}
+                    onClick={() => remove(idx)}
                     className="text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center"
                   >
                     <X size={16} />
@@ -387,54 +497,76 @@ export function PaymentModal({ payment, defaultTutor, onClose, onSuccess }: Paym
               ))}
               <div className="flex justify-end pt-1">
                 <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Total: <span className="text-teal-600 dark:text-teal-400">{fmtCurrency(total)}</span>
+                  Total:{' '}
+                  <span className="text-teal-600 dark:text-teal-400">
+                    {fmtCurrency(total)}
+                  </span>
                 </span>
               </div>
             </div>
           )}
-          {errors.items && <p className="mt-1 text-xs text-red-500">{errors.items}</p>}
+          {errors.items?.message && (
+            <p className="mt-1 text-xs text-red-500">{errors.items.message}</p>
+          )}
         </div>
 
-        {/* Due date + status */}
         <div className="grid grid-cols-2 gap-3">
           <DateInput
             label="Vencimento"
-            value={dueDate}
-            onChange={setDueDate}
+            value={watch('due_date') ?? ''}
+            onChange={(v) => setValue('due_date', v, { shouldValidate: true })}
             required
-            error={errors.dueDate}
+            error={errors.due_date?.message}
           />
-          <div>
-            <Label required className="mb-1.5">Status</Label>
-            <SelectInput
-              value={status}
-              onChange={(v) => setStatus(v as PaymentStatus)}
-              options={STATUS_OPTIONS}
-            />
-          </div>
+          <SelectInput
+            label="Status"
+            required
+            control={control}
+            name="status"
+            options={STATUS_OPTIONS}
+            error={errors.status?.message}
+          />
         </div>
 
-        {status === 'PAID' && (
-          <DateInput label="Data do pagamento" value={paidAt} onChange={setPaidAt} />
+        {watchedStatus === 'PAID' && (
+          <DateInput
+            label="Data do pagamento"
+            value={watch('paid_at') ?? ''}
+            onChange={(v) => setValue('paid_at', v)}
+            error={errors.paid_at?.message}
+          />
         )}
 
-        <div>
-          <Label className="mb-1.5">ObservaÃ§Ãµes</Label>
-          <input
-            type="text"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Ex: Atendimento referente a 10/05"
-            className={inputCls}
-          />
-        </div>
-
-        {errors.general && <p className="text-sm text-red-500">{errors.general}</p>}
+        <FormTextarea
+          label="Observações"
+          placeholder="Ex: Atendimento referente a 10/05"
+          rows={2}
+          control={control}
+          name="notes"
+          error={errors.notes?.message}
+        />
 
         <div className="flex justify-end gap-2 pt-1">
-          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
-          <Button type="submit" disabled={saving} className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600">
-            {saving ? <Loader2 size={16} className="animate-spin" /> : isEditing ? 'Salvar alteraÃ§Ãµes' : `Registrar ${total > 0 ? fmtCurrency(total) : ''}`}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600"
+          >
+            {isSubmitting ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : isEditing ? (
+              'Salvar alterações'
+            ) : (
+              `Registrar ${total > 0 ? fmtCurrency(total) : ''}`
+            )}
           </Button>
         </div>
       </form>

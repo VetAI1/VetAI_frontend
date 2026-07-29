@@ -21,15 +21,6 @@ function parseMinutes(time: string): number {
   return h * 60 + m;
 }
 
-interface WeekCalendarProps {
-  weekStart: Date;
-  events: ScheduleEvent[];
-  today: string;
-  startHour?: number;
-  endHour?: number;
-  onEventClick: (event: ScheduleEvent) => void;
-}
-
 function isPastEvent(ev: ScheduleEvent, today: string): boolean {
   if (ev.date < today) return true;
   if (ev.date === today) {
@@ -41,7 +32,23 @@ function isPastEvent(ev: ScheduleEvent, today: string): boolean {
   return false;
 }
 
-export function WeekCalendar({ weekStart, events, today, startHour = DEFAULT_START_HOUR, endHour = DEFAULT_END_HOUR, onEventClick }: WeekCalendarProps) {
+interface WeekCalendarProps {
+  weekStart: Date;
+  events: ScheduleEvent[];
+  today: string;
+  startHour?: number;
+  endHour?: number;
+  onEventClick: (event: ScheduleEvent) => void;
+}
+
+export function WeekCalendar({
+  weekStart,
+  events,
+  today,
+  startHour = DEFAULT_START_HOUR,
+  endHour = DEFAULT_END_HOUR,
+  onEventClick,
+}: WeekCalendarProps) {
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);
     d.setDate(weekStart.getDate() + i);
@@ -103,13 +110,13 @@ export function WeekCalendar({ weekStart, events, today, startHour = DEFAULT_STA
         })}
       </div>
 
-      <div
-        className="overflow-y-auto"
-        style={{ maxHeight: '580px' }}
-      >
+      <div className="overflow-y-auto" style={{ maxHeight: '580px' }}>
         <div
           className="grid relative"
-          style={{ gridTemplateColumns: '48px repeat(7, 1fr)', height: totalHeight }}
+          style={{
+            gridTemplateColumns: '48px repeat(7, 1fr)',
+            height: totalHeight,
+          }}
         >
           <div
             className="absolute left-0 right-0 top-0 pointer-events-none"
@@ -165,10 +172,13 @@ export function WeekCalendar({ weekStart, events, today, startHour = DEFAULT_STA
                       className={`absolute left-0.5 right-0.5 rounded px-1.5 py-0.5 text-left overflow-hidden border z-10 hover:opacity-80 transition-opacity ${bgClass} ${colorClass}`}
                       style={{ top, height }}
                     >
-                      <p className="text-[10px] font-semibold leading-snug truncate">{ev.title}</p>
+                      <p className="text-[10px] font-semibold leading-snug truncate">
+                        {ev.title}
+                      </p>
                       {height >= 32 && (
                         <p className="text-[9px] opacity-75 leading-snug truncate">
-                          {ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}
+                          {ev.startTime}
+                          {ev.endTime ? ` – ${ev.endTime}` : ''}
                           {ev.patientName ? ` · ${ev.patientName}` : ''}
                         </p>
                       )}

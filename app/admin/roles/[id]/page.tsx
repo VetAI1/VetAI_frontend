@@ -33,7 +33,7 @@ export default function RoleDetail() {
   }, [params.id, isNew]);
 
   return (
-    <div className='mx-auto flex w-full max-w-7xl flex-col gap-8 pb-12'>
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 pb-12">
       <Header
         title={
           isNew
@@ -43,8 +43,8 @@ export default function RoleDetail() {
         showStorage={false}
       />
       {loading ? (
-        <div className='flex justify-center py-20 text-slate-500'>
-          <Loader2 className='animate-spin' />
+        <div className="flex justify-center py-20 text-slate-500">
+          <Loader2 className="animate-spin" />
         </div>
       ) : (
         <RoleForm

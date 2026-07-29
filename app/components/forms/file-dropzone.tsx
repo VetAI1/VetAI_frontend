@@ -51,23 +51,23 @@ export function FileDropzone({
       >
         <input
           ref={inputRef}
-          type='file'
+          type="file"
           accept={accept}
-          className='hidden'
+          className="hidden"
           onChange={(event) => onFileSelect(event.target.files?.[0] ?? null)}
         />
 
         {file ? (
-          <div className='flex items-center justify-center gap-3'>
+          <div className="flex items-center justify-center gap-3">
             <FileText
               size={24}
-              className='shrink-0 text-teal-600 dark:text-teal-400'
+              className="shrink-0 text-teal-600 dark:text-teal-400"
             />
-            <div className='min-w-0 text-left'>
-              <p className='truncate text-sm font-medium text-teal-800 dark:text-teal-300'>
+            <div className="min-w-0 text-left">
+              <p className="truncate text-sm font-medium text-teal-800 dark:text-teal-300">
                 {file.name}
               </p>
-              <p className='text-xs text-slate-500 dark:text-slate-400'>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {(file.size / 1024 / 1024).toFixed(2)} MB · Clique para trocar
               </p>
             </div>
@@ -76,13 +76,13 @@ export function FileDropzone({
           <>
             <Upload
               size={24}
-              className='mx-auto mb-2 text-slate-400 dark:text-slate-500'
+              className="mx-auto mb-2 text-slate-400 dark:text-slate-500"
             />
-            <p className='text-sm font-medium text-slate-700 dark:text-slate-300'>
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Arraste o arquivo aqui ou clique para selecionar
             </p>
             {helperText && (
-              <p className='mt-1 text-xs text-slate-500 dark:text-slate-400'>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {helperText}
               </p>
             )}

@@ -92,29 +92,29 @@ export function AnalyticsChart({
   if (loading) {
     return (
       <SectionCard
-        title={<Skeleton className='h-5 w-40' />}
-        subtitle={<Skeleton className='h-3.5 w-56 mt-1' />}
+        title={<Skeleton className="h-5 w-40" />}
+        subtitle={<Skeleton className="h-3.5 w-56 mt-1" />}
         {...(className ? { className } : {})}
       >
-        <div className='w-full mt-4' style={{ height }}>
+        <div className="w-full mt-4" style={{ height }}>
           {type === 'doughnut' ? (
-            <div className='flex items-center justify-center h-full gap-8'>
-              <Skeleton className='w-44 h-44 rounded-full' />
-              <div className='flex flex-col gap-2'>
+            <div className="flex items-center justify-center h-full gap-8">
+              <Skeleton className="w-44 h-44 rounded-full" />
+              <div className="flex flex-col gap-2">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className='flex items-center gap-2'>
-                    <Skeleton className='w-3 h-3 rounded-full' />
-                    <Skeleton className='h-3 w-20' />
+                  <div key={i} className="flex items-center gap-2">
+                    <Skeleton className="w-3 h-3 rounded-full" />
+                    <Skeleton className="h-3 w-20" />
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <div className='flex items-end gap-2 h-full w-full pb-6'>
+            <div className="flex items-end gap-2 h-full w-full pb-6">
               {Array.from({ length: type === 'bar' ? 6 : 8 }).map((_, i) => (
                 <Skeleton
                   key={i}
-                  className='flex-1 rounded-t-md'
+                  className="flex-1 rounded-t-md"
                   style={{ height: `${30 + Math.sin(i * 1.2) * 20 + (i % 3) * 15}%` }}
                 />
               ))}
@@ -139,8 +139,12 @@ export function AnalyticsChart({
   };
 
   return (
-    <SectionCard title={title} {...(subtitle ? { subtitle } : {})} {...(className ? { className } : {})}>
-      <div className='w-full mt-4' style={{ height }}>
+    <SectionCard
+      title={title}
+      {...(subtitle ? { subtitle } : {})}
+      {...(className ? { className } : {})}
+    >
+      <div className="w-full mt-4" style={{ height }}>
         {renderChart()}
       </div>
     </SectionCard>
