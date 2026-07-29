@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { AuthPanel } from '@/app/components/common/auth-panel';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '@/infra/auth-context';
 import { loginSchema, type LoginFormData } from '@/schemas/auth';
 
@@ -74,39 +75,40 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-end justify-between gap-4">
-                <div className="flex-1">
-                  <InputWithLabel
-                    label="Senha"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Sua senha"
-                    name="password"
-                    control={control}
-                    autoComplete="current-password"
-                    className="h-11 pr-10"
-                    error={errors.password?.message}
-                    endAdornment={
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="text-slate-400 hover:text-slate-600"
-                      >
-                        {showPassword ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
-                    }
-                  />
-                </div>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Senha
+                </Label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-teal-600 hover:text-teal-700 dark:text-teal-400"
+                  className="text-xs text-teal-600 hover:text-teal-700 dark:text-teal-400 hover:underline font-medium"
                 >
                   Esqueceu a senha?
                 </Link>
               </div>
+
+              <InputWithLabel
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Sua senha"
+                name="password"
+                control={control}
+                autoComplete="current-password"
+                className="h-11 pr-10"
+                error={errors.password?.message}
+                endAdornment={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-slate-400 hover:text-slate-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+                }
+              />
             </div>
 
             <Button
