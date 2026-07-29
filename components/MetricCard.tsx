@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Tooltip,
   TooltipContent,
@@ -80,7 +81,7 @@ export function MetricCard({
 
           <div className="flex items-baseline gap-1">
             {loading ? (
-              <div className="h-9 w-24 animate-pulse rounded-md bg-muted" />
+              <Skeleton className="h-9 w-24" />
             ) : (
               <h3 className="text-3xl font-bold tracking-tight text-foreground">
                 {value}
@@ -92,15 +93,18 @@ export function MetricCard({
         <div
           className={cn(
             'flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300 border',
-            loading ? 'bg-muted' : '',
           )}
           style={{
             backgroundColor: !loading ? `${color}25` : undefined,
             borderColor: !loading ? `${color}40` : 'transparent',
-            color,
+            color: !loading ? color : 'transparent',
           }}
         >
-          <IconComponent className="h-6 w-6" strokeWidth={2.5} />
+          {loading ? (
+            <Skeleton className="h-6 w-6 rounded-full" />
+          ) : (
+            <IconComponent className="h-6 w-6" strokeWidth={2.5} />
+          )}
         </div>
       </div>
 

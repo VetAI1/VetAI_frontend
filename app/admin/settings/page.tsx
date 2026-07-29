@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/infra/auth-context';
 import { hospitalSchema, type HospitalFormData } from '@/schemas/hospital';
 import { hospitalsService } from '@/services/hospitals.service';
@@ -74,7 +75,26 @@ export default function SettingsPage() {
   }
 
   if (loading) {
-    return <p className="p-6 text-sm text-slate-500">Carregando configurações...</p>;
+    return (
+      <main className="mx-auto w-full max-w-5xl space-y-8 p-4 sm:p-6">
+        <div className="flex items-start gap-4">
+          <Skeleton className="h-12 w-12 rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-64" />
+            <Skeleton className="h-4 w-80" />
+          </div>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-950 space-y-5">
+          <Skeleton className="h-6 w-32" />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (

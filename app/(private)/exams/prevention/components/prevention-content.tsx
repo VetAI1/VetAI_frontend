@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   CheckCircle2,
   Lightbulb,
-  Loader2,
   Microscope,
   ShieldCheck,
 } from 'lucide-react';
@@ -17,6 +16,7 @@ import { Badge } from '@/app/components/common/badge';
 import { Card } from '@/app/components/common/card';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { studiesService } from '@/services/studies.service';
 import type { Study } from '@/types/study';
 
@@ -45,11 +45,18 @@ export function PreventionContent() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <Loader2 size={32} className="animate-spin text-teal-600" />
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Carregando…
-        </p>
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-9 w-24" />
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-6 shadow space-y-3">
+          <Skeleton className="h-7 w-64" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Skeleton className="h-48 w-full rounded-xl" />
+          <Skeleton className="h-48 w-full rounded-xl" />
+        </div>
       </div>
     );
   }

@@ -20,6 +20,7 @@ import { Badge } from '@/app/components/common/badge';
 import { Card } from '@/app/components/common/card';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { STUDY_STATUS_MAP } from '@/constants';
 import { studiesService } from '@/services/studies.service';
 import type { AlteredValueInfo, Study } from '@/types/study';
@@ -104,8 +105,35 @@ export function ExamDetailContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 size={32} className="animate-spin text-teal-600" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-9 w-24" />
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-6 shadow space-y-4">
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-64" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Skeleton className="h-9 w-32" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
+            <Skeleton className="h-64 w-full rounded-xl" />
+            <Skeleton className="h-48 w-full rounded-xl" />
+          </div>
+          <div className="space-y-4">
+            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-40 w-full rounded-xl" />
+          </div>
+        </div>
       </div>
     );
   }

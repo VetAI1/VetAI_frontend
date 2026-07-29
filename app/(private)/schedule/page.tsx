@@ -248,9 +248,10 @@ export default function SchedulePage() {
             <div className="w-full xl:w-80 bg-white dark:bg-slate-800 rounded-xl shadow p-4 sm:p-6 xl:h-fit xl:sticky xl:top-6">
               <TodayEventsList
                 date={selectedDate}
-                events={loadingEvents ? [] : selectedEvents}
+                events={selectedEvents}
                 onEventClick={setDetailEvent}
                 onAddClick={() => handleAddClick(selectedDate)}
+                loading={loadingEvents}
               />
               <ScheduleSettings
                 settings={scheduleSettings}

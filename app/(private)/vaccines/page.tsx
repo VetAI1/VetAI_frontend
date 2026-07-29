@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { VaccineFormModal } from './components/vaccine-form-modal';
@@ -66,6 +66,7 @@ export default function VaccinesPage() {
           searchPlaceholder="Buscar vacina..."
           onSearch={setSearch}
           columnWidths={['flex-1', 'w-32', 'w-44', 'w-36', 'w-24']}
+          loading={loading}
           actions={
             <Button
               onClick={() => setShowCreateModal(true)}
@@ -75,16 +76,7 @@ export default function VaccinesPage() {
             </Button>
           }
         >
-          {loading ? (
-            <tr>
-              <td colSpan={5} className="py-12 text-center">
-                <Loader2
-                  size={24}
-                  className="animate-spin text-teal-600 mx-auto"
-                />
-              </td>
-            </tr>
-          ) : vaccines.length === 0 ? (
+          {vaccines.length === 0 ? (
             <tr>
               <td colSpan={5} className="py-12 text-center">
                 <Syringe

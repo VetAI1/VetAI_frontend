@@ -186,18 +186,13 @@ export default function AdminCollaborators() {
         title="Equipe"
         subtitle="Colaboradores ativos e convites pendentes"
       >
-        {loading ? (
-          <div className="flex justify-center py-10 text-slate-500">
-            <Loader2 className="animate-spin" />
-          </div>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={collaborators}
-            getRowKey={(c) => c.id}
-            emptyState="Nenhum colaborador encontrado."
-          />
-        )}
+        <DataTable
+          columns={columns}
+          data={collaborators}
+          getRowKey={(c) => c.id}
+          emptyState="Nenhum colaborador encontrado."
+          loading={loading}
+        />
       </SectionCard>
 
       {isInviteOpen && (

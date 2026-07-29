@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -119,18 +119,13 @@ export default function AdminRoles() {
           </Button>
         }
       >
-        {loading ? (
-          <div className="flex justify-center py-10 text-slate-500">
-            <Loader2 className="animate-spin" />
-          </div>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={roles}
-            getRowKey={(role) => role.id}
-            emptyState="Nenhum papel administrativo criado."
-          />
-        )}
+        <DataTable
+          columns={columns}
+          data={roles}
+          getRowKey={(role) => role.id}
+          emptyState="Nenhum papel administrativo criado."
+          loading={loading}
+        />
       </SectionCard>
     </div>
   );

@@ -90,12 +90,21 @@ All forms **must** follow these conventions:
 
 ### Component Structure
 
-- `components/ui/` — shadcn/ui primitives (button, input, label, switch, tooltip, carousel, progress)
+- `components/ui/` — shadcn/ui primitives (button, input, label, switch, tooltip, carousel, progress, skeleton)
 - `app/components/layout/` — Sidebar, Header, AuthGuard
 - `app/components/common/` — Modal, Badge, Card, Reveal, Counter, ConfirmModal, PasswordStrength, Switch
 - `app/components/forms/` — InputWithLabel, SelectInput, SearchSelect, DateInput, TimeInput, FormTextarea, FileDropzone, FieldShell
 - `app/components/data/` — DataTable, SectionCard, StatCard
 - `app/components/business/` — Domain components (PatientModal, TutorModal, UploadExamModal, ConsultationHistory, etc.)
+
+### Skeleton Loading Patterns
+
+All async data fetching states across pages, tables, cards, stat metrics, and section containers **must** use Skeleton loading components (`@/components/ui/skeleton` or dedicated skeleton sub-views):
+
+1. **Primitive**: Use `<Skeleton className="..." />` (renders an animated pulse block with `bg-slate-200 dark:bg-slate-800`).
+2. **Tables**: `DataTable` handles loading via `loading={true}` prop, rendering skeleton rows matching header count.
+3. **Cards & Metrics**: Stat cards and analytics charts render skeleton blocks corresponding to their dimensions while fetching.
+4. **Spinners Limit**: `<Loader2 className="animate-spin" />` is strictly reserved for inline button submission states (`<Button loading={saving}>`) or search input indicators (`SearchSelect`), NOT for layout or page data loading.
 
 ### Services & API
 

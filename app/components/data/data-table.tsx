@@ -6,6 +6,8 @@ import { useState } from 'react';
 
 import { Card } from '../common/card';
 
+import { Skeleton } from '@/components/ui/skeleton';
+
 export interface DataTableColumn<T> {
   key: string;
   header: ReactNode;
@@ -21,6 +23,8 @@ interface DataTableProps<T> {
   data?: T[];
   getRowKey?: (row: T, index: number) => string;
   emptyState?: ReactNode;
+  loading?: boolean;
+  skeletonRows?: number;
   showSearch?: boolean;
   onSearch?: (value: string) => void;
   searchPlaceholder?: string;
@@ -37,6 +41,8 @@ export function DataTable<T>({
   data,
   getRowKey,
   emptyState = 'Nenhum registro encontrado.',
+  loading = false,
+  skeletonRows = 5,
   showSearch = false,
   onSearch,
   searchPlaceholder = 'Buscar...',
@@ -103,7 +109,23 @@ export function DataTable<T>({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-700 [&>tr:last-child]:border-b [&>tr:last-child]:border-slate-200 dark:[&>tr:last-child]:border-slate-700">
-            {columns && data ? (
+            {loading ? (
+              Array.from({ length: skeletonRows }).map((_, rIdx) => (
+                <tr key={`skel-row-${rIdx}`}>
+                  {tableHeaders.length > 0 ? (
+                    tableHeaders.map((_, cIdx) => (
+                      <td key={`skel-cell-${cIdx}`} className="p-4">
+                        <Skeleton className="h-5 w-full" />
+                      </td>
+                    ))
+                  ) : (
+                    <td className="p-4">
+                      <Skeleton className="h-5 w-full" />
+                    </td>
+                  )}
+                </tr>
+              ))
+            ) : columns && data ? (
               data.length > 0 ? (
                 data.map((row, rowIndex) => (
                   <tr

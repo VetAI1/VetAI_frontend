@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, Loader2, PawPrint, Plus } from 'lucide-react';
+import { ChevronRight, PawPrint, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -9,6 +9,7 @@ import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
 import { patientsService } from '@/services/patients.service';
 import type { PaginatedMeta } from '@/types/common';
@@ -63,7 +64,11 @@ export default function PatientsPage() {
         <SectionCard
           title="Pacientes cadastrados"
           subtitle={
-            meta ? `${meta.total_elements} pacientes no total` : 'Carregando...'
+            loading ? (
+              <Skeleton className="h-4 w-36 mt-1" />
+            ) : meta ? (
+              `${meta.total_elements} pacientes no total`
+            ) : undefined
           }
           headerAction={
             <Button
@@ -79,17 +84,9 @@ export default function PatientsPage() {
             showSearch={true}
             onSearch={handleSearch}
             searchPlaceholder="Buscar por nome..."
+            loading={loading}
           >
-            {loading ? (
-              <tr>
-                <td colSpan={5} className="p-8 text-center">
-                  <Loader2
-                    size={24}
-                    className="animate-spin text-teal-600 mx-auto"
-                  />
-                </td>
-              </tr>
-            ) : patients.length === 0 ? (
+            {patients.length === 0 ? (
               <tr>
                 <td colSpan={5} className="p-8 text-center">
                   <PawPrint

@@ -14,10 +14,10 @@ import {
   type ChartData,
   type ChartOptions,
 } from 'chart.js';
-import { Loader2 } from 'lucide-react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
 import { SectionCard } from '@/app/components/data/section-card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 ChartJS.register(
   CategoryScale,
@@ -92,12 +92,10 @@ export function AnalyticsChart({
   const renderChart = () => {
     if (loading) {
       return (
-        <div
-          className="flex items-center justify-center w-full"
-          style={{ height }}
-        >
-          <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
-        </div>
+        <Skeleton
+          className="w-full rounded-lg"
+          style={{ height: typeof height === 'number' ? `${height}px` : height }}
+        />
       );
     }
 

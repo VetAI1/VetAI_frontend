@@ -1,6 +1,5 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { DataTable } from '@/app/components/data/data-table';
@@ -75,47 +74,42 @@ export default function AdminDashboard() {
         title="Atividade por colaborador"
         subtitle="Resumo global baseado nos registros vinculados a cada usuário"
       >
-        {loading ? (
-          <div className="flex justify-center py-10 text-slate-500">
-            <Loader2 className="animate-spin" />
-          </div>
-        ) : (
-          <DataTable
-            headers={[
-              'Colaborador',
-              'E-mail',
-              'Pacientes',
-              'Exames',
-              'Consultas',
-            ]}
-          >
-            {(data?.collaborators_activity ?? []).length === 0 ? (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="p-8 text-center text-sm text-slate-500"
-                >
-                  Nenhum colaborador ativo.
+        <DataTable
+          headers={[
+            'Colaborador',
+            'E-mail',
+            'Pacientes',
+            'Exames',
+            'Consultas',
+          ]}
+          loading={loading}
+        >
+          {(data?.collaborators_activity ?? []).length === 0 ? (
+            <tr>
+              <td
+                colSpan={5}
+                className="p-8 text-center text-sm text-slate-500"
+              >
+                Nenhum colaborador ativo.
+              </td>
+            </tr>
+          ) : (
+            data?.collaborators_activity.map((item) => (
+              <tr
+                key={item.id}
+                className="border-t border-slate-100 dark:border-slate-800"
+              >
+                <td className="p-4 font-medium text-slate-900 dark:text-white">
+                  {item.name}
                 </td>
+                <td className="p-4 text-sm text-slate-500">{item.email}</td>
+                <td className="p-4 text-sm">{item.patients}</td>
+                <td className="p-4 text-sm">{item.studies}</td>
+                <td className="p-4 text-sm">{item.consultations}</td>
               </tr>
-            ) : (
-              data?.collaborators_activity.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-t border-slate-100 dark:border-slate-800"
-                >
-                  <td className="p-4 font-medium text-slate-900 dark:text-white">
-                    {item.name}
-                  </td>
-                  <td className="p-4 text-sm text-slate-500">{item.email}</td>
-                  <td className="p-4 text-sm">{item.patients}</td>
-                  <td className="p-4 text-sm">{item.studies}</td>
-                  <td className="p-4 text-sm">{item.consultations}</td>
-                </tr>
-              ))
-            )}
-          </DataTable>
-        )}
+            ))
+          )}
+        </DataTable>
       </SectionCard>
     </div>
   );

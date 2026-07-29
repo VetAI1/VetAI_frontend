@@ -8,6 +8,7 @@ import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/infra/auth-context';
 import { collaboratorsService } from '@/services/collaborators.service';
 import { rolesService } from '@/services/roles.service';
@@ -232,8 +233,12 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
         subtitle="Busque e adicione usuários que receberão este papel administrativo"
       >
         {loadingCollaborators ? (
-          <div className="flex justify-center py-8 text-slate-500">
-            <Loader2 className="animate-spin" />
+          <div className="space-y-4 max-w-xl">
+            <Skeleton className="h-10 w-full" />
+            <div className="flex gap-2">
+              <Skeleton className="h-7 w-28 rounded-full" />
+              <Skeleton className="h-7 w-28 rounded-full" />
+            </div>
           </div>
         ) : (
           <div className="space-y-4">

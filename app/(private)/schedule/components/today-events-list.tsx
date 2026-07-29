@@ -1,5 +1,6 @@
 import { CalendarX, PawPrint, Plus, User } from 'lucide-react';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import type { ScheduleEvent } from '@/types/schedule';
 import { EVENT_TYPE_MAP } from '@/types/schedule';
 
@@ -8,6 +9,7 @@ interface TodayEventsListProps {
   events: ScheduleEvent[];
   onEventClick: (event: ScheduleEvent) => void;
   onAddClick: () => void;
+  loading?: boolean;
 }
 
 export function TodayEventsList({
@@ -15,6 +17,7 @@ export function TodayEventsList({
   events,
   onEventClick,
   onAddClick,
+  loading = false,
 }: TodayEventsListProps) {
   const sorted = [...events].sort((a, b) =>
     a.startTime.localeCompare(b.startTime),
@@ -37,9 +40,13 @@ export function TodayEventsList({
             {dateFormatted}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {sorted.length === 0
-              ? 'Nenhum evento'
-              : `${sorted.length} evento${sorted.length > 1 ? 's' : ''}`}
+            {loading ? (
+              <Skeleton className="h-3 w-16" />
+            ) : sorted.length === 0 ? (
+              'Nenhum evento'
+            ) : (
+              `${sorted.length} evento${sorted.length > 1 ? 's' : ''}`
+            )}
           </p>
         </div>
         <button
@@ -50,7 +57,13 @@ export function TodayEventsList({
         </button>
       </div>
 
-      {sorted.length === 0 ? (
+      {loading ? (
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-16 w-full rounded-lg" />
+          <Skeleton className="h-16 w-full rounded-lg" />
+          <Skeleton className="h-16 w-full rounded-lg" />
+        </div>
+      ) : sorted.length === 0 ? (
         <div className="flex flex-col items-center justify-center flex-1 py-10 text-center">
           <CalendarX
             size={36}

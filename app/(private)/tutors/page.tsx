@@ -9,6 +9,7 @@ import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { tutorsService } from '@/services/tutors.service';
 import type { Tutor } from '@/types/tutor';
@@ -80,7 +81,11 @@ export default function TutorsPage() {
         <SectionCard
           title="Tutores cadastrados"
           subtitle={
-            meta ? `${meta.total_elements} tutores no total` : 'Carregando...'
+            loading ? (
+              <Skeleton className="h-4 w-36 mt-1" />
+            ) : meta ? (
+              `${meta.total_elements} tutores no total`
+            ) : undefined
           }
           headerAction={
             <Button
@@ -106,17 +111,9 @@ export default function TutorsPage() {
             showSearch={true}
             onSearch={setSearch}
             searchPlaceholder="Buscar por nome..."
+            loading={loading}
           >
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="p-8 text-center">
-                  <Loader2
-                    size={24}
-                    className="animate-spin text-teal-600 mx-auto"
-                  />
-                </td>
-              </tr>
-            ) : tutors.length === 0 ? (
+            {tutors.length === 0 ? (
               <tr>
                 <td colSpan={6} className="p-8 text-center">
                   <User

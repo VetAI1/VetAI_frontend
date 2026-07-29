@@ -53,6 +53,7 @@ import { Card } from '@/app/components/common/card';
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
 import { documentsService } from '@/services/documents.service';
 import { healthRecordsService } from '@/services/health-records.service';
@@ -74,6 +75,47 @@ import type { ScheduleEvent } from '@/types/schedule';
 import { EVENT_TYPE_MAP } from '@/types/schedule';
 import type { Study } from '@/types/study';
 import type { Tutor } from '@/types/tutor';
+
+function PatientDetailSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-9 w-24" />
+      </div>
+      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-6 shadow">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Skeleton className="w-16 h-16 rounded-full shrink-0" />
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-48" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-24" />
+            <Skeleton className="h-9 w-24" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-700">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      </div>
+      <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-2">
+        <Skeleton className="h-8 w-24" />
+        <Skeleton className="h-8 w-24" />
+        <Skeleton className="h-8 w-24" />
+      </div>
+      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-6 shadow space-y-4">
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-16 w-full" />
+        <Skeleton className="h-16 w-full" />
+      </div>
+    </div>
+  );
+}
 
 export function PatientDetailContent() {
   const searchParams = useSearchParams();
@@ -394,13 +436,7 @@ export function PatientDetailContent() {
       setConfirmDeleting(false);
     }
   };
-
-  if (loading)
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 size={32} className="animate-spin text-teal-600" />
-      </div>
-    );
+  if (loading) return <PatientDetailSkeleton />;
 
   if (!patient)
     return (
@@ -635,8 +671,9 @@ export function PatientDetailContent() {
         }
       >
         {examsLoading ? (
-          <div className="py-8 flex justify-center">
-            <Loader2 size={24} className="animate-spin text-teal-600" />
+          <div className="py-4 space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
           </div>
         ) : exams.length === 0 ? (
           <div className="py-8 text-center">
@@ -713,8 +750,9 @@ export function PatientDetailContent() {
           }
         >
           {weightsLoading ? (
-            <div className="py-8 flex justify-center">
-              <Loader2 size={24} className="animate-spin text-teal-600" />
+            <div className="py-4 space-y-3">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </div>
           ) : weightRecords.length === 0 ? (
             <div className="py-8 text-center">
@@ -784,8 +822,9 @@ export function PatientDetailContent() {
           }
         >
           {clinicalLoading ? (
-            <div className="py-8 flex justify-center">
-              <Loader2 size={24} className="animate-spin text-teal-600" />
+            <div className="py-4 space-y-3">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </div>
           ) : clinicalNotes.length === 0 ? (
             <div className="py-8 text-center">
@@ -848,8 +887,9 @@ export function PatientDetailContent() {
           }
         >
           {vaccinesLoading ? (
-            <div className="py-8 flex justify-center">
-              <Loader2 size={24} className="animate-spin text-teal-600" />
+            <div className="py-4 space-y-3">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </div>
           ) : vaccines.length === 0 ? (
             <div className="py-8 text-center">
@@ -965,8 +1005,9 @@ export function PatientDetailContent() {
           }
         >
           {prescriptionsLoading ? (
-            <div className="py-8 flex justify-center">
-              <Loader2 size={24} className="animate-spin text-teal-600" />
+            <div className="py-4 space-y-3">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </div>
           ) : prescriptions.length === 0 ? (
             <div className="py-8 text-center">
@@ -1063,8 +1104,9 @@ export function PatientDetailContent() {
           }
         >
           {notesLoading ? (
-            <div className="py-8 flex justify-center">
-              <Loader2 size={24} className="animate-spin text-teal-600" />
+            <div className="py-4 space-y-3">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </div>
           ) : notes.length === 0 ? (
             <div className="py-8 text-center">
@@ -1145,8 +1187,9 @@ export function PatientDetailContent() {
           }
         >
           {docsLoading ? (
-            <div className="py-8 flex justify-center">
-              <Loader2 size={24} className="animate-spin text-teal-600" />
+            <div className="py-4 space-y-3">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </div>
           ) : documents.length === 0 ? (
             <div

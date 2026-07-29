@@ -11,6 +11,7 @@ import { SectionCard } from '@/app/components/data/section-card';
 import { AnalyticsChart } from '@/components/AnalyticsChart';
 import { MetricCard } from '@/components/MetricCard';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS, STUDY_STATUS_MAP } from '@/constants';
 import { cn } from '@/infra/utils';
 import type { DashboardData } from '@/services/analytics.service';
@@ -146,7 +147,13 @@ export default function Dashboard() {
             subtitle="Eventos agendados para o dia de hoje"
           >
             <div className="h-[260px] overflow-y-auto mt-2">
-              {todayEvents.length === 0 ? (
+              {loading ? (
+                <div className="flex flex-col gap-2">
+                  <Skeleton className="h-14 w-full rounded-lg" />
+                  <Skeleton className="h-14 w-full rounded-lg" />
+                  <Skeleton className="h-14 w-full rounded-lg" />
+                </div>
+              ) : todayEvents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center py-4">
                   <CalendarCheck
                     size={32}
@@ -240,6 +247,7 @@ export default function Dashboard() {
           <DataTable
             headers={['Data', 'Paciente', 'Título', 'Status', 'Ações']}
             className="h-full"
+            loading={loading}
           >
             {studies.length === 0 ? (
               <tr>
@@ -305,7 +313,13 @@ export default function Dashboard() {
         >
           <div className="flex-1 overflow-y-auto min-h-0">
             <div className="flex flex-col gap-3 mt-4">
-              {patients.length === 0 ? (
+              {loading ? (
+                <div className="flex flex-col gap-3">
+                  <Skeleton className="h-16 w-full rounded-lg" />
+                  <Skeleton className="h-16 w-full rounded-lg" />
+                  <Skeleton className="h-16 w-full rounded-lg" />
+                </div>
+              ) : patients.length === 0 ? (
                 <div className="text-center py-8">
                   <PawPrint
                     size={32}

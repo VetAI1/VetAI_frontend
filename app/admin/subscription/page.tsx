@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Crown,
   Info,
-  Loader2,
   RefreshCw,
   Sparkles,
   Users,
@@ -26,6 +25,7 @@ import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/infra/auth-context';
 import { billingService } from '@/services/billing.service';
 import { collaboratorsService } from '@/services/collaborators.service';
@@ -248,8 +248,25 @@ export default function AdminSubscriptionPage() {
       />
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center text-slate-500">
-          <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
+            <Skeleton className="h-6 w-40" />
+            <div className="grid gap-6 md:grid-cols-3 pt-2">
+              <Skeleton className="h-28 w-full rounded-xl" />
+              <Skeleton className="h-28 w-full rounded-xl" />
+              <Skeleton className="h-28 w-full rounded-xl" />
+            </div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-16 w-full rounded-xl" />
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-16 w-full rounded-xl" />
+            </div>
+          </div>
         </div>
       ) : (
         <>
