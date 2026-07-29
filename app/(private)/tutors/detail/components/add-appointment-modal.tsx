@@ -47,9 +47,9 @@ export function AddAppointmentModal({ tutorId, pets, onClose, onSuccess }: AddAp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (!title.trim()) errs.title = 'TÃ­tulo Ã© obrigatÃ³rio';
-    if (!date) errs.date = 'Data Ã© obrigatÃ³ria';
-    if (!startTime) errs.startTime = 'HorÃ¡rio de inÃ­cio Ã© obrigatÃ³rio';
+    if (!title.trim()) errs.title = 'Título é obrigatório';
+    if (!date) errs.date = 'Data é obrigatória';
+    if (!startTime) errs.startTime = 'Horário de início é obrigatório';
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
     setSaving(true);
@@ -77,7 +77,7 @@ export function AddAppointmentModal({ tutorId, pets, onClose, onSuccess }: AddAp
       <form onSubmit={(e) => { void handleSubmit(e); }} className="flex flex-col gap-4">
 
         <div>
-          <Label required className="mb-1.5">TÃ­tulo</Label>
+          <Label required className="mb-1.5">Título</Label>
           <input
             type="text"
             value={title}
@@ -110,13 +110,13 @@ export function AddAppointmentModal({ tutorId, pets, onClose, onSuccess }: AddAp
 
         <div className="grid grid-cols-2 gap-3">
           <TimeInput
-            label="HorÃ¡rio inÃ­cio"
+            label="Horário início"
             required
             value={startTime}
             onChange={setStartTime}
           />
           <TimeInput
-            label="HorÃ¡rio fim"
+            label="Horário fim"
             value={endTime}
             onChange={setEndTime}
           />
@@ -136,11 +136,11 @@ export function AddAppointmentModal({ tutorId, pets, onClose, onSuccess }: AddAp
         )}
 
         <div>
-          <Label className="mb-1.5">DescriÃ§Ã£o</Label>
+          <Label className="mb-1.5">Descrição</Label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="ObservaÃ§Ãµes..."
+            placeholder="Observações..."
             rows={2}
             className={`${inputCls} resize-none`}
           />

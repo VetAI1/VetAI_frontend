@@ -30,16 +30,16 @@ interface MedicineDetailModalProps {
 
 const TABS = [
   { key: 'sobre', label: 'Sobre' },
-  { key: 'indicacoes', label: 'IndicaÃ§Ãµes e ContraindicaÃ§Ãµes' },
-  { key: 'administracao', label: 'AdministraÃ§Ã£o e Doses' },
-  { key: 'apresentacoes', label: 'ApresentaÃ§Ãµes e ConcentraÃ§Ãµes' },
+  { key: 'indicacoes', label: 'Indicações e Contraindicações' },
+  { key: 'administracao', label: 'Administração e Doses' },
+  { key: 'apresentacoes', label: 'Apresentações e Concentrações' },
 ] as const;
 
 type Tab = (typeof TABS)[number]['key'];
 type SpeciesKey = 'dogs' | 'cats' | 'cattle' | 'horses';
 
 const SPECIES_OPTIONS: { key: SpeciesKey; label: string }[] = [
-  { key: 'dogs', label: 'CÃ£o' },
+  { key: 'dogs', label: 'Cão' },
   { key: 'cats', label: 'Gato' },
   { key: 'cattle', label: 'Bovino' },
   { key: 'horses', label: 'Equino' },
@@ -116,7 +116,7 @@ function InfoCard({
         </span>
       </div>
       <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-        {value || <span className="text-slate-400 dark:text-slate-500 font-normal">â€”</span>}
+        {value || <span className="text-slate-400 dark:text-slate-500 font-normal">—</span>}
       </p>
     </div>
   );
@@ -211,7 +211,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
             <>
               <TextBlock
                 icon={BookOpen}
-                label="IndicaÃ§Ãµes"
+                label="Indicações"
                 value={medicine.fullIndications}
                 iconColor="text-teal-500"
                 borderColor="border-teal-200 dark:border-teal-800"
@@ -220,7 +220,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
 
               <ListSection
                 icon={AlertTriangle}
-                label="ContraindicaÃ§Ãµes e PrecauÃ§Ãµes"
+                label="Contraindicações e Precauções"
                 items={medicine.contraindicationsPrecautions ?? []}
                 iconColor="text-red-500"
                 bgColor="border-red-200 dark:border-red-800/50 bg-red-50/50 dark:bg-red-900/10"
@@ -245,7 +245,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
 
               <TextBlock
                 icon={Info}
-                label="ReproduÃ§Ã£o, GestaÃ§Ã£o e LactaÃ§Ã£o"
+                label="Reprodução, Gestação e Lactação"
                 value={medicine.reproductionPregnancyLactation}
                 iconColor="text-slate-400 dark:text-slate-500"
                 borderColor="border-slate-200 dark:border-slate-700"
@@ -260,7 +260,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-6 text-center">
                   <AlertTriangle size={24} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                   <p className="text-sm text-slate-400 dark:text-slate-500">
-                      Nenhuma informaÃ§Ã£o disponÃ­vel.
+                      Nenhuma informação disponível.
                   </p>
                 </div>
               )}
@@ -276,7 +276,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   <div className="flex items-center gap-2">
                     <Route size={14} className="text-emerald-500" />
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      Vias de AdministraÃ§Ã£o
+                      Vias de Administração
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -296,13 +296,13 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <InfoCard
                   icon={Clock}
-                  label="FrequÃªncia de Uso"
+                  label="Frequência de Uso"
                   value={medicine.usageFrequency}
                   iconColor="text-blue-500"
                 />
                 <InfoCard
                   icon={Clock}
-                  label="DuraÃ§Ã£o do Tratamento"
+                  label="Duração do Tratamento"
                   value={medicine.treatmentDuration}
                   iconColor="text-indigo-500"
                 />
@@ -314,7 +314,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   <div className="flex items-center gap-2 mb-3">
                     <Pill size={14} className="text-violet-500" />
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      Doses de ReferÃªncia
+                      Doses de Referência
                     </span>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -338,7 +338,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                               )}
                             </>
                           ) : (
-                            <span className="text-xs text-slate-400 dark:text-slate-500">â€”</span>
+                            <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                           )}
                         </div>
                       );
@@ -346,7 +346,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                     {medicine.referenceDose.general && (
                       <div className="col-span-2 sm:col-span-4 flex flex-col gap-1 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
                         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                          Geral (todas as espÃ©cies)
+                          Geral (todas as espécies)
                         </span>
                         <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                           {medicine.referenceDose.general.dose}
@@ -365,7 +365,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               {/* Dosage notes */}
               <TextBlock
                 icon={Info}
-                label="ObservaÃ§Ãµes de Dosagem"
+                label="Observações de Dosagem"
                 value={medicine.dosageNotes}
                 iconColor="text-blue-400"
                 borderColor="border-blue-200 dark:border-blue-800/50"
@@ -382,7 +382,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 </div>
                 <div className="p-4 space-y-4">
                   <div>
-                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">EspÃ©cie</p>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Espécie</p>
                     <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden w-fit">
                       {SPECIES_OPTIONS.map((opt) => (
                         <button
@@ -433,7 +433,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                             </p>
                             <p className="text-base font-bold text-teal-700 dark:text-teal-300">
                               {calculatedResult.isRange
-                                ? `${formatDose(calculatedResult.min)} â€“ ${formatDose(calculatedResult.max)}`
+                                ? `${formatDose(calculatedResult.min)} – ${formatDose(calculatedResult.max)}`
                                 : formatDose(calculatedResult.min)}
                             </p>
                           </div>
@@ -442,8 +442,8 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                         <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3">
                           <p className="text-xs text-amber-700 dark:text-amber-400">
                             {activeEntry
-                              ? 'Dose disponÃ­vel mas nÃ£o calculÃ¡vel automaticamente. Consulte a bula.'
-                              : 'Dose nÃ£o informada para esta espÃ©cie. Consulte a bula.'}
+                              ? 'Dose disponível mas não calculável automaticamente. Consulte a bula.'
+                              : 'Dose não informada para esta espécie. Consulte a bula.'}
                           </p>
                         </div>
                       )}
@@ -462,7 +462,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   <div className="flex items-center gap-2 mb-3">
                     <Layers size={15} className="text-teal-500" />
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      ApresentaÃ§Ãµes e ConcentraÃ§Ãµes
+                      Apresentações e Concentrações
                     </span>
                   </div>
                   <ul className="space-y-2">
@@ -481,7 +481,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-6 text-center">
                   <FlaskConical size={24} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                   <p className="text-sm text-slate-400 dark:text-slate-500">
-                    Nenhuma apresentaÃ§Ã£o disponÃ­vel.
+                    Nenhuma apresentação disponível.
                   </p>
                 </div>
               )}
@@ -503,7 +503,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
 
               <TextBlock
                 icon={MessageSquare}
-                label="InformaÃ§Ãµes ao Cliente"
+                label="Informações ao Cliente"
                 value={medicine.clientInformation}
                 iconColor="text-slate-400 dark:text-slate-500"
                 borderColor="border-slate-200 dark:border-slate-700"
@@ -518,13 +518,13 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <InfoCard
                   icon={Pill}
-                  label="PrincÃ­pios Ativos"
+                  label="Princípios Ativos"
                   value={medicine.activeIngredients}
                   iconColor="text-teal-500"
                 />
                 <InfoCard
                   icon={Archive}
-                  label="ClassificaÃ§Ã£o"
+                  label="Classificação"
                   value={medicine.classification}
                   iconColor="text-indigo-500"
                 />
@@ -535,7 +535,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   <div className="flex items-center gap-2">
                     <User size={14} className="text-slate-400" />
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      EspÃ©cies Recomendadas
+                      Espécies Recomendadas
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -557,7 +557,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-6 text-center">
                   <FlaskConical size={24} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                   <p className="text-sm text-slate-400 dark:text-slate-500">
-                      Nenhuma informaÃ§Ã£o disponÃ­vel.
+                      Nenhuma informação disponível.
                   </p>
                 </div>
               )}

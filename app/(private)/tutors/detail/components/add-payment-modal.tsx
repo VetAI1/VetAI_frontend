@@ -108,7 +108,7 @@ export function AddPaymentModal({ tutorId, pets, onClose, onSuccess }: AddPaymen
     if (items.length === 0) errs.items = 'Adicione pelo menos um item';
     const hasInvalidItem = items.some((i) => !i.name.trim() || i.unit_price <= 0 || i.quantity < 1);
     if (hasInvalidItem) errs.items = 'Preencha nome, quantidade e valor de todos os itens';
-    if (!dueDate) errs.dueDate = 'Data de vencimento Ã© obrigatÃ³ria';
+    if (!dueDate) errs.dueDate = 'Data de vencimento é obrigatória';
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
     setSaving(true);
@@ -136,13 +136,13 @@ export function AddPaymentModal({ tutorId, pets, onClose, onSuccess }: AddPaymen
   };
 
   return (
-    <Modal title="Nova CobranÃ§a" description="Adicione produtos e serviÃ§os para gerar a cobranÃ§a" onClose={onClose} maxWidth="lg">
+    <Modal title="Nova Cobrança" description="Adicione produtos e serviços para gerar a cobrança" onClose={onClose} maxWidth="lg">
       <form onSubmit={(e) => { void handleSubmit(e); }} className="flex flex-col gap-4">
 
         {/* Items section */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <Label required>Itens da cobranÃ§a</Label>
+            <Label required>Itens da cobrança</Label>
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -152,7 +152,7 @@ export function AddPaymentModal({ tutorId, pets, onClose, onSuccess }: AddPaymen
                 className="gap-1.5 text-xs h-7"
               >
                 <Search size={12} />
-                Do catÃ¡logo
+                Do catálogo
               </Button>
               <Button
                 type="button"
@@ -175,7 +175,7 @@ export function AddPaymentModal({ tutorId, pets, onClose, onSuccess }: AddPaymen
                   type="text"
                   value={catalogSearch}
                   onChange={(e) => setCatalogSearch(e.target.value)}
-                  placeholder="Buscar produto ou serviÃ§o..."
+                  placeholder="Buscar produto ou serviço..."
                   className="w-full px-3 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   autoFocus
                 />
@@ -187,7 +187,7 @@ export function AddPaymentModal({ tutorId, pets, onClose, onSuccess }: AddPaymen
                   </div>
                 ) : filteredCatalog.length === 0 ? (
                   <p className="text-sm text-slate-400 text-center py-4">
-                    {catalogItems.length === 0 ? 'Nenhum item no catÃ¡logo.' : 'Nenhum resultado.'}
+                    {catalogItems.length === 0 ? 'Nenhum item no catálogo.' : 'Nenhum resultado.'}
                   </p>
                 ) : (
                   filteredCatalog.map((item) => (
@@ -212,7 +212,7 @@ export function AddPaymentModal({ tutorId, pets, onClose, onSuccess }: AddPaymen
           {/* Items list */}
           {items.length === 0 ? (
             <div className="border border-dashed border-slate-300 dark:border-slate-600 rounded-lg py-6 text-center text-sm text-slate-400 dark:text-slate-500">
-              Adicione itens do catÃ¡logo ou crie avulsos
+              Adicione itens do catálogo ou crie avulsos
             </div>
           ) : (
             <div className="space-y-2">
@@ -297,7 +297,7 @@ export function AddPaymentModal({ tutorId, pets, onClose, onSuccess }: AddPaymen
         )}
 
         <div>
-          <Label className="mb-1.5">ObservaÃ§Ãµes</Label>
+          <Label className="mb-1.5">Observações</Label>
           <input
             type="text"
             value={notes}

@@ -120,11 +120,11 @@ export default function CatalogPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
-        <Header title="CatÃ¡logo" showStorage={false} />
+        <Header title="Catálogo" showStorage={false} />
 
         <SectionCard
-          title="Produtos e ServiÃ§os"
-          subtitle={meta ? `${meta.total_elements} item${meta.total_elements !== 1 ? 's' : ''} no catÃ¡logo` : 'Carregando...'}
+          title="Produtos e Serviços"
+          subtitle={meta ? `${meta.total_elements} item${meta.total_elements !== 1 ? 's' : ''} no catálogo` : 'Carregando...'}
           headerAction={
             <Button
               onClick={() => { setEditingItem(undefined); setShowModal(true); }}
@@ -153,7 +153,7 @@ export default function CatalogPage() {
           </div>
 
           <DataTable
-            headers={['Nome', 'Categoria', 'PreÃ§o', 'Status', 'AÃ§Ãµes']}
+            headers={['Nome', 'Categoria', 'Preço', 'Status', 'Ações']}
             columnWidths={['', '160px', '130px', '110px', '90px']}
           >
             {loading ? (
@@ -167,7 +167,7 @@ export default function CatalogPage() {
                 <td colSpan={5} className="p-8 text-center">
                   <BookOpen size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
                   <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    {categoryFilter || activeFilter !== 'true' ? 'Nenhum item encontrado para os filtros selecionados.' : 'Nenhum item no catÃ¡logo ainda.'}
+                    {categoryFilter || activeFilter !== 'true' ? 'Nenhum item encontrado para os filtros selecionados.' : 'Nenhum item no catálogo ainda.'}
                   </p>
                 </td>
               </tr>
@@ -242,7 +242,7 @@ export default function CatalogPage() {
                 </Button>
               ))}
               <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>
-                PrÃ³xima
+                Próxima
               </Button>
             </div>
           )}
@@ -259,8 +259,8 @@ export default function CatalogPage() {
 
       {confirmDelete && (
         <ConfirmModal
-          title="Excluir item do catÃ¡logo?"
-          description={`"${confirmDelete.name}" serÃ¡ removido permanentemente do catÃ¡logo.`}
+          title="Excluir item do catálogo?"
+          description={`"${confirmDelete.name}" será removido permanentemente do catálogo.`}
           confirmLabel="Excluir"
           loading={!!deletingId}
           onConfirm={() => { void handleDelete(); }}

@@ -51,7 +51,7 @@ import {
 import type { Tutor } from '@/types/tutor';
 
 function fmtDate(dateStr?: string | null): string {
-  if (!dateStr) return 'â€”';
+  if (!dateStr) return '—';
   const s = dateStr.split('T')[0]!;
   const [y, m, d] = s.split('-').map(Number);
   return new Date(y!, m! - 1, d!).toLocaleDateString('pt-BR');
@@ -227,7 +227,7 @@ export function TutorDetailContent() {
   if (!tutor) return null;
 
   const petNameById = (patientId?: string) =>
-    pets.find((p) => p.id === patientId)?.name ?? 'â€”';
+    pets.find((p) => p.id === patientId)?.name ?? '—';
 
   return (
     <div className="space-y-6">
@@ -254,12 +254,12 @@ export function TutorDetailContent() {
       </div>
 
       {/* Info cards */}
-      <SectionCard title={tutor.name} subtitle="InformaÃ§Ãµes do tutor">
+      <SectionCard title={tutor.name} subtitle="Informações do tutor">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <InfoItem icon={<User size={16} className="text-teal-600 dark:text-teal-400" />} iconBg="bg-teal-50 dark:bg-teal-900/30" label="CPF" value={fmtCpf(tutor.cpf)} />
-          <InfoItem icon={<Phone size={16} className="text-blue-600 dark:text-blue-400" />} iconBg="bg-blue-50 dark:bg-blue-900/30" label="Telefone" value={tutor.phone ?? 'â€”'} />
-          <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? 'â€”'} />
-          <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="EndereÃ§o" value={tutor.address ?? 'â€”'} />
+          <InfoItem icon={<Phone size={16} className="text-blue-600 dark:text-blue-400" />} iconBg="bg-blue-50 dark:bg-blue-900/30" label="Telefone" value={tutor.phone ?? '—'} />
+          <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? '—'} />
+          <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="Endereço" value={tutor.address ?? '—'} />
         </div>
       </SectionCard>
 
@@ -285,7 +285,7 @@ export function TutorDetailContent() {
                 </div>
                 <div className="min-w-0">
                   <p className="font-medium text-slate-900 dark:text-white text-sm truncate group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">{pet.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` Â· ${pet.breed}` : ''}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
                 </div>
               </Link>
             ))}
@@ -296,7 +296,7 @@ export function TutorDetailContent() {
       {/* Agendamentos */}
       <SectionCard
         title={<span className="flex items-center gap-2"><CalendarClock size={18} />Atividades Agendadas</span>}
-        subtitle={`${upcomingAppointments.length} prÃ³xima${upcomingAppointments.length !== 1 ? 's' : ''}`}
+        subtitle={`${upcomingAppointments.length} próxima${upcomingAppointments.length !== 1 ? 's' : ''}`}
         headerAction={
           <Button
             size="sm"
@@ -357,7 +357,7 @@ export function TutorDetailContent() {
             className="gap-1.5 bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
           >
             <Plus size={14} />
-            Registrar cobranÃ§a
+            Registrar cobrança
           </Button>
         }
       >
@@ -380,15 +380,15 @@ export function TutorDetailContent() {
         )}
       </SectionCard>
 
-      {/* HistÃ³rico de compras */}
+      {/* Histórico de compras */}
       <SectionCard
-        title={<span className="flex items-center gap-2"><History size={18} />HistÃ³rico de Compras</span>}
+        title={<span className="flex items-center gap-2"><History size={18} />Histórico de Compras</span>}
         subtitle={`${paidPayments.length} registro${paidPayments.length !== 1 ? 's' : ''}`}
       >
         {paymentsLoading ? (
           <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
         ) : paidPayments.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum histÃ³rico de compras.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum histórico de compras.</p>
         ) : (
           <div className="space-y-2">
             {paidPayments.map((payment) => (
@@ -443,7 +443,7 @@ export function TutorDetailContent() {
       {confirmDelete && (
         <ConfirmModal
           title={confirmDelete.type === 'appointment' ? 'Excluir agendamento' : 'Excluir pagamento'}
-          description="Esta aÃ§Ã£o nÃ£o pode ser desfeita. Deseja continuar?"
+          description="Esta ação não pode ser desfeita. Deseja continuar?"
           confirmLabel="Excluir"
           loading={deleting}
           onConfirm={() => { void (confirmDelete.type === 'appointment' ? handleDeleteAppointment() : handleDeletePayment()); }}
@@ -454,7 +454,7 @@ export function TutorDetailContent() {
       {confirmMarkPaid && (
         <ConfirmModal
           title="Confirmar pagamento"
-          description={`Marcar cobranÃ§a de ${fmtCurrency(confirmMarkPaid.amount)} como pago?`}
+          description={`Marcar cobrança de ${fmtCurrency(confirmMarkPaid.amount)} como pago?`}
           confirmLabel="Confirmar pagamento"
           variant="default"
           loading={markingPaid}
@@ -547,7 +547,7 @@ function PaymentRow({
   const isOverdue = payment.status === 'PENDING' && payment.due_date < new Date().toISOString().split('T')[0]!;
   const itemsSummary = payment.items.length > 0
     ? payment.items.map((i) => `${i.quantity > 1 ? `${i.quantity}Ã— ` : ''}${i.name}`).join(', ')
-    : payment.notes ?? 'â€”';
+    : payment.notes ?? '—';
 
   return (
     <div className={`p-3 rounded-lg border ${isOverdue ? 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10' : 'border-slate-200 dark:border-slate-700'}`}>
@@ -581,7 +581,7 @@ function PaymentRow({
             <button
               onClick={onDelete}
               className="text-slate-400 hover:text-red-500 transition-colors p-1"
-              aria-label="Excluir cobranÃ§a"
+              aria-label="Excluir cobrança"
             >
               <Trash2 size={14} />
             </button>
@@ -640,8 +640,8 @@ function TutorEditModal({
 
   const handleSubmit = async () => {
     const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = 'Nome Ã© obrigatÃ³rio';
-    if (!cpf.trim()) errs.cpf = 'CPF Ã© obrigatÃ³rio';
+    if (!name.trim()) errs.name = 'Nome é obrigatório';
+    if (!cpf.trim()) errs.cpf = 'CPF é obrigatório';
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
     setSaving(true);
@@ -676,7 +676,7 @@ function TutorEditModal({
         </div>
         <div className="p-5 space-y-4">
           <FormField label="Nome" required error={errors.name}>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: JoÃ£o Silva" className={inputClass} />
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: João Silva" className={inputClass} />
           </FormField>
           <FormField label="CPF" required error={errors.cpf}>
             <input type="text" value={cpf} onChange={(e) => setCpf(formatCpf(e.target.value))} placeholder="Ex: 123.456.789-09" className={inputClass} />
@@ -687,7 +687,7 @@ function TutorEditModal({
           <FormField label="E-mail">
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ex: joao@email.com" className={inputClass} />
           </FormField>
-          <FormField label="EndereÃ§o">
+          <FormField label="Endereço">
             <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Ex: Rua das Flores, 123 - SP" className={inputClass} />
           </FormField>
           {errors.general && <p className="text-sm text-red-500">{errors.general}</p>}

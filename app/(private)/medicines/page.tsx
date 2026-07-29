@@ -13,39 +13,39 @@ import { medicinesService } from '@/services/medicines.service';
 import type { Medicine } from '@/types/medicine';
 
 const MEDICINE_TYPES = [
-  'Aditivos Promotores de Crescimento', 'AdrenolÃ­ticos', 'Adulticidas', 'Agentes Alquilantes',
-  'Alcalinizantes SistÃªmicos', 'AminoglicosÃ­deos', 'AnalgÃ©sicos', 'AnestÃ©sicos dissociativos',
-  'AnestÃ©sicos gerais', 'AnestÃ©sicos Gerais Intravenosos', 'AnestÃ©sicos inalatÃ³rios', 'AnestÃ©sicos locais',
-  'AnfenicÃ³is', 'AnsiolÃ­ticos', 'Antagonistas Alfa-2', 'Antagonistas BenzodiazepÃ­nicos',
-  'Antagonistas H2', 'Antagonistas Opioides', 'Antiagregantes', 'Antiagregantes plaquetÃ¡rios',
-  'AntiarrÃ­tmicos', 'AntiarrÃ­tmicos classe I', 'AntiarrÃ­tmicos classe III', 'AntibiÃ³ticos',
-  'Anticoccidianos', 'Anticoccidianos Bovinos', 'AnticolinesterÃ¡sicos', 'AnticolinesterÃ¡sicos de Curta DuraÃ§Ã£o',
-  'Anticonvulsivantes', 'Antidepressivos', 'AntidiabÃ©ticos', 'Antidiarreicos', 'AntidiurÃ©ticos',
-  'AntÃ­dotos', 'AntÃ­dotos Especiais', 'AntiemÃ©ticos', 'AntiespasmÃ³dicos', 'AntifibrinolÃ­ticos',
-  'AntifÃºngicos', 'Antiglaucomatosos', 'Anti-hipertensivos', 'Anti-histamÃ­nicos', 'Anti-inflamatÃ³rios',
-  'Anti-inflamatÃ³rios intestinais', 'Anti-inflamatÃ³rios Naturais', 'Antimicrobianos', 'AntineoplÃ¡sicos',
-  'AntineoplÃ¡sicos adjuvantes', 'Antioxidantes', 'AntiparasitÃ¡rios', 'AntiprogestÃ¡genos',
-  'AntiprotozoÃ¡rios', 'AntiprotozoÃ¡rios sanguÃ­neos', 'Antipruriginosos', 'AntissÃ©pticos UrinÃ¡rios',
-  'AntitÃ©rmicos', 'Antitireoidianos', 'AntitussÃ­genos', 'Antivirais', 'AntiÃ¡cidos', 'Babesicidas',
-  'BarbitÃºricos', 'Betabloqueadores', 'Bloqueadores de Canal de CÃ¡lcio', 'Bloqueadores dos Receptores de Angiotensina',
-  'Bloqueadores Neuromusculares', 'Broncodilatadores', 'Broncodilatadores inalatÃ³rios', 'CardiotÃ´nicos',
-  'CardiotÃ´nicos de EmergÃªncia', 'Catecolaminas', 'Cefalosporinas', 'Cefalosporinas de 4Âª GeraÃ§Ã£o',
-  'Coagulantes', 'CoccidiostÃ¡ticos', 'ColerÃ©ticos', 'Condroprotetores', 'Corticosteroides', 'Coxibes',
-  'DiagnÃ³stico', 'DiurÃ©ticos', 'DiurÃ©ticos TiazÃ­dicos', 'Ectoparasiticidas', 'EmergÃªncia', 'Endectocidas',
-  'EndÃ³crinos', 'Enzimas Digestivas', 'Estimuladores hematopoiÃ©ticos', 'Estimulantes de apetite',
-  'FenotiazÃ­nicos', 'Fluoroquinolonas', 'Galactagogos', 'HemostÃ¡ticos', 'Heparinas Baixo Peso',
-  'Hepatoprotetores', 'HormÃ´nios', 'HormÃ´nios Reprodutivos', 'Imunomoduladores', 'Imunossupressores',
+  'Aditivos Promotores de Crescimento', 'Adrenolíticos', 'Adulticidas', 'Agentes Alquilantes',
+  'Alcalinizantes Sistêmicos', 'Aminoglicosídeos', 'Analgésicos', 'Anestésicos dissociativos',
+  'Anestésicos gerais', 'Anestésicos Gerais Intravenosos', 'Anestésicos inalatórios', 'Anestésicos locais',
+  'Anfenicóis', 'Ansiolíticos', 'Antagonistas Alfa-2', 'Antagonistas Benzodiazepínicos',
+  'Antagonistas H2', 'Antagonistas Opioides', 'Antiagregantes', 'Antiagregantes plaquetários',
+  'Antiarrítmicos', 'Antiarrítmicos classe I', 'Antiarrítmicos classe III', 'Antibióticos',
+  'Anticoccidianos', 'Anticoccidianos Bovinos', 'Anticolinesterásicos', 'Anticolinesterásicos de Curta Duração',
+  'Anticonvulsivantes', 'Antidepressivos', 'Antidiabéticos', 'Antidiarreicos', 'Antidiuréticos',
+  'Antídotos', 'Antídotos Especiais', 'Antieméticos', 'Antiespasmódicos', 'Antifibrinolíticos',
+  'Antifúngicos', 'Antiglaucomatosos', 'Anti-hipertensivos', 'Anti-histamínicos', 'Anti-inflamatórios',
+  'Anti-inflamatórios intestinais', 'Anti-inflamatórios Naturais', 'Antimicrobianos', 'Antineoplásicos',
+  'Antineoplásicos adjuvantes', 'Antioxidantes', 'Antiparasitários', 'Antiprogestágenos',
+  'Antiprotozoários', 'Antiprotozoários sanguíneos', 'Antipruriginosos', 'Antissépticos Urinários',
+  'Antitérmicos', 'Antitireoidianos', 'Antitussígenos', 'Antivirais', 'Antiácidos', 'Babesicidas',
+  'Barbitúricos', 'Betabloqueadores', 'Bloqueadores de Canal de Cálcio', 'Bloqueadores dos Receptores de Angiotensina',
+  'Bloqueadores Neuromusculares', 'Broncodilatadores', 'Broncodilatadores inalatórios', 'Cardiotônicos',
+  'Cardiotônicos de Emergência', 'Catecolaminas', 'Cefalosporinas', 'Cefalosporinas de 4ª Geração',
+  'Coagulantes', 'Coccidiostáticos', 'Coleréticos', 'Condroprotetores', 'Corticosteroides', 'Coxibes',
+  'Diagnóstico', 'Diuréticos', 'Diuréticos Tiazídicos', 'Ectoparasiticidas', 'Emergência', 'Endectocidas',
+  'Endócrinos', 'Enzimas Digestivas', 'Estimuladores hematopoiéticos', 'Estimulantes de apetite',
+  'Fenotiazínicos', 'Fluoroquinolonas', 'Galactagogos', 'Hemostáticos', 'Heparinas Baixo Peso',
+  'Hepatoprotetores', 'Hormônios', 'Hormônios Reprodutivos', 'Imunomoduladores', 'Imunossupressores',
   'Inibidores Adrenais', 'Inibidores da ECA', 'Inibidores da MAO', 'Inibidores de prolactina',
-  'Inibidores de quitina', 'Inibidores de Tirosina Quinase', 'Inodilatadores', 'InotrÃ³picos Positivos',
-  'Isoxazolinas', 'Laxantes', 'Laxantes OsmÃ³ticos', 'Lincosamidas', 'MacrolÃ­deos', 'MidriÃ¡ticos',
-  'Milbemicinas', 'Mineralocorticoides', 'Modificadores de Comportamento', 'MucolÃ­ticos',
-  'Neonicotinoides', 'NeurolÃ³gicos', 'Neuromoduladores', 'NutracÃªuticos', 'OftÃ¡lmicos', 'Opioides',
-  'PolipeptÃ­deos', 'Prostaglandinas', 'Protetores biliares', 'Protetores GÃ¡stricos', 'PrÃ³-cinÃ©ticos',
-  'PrÃ³-cinÃ©ticos GI fortes', 'Quelantes', 'Quimioterapia', 'Reativadores de Colinesterase',
-  'Redutores de amÃ´nia', 'Relaxantes AnestÃ©sicos', 'Relaxantes musculares', 'Relaxantes Musculares Centrais',
-  'Repelentes', 'Reversores Neuromusculares', 'Rifamicinas', 'Sedativos', 'SimpatomimÃ©ticos', 'Sulfonamidas',
-  'Suplementos', 'Suplementos Minerais InjetÃ¡veis', 'Tenicidas', 'Tetraciclinas', 'Tireoidianos',
-  'Tranquilizantes', 'Vasodilatadores', 'Vasopressores', 'VermÃ­fugos', 'VermÃ­fugos PrÃ³-drogas', 'Vitaminas',
+  'Inibidores de quitina', 'Inibidores de Tirosina Quinase', 'Inodilatadores', 'Inotrópicos Positivos',
+  'Isoxazolinas', 'Laxantes', 'Laxantes Osmóticos', 'Lincosamidas', 'Macrolídeos', 'Midriáticos',
+  'Milbemicinas', 'Mineralocorticoides', 'Modificadores de Comportamento', 'Mucolíticos',
+  'Neonicotinoides', 'Neurológicos', 'Neuromoduladores', 'Nutracêuticos', 'Oftálmicos', 'Opioides',
+  'Polipeptídeos', 'Prostaglandinas', 'Protetores biliares', 'Protetores Gástricos', 'Pró-cinéticos',
+  'Pró-cinéticos GI fortes', 'Quelantes', 'Quimioterapia', 'Reativadores de Colinesterase',
+  'Redutores de amônia', 'Relaxantes Anestésicos', 'Relaxantes musculares', 'Relaxantes Musculares Centrais',
+  'Repelentes', 'Reversores Neuromusculares', 'Rifamicinas', 'Sedativos', 'Simpatomiméticos', 'Sulfonamidas',
+  'Suplementos', 'Suplementos Minerais Injetáveis', 'Tenicidas', 'Tetraciclinas', 'Tireoidianos',
+  'Tranquilizantes', 'Vasodilatadores', 'Vasopressores', 'Vermífugos', 'Vermífugos Pró-drogas', 'Vitaminas',
 ];
 
 const TYPE_OPTIONS = [
@@ -97,7 +97,7 @@ export default function MedicinesPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
-        <Header title="MedicaÃ§Ãµes" showStorage={false} />
+        <Header title="Medicações" showStorage={false} />
 
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">

@@ -54,7 +54,7 @@ export function CatalogItemModal({ item, onClose, onSuccess }: CatalogItemModalP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = 'Nome Ã© obrigatÃ³rio';
+    if (!name.trim()) errs.name = 'Nome é obrigatório';
     const parsedPrice = parsePrice(price);
     if (parsedPrice <= 0) errs.price = 'Valor deve ser maior que zero';
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
@@ -84,8 +84,8 @@ export function CatalogItemModal({ item, onClose, onSuccess }: CatalogItemModalP
 
   return (
     <Modal
-      title={isEditing ? 'Editar item' : 'Novo item do catÃ¡logo'}
-      description={isEditing ? 'Atualize as informaÃ§Ãµes do produto ou serviÃ§o' : 'Adicione um produto ou serviÃ§o com seu preÃ§o padrÃ£o'}
+      title={isEditing ? 'Editar item' : 'Novo item do catálogo'}
+      description={isEditing ? 'Atualize as informações do produto ou serviço' : 'Adicione um produto ou serviço com seu preço padrão'}
       onClose={onClose}
     >
       <form onSubmit={(e) => { void handleSubmit(e); }} className="flex flex-col gap-4">
@@ -95,7 +95,7 @@ export function CatalogItemModal({ item, onClose, onSuccess }: CatalogItemModalP
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ex: Consulta clÃ­nica geral"
+            placeholder="Ex: Consulta clínica geral"
             className={inputCls}
             autoFocus
           />
@@ -104,7 +104,7 @@ export function CatalogItemModal({ item, onClose, onSuccess }: CatalogItemModalP
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label required className="mb-1.5">PreÃ§o (R$)</Label>
+            <Label required className="mb-1.5">Preço (R$)</Label>
             <input
               type="text"
               inputMode="numeric"
@@ -125,7 +125,7 @@ export function CatalogItemModal({ item, onClose, onSuccess }: CatalogItemModalP
         </div>
 
         <div>
-          <Label className="mb-1.5">DescriÃ§Ã£o (opcional)</Label>
+          <Label className="mb-1.5">Descrição (opcional)</Label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -146,7 +146,7 @@ export function CatalogItemModal({ item, onClose, onSuccess }: CatalogItemModalP
             <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${active ? 'translate-x-[18px]' : 'translate-x-[3px]'}`} />
           </button>
           <span className="text-sm text-slate-700 dark:text-slate-300">
-            {active ? 'Ativo â€” aparece na seleÃ§Ã£o de cobranÃ§as' : 'Inativo â€” nÃ£o aparece na seleÃ§Ã£o'}
+            {active ? 'Ativo — aparece na seleção de cobranças' : 'Inativo — não aparece na seleção'}
           </span>
         </div>
 
@@ -155,7 +155,7 @@ export function CatalogItemModal({ item, onClose, onSuccess }: CatalogItemModalP
         <div className="flex justify-end gap-2 pt-1">
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
           <Button type="submit" disabled={saving} className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600">
-            {saving ? <Loader2 size={16} className="animate-spin" /> : isEditing ? 'Salvar alteraÃ§Ãµes' : 'Adicionar ao catÃ¡logo'}
+            {saving ? <Loader2 size={16} className="animate-spin" /> : isEditing ? 'Salvar alterações' : 'Adicionar ao catálogo'}
           </Button>
         </div>
       </form>
