@@ -106,6 +106,74 @@ All async data fetching states across pages, tables, cards, stat metrics, and se
 3. **Cards & Metrics**: Stat cards and analytics charts render skeleton blocks corresponding to their dimensions while fetching.
 4. **Spinners Limit**: `<Loader2 className="animate-spin" />` is strictly reserved for inline button submission states (`<Button loading={saving}>`) or search input indicators (`SearchSelect`), NOT for layout or page data loading.
 
+### Paginated Table Standard Pattern (usePaginatedResource + DataTable)
+
+All paginated data listing pages **must** follow the standard pattern combining `usePaginatedResource` and `DataTable`:
+
+1. **Custom Hook (`usePaginatedResource`)**:
+   Use `usePaginatedResource<TItem, TFilters>` to handle list fetching, page management, search debouncing, and local mutation helpers (`prependItem`, `replaceItem`, `removeItem`, `refresh`):
+
+   ```tsx
+   const {
+     items,
+     meta,
+     loading,
+     page,
+     filters,
+     setPage,
+     setFilters,
+     prependItem,
+     replaceItem,
+     removeItem,
+   } = usePaginatedResource<MyDomain, MyFilters>({
+     fetcher: myDomainService.list,
+     initialFilters: { status: '' },
+     pageSize: 15,
+   });
+   ```
+
+2. **Declarative Table (`DataTable`)**:
+   Define `columns: DataTableColumn<TItem>[]` declaratively and pass `columns`, `data`, `loading`, and `getRowKey` to `DataTable`. Do NOT write custom `<tr>`/`<td>` loops manually or render custom loading spinners for data fetching:
+
+   ```tsx
+   const columns: DataTableColumn<MyDomain>[] = [
+     {
+       key: 'name',
+       header: 'Nome',
+       render: (item) => (
+         <span className="font-medium text-slate-900 dark:text-white">
+           {item.name}
+         </span>
+       ),
+     },
+     {
+       key: 'actions',
+       header: 'Ações',
+       width: '100px',
+       align: 'right',
+       render: (item) => (
+         <Button variant="ghost" size="icon-sm" onClick={() => handleEdit(item)}>
+           <Pencil size={15} />
+         </Button>
+       ),
+     },
+   ];
+
+   <DataTable
+     columns={columns}
+     data={items}
+     getRowKey={(item) => item.id}
+     loading={loading}
+     emptyState="Nenhum registro encontrado."
+   />
+   ```
+
+3. **Optimistic & Local Mutations**:
+   - On creation: Call `prependItem(newItem)` upon successful service call to immediately display the new item without re-fetching the entire list.
+   - On edition: Call `replaceItem((item) => item.id === updated.id, updated)` to update the row in-place.
+   - On deletion: Call `removeItem((item) => item.id === targetId)` to remove the row cleanly.
+   - On bulk/external changes: Call `refresh()` if full list re-fetch is necessary.
+
 ### Services & API
 
 - Each domain has a service file in `services/` with CRUD methods: `.list()`, `.get()`, `.create()`, `.update()`, `.delete()`
