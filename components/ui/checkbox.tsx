@@ -31,7 +31,7 @@ export function Checkbox({
       <span className="relative mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center">
         <input
           type="checkbox"
-          checked={checked}
+          checked={checked !== undefined ? (checked ?? false) : undefined}
           disabled={disabled}
           className={cn(
             'peer h-4 w-4 appearance-none rounded border border-slate-300 bg-white transition-colors checked:border-indigo-600 checked:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:cursor-not-allowed dark:border-slate-600 dark:bg-slate-900',

@@ -22,7 +22,8 @@ export interface TimeInputProps {
   name?: string;
 }
 
-function splitTime(value: string): { h: number | null; m: number | null } {
+function splitTime(value?: string): { h: number | null; m: number | null } {
+  if (!value) return { h: null, m: null };
   const match = value.match(/^(\d{2}):(\d{2})$/);
   if (!match) return { h: null, m: null };
   return { h: parseInt(match[1]!, 10), m: parseInt(match[2]!, 10) };
@@ -360,7 +361,7 @@ export function TimeInput({
         control={control}
         render={({ field }) => (
           <TimeInputInner
-            value={field.value}
+            value={field.value ?? ''}
             onChange={field.onChange}
             {...rest}
           />

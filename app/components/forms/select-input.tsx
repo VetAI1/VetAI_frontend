@@ -260,7 +260,7 @@ export function SelectInput({
           field: { value: string; onChange: (value: string) => void };
         }) => (
           <SelectInputInner
-            value={field.value}
+            value={field.value ?? ''}
             onChange={field.onChange}
             {...rest}
           />

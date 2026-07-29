@@ -96,7 +96,7 @@ export function SearchSelect({
             <input
               type="text"
               placeholder={placeholder}
-              value={search}
+              value={search ?? ''}
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={() => onOpenChange(true)}
               className={`w-full rounded-lg border bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 dark:bg-slate-700 dark:text-white ${error ? 'border-red-400 focus:ring-red-500 dark:border-red-500' : 'border-slate-200 focus:ring-teal-500 dark:border-slate-600'}`}

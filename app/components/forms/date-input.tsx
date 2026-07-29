@@ -408,7 +408,7 @@ export function DateInput({
         control={control}
         render={({ field }) => (
           <DateInputInner
-            value={field.value}
+            value={field.value ?? ''}
             onChange={field.onChange}
             {...rest}
           />
