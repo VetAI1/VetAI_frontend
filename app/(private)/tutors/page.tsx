@@ -1,6 +1,16 @@
 'use client';
 
-import { Loader2, Mail, Pencil, Phone, Plus, Trash2, User } from 'lucide-react';
+import {
+  Eye,
+  Loader2,
+  Mail,
+  Pencil,
+  Phone,
+  Plus,
+  Trash2,
+  User,
+} from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 import { TutorModal } from './components/tutor-modal';
@@ -108,6 +118,7 @@ export default function TutorsPage() {
               'Cadastrado em',
               'Ações',
             ]}
+            columnWidths={['', '', '', '', '', '140px']}
             showSearch={true}
             onSearch={setSearch}
             searchPlaceholder="Buscar por nome..."
@@ -182,6 +193,15 @@ export default function TutorsPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
+                      <Link href={`/tutors/detail?id=${tutor.id}`}>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          title="Ver detalhes"
+                        >
+                          <Eye size={15} className="text-teal-600 dark:text-teal-400" />
+                        </Button>
+                      </Link>
                       <Button
                         variant="ghost"
                         size="icon-sm"

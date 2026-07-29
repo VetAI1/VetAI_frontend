@@ -35,7 +35,7 @@ export function Header({
             variant="outline"
             size="icon"
             onClick={toggleTheme}
-            className="md:hidden"
+            className="md:hidden print:hidden"
           >
             {theme === 'dark' ? <Sun /> : <Moon />}
           </Button>
@@ -54,7 +54,7 @@ export function Header({
             variant="outline"
             size="icon"
             onClick={toggleTheme}
-            className="hidden md:flex"
+            className="hidden md:flex print:hidden"
           >
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </Button>

@@ -64,18 +64,24 @@ export function MetricCard({
       <div className="flex items-start justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">
-              {title}
-            </span>
-            {tooltip && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors" />
-                </TooltipTrigger>
-                <TooltipContent side="top" align="center">
-                  <p className="max-w-[200px] leading-relaxed">{tooltip}</p>
-                </TooltipContent>
-              </Tooltip>
+            {loading ? (
+              <Skeleton className="h-4 w-28" />
+            ) : (
+              <>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {title}
+                </span>
+                {tooltip && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors" />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" align="center">
+                      <p className="max-w-[200px] leading-relaxed">{tooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </>
             )}
           </div>
 
@@ -91,9 +97,7 @@ export function MetricCard({
         </div>
 
         <div
-          className={cn(
-            'flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300 border',
-          )}
+          className="flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300 border"
           style={{
             backgroundColor: !loading ? `${color}25` : undefined,
             borderColor: !loading ? `${color}40` : 'transparent',

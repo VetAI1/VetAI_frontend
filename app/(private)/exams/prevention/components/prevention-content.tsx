@@ -4,7 +4,9 @@ import {
   AlertTriangle,
   ArrowLeft,
   CheckCircle2,
+  ClipboardList,
   Lightbulb,
+  Loader2,
   Microscope,
   ShieldCheck,
 } from 'lucide-react';
@@ -121,6 +123,21 @@ export function PreventionContent() {
           </p>
         </div>
       </div>
+
+      {prevention.generalDiagnosis && (
+        <SectionCard
+          title="Diagnóstico Geral"
+          subtitle="Avaliação clínica consolidada com base nos valores alterados"
+          className="mb-4"
+        >
+          <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg mt-1">
+            <ClipboardList size={18} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+              {prevention.generalDiagnosis}
+            </p>
+          </div>
+        </SectionCard>
+      )}
 
       {prevention.alteredValues.length > 0 && (
         <SectionCard

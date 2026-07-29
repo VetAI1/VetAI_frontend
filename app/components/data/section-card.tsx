@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 interface SectionCardProps {
-  title: string;
+  title: ReactNode;
   subtitle?: ReactNode;
   children: ReactNode;
   className?: string;
@@ -23,18 +23,18 @@ export function SectionCard({
         className={`mb-4 ${headerAction ? 'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0' : ''}`}
       >
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
             {title}
-          </h2>
+          </div>
           {subtitle && (
-            <p className="text-sm text-gray-500 dark:text-slate-400">
+            <div className="text-sm text-gray-500 dark:text-slate-400">
               {subtitle}
-            </p>
+            </div>
           )}
         </div>
         {headerAction && <div className="w-full sm:w-auto">{headerAction}</div>}
       </div>
-      <div className="flex flex-col flex-1 min-h-0">{children}</div>
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">{children}</div>
     </div>
   );
 }

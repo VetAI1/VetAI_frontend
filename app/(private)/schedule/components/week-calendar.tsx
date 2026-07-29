@@ -21,6 +21,17 @@ function parseMinutes(time: string): number {
   return h * 60 + m;
 }
 
+function isPastEvent(ev: ScheduleEvent, today: string): boolean {
+  if (ev.date < today) return true;
+  if (ev.date === today) {
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const endMin = ev.endTime ? parseMinutes(ev.endTime) : parseMinutes(ev.startTime) + 60;
+    return endMin <= nowMin;
+  }
+  return false;
+}
+
 interface WeekCalendarProps {
   weekStart: Date;
   events: ScheduleEvent[];
@@ -146,12 +157,19 @@ export function WeekCalendar({
                   const { top, height } = getEventStyle(ev);
                   if (top >= totalHeight) return null;
                   const typeStyle = EVENT_TYPE_MAP[ev.type];
+                  const past = isPastEvent(ev, today);
+                  const bgClass = past
+                    ? 'bg-slate-100 dark:bg-slate-700/40 border-slate-200 dark:border-slate-600'
+                    : typeStyle.bg;
+                  const colorClass = past
+                    ? 'text-slate-400 dark:text-slate-500'
+                    : typeStyle.color;
                   return (
                     <button
                       key={ev.id}
                       onClick={() => onEventClick(ev)}
                       title={`${ev.title}${ev.patientName ? ` · ${ev.patientName}` : ''}`}
-                      className={`absolute left-0.5 right-0.5 rounded px-1.5 py-0.5 text-left overflow-hidden border z-10 hover:opacity-80 transition-opacity ${typeStyle.bg} ${typeStyle.color}`}
+                      className={`absolute left-0.5 right-0.5 rounded px-1.5 py-0.5 text-left overflow-hidden border z-10 hover:opacity-80 transition-opacity ${bgClass} ${colorClass}`}
                       style={{ top, height }}
                     >
                       <p className="text-[10px] font-semibold leading-snug truncate">

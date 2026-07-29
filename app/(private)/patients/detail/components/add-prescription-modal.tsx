@@ -14,6 +14,7 @@ import { Modal } from '@/app/components/common/modal';
 import { DateInput } from '@/app/components/forms/date-input';
 import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
+import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -22,6 +23,7 @@ import {
   type PrescriptionFormData,
 } from '@/schemas/health-record';
 import { healthRecordsService } from '@/services/health-records.service';
+import { PRESCRIPTION_USAGE_OPTIONS } from '@/types/health-record';
 
 interface AddPrescriptionModalProps {
   patientId: string;
@@ -45,7 +47,15 @@ export function AddPrescriptionModal({
     defaultValues: {
       date: new Date().toISOString().slice(0, 10),
       includeDate: true,
-      medications: [{ drug: '', form: '', quantity: '', posology: '' }],
+      medications: [
+        {
+          drug: '',
+          form: '',
+          quantity: '',
+          posology: '',
+          usage: 'Oral Veterinário',
+        },
+      ],
     },
   });
 
@@ -67,6 +77,7 @@ export function AddPrescriptionModal({
             form: medication.form?.trim() || undefined,
             quantity: medication.quantity?.trim() || undefined,
             posology: medication.posology.trim(),
+            usage: medication.usage?.trim() || undefined,
           })),
         },
       });
@@ -194,6 +205,20 @@ export function AddPrescriptionModal({
                   )}
                 />
               </div>
+
+              <Controller
+                name={`medications.${index}.usage`}
+                control={control}
+                render={({ field: medicationField }) => (
+                  <SelectInput
+                    label="Via de Administração"
+                    value={medicationField.value ?? ''}
+                    onChange={medicationField.onChange}
+                    options={[...PRESCRIPTION_USAGE_OPTIONS]}
+                    error={errors.medications?.[index]?.usage?.message}
+                  />
+                )}
+              />
 
               <Controller
                 name={`medications.${index}.posology`}

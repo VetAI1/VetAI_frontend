@@ -8,10 +8,10 @@ import { cn } from '@/infra/utils';
 
 export interface ModalProps {
   title: string;
-  description?: string;
+  description?: string | undefined;
   children: ReactNode;
   onClose: () => void;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
 
@@ -20,6 +20,7 @@ const MAX_WIDTH_MAP = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
 };
 
 export function Modal({
