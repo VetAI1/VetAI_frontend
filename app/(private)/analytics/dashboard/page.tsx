@@ -46,7 +46,6 @@ export default function Dashboard() {
       const res = await analyticsService.getDashboard();
       setData(res);
     } catch (_) {
-      console.error('Failed to fetch dashboard data');
     } finally {
       setLoading(false);
     }

@@ -120,12 +120,12 @@ export function DataTable<T>({
                   {tableHeaders.length > 0 ? (
                     tableHeaders.map((_, cIdx) => (
                       <td key={`skel-cell-${cIdx}`} className="p-4">
-                        <Skeleton className="h-5 w-full" />
+                        <Skeleton className="h-5 w-full dark:bg-slate-700" />
                       </td>
                     ))
                   ) : (
                     <td className="p-4">
-                      <Skeleton className="h-5 w-full" />
+                      <Skeleton className="h-5 w-full dark:bg-slate-700" />
                     </td>
                   )}
                 </tr>

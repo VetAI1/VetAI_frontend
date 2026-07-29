@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   ClipboardList,
   Lightbulb,
-  Loader2,
   Microscope,
   ShieldCheck,
 } from 'lucide-react';
