@@ -3,6 +3,7 @@ export interface Plan {
   name: string;
   description?: string;
   monthlyPrice: number;
+  basePrice?: number;
   pricePerUser: number;
   userLimit: number;
   aiCredits: number;
@@ -30,6 +31,8 @@ export interface Subscription {
   additionalUserSeats: number;
   currentPeriodStart: string;
   currentPeriodEnd: string;
+  nextRenewalAt?: string;
+  canceledAt?: string;
   aiCreditBalance?: number;
   aiCreditReserved?: number;
 }

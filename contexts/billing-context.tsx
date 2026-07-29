@@ -26,9 +26,8 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
     try {
       const credits = await billingService.getAiCredits();
       setAiCredits(credits);
-    } catch (err) {
+    } catch {
       // Ignore silently if user is unauthenticated or has no billing permission
-      console.warn('Failed to fetch AI credits:', err);
     }
   }, []);
 

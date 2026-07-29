@@ -2,6 +2,7 @@
 
 import {
   ArrowLeft,
+  CreditCard,
   LayoutDashboard,
   Menu,
   Moon,
@@ -20,6 +21,12 @@ import { useAuth } from '@/infra/auth-context';
 
 const items = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  {
+    href: '/admin/subscription',
+    label: 'Plano & Assinatura',
+    icon: CreditCard,
+    permission: 'billing:view',
+  },
   {
     href: '/admin/collaborators',
     label: 'Colaboradores',
