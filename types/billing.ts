@@ -7,6 +7,7 @@ export interface Plan {
   pricePerUser: number;
   userLimit: number;
   aiCredits: number;
+  creditPackages?: AiCreditPackageConfig[];
   highlighted: boolean;
   billingMode: 'subscription' | 'invoice';
   paymentMethod: 'card' | 'bank_slip';
@@ -75,10 +76,33 @@ export interface BillingStatus {
   blocked: boolean;
 }
 
+export interface AiCreditPackageConfig {
+  id: string;
+  name: string;
+  credits: number;
+  price: number;
+  durabilityDays: number;
+}
+
+export interface PurchasedAiCreditPackage {
+  id: string;
+  packageId: string;
+  creditsTotal: number;
+  creditsRemaining: number;
+  price: number;
+  durabilityDays: number;
+  purchasedAt: string;
+  expiresAt: string;
+}
+
 export interface AiCredits {
   totalCredits: number;
   availableCredits: number;
+  planCreditsBalance?: number;
+  purchasedCreditsBalance?: number;
   reservedCredits: number;
+  purchasedPackages?: PurchasedAiCreditPackage[];
+  availablePackages?: AiCreditPackageConfig[];
   periodStart: string;
   periodEnd: string;
 }

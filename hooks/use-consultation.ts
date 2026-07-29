@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 
+import { notifyInsufficientAiCredits } from '@/infra/http-client';
 import { getSocket } from '@/infra/socket';
 import type { ConsultationDisease } from '@/types/consultation';
 
@@ -106,12 +107,32 @@ export function useConsultation({
       setIsLoading(false);
     };
 
-    const handleError = (payload: { message: string }) => {
-      setError(payload.message);
+    const handleError = (payload: unknown) => {
+      const errObj = typeof payload === 'object' && payload !== null ? (payload as Record<string, unknown>) : {};
+      const responseObj = typeof errObj.response === 'object' && errObj.response !== null ? (errObj.response as Record<string, unknown>) : undefined;
+
+      const code = String(errObj.code ?? responseObj?.code ?? '');
+      const msg = String(errObj.message ?? responseObj?.message ?? (typeof payload === 'string' ? payload : ''));
+      const status = Number(errObj.status ?? errObj.statusCode ?? responseObj?.statusCode ?? responseObj?.status ?? 0);
+
+      const isInsufficientCredits =
+        code === 'INSUFFICIENT_AI_CREDITS' ||
+        status === 403 ||
+        msg.toLowerCase().includes('insufficient ai credits') ||
+        msg.toLowerCase().includes('créditos de ia insuficientes');
+
+      if (isInsufficientCredits) {
+        notifyInsufficientAiCredits();
+        setIsLoading(false);
+        setIsFinishing(false);
+        return;
+      }
+
+      setError(msg || 'Erro ao processar mensagem.');
       setIsFinishing(false);
 
       setMessages((prev) => {
-        const withoutTyping = prev.filter((msg) => !msg.isTyping);
+        const withoutTyping = prev.filter((msgItem) => !msgItem.isTyping);
         nextIdRef.current += 1;
         return [
           ...withoutTyping,

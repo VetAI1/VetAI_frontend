@@ -1,7 +1,9 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
+import { onInsufficientAiCredits } from '@/infra/http-client';
 import { billingService } from '@/services/billing.service';
 import type { AiCredits, BillingStatus } from '@/types/billing';
 
@@ -10,6 +12,9 @@ interface BillingContextValue {
   aiCredits: AiCredits | null;
   isLoading: boolean;
   error: string | null;
+  isBuyAiCreditsModalOpen: boolean;
+  openBuyAiCreditsModal: () => void;
+  closeBuyAiCreditsModal: () => void;
   refetchBilling: () => Promise<void>;
   refetchAiCredits: () => Promise<void>;
 }
@@ -17,10 +22,20 @@ interface BillingContextValue {
 const BillingContext = createContext<BillingContextValue | undefined>(undefined);
 
 export function BillingProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [status, setStatus] = useState<BillingStatus | null>(null);
   const [aiCredits, setAiCredits] = useState<AiCredits | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isBuyAiCreditsModalOpen, setIsBuyAiCreditsModalOpen] = useState<boolean>(false);
+
+  const openBuyAiCreditsModal = useCallback(() => {
+    router.push('/admin/subscription/buy-credits');
+  }, [router]);
+
+  const closeBuyAiCreditsModal = useCallback(() => {
+    setIsBuyAiCreditsModalOpen(false);
+  }, []);
 
   const refetchAiCredits = useCallback(async () => {
     try {
@@ -52,6 +67,13 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
     void refetchBilling();
   }, [refetchBilling]);
 
+  useEffect(() => {
+    const unsubscribe = onInsufficientAiCredits(() => {
+      router.push('/admin/subscription/buy-credits');
+    });
+    return unsubscribe;
+  }, [router]);
+
   return (
     <BillingContext.Provider
       value={{
@@ -59,6 +81,9 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
         aiCredits,
         isLoading,
         error,
+        isBuyAiCreditsModalOpen,
+        openBuyAiCreditsModal,
+        closeBuyAiCreditsModal,
         refetchBilling,
         refetchAiCredits,
       }}

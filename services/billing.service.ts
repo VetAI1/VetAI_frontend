@@ -1,6 +1,7 @@
 import { httpClient } from '@/infra/http-client';
 import type {
   AdditionalUserSeatPurchase,
+  AiCreditPackageConfig,
   AiCredits,
   AiUsage,
   BillingStatus,
@@ -30,6 +31,20 @@ export const billingService = {
 
   getAiCredits: () =>
     httpClient<AiCredits>('billing/ai-credits', { method: 'GET' }),
+
+  getAiCreditPackages: () =>
+    httpClient<AiCreditPackageConfig[]>('billing/ai-credits/packages', {
+      method: 'GET',
+    }),
+
+  purchaseAiCredits: (packageId: string) =>
+    httpClient<{
+      url: string;
+      sessionId?: string;
+    }>('billing/ai-credits/purchase', {
+      method: 'POST',
+      body: JSON.stringify({ packageId }),
+    }),
 
   getAiUsage: () =>
     httpClient<AiUsage[]>('billing/ai-usage', { method: 'GET' }),

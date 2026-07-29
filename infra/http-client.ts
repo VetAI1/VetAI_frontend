@@ -19,6 +19,7 @@ export class ApiError extends Error {
 let token: string | null = null;
 let refreshPromise: Promise<RefreshResponse> | null = null;
 const sessionExpiredListeners = new Set<() => void>();
+const insufficientAiCreditsListeners = new Set<() => void>();
 
 export function getToken(): string | null {
   return token;
@@ -40,6 +41,15 @@ export function onSessionExpired(listener: () => void): () => void {
 function notifySessionExpired(): void {
   removeToken();
   sessionExpiredListeners.forEach((listener) => listener());
+}
+
+export function onInsufficientAiCredits(listener: () => void): () => void {
+  insufficientAiCreditsListeners.add(listener);
+  return () => insufficientAiCreditsListeners.delete(listener);
+}
+
+export function notifyInsufficientAiCredits(): void {
+  insufficientAiCreditsListeners.forEach((listener) => listener());
 }
 
 export interface HttpClientOptions extends RequestInit {
@@ -156,7 +166,17 @@ async function request<T>(
         }
       }
 
-      if (!skipToast && !shouldRefresh) {
+      const isInsufficientCredits =
+        response.status === 403 &&
+        ((errorData as { code?: string })?.code === 'INSUFFICIENT_AI_CREDITS' ||
+          errorMessage.toLowerCase().includes('insufficient ai credits') ||
+          errorMessage.toLowerCase().includes('créditos de ia insuficientes'));
+
+      if (isInsufficientCredits) {
+        notifyInsufficientAiCredits();
+      }
+
+      if (!skipToast && !shouldRefresh && !isInsufficientCredits) {
         toast.error(errorMessage);
       }
 

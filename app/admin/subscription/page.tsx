@@ -12,6 +12,8 @@ import {
   Users,
   XCircle,
 } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -30,6 +32,7 @@ import { useAuth } from '@/infra/auth-context';
 import { billingService } from '@/services/billing.service';
 import { collaboratorsService } from '@/services/collaborators.service';
 import type { AiCredits, AiUsage, Plan, Subscription } from '@/types/billing';
+import { formatCurrency } from '@/utils/format';
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '—';
@@ -61,13 +64,6 @@ function formatDateTime(dateString?: string | null): string {
   } catch {
     return '—';
   }
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(amount);
 }
 
 export default function AdminSubscriptionPage() {
@@ -112,6 +108,16 @@ export default function AdminSubscriptionPage() {
       setRefreshing(false);
     }
   }
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      toast.success('Compra de pacote de créditos de IA efetuada com sucesso!');
+    } else if (searchParams.get('canceled') === 'true') {
+      toast.info('Compra de créditos cancelada.');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     void loadData();
@@ -429,6 +435,20 @@ export default function AdminSubscriptionPage() {
             <SectionCard
               title="Créditos de Inteligência Artificial"
               subtitle="Consumo de créditos para análises e diagnósticos"
+              headerAction={
+                canPay ? (
+                  <Button
+                    size="sm"
+                    asChild
+                    className="bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-1.5"
+                  >
+                    <Link href="/admin/subscription/buy-credits">
+                      <Sparkles size={14} />
+                      Comprar Créditos
+                    </Link>
+                  </Button>
+                ) : null
+              }
             >
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
