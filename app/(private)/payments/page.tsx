@@ -16,7 +16,6 @@ import { toast } from 'sonner';
 
 import { PaymentModal } from './components/payment-modal';
 
-import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import {
   DataTable,
   type DataTableColumn,
@@ -25,6 +24,8 @@ import { SectionCard } from '@/app/components/data/section-card';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { useConfirmation } from '@/contexts/confirmation-context';
+import { useAutoComplete } from '@/hooks/use-auto-complete';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { paymentsService } from '@/services/payments.service';
 import { tutorsService } from '@/services/tutors.service';
@@ -58,11 +59,19 @@ function TutorFilterComboBox({
   onSelect: (t: TutorFilter) => void;
   onClear: () => void;
 }) {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<TutorFilter[]>([]);
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const {
+    items: tutors,
+    search,
+    loading,
+    setSearch,
+  } = useAutoComplete<Tutor>({
+    fetcher: tutorsService.list,
+    pageSize: 8,
+    enabled: open,
+  });
 
   useEffect(() => {
     const handle = (e: MouseEvent) => {
@@ -73,25 +82,6 @@ function TutorFilterComboBox({
     document.addEventListener('mousedown', handle);
     return () => document.removeEventListener('mousedown', handle);
   }, []);
-
-  useEffect(() => {
-    if (query.length < 2) {
-      setResults([]);
-      return;
-    }
-    setLoading(true);
-    const timer = setTimeout(async () => {
-      try {
-        const res = await tutorsService.list({ search: query, size: 8 });
-        setResults(res.data.map((t: Tutor) => ({ id: t.id, name: t.name })));
-      } catch {
-        /* silently fail */
-      } finally {
-        setLoading(false);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query]);
 
   if (value) {
     return (
@@ -119,9 +109,9 @@ function TutorFilterComboBox({
         <input
           className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 pl-8 pr-8 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
           placeholder="Filtrar por tutor..."
-          value={query}
+          value={search}
           onChange={(e) => {
-            setQuery(e.target.value);
+            setSearch(e.target.value);
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
@@ -137,22 +127,22 @@ function TutorFilterComboBox({
             <p className="text-xs text-slate-400 px-3 py-2 flex items-center gap-2">
               <Loader2 size={12} className="animate-spin" /> Buscando...
             </p>
-          ) : results.length === 0 ? (
+          ) : tutors.length === 0 ? (
             <p className="text-xs text-slate-400 px-3 py-2">
-              {query.length < 2
+              {search.length < 2
                 ? 'Digite ao menos 2 caracteres...'
                 : 'Nenhum tutor encontrado'}
             </p>
           ) : (
-            results.map((t) => (
+            tutors.map((t) => (
               <button
                 key={t.id}
                 type="button"
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  onSelect(t);
+                  onSelect({ id: t.id, name: t.name });
                   setOpen(false);
-                  setQuery('');
+                  setSearch('');
                 }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
@@ -188,18 +178,17 @@ function fmtAmount(amount?: number) {
 }
 
 interface PaymentFilters {
-  status: string;
-  tutor_id: string;
+  status?: string | undefined;
+  tutor_id?: string | undefined;
 }
 
 export default function PaymentsPage() {
+  const { confirm } = useConfirmation();
   const [tutorFilter, setTutorFilter] = useState<TutorFilter | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingPayment, setEditingPayment] = useState<Payment | undefined>(
     undefined,
   );
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<Payment | null>(null);
 
   const {
     items: payments,
@@ -235,29 +224,26 @@ export default function PaymentsPage() {
   const handleCreateSuccess = (p: Payment) => {
     setShowModal(false);
     prependItem(p);
-    toast.success('Cobrança criada com sucesso.');
   };
 
   const handleEditSuccess = (updated: Payment) => {
     setShowModal(false);
     setEditingPayment(undefined);
     replaceItem((item) => item.id === updated.id, updated);
-    toast.success('Cobrança atualizada com sucesso.');
   };
 
-  const handleDelete = async () => {
-    if (!confirmDelete) return;
-    setDeletingId(confirmDelete.id);
-    try {
-      await paymentsService.delete(confirmDelete.id);
-      removeItem((p) => p.id === confirmDelete.id);
-      toast.success('Cobrança removida com sucesso.');
-    } catch {
-      toast.error('Erro ao excluir cobrança.');
-    } finally {
-      setDeletingId(null);
-      setConfirmDelete(null);
-    }
+  const handleDelete = (payment: Payment) => {
+    confirm({
+      title: 'Excluir cobrança?',
+      description: `Esta cobrança de ${fmtAmount(payment.amount)} será removida permanentemente.`,
+      variant: 'danger',
+      confirmLabel: 'Excluir',
+      onConfirm: async () => {
+        await paymentsService.delete(payment.id);
+        removeItem((p) => p.id === payment.id);
+        toast.success('Cobrança removida com sucesso.');
+      },
+    });
   };
 
   const openEdit = (p: Payment) => {
@@ -369,15 +355,10 @@ export default function PaymentsPage() {
           <Button
             variant="ghost"
             size="icon-sm"
-            onClick={() => setConfirmDelete(p)}
+            onClick={() => handleDelete(p)}
             title="Excluir"
-            disabled={deletingId === p.id}
           >
-            {deletingId === p.id ? (
-              <Loader2 size={15} className="animate-spin text-red-500" />
-            ) : (
-              <Trash2 size={15} className="text-red-500" />
-            )}
+            <Trash2 size={15} className="text-red-500" />
           </Button>
         </div>
       ),
@@ -412,7 +393,7 @@ export default function PaymentsPage() {
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <div className="w-56">
               <SelectInput
-                value={filters.status}
+                value={filters.status ?? ''}
                 onChange={handleStatusChange}
                 options={STATUS_FILTER_OPTIONS}
                 placeholder="Todos os status"
@@ -491,19 +472,6 @@ export default function PaymentsPage() {
           {...(editingPayment ? { payment: editingPayment } : {})}
           onClose={closeModal}
           onSuccess={editingPayment ? handleEditSuccess : handleCreateSuccess}
-        />
-      )}
-
-      {confirmDelete && (
-        <ConfirmModal
-          title="Excluir cobrança?"
-          description={`Esta cobrança de ${fmtAmount(confirmDelete.amount)} será removida permanentemente.`}
-          confirmLabel="Excluir"
-          loading={!!deletingId}
-          onConfirm={() => {
-            void handleDelete();
-          }}
-          onClose={() => setConfirmDelete(null)}
         />
       )}
     </div>

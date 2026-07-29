@@ -1,13 +1,19 @@
 'use client';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Check, ChevronDown, Loader2, Plus, Search, User, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Modal } from '@/app/components/common/modal';
 import { DateInput } from '@/app/components/forms/date-input';
+import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { useAutoComplete } from '@/hooks/use-auto-complete';
+import { paymentSchema, type PaymentFormData } from '@/schemas/payment';
 import { catalogService } from '@/services/catalog.service';
 import { paymentsService } from '@/services/payments.service';
 import { tutorsService } from '@/services/tutors.service';
@@ -15,7 +21,6 @@ import type { CatalogItem } from '@/types/catalog';
 import { CATALOG_CATEGORY_LABELS } from '@/types/catalog';
 import {
   PAYMENT_STATUS_LABELS,
-  type ChargeItem,
   type Payment,
   type PaymentStatus,
 } from '@/types/payment';
@@ -55,11 +60,19 @@ function TutorComboBox({
   onClear: () => void;
   disabled?: boolean;
 }) {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<TutorItem[]>([]);
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const {
+    items: results,
+    search: query,
+    loading,
+    setSearch: setQuery,
+  } = useAutoComplete<Tutor>({
+    fetcher: tutorsService.list,
+    pageSize: 8,
+    enabled: open,
+  });
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -70,31 +83,6 @@ function TutorComboBox({
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
-
-  useEffect(() => {
-    if (query.length < 2) {
-      setResults([]);
-      return;
-    }
-    setLoading(true);
-    const timer = setTimeout(async () => {
-      try {
-        const res = await tutorsService.list({ search: query, size: 8 });
-        setResults(
-          res.data.map((t: Tutor) => ({
-            id: t.id,
-            name: t.name,
-            ...(t.phone ? { phone: t.phone } : {}),
-          })),
-        );
-      } catch {
-        /* silently fail */
-      } finally {
-        setLoading(false);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query]);
 
   if (value) {
     return (
@@ -163,7 +151,11 @@ function TutorComboBox({
                 type="button"
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  onSelect(t);
+                  onSelect({
+                    id: t.id,
+                    name: t.name,
+                    ...(t.phone ? { phone: t.phone } : {}),
+                  });
                   setOpen(false);
                   setQuery('');
                 }}
@@ -204,20 +196,38 @@ export function PaymentModal({
   const [tutor, setTutor] = useState<TutorItem | null>(
     defaultTutor ? { id: defaultTutor.id, name: defaultTutor.name } : null,
   );
-  const [notes, setNotes] = useState(payment?.notes ?? '');
-  const [dueDate, setDueDate] = useState(payment?.due_date ?? '');
-  const [status, setStatus] = useState<PaymentStatus>(
-    payment?.status ?? 'PENDING',
-  );
-  const [paidAt, setPaidAt] = useState(payment?.paid_at ?? '');
-  const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const [items, setItems] = useState<ChargeItem[]>(payment?.items ?? []);
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([]);
   const [catalogSearch, setCatalogSearch] = useState('');
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<PaymentFormData>({
+    resolver: yupResolver(paymentSchema) as any,
+    defaultValues: {
+      tutor_id: payment?.tutor_id ?? defaultTutor?.id ?? '',
+      patient_id: payment?.patient_id ?? '',
+      due_date: payment?.due_date ?? '',
+      status: payment?.status ?? 'PENDING',
+      paid_at: payment?.paid_at ?? '',
+      notes: payment?.notes ?? '',
+      items: payment?.items ?? [],
+    },
+  });
+
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: 'items',
+  });
+
+  const watchedItems = watch('items') ?? [];
+  const watchedStatus = watch('status');
 
   useEffect(() => {
     const load = async () => {
@@ -239,100 +249,87 @@ export function PaymentModal({
   );
 
   const addFromCatalog = (item: CatalogItem) => {
-    const existing = items.findIndex((i) => i.catalog_item_id === item.id);
-    if (existing >= 0) {
-      setItems((prev) =>
-        prev.map((i, idx) =>
-          idx === existing ? { ...i, quantity: i.quantity + 1 } : i,
-        ),
-      );
+    const existingIndex = watchedItems.findIndex(
+      (i) => i.catalog_item_id === item.id,
+    );
+    if (existingIndex >= 0) {
+      const existing = watchedItems[existingIndex];
+      if (existing) {
+        update(existingIndex, {
+          ...existing,
+          quantity: (existing.quantity || 1) + 1,
+        });
+      }
     } else {
-      setItems((prev) => [
-        ...prev,
-        {
-          name: item.name,
-          quantity: 1,
-          unit_price: item.price,
-          catalog_item_id: item.id,
-        },
-      ]);
+      append({
+        name: item.name,
+        quantity: 1,
+        unit_price: item.price,
+        catalog_item_id: item.id,
+      });
     }
     setShowCatalog(false);
     setCatalogSearch('');
   };
 
   const addCustomItem = () => {
-    setItems((prev) => [...prev, { name: '', quantity: 1, unit_price: 0 }]);
+    append({ name: '', quantity: 1, unit_price: 0 });
   };
 
-  const updateItem = (
-    index: number,
-    field: keyof ChargeItem,
-    value: string | number,
-  ) => {
-    setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
-    );
-  };
+  const total = watchedItems.reduce(
+    (sum, i) => sum + (Number(i.quantity) || 0) * (Number(i.unit_price) || 0),
+    0,
+  );
 
-  const removeItem = (index: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const total = items.reduce((sum, i) => sum + i.quantity * i.unit_price, 0);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs: Record<string, string> = {};
-    if (!isEditing && !tutor) errs.tutor = 'Selecione um tutor';
-    if (items.length === 0) errs.items = 'Adicione pelo menos um item';
-    const hasInvalidItem = items.some(
-      (i) => !i.name.trim() || i.unit_price <= 0 || i.quantity < 1,
-    );
-    if (hasInvalidItem)
-      errs.items = 'Preencha nome, quantidade e valor de todos os itens';
-    if (!dueDate) errs.dueDate = 'Data de vencimento é obrigatória';
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs);
+  const onSubmit = async (data: PaymentFormData) => {
+    const targetTutorId = isEditing ? payment.tutor_id : tutor?.id;
+    if (!targetTutorId) {
+      toast.error('Selecione um tutor');
       return;
     }
-    setErrors({});
-    setSaving(true);
+
     try {
       let result: Payment;
-      const mappedItems = items.map((i) => ({
+      const mappedItems = data.items.map((i) => ({
         name: i.name.trim(),
         quantity: Number(i.quantity),
         unit_price: Number(i.unit_price),
         ...(i.catalog_item_id ? { catalog_item_id: i.catalog_item_id } : {}),
       }));
+
       if (isEditing) {
         result = await paymentsService.update(payment.id, {
-          ...(notes.trim() ? { notes: notes.trim() } : {}),
+          ...(data.notes?.trim() ? { notes: data.notes.trim() } : {}),
           items: mappedItems,
-          status,
-          due_date: dueDate,
-          ...(status === 'PAID'
-            ? { paid_at: paidAt || new Date().toISOString().split('T')[0]! }
+          status: data.status as PaymentStatus,
+          due_date: data.due_date,
+          ...(data.status === 'PAID'
+            ? {
+              paid_at:
+                  data.paid_at || new Date().toISOString().split('T')[0]!,
+            }
             : {}),
         });
+        toast.success('Cobrança atualizada com sucesso!');
       } else {
         result = await paymentsService.create({
-          ...(notes.trim() ? { notes: notes.trim() } : {}),
+          ...(data.notes?.trim() ? { notes: data.notes.trim() } : {}),
           items: mappedItems,
-          status,
-          due_date: dueDate,
-          ...(status === 'PAID'
-            ? { paid_at: paidAt || new Date().toISOString().split('T')[0]! }
+          status: data.status as PaymentStatus,
+          due_date: data.due_date,
+          ...(data.status === 'PAID'
+            ? {
+              paid_at:
+                  data.paid_at || new Date().toISOString().split('T')[0]!,
+            }
             : {}),
-          tutor_id: tutor!.id,
+          tutor_id: targetTutorId,
         });
+        toast.success('Cobrança registrada com sucesso!');
       }
       onSuccess(result);
     } catch {
-      setErrors({ general: 'Erro ao salvar. Tente novamente.' });
-    } finally {
-      setSaving(false);
+      toast.error('Erro ao salvar cobrança. Tente novamente.');
     }
   };
 
@@ -348,9 +345,7 @@ export function PaymentModal({
       maxWidth="lg"
     >
       <form
-        onSubmit={(e) => {
-          void handleSubmit(e);
-        }}
+        onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-4"
       >
         {!isEditing && (
@@ -360,16 +355,23 @@ export function PaymentModal({
             </Label>
             <TutorComboBox
               value={tutor}
-              onSelect={(t) => setTutor(t)}
-              onClear={() => setTutor(null)}
+              onSelect={(t) => {
+                setTutor(t);
+                setValue('tutor_id', t.id, { shouldValidate: true });
+              }}
+              onClear={() => {
+                setTutor(null);
+                setValue('tutor_id', '', { shouldValidate: true });
+              }}
             />
-            {errors.tutor && (
-              <p className="mt-1 text-xs text-red-500">{errors.tutor}</p>
+            {errors.tutor_id?.message && (
+              <p className="mt-1 text-xs text-red-500">
+                {errors.tutor_id.message}
+              </p>
             )}
           </div>
         )}
 
-        {/* Items section */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <Label required>Itens da cobrança</Label>
@@ -400,7 +402,6 @@ export function PaymentModal({
             </div>
           </div>
 
-          {/* Catalog picker */}
           {showCatalog && (
             <div className="mb-3 border border-slate-200 dark:border-slate-600 rounded-lg overflow-hidden">
               <div className="p-2 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800">
@@ -453,32 +454,27 @@ export function PaymentModal({
             </div>
           )}
 
-          {/* Items list */}
-          {items.length === 0 ? (
+          {fields.length === 0 ? (
             <div className="border border-dashed border-slate-300 dark:border-slate-600 rounded-lg py-6 text-center text-sm text-slate-400 dark:text-slate-500">
               Adicione itens do catálogo ou crie avulsos
             </div>
           ) : (
             <div className="space-y-2">
-              {items.map((item, idx) => (
+              {fields.map((field, idx) => (
                 <div
-                  key={idx}
+                  key={field.id}
                   className="grid grid-cols-[1fr_80px_100px_32px] gap-2 items-center"
                 >
                   <input
                     type="text"
-                    value={item.name}
-                    onChange={(e) => updateItem(idx, 'name', e.target.value)}
+                    {...register(`items.${idx}.name`)}
                     placeholder="Nome do item"
                     className={inputCls}
                   />
                   <input
                     type="number"
                     min={1}
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateItem(idx, 'quantity', Number(e.target.value))
-                    }
+                    {...register(`items.${idx}.quantity`)}
                     placeholder="Qtd"
                     className={inputCls}
                   />
@@ -486,16 +482,13 @@ export function PaymentModal({
                     type="number"
                     min={0}
                     step={0.01}
-                    value={item.unit_price}
-                    onChange={(e) =>
-                      updateItem(idx, 'unit_price', Number(e.target.value))
-                    }
+                    {...register(`items.${idx}.unit_price`)}
                     placeholder="R$ 0,00"
                     className={inputCls}
                   />
                   <button
                     type="button"
-                    onClick={() => removeItem(idx)}
+                    onClick={() => remove(idx)}
                     className="text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center"
                   >
                     <X size={16} />
@@ -512,70 +505,62 @@ export function PaymentModal({
               </div>
             </div>
           )}
-          {errors.items && (
-            <p className="mt-1 text-xs text-red-500">{errors.items}</p>
+          {errors.items?.message && (
+            <p className="mt-1 text-xs text-red-500">{errors.items.message}</p>
           )}
         </div>
 
-        {/* Due date + status */}
         <div className="grid grid-cols-2 gap-3">
           <DateInput
             label="Vencimento"
-            value={dueDate}
-            onChange={setDueDate}
+            value={watch('due_date') ?? ''}
+            onChange={(v) => setValue('due_date', v, { shouldValidate: true })}
             required
-            error={errors.dueDate}
+            error={errors.due_date?.message}
           />
-          <div>
-            <Label required className="mb-1.5">
-              Status
-            </Label>
-            <SelectInput
-              value={status}
-              onChange={(v) => setStatus(v as PaymentStatus)}
-              options={STATUS_OPTIONS}
-            />
-          </div>
+          <SelectInput
+            label="Status"
+            required
+            control={control}
+            name="status"
+            options={STATUS_OPTIONS}
+            error={errors.status?.message}
+          />
         </div>
 
-        {status === 'PAID' && (
+        {watchedStatus === 'PAID' && (
           <DateInput
             label="Data do pagamento"
-            value={paidAt}
-            onChange={setPaidAt}
+            value={watch('paid_at') ?? ''}
+            onChange={(v) => setValue('paid_at', v)}
+            error={errors.paid_at?.message}
           />
         )}
 
-        <div>
-          <Label className="mb-1.5">Observações</Label>
-          <input
-            type="text"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Ex: Atendimento referente a 10/05"
-            className={inputCls}
-          />
-        </div>
-
-        {errors.general && (
-          <p className="text-sm text-red-500">{errors.general}</p>
-        )}
+        <FormTextarea
+          label="Observações"
+          placeholder="Ex: Atendimento referente a 10/05"
+          rows={2}
+          control={control}
+          name="notes"
+          error={errors.notes?.message}
+        />
 
         <div className="flex justify-end gap-2 pt-1">
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
-            disabled={saving}
+            disabled={isSubmitting}
           >
             Cancelar
           </Button>
           <Button
             type="submit"
-            disabled={saving}
+            disabled={isSubmitting}
             className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600"
           >
-            {saving ? (
+            {isSubmitting ? (
               <Loader2 size={16} className="animate-spin" />
             ) : isEditing ? (
               'Salvar alterações'

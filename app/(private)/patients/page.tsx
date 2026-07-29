@@ -2,59 +2,108 @@
 
 import { ChevronRight, PawPrint, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { PatientModal } from '@/app/components/business/patient-modal';
-import { DataTable } from '@/app/components/data/data-table';
+import {
+  DataTable,
+  type DataTableColumn,
+} from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
+import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { patientsService } from '@/services/patients.service';
-import type { PaginatedMeta } from '@/types/common';
 import type { Patient } from '@/types/patient';
 
+interface PatientFilters {
+  search?: string | undefined;
+}
+
 export default function PatientsPage() {
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [meta, setMeta] = useState<PaginatedMeta | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const fetchPatients = useCallback(async (searchQuery?: string, page = 1) => {
-    setLoading(true);
-    try {
-      const response = await patientsService.list({
-        page,
-        size: 10,
-        search: searchQuery,
-      });
-      setPatients(response.data);
-      setMeta(response.meta);
-    } catch {
-      // silently fail
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void fetchPatients();
-  }, [fetchPatients]);
-
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    void fetchPatients(value);
-  };
+  const {
+    items: patients,
+    meta,
+    loading,
+    search,
+    setSearch,
+    prependItem,
+  } = usePaginatedResource<Patient, PatientFilters>({
+    fetcher: patientsService.list,
+    initialFilters: { search: '' },
+    pageSize: 10,
+    debounceMs: 300,
+  });
 
   const handleCreateSuccess = (patient: Patient) => {
     setShowCreateModal(false);
-    setPatients((prev) => [patient, ...prev]);
-    setMeta((prev) =>
-      prev ? { ...prev, total_elements: prev.total_elements + 1 } : prev,
-    );
+    prependItem(patient);
   };
+
+  const columns: DataTableColumn<Patient>[] = [
+    {
+      key: 'name',
+      header: 'Animal',
+      render: (patient) => (
+        <Link
+          href={`/patients/detail?id=${patient.id}`}
+          className="flex items-center gap-3"
+        >
+          <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
+            <PawPrint size={18} className="text-teal-600 dark:text-teal-400" />
+          </div>
+          <p className="font-medium text-slate-900 dark:text-white">
+            {patient.name}
+          </p>
+        </Link>
+      ),
+    },
+    {
+      key: 'specie',
+      header: 'Espécie',
+      render: (patient) => (
+        <span className="text-slate-600 dark:text-slate-300">
+          {SPECIE_LABELS[patient.specie] ?? patient.specie}
+        </span>
+      ),
+    },
+    {
+      key: 'breed',
+      header: 'Raça',
+      render: (patient) => (
+        <span className="text-slate-600 dark:text-slate-300">
+          {patient.breed ?? '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'created_at',
+      header: 'Cadastrado em',
+      render: (patient) => (
+        <span className="text-slate-600 dark:text-slate-300">
+          {new Date(patient.created_at).toLocaleDateString('pt-BR')}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      align: 'right',
+      width: '60px',
+      render: (patient) => (
+        <Link href={`/patients/detail?id=${patient.id}`}>
+          <ChevronRight
+            className="inline text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+            size={20}
+          />
+        </Link>
+      ),
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
@@ -80,69 +129,27 @@ export default function PatientsPage() {
           }
         >
           <DataTable
-            headers={['Animal', 'Espécie', 'Raça', 'Cadastrado em', '']}
-            showSearch={true}
-            onSearch={handleSearch}
-            searchPlaceholder="Buscar por nome..."
+            columns={columns}
+            data={patients}
+            getRowKey={(patient) => patient.id}
             loading={loading}
-          >
-            {patients.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="p-8 text-center">
-                  <PawPrint
-                    size={32}
-                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
-                  />
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    {search
-                      ? 'Nenhum paciente encontrado.'
-                      : 'Nenhum paciente cadastrado ainda.'}
-                  </p>
-                </td>
-              </tr>
-            ) : (
-              patients.map((patient) => (
-                <tr
-                  key={patient.id}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
-                >
-                  <td className="p-4">
-                    <Link
-                      href={`/patients/detail?id=${patient.id}`}
-                      className="flex items-center gap-3"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
-                        <PawPrint
-                          size={18}
-                          className="text-teal-600 dark:text-teal-400"
-                        />
-                      </div>
-                      <p className="font-medium text-slate-900 dark:text-white">
-                        {patient.name}
-                      </p>
-                    </Link>
-                  </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
-                    {SPECIE_LABELS[patient.specie] ?? patient.specie}
-                  </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
-                    {patient.breed ?? '-'}
-                  </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
-                    {new Date(patient.created_at).toLocaleDateString('pt-BR')}
-                  </td>
-                  <td className="p-4 text-right">
-                    <Link href={`/patients/detail?id=${patient.id}`}>
-                      <ChevronRight
-                        className="inline text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors"
-                        size={20}
-                      />
-                    </Link>
-                  </td>
-                </tr>
-              ))
-            )}
-          </DataTable>
+            showSearch={true}
+            onSearch={setSearch}
+            searchPlaceholder="Buscar por nome..."
+            emptyState={
+              <div className="p-8 text-center">
+                <PawPrint
+                  size={32}
+                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                />
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
+                  {search
+                    ? 'Nenhum paciente encontrado.'
+                    : 'Nenhum paciente cadastrado ainda.'}
+                </p>
+              </div>
+            }
+          />
         </SectionCard>
       </div>
 

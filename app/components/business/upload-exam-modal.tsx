@@ -5,13 +5,13 @@ import { Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 
+import { Autocomplete } from '../forms/autocomplete';
 import { DateInput } from '../forms/date-input';
 import { FileDropzone } from '../forms/file-dropzone';
 import { InputWithLabel } from '../forms/input-with-label';
-import { SearchSelect } from '../forms/search-select';
 
 import { Button } from '@/components/ui/button';
-import { usePaginatedResource } from '@/hooks/use-paginated-resource';
+import { useAutoComplete } from '@/hooks/use-auto-complete';
 import { uploadExamSchema, type UploadExamFormData } from '@/schemas/vaccine';
 import { patientsService } from '@/services/patients.service';
 import { studiesService } from '@/services/studies.service';
@@ -38,11 +38,13 @@ export function UploadExamModal({
   const {
     items: patients,
     loading: loadingPatients,
+    loadingMore: loadingMorePatients,
+    hasMorePage: hasMorePatients,
+    loadNextPage: loadNextPatientPage,
     search: patientSearch,
     setSearch: setPatientSearch,
-  } = usePaginatedResource<Patient, { search?: string }>({
+  } = useAutoComplete<Patient>({
     fetcher: patientsService.list,
-    initialFilters: { search: '' },
     pageSize: 8,
     debounceMs: 300,
     enabled: !preselectedPatient,
@@ -128,18 +130,19 @@ export function UploadExamModal({
 
         <div className="space-y-4 p-5">
           {!preselectedPatient && (
-            <SearchSelect
+            <Autocomplete
               label="Paciente"
               required
               placeholder="Buscar paciente por nome..."
               search={patientSearch}
               onSearchChange={setPatientSearch}
-              options={patients.map((patient) => ({
-                id: patient.id,
-                label: patient.name,
-                description: patient.breed,
-              }))}
+              items={patients}
+              getOptionLabel={(patient) => patient.name}
+              getOptionDescription={(patient) => patient.breed}
               loading={loadingPatients}
+              loadingMore={loadingMorePatients}
+              hasMorePage={hasMorePatients}
+              onLoadNextPage={loadNextPatientPage}
               open={showDropdown}
               onOpenChange={setShowDropdown}
               selectedOption={
@@ -151,9 +154,7 @@ export function UploadExamModal({
                   }
                   : null
               }
-              onSelect={(option) => {
-                const patient = patients.find((item) => item.id === option.id);
-                if (!patient) return;
+              onSelect={(patient) => {
                 setSelectedPatient(patient);
                 setValue('patientId', patient.id, { shouldValidate: true });
                 setPatientSearch('');

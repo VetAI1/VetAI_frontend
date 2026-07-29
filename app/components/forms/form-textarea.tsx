@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
-import type { Control, FieldValues } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
 
 import { cn } from '@/infra/utils';
 
@@ -11,7 +11,7 @@ export interface FormTextareaProps extends React.ComponentProps<'textarea'> {
   required?: boolean;
   error?: string | undefined;
   containerClassName?: string;
-  control?: Control<FieldValues>;
+  control?: Control<any> | any;
   name?: string;
 }
 

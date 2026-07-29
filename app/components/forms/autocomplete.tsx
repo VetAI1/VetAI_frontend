@@ -3,41 +3,52 @@
 import { Loader2, Search, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
-import { FieldShell } from '../forms/field-shell';
+import { FieldShell } from './field-shell';
 
+import { InfiniteScroll } from '@/app/components/common/infinite-scroll';
 import { Button } from '@/components/ui/button';
 
-interface SearchSelectOption {
+export interface AutoCompleteOption {
   id: string;
   label: string;
   description?: string | undefined;
 }
 
-interface SearchSelectProps {
+interface AutoCompleteProps<TItem extends { id: string }> {
   label: string;
   required?: boolean;
   placeholder: string;
   search: string;
   onSearchChange: (value: string) => void;
-  options: SearchSelectOption[];
+  items: TItem[];
+  getOptionLabel: (item: TItem) => string;
+  getOptionDescription?: (item: TItem) => string | undefined;
   loading?: boolean;
+  loadingMore?: boolean;
+  hasMorePage?: boolean;
+  onLoadNextPage?: () => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  selectedOption: SearchSelectOption | null;
-  onSelect: (option: SearchSelectOption) => void;
+  selectedOption: AutoCompleteOption | null;
+  onSelect: (item: TItem) => void;
   onClear: () => void;
   error?: string | undefined;
   emptyMessage?: string;
 }
 
-export function SearchSelect({
+export function Autocomplete<TItem extends { id: string }>({
   label,
   required,
   placeholder,
   search,
   onSearchChange,
-  options,
+  items,
+  getOptionLabel,
+  getOptionDescription,
   loading = false,
+  loadingMore = false,
+  hasMorePage = false,
+  onLoadNextPage,
   open,
   onOpenChange,
   selectedOption,
@@ -45,7 +56,7 @@ export function SearchSelect({
   onClear,
   error,
   emptyMessage = 'Nenhum resultado encontrado',
-}: SearchSelectProps) {
+}: AutoCompleteProps<TItem>) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -104,39 +115,44 @@ export function SearchSelect({
           </div>
 
           {open && (
-            <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
+            <InfiniteScroll
+              className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700"
+              hasMore={hasMorePage}
+              loading={loadingMore}
+              onLoadMore={() => onLoadNextPage?.()}
+            >
               {loading ? (
                 <div className="flex items-center justify-center p-4">
                   <Loader2 size={16} className="animate-spin text-teal-600" />
                 </div>
-              ) : options.length === 0 ? (
+              ) : items.length === 0 ? (
                 <p className="p-3 text-center text-sm text-slate-500 dark:text-slate-400">
                   {emptyMessage}
                 </p>
               ) : (
-                options.map((option) => (
+                items.map((item) => (
                   <Button
-                    key={option.id}
+                    key={item.id}
                     type="button"
                     variant="ghost"
                     onClick={() => {
-                      onSelect(option);
+                      onSelect(item);
                       onOpenChange(false);
                     }}
                     className="h-auto w-full justify-start rounded-none border-b border-slate-100 px-3 py-2.5 text-sm text-slate-900 last:border-0 dark:border-slate-600 dark:text-white"
                   >
                     <div className="text-left">
-                      <p className="font-medium">{option.label}</p>
-                      {option.description && (
+                      <p className="font-medium">{getOptionLabel(item)}</p>
+                      {getOptionDescription?.(item) && (
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {option.description}
+                          {getOptionDescription(item)}
                         </p>
                       )}
                     </div>
                   </Button>
                 ))
               )}
-            </div>
+            </InfiniteScroll>
           )}
         </div>
       )}

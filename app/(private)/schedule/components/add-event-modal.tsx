@@ -7,13 +7,13 @@ import { Controller, useForm, type Resolver } from 'react-hook-form';
 import { toLocalDateStr } from '../utils';
 
 import { Modal } from '@/app/components/common/modal';
+import { Autocomplete } from '@/app/components/forms/autocomplete';
 import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
-import { SearchSelect } from '@/app/components/forms/search-select';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { TimeInput } from '@/app/components/forms/time-input';
 import { Button } from '@/components/ui/button';
-import { usePaginatedResource } from '@/hooks/use-paginated-resource';
+import { useAutoComplete } from '@/hooks/use-auto-complete';
 import {
   scheduleEventSchema,
   type ScheduleEventFormData,
@@ -68,11 +68,13 @@ export function AddEventModal({
   const {
     items: patients,
     loading: patientLoading,
+    loadingMore: patientLoadingMore,
+    hasMorePage: hasMorePatients,
+    loadNextPage: loadNextPatientPage,
     search: patientSearch,
     setSearch: setPatientSearch,
-  } = usePaginatedResource<Patient, { search?: string }>({
+  } = useAutoComplete<Patient>({
     fetcher: patientsService.list,
-    initialFilters: { search: '' },
     pageSize: 8,
     debounceMs: 300,
   });
@@ -80,11 +82,13 @@ export function AddEventModal({
   const {
     items: tutors,
     loading: tutorLoading,
+    loadingMore: tutorLoadingMore,
+    hasMorePage: hasMoreTutors,
+    loadNextPage: loadNextTutorPage,
     search: tutorSearch,
     setSearch: setTutorSearch,
-  } = usePaginatedResource<Tutor, { search?: string }>({
+  } = useAutoComplete<Tutor>({
     fetcher: tutorsService.list,
-    initialFilters: { search: '' },
     pageSize: 8,
     debounceMs: 300,
   });
@@ -254,23 +258,28 @@ export function AddEventModal({
           />
         </div>
 
-        <SearchSelect
+        <Autocomplete
           label="Paciente"
           required
           placeholder="Buscar paciente..."
           search={patientSearch}
           onSearchChange={setPatientSearch}
-          options={patients.map((patient) => ({
-            id: patient.id,
-            label: patient.name,
-            description: patient.breed,
-          }))}
+          items={patients}
+          getOptionLabel={(patient) => patient.name}
+          getOptionDescription={(patient) => patient.breed}
           loading={patientLoading}
+          loadingMore={patientLoadingMore}
+          hasMorePage={hasMorePatients}
+          onLoadNextPage={loadNextPatientPage}
           open={patientOpen}
           onOpenChange={setPatientOpen}
           selectedOption={selectedPatient}
-          onSelect={(option) => {
-            void handleSelectPatient(option);
+          onSelect={(patient) => {
+            void handleSelectPatient({
+              id: patient.id,
+              label: patient.name,
+              description: patient.breed,
+            });
           }}
           onClear={() => {
             setSelectedPatient(null);
@@ -280,24 +289,29 @@ export function AddEventModal({
           emptyMessage="Nenhum paciente encontrado"
         />
 
-        <SearchSelect
+        <Autocomplete
           label="Tutor"
           required
           placeholder="Buscar tutor..."
           search={tutorSearch}
           onSearchChange={setTutorSearch}
-          options={tutors.map((tutor) => ({
-            id: tutor.id,
-            label: tutor.name,
-            description: tutor.phone ?? tutor.email,
-          }))}
+          items={tutors}
+          getOptionLabel={(tutor) => tutor.name}
+          getOptionDescription={(tutor) => tutor.phone ?? tutor.email}
           loading={tutorLoading}
+          loadingMore={tutorLoadingMore}
+          hasMorePage={hasMoreTutors}
+          onLoadNextPage={loadNextTutorPage}
           open={tutorOpen}
           onOpenChange={setTutorOpen}
           selectedOption={selectedTutor}
-          onSelect={(option) => {
-            setSelectedTutor(option);
-            setValue('tutorName', option.label, { shouldValidate: true });
+          onSelect={(tutor) => {
+            setSelectedTutor({
+              id: tutor.id,
+              label: tutor.name,
+              description: tutor.phone ?? tutor.email,
+            });
+            setValue('tutorName', tutor.name, { shouldValidate: true });
             setTutorSearch('');
           }}
           onClear={() => {

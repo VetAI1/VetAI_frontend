@@ -5,14 +5,14 @@ import { Loader2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
+import { Autocomplete } from '../forms/autocomplete';
 import { DateInput } from '../forms/date-input';
 import { InputWithLabel } from '../forms/input-with-label';
-import { SearchSelect } from '../forms/search-select';
 import { SelectInput } from '../forms/select-input';
 
 import { Button } from '@/components/ui/button';
 import { SPECIE_LABELS } from '@/constants';
-import { usePaginatedResource } from '@/hooks/use-paginated-resource';
+import { useAutoComplete } from '@/hooks/use-auto-complete';
 import { patientSchema, type PatientFormData } from '@/schemas/patient';
 import { patientsService } from '@/services/patients.service';
 import { tutorsService } from '@/services/tutors.service';
@@ -72,11 +72,13 @@ export function PatientModal({
   const {
     items: tutors,
     loading: loadingTutors,
+    loadingMore: loadingMoreTutors,
+    hasMorePage: hasMoreTutors,
+    loadNextPage: loadNextTutorPage,
     search: tutorSearch,
     setSearch: setTutorSearch,
-  } = usePaginatedResource<Tutor, { search?: string }>({
+  } = useAutoComplete<Tutor>({
     fetcher: tutorsService.list,
-    initialFilters: { search: '' },
     pageSize: 8,
     debounceMs: 300,
   });
@@ -307,18 +309,19 @@ export function PatientModal({
             )}
           />
 
-          <SearchSelect
+          <Autocomplete
             label="Tutor"
             required
             placeholder="Buscar tutor por nome..."
             search={tutorSearch}
             onSearchChange={setTutorSearch}
-            options={tutors.map((tutor) => ({
-              id: tutor.id,
-              label: tutor.name,
-              description: tutor.email,
-            }))}
+            items={tutors}
+            getOptionLabel={(tutor) => tutor.name}
+            getOptionDescription={(tutor) => tutor.email}
             loading={loadingTutors}
+            loadingMore={loadingMoreTutors}
+            hasMorePage={hasMoreTutors}
+            onLoadNextPage={loadNextTutorPage}
             open={showTutorDropdown}
             onOpenChange={setShowTutorDropdown}
             selectedOption={
@@ -330,9 +333,7 @@ export function PatientModal({
                 }
                 : null
             }
-            onSelect={(option) => {
-              const tutor = tutors.find((item) => item.id === option.id);
-              if (!tutor) return;
+            onSelect={(tutor) => {
               setSelectedTutor(tutor);
               setValue('tutorId', tutor.id, { shouldValidate: true });
               setTutorSearch('');

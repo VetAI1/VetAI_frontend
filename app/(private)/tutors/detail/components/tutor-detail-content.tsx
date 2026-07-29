@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   CreditCard,
   History,
-  Loader2,
   Mail,
   MapPin,
   Pencil,
@@ -16,7 +15,6 @@ import {
   Plus,
   Trash2,
   User,
-  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -25,6 +23,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { AddAppointmentModal } from './add-appointment-modal';
 import { AddPaymentModal } from './add-payment-modal';
 
+import { TutorModal } from '@/app/(private)/tutors/components/tutor-modal';
 import { Card } from '@/app/components/common/card';
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import { SectionCard } from '@/app/components/data/section-card';
@@ -405,10 +404,13 @@ export function TutorDetailContent() {
 
       {/* Modals */}
       {showEditModal && tutor && (
-        <TutorEditModal
+        <TutorModal
           tutor={tutor}
           onClose={() => setShowEditModal(false)}
-          onSuccess={(updated) => { setTutor(updated); setShowEditModal(false); }}
+          onSuccess={(updated) => {
+            setTutor(updated);
+            setShowEditModal(false);
+          }}
         />
       )}
 
@@ -442,11 +444,19 @@ export function TutorDetailContent() {
 
       {confirmDelete && (
         <ConfirmModal
-          title={confirmDelete.type === 'appointment' ? 'Excluir agendamento' : 'Excluir pagamento'}
+          title={
+            confirmDelete.type === 'appointment'
+              ? 'Excluir agendamento'
+              : 'Excluir pagamento'
+          }
           description="Esta ação não pode ser desfeita. Deseja continuar?"
           confirmLabel="Excluir"
           loading={deleting}
-          onConfirm={() => { void (confirmDelete.type === 'appointment' ? handleDeleteAppointment() : handleDeletePayment()); }}
+          onConfirm={() => {
+            void (confirmDelete.type === 'appointment'
+              ? handleDeleteAppointment()
+              : handleDeletePayment());
+          }}
           onClose={() => setConfirmDelete(null)}
         />
       )}
@@ -458,7 +468,9 @@ export function TutorDetailContent() {
           confirmLabel="Confirmar pagamento"
           variant="default"
           loading={markingPaid}
-          onConfirm={() => { void handleMarkPaid(); }}
+          onConfirm={() => {
+            void handleMarkPaid();
+          }}
           onClose={() => setConfirmMarkPaid(null)}
         />
       )}
@@ -479,12 +491,16 @@ function InfoItem({
 }) {
   return (
     <Card className="px-3 py-4 flex items-start gap-2.5">
-      <div className={`w-9 h-9 rounded-lg ${iconBg} flex items-center justify-center shrink-0`}>
+      <div
+        className={`w-9 h-9 rounded-lg ${iconBg} flex items-center justify-center shrink-0`}
+      >
         {icon}
       </div>
       <div className="min-w-0 pl-2">
         <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{value}</p>
+        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+          {value}
+        </p>
       </div>
     </Card>
   );
@@ -504,21 +520,37 @@ function AppointmentRow({
   const typeColors = APPOINTMENT_TYPE_COLORS[appointment.type];
   const statusColors = APPOINTMENT_STATUS_COLORS[appointment.status];
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 ${muted ? 'opacity-60' : ''}`}>
+    <div
+      className={`flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 ${muted ? 'opacity-60' : ''}`}
+    >
       <div className={`w-2 h-2 rounded-full shrink-0 ${typeColors.dot}`} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-slate-900 dark:text-white truncate">{appointment.title}</span>
-          <span className={`text-xs px-1.5 py-0.5 rounded-full ${typeColors.bg} ${typeColors.text}`}>
+          <span className="text-sm font-medium text-slate-900 dark:text-white truncate">
+            {appointment.title}
+          </span>
+          <span
+            className={`text-xs px-1.5 py-0.5 rounded-full ${typeColors.bg} ${typeColors.text}`}
+          >
             {APPOINTMENT_TYPE_LABELS[appointment.type]}
           </span>
-          <span className={`text-xs px-1.5 py-0.5 rounded-full ${statusColors.bg} ${statusColors.text}`}>
+          <span
+            className={`text-xs px-1.5 py-0.5 rounded-full ${statusColors.bg} ${statusColors.text}`}
+          >
             {APPOINTMENT_STATUS_LABELS[appointment.status]}
           </span>
         </div>
         <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-          <span className="flex items-center gap-1"><Calendar size={11} />{fmtDate(appointment.date)} Ã s {appointment.start_time}</span>
-          {appointment.patient_id && <span className="flex items-center gap-1"><PawPrint size={11} />{petName}</span>}
+          <span className="flex items-center gap-1">
+            <Calendar size={11} />
+            {fmtDate(appointment.date)} às {appointment.start_time}
+          </span>
+          {appointment.patient_id && (
+            <span className="flex items-center gap-1">
+              <PawPrint size={11} />
+              {petName}
+            </span>
+          )}
         </div>
       </div>
       <button
@@ -544,27 +576,54 @@ function PaymentRow({
   onDelete?: () => void;
 }) {
   const statusColors = PAYMENT_STATUS_COLORS[payment.status];
-  const isOverdue = payment.status === 'PENDING' && payment.due_date < new Date().toISOString().split('T')[0]!;
-  const itemsSummary = payment.items.length > 0
-    ? payment.items.map((i) => `${i.quantity > 1 ? `${i.quantity}Ã— ` : ''}${i.name}`).join(', ')
-    : payment.notes ?? '—';
+  const isOverdue =
+    payment.status === 'PENDING' &&
+    payment.due_date < new Date().toISOString().split('T')[0]!;
+  const itemsSummary =
+    payment.items.length > 0
+      ? payment.items
+        .map(
+          (i) => `${i.quantity > 1 ? `${i.quantity}× ` : ''}${i.name}`,
+        )
+        .join(', ')
+      : payment.notes ?? '—';
 
   return (
-    <div className={`p-3 rounded-lg border ${isOverdue ? 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10' : 'border-slate-200 dark:border-slate-700'}`}>
+    <div
+      className={`p-3 rounded-lg border ${isOverdue ? 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10' : 'border-slate-200 dark:border-slate-700'}`}
+    >
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">{fmtCurrency(payment.amount)}</span>
-            <span className={`text-xs px-1.5 py-0.5 rounded-full ${statusColors.bg} ${statusColors.text}`}>
+            <span className="text-sm font-semibold text-slate-900 dark:text-white">
+              {fmtCurrency(payment.amount)}
+            </span>
+            <span
+              className={`text-xs px-1.5 py-0.5 rounded-full ${statusColors.bg} ${statusColors.text}`}
+            >
               {PAYMENT_STATUS_LABELS[payment.status]}
             </span>
-            {isOverdue && <span className="text-xs text-red-600 dark:text-red-400 font-medium">Vencido</span>}
+            {isOverdue && (
+              <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+                Vencido
+              </span>
+            )}
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">{itemsSummary}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+            {itemsSummary}
+          </p>
           <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-400 dark:text-slate-500 flex-wrap">
-            <span className="flex items-center gap-1"><Calendar size={11} />Vence: {fmtDate(payment.due_date)}</span>
+            <span className="flex items-center gap-1">
+              <Calendar size={11} />
+              Vence: {fmtDate(payment.due_date)}
+            </span>
             {payment.paid_at && <span>Pago: {fmtDate(payment.paid_at)}</span>}
-            {payment.patient_id && <span className="flex items-center gap-1"><PawPrint size={11} />{petName}</span>}
+            {payment.patient_id && (
+              <span className="flex items-center gap-1">
+                <PawPrint size={11} />
+                {petName}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0 mt-0.5">
@@ -595,138 +654,20 @@ function PaymentRow({
           </summary>
           <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-slate-200 dark:border-slate-600">
             {payment.items.map((item, i) => (
-              <div key={i} className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-                <span>{item.quantity > 1 ? `${item.quantity}Ã— ` : ''}{item.name}</span>
+              <div
+                key={i}
+                className="flex justify-between text-xs text-slate-500 dark:text-slate-400"
+              >
+                <span>
+                  {item.quantity > 1 ? `${item.quantity}× ` : ''}
+                  {item.name}
+                </span>
                 <span>{fmtCurrency(item.quantity * item.unit_price)}</span>
               </div>
             ))}
           </div>
         </details>
       )}
-    </div>
-  );
-}
-
-function TutorEditModal({
-  tutor,
-  onClose,
-  onSuccess,
-}: {
-  tutor: Tutor;
-  onClose: () => void;
-  onSuccess: (t: Tutor) => void;
-}) {
-  const [name, setName] = useState(tutor.name);
-  const [cpf, setCpf] = useState(tutor.cpf);
-  const [phone, setPhone] = useState(tutor.phone ?? '');
-  const [email, setEmail] = useState(tutor.email ?? '');
-  const [address, setAddress] = useState(tutor.address ?? '');
-  const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  function formatCpf(value: string): string {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
-    if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
-    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
-  }
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
-
-  const handleSubmit = async () => {
-    const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = 'Nome é obrigatório';
-    if (!cpf.trim()) errs.cpf = 'CPF é obrigatório';
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    setErrors({});
-    setSaving(true);
-    try {
-      const result = await tutorsService.update(tutor.id, {
-        name: name.trim(),
-        cpf: cpf.trim(),
-        ...(phone.trim() ? { phone: phone.trim() } : {}),
-        ...(email.trim() ? { email: email.trim() } : {}),
-        ...(address.trim() ? { address: address.trim() } : {}),
-      });
-      onSuccess(result);
-    } catch {
-      setErrors({ general: 'Erro ao salvar. Tente novamente.' });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Editar Tutor</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Atualize os dados do tutor</p>
-          </div>
-          <Button variant="ghost" size="icon-sm" onClick={onClose} className="text-slate-500">
-            <X size={18} />
-          </Button>
-        </div>
-        <div className="p-5 space-y-4">
-          <FormField label="Nome" required error={errors.name}>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: João Silva" className={inputClass} />
-          </FormField>
-          <FormField label="CPF" required error={errors.cpf}>
-            <input type="text" value={cpf} onChange={(e) => setCpf(formatCpf(e.target.value))} placeholder="Ex: 123.456.789-09" className={inputClass} />
-          </FormField>
-          <FormField label="Telefone">
-            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Ex: (11) 99999-9999" className={inputClass} />
-          </FormField>
-          <FormField label="E-mail">
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ex: joao@email.com" className={inputClass} />
-          </FormField>
-          <FormField label="Endereço">
-            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Ex: Rua das Flores, 123 - SP" className={inputClass} />
-          </FormField>
-          {errors.general && <p className="text-sm text-red-500">{errors.general}</p>}
-        </div>
-        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-200 dark:border-slate-700">
-          <Button variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
-          <Button
-            onClick={() => { void handleSubmit(); }}
-            disabled={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800 min-w-[100px]"
-          >
-            {saving ? <Loader2 size={16} className="animate-spin" /> : 'Salvar'}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const inputClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm';
-
-function FormField({
-  label,
-  required,
-  error,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  error?: string | undefined;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
-      {children}
-      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

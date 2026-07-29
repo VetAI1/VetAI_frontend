@@ -20,135 +20,51 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { InfoCard } from '@/app/components/common/info-card';
+import { ListSection } from '@/app/components/common/list-section';
 import { Modal } from '@/app/components/common/modal';
-import type { DoseEntry, Medicine } from '@/types/medicine';
+import { TextBlock } from '@/app/components/common/text-block';
+import type { DoseEntry, Medicine, ReferenceDose } from '@/types/medicine';
+
+type Tab = 'sobre' | 'indicacoes' | 'administracao' | 'apresentacoes';
+type SpeciesKey = keyof ReferenceDose;
+
+function parseDoseRange(entry?: DoseEntry): { min: number; max: number } | null {
+  if (!entry?.dose) return null;
+  const matches = entry.dose.match(/([\d.,]+)\s*(?:a|-)\s*([\d.,]+)/);
+  if (matches?.[1] && matches[2]) {
+    return {
+      min: parseFloat(matches[1].replace(',', '.')),
+      max: parseFloat(matches[2].replace(',', '.')),
+    };
+  }
+  const single = parseFloat(entry.dose.replace(',', '.'));
+  if (!isNaN(single)) return { min: single, max: single };
+  return null;
+}
+
+function formatDose(val: number): string {
+  return val.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+}
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: 'sobre', label: 'Visão Geral' },
+  { key: 'indicacoes', label: 'Indicações' },
+  { key: 'administracao', label: 'Administração' },
+  { key: 'apresentacoes', label: 'Apresentações' },
+];
+
+const SPECIES_OPTIONS: { key: SpeciesKey; label: string }[] = [
+  { key: 'dogs', label: 'Cães' },
+  { key: 'cats', label: 'Gatos' },
+  { key: 'cattle', label: 'Bovinos' },
+  { key: 'horses', label: 'Equinos' },
+  { key: 'general', label: 'Geral' },
+];
 
 interface MedicineDetailModalProps {
   medicine: Medicine;
   onClose: () => void;
-}
-
-const TABS = [
-  { key: 'sobre', label: 'Sobre' },
-  { key: 'indicacoes', label: 'Indicações e Contraindicações' },
-  { key: 'administracao', label: 'Administração e Doses' },
-  { key: 'apresentacoes', label: 'Apresentações e Concentrações' },
-] as const;
-
-type Tab = (typeof TABS)[number]['key'];
-type SpeciesKey = 'dogs' | 'cats' | 'cattle' | 'horses';
-
-const SPECIES_OPTIONS: { key: SpeciesKey; label: string }[] = [
-  { key: 'dogs', label: 'Cão' },
-  { key: 'cats', label: 'Gato' },
-  { key: 'cattle', label: 'Bovino' },
-  { key: 'horses', label: 'Equino' },
-];
-
-function parseDoseRange(entry: DoseEntry | undefined): { min: number; max: number } | null {
-  if (!entry?.dose || !entry?.unit) return null;
-  if (!entry.unit.toLowerCase().includes('/kg')) return null;
-  const match = entry.dose.match(/(\d+(?:[.,]\d+)?)\s*(?:a\s*(\d+(?:[.,]\d+)?))?/);
-  if (!match) return null;
-  const min = parseFloat(match[1]!.replace(',', '.'));
-  const max = match[2] ? parseFloat(match[2].replace(',', '.')) : min;
-  if (isNaN(min)) return null;
-  return { min, max };
-}
-
-function formatDose(mg: number): string {
-  return mg >= 1000
-    ? `${(mg / 1000).toFixed(2).replace(/\.?0+$/, '')} g`
-    : `${mg % 1 === 0 ? mg : mg.toFixed(2)} mg`;
-}
-
-function ListSection({
-  icon: Icon,
-  label,
-  items,
-  iconColor,
-  bgColor,
-}: {
-  icon: React.ElementType;
-  label: string;
-  items: string[];
-  iconColor: string;
-  bgColor: string;
-}) {
-  if (!items.length) return null;
-  return (
-    <div className={`rounded-xl border p-4 ${bgColor}`}>
-      <div className="flex items-center gap-2 mb-3">
-        <Icon size={15} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-          {label}
-        </span>
-      </div>
-      <ul className="space-y-2">
-        {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-300">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${iconColor.replace('text-', 'bg-')}`} />
-            {item}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function InfoCard({
-  icon: Icon,
-  label,
-  value,
-  iconColor,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string | undefined;
-  iconColor: string;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-      <div className="flex items-center gap-2">
-        <Icon size={14} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-          {label}
-        </span>
-      </div>
-      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-        {value || <span className="text-slate-400 dark:text-slate-500 font-normal">—</span>}
-      </p>
-    </div>
-  );
-}
-
-function TextBlock({
-  icon: Icon,
-  label,
-  value,
-  iconColor,
-  borderColor,
-  bgColor,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string | undefined;
-  iconColor: string;
-  borderColor: string;
-  bgColor: string;
-}) {
-  if (!value) return null;
-  return (
-    <div className={`rounded-xl border p-4 ${borderColor} ${bgColor}`}>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon size={14} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-          {label}
-        </span>
-      </div>
-      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{value}</p>
-    </div>
-  );
 }
 
 export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalProps) {

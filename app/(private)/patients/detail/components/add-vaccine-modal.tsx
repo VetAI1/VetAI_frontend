@@ -6,12 +6,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
+import { Autocomplete } from '@/app/components/forms/autocomplete';
 import { DateInput } from '@/app/components/forms/date-input';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
-import { SearchSelect } from '@/app/components/forms/search-select';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
-import { usePaginatedResource } from '@/hooks/use-paginated-resource';
+import { useAutoComplete } from '@/hooks/use-auto-complete';
 import { vaccineDoseSchema, type VaccineDoseFormData } from '@/schemas/vaccine';
 import { healthRecordsService } from '@/services/health-records.service';
 import { vaccinesService } from '@/services/vaccines.service';
@@ -39,11 +39,13 @@ export function AddVaccineModal({
   const {
     items: catalogVaccines,
     loading: loadingCatalog,
+    loadingMore: loadingMoreCatalog,
+    hasMorePage: hasMoreCatalog,
+    loadNextPage: loadNextCatalogPage,
     search: vaccineSearch,
     setSearch: setVaccineSearch,
-  } = usePaginatedResource<Vaccine, { search?: string }>({
+  } = useAutoComplete<Vaccine>({
     fetcher: vaccinesService.list,
-    initialFilters: { search: '' },
     pageSize: 20,
     debounceMs: 300,
   });
@@ -170,18 +172,19 @@ export function AddVaccineModal({
       maxWidth="md"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <SearchSelect
+        <Autocomplete
           label="Vacina"
           required
           placeholder="Buscar vacina no catálogo..."
           search={vaccineSearch}
           onSearchChange={setVaccineSearch}
-          options={catalogVaccines.map((vaccine) => ({
-            id: vaccine.id,
-            label: vaccine.name,
-            description: vaccine.code,
-          }))}
+          items={catalogVaccines}
+          getOptionLabel={(vaccine) => vaccine.name}
+          getOptionDescription={(vaccine) => vaccine.code}
           loading={loadingCatalog}
+          loadingMore={loadingMoreCatalog}
+          hasMorePage={hasMoreCatalog}
+          onLoadNextPage={loadNextCatalogPage}
           open={showVaccineDropdown}
           onOpenChange={setShowVaccineDropdown}
           selectedOption={
@@ -193,11 +196,7 @@ export function AddVaccineModal({
               }
               : null
           }
-          onSelect={(option) => {
-            const vaccine = catalogVaccines.find(
-              (item) => item.id === option.id,
-            );
-            if (!vaccine) return;
+          onSelect={(vaccine) => {
             void handleSelectVaccine(vaccine);
           }}
           onClear={() => {

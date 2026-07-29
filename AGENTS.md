@@ -92,8 +92,8 @@ All forms **must** follow these conventions:
 
 - `components/ui/` — shadcn/ui primitives (button, input, label, switch, tooltip, carousel, progress, skeleton)
 - `app/components/layout/` — Sidebar, Header, AuthGuard
-- `app/components/common/` — Modal, Badge, Card, Reveal, Counter, ConfirmModal, PasswordStrength, Switch
-- `app/components/forms/` — InputWithLabel, SelectInput, SearchSelect, DateInput, TimeInput, FormTextarea, FileDropzone, FieldShell
+- `app/components/common/` — Modal, Badge, Card, Reveal, Counter, ConfirmModal, PasswordStrength, Switch, InfiniteScroll
+- `app/components/forms/` — InputWithLabel, SelectInput, Autocomplete, DateInput, TimeInput, FormTextarea, FileDropzone, FieldShell
 - `app/components/data/` — DataTable, SectionCard, StatCard
 - `app/components/business/` — Domain components (PatientModal, TutorModal, UploadExamModal, ConsultationHistory, etc.)
 
@@ -104,7 +104,13 @@ All async data fetching states across pages, tables, cards, stat metrics, and se
 1. **Primitive**: Use `<Skeleton className="..." />` (renders an animated pulse block with `bg-slate-200 dark:bg-slate-800`).
 2. **Tables**: `DataTable` handles loading via `loading={true}` prop, rendering skeleton rows matching header count.
 3. **Cards & Metrics**: Stat cards and analytics charts render skeleton blocks corresponding to their dimensions while fetching.
-4. **Spinners Limit**: `<Loader2 className="animate-spin" />` is strictly reserved for inline button submission states (`<Button loading={saving}>`) or search input indicators (`SearchSelect`), NOT for layout or page data loading.
+4. **Spinners Limit**: `<Loader2 className="animate-spin" />` is strictly reserved for inline button submission states (`<Button loading={saving}>`) or search input indicators (`Autocomplete`), NOT for layout or page data loading.
+
+### Reusable Components and Hooks
+
+- Prefer existing system components and hooks over page-specific implementations whenever they satisfy the requirement.
+- For remote, searchable, paginated selectors, use `Autocomplete` with `useAutoComplete`; do not duplicate search debouncing, pagination, scroll loading, or option-list state in pages and modals.
+- Use `InfiniteScroll` for reusable, paginated scroll containers instead of implementing scroll-end detection in feature components.
 
 ### Paginated Table Standard Pattern (usePaginatedResource + DataTable)
 
@@ -185,7 +191,58 @@ All paginated data listing pages **must** follow the standard pattern combining 
 
 - **React Context**: AuthContext (`@/infra/auth-context`) for authentication state, ThemeContext (`@/contexts/theme-context`) for theme
 - **Custom Hooks**: `usePaginatedResource` for paginated lists, `useConsultation` for real-time chat, `useReveal` for scroll animations
+- **Modal Context**: Always use `useModal` from `@/contexts/modal-context` to open application modals. Do not create page-level `useState` solely to control modal visibility.
 - **Local State**: `useState`/`useCallback` for page-level state
+
+### Modal Pattern
+
+Use the global modal stack through `useModal`. `open` receives one object and returns the modal id. It manages stacking, Escape, click outside, page scroll locking, focus restoration, position, and animations.
+
+```tsx
+const { open, close, closeAll } = useModal();
+
+open({
+  content: ({ close }) => <PatientForm onClose={close} />,
+  position: 'center',
+  closeOnOutsideClick: true,
+  closeOnEscape: true,
+});
+```
+
+- `close()` closes the current (top) modal.
+- `close(id)` closes a specific modal returned by `open`.
+- `closeAll()` closes every modal in the stack.
+- `position` accepts `center` (default), `top`, `right`, `bottom`, or `left`; animation follows the chosen position.
+- `content` owns its layout and dimensions. Do not add width options to the modal stack API.
+
+### Confirmation Pattern
+
+Use `useConfirmation` from `@/contexts/confirmation-context` for user confirmation flows. Do not create local state or render `ConfirmModal` directly for new confirmations.
+
+```tsx
+const { confirm } = useConfirmation();
+
+confirm({
+  title: 'Excluir paciente?',
+  description: 'Esta ação não pode ser desfeita.',
+  variant: 'danger',
+  icon: Trash2,
+  confirmLabel: 'Excluir',
+  cancelLabel: 'Manter paciente',
+  onConfirm: async () => {
+    await patientsService.delete(patient.id);
+    removeItem((item) => item.id === patient.id);
+  },
+  onCancel: () => {
+    trackCancellation();
+  },
+});
+```
+
+- `variant` accepts `default`, `alert`, and `danger`.
+- `onConfirm` may be asynchronous; the confirmation stays open with its primary button loading until it finishes successfully.
+- An error thrown by `onConfirm` keeps the confirmation open. Handle user feedback, such as a toast, inside the callback.
+- Customize `icon`, button labels, outside-click behavior, and Escape behavior through the options object.
 
 ### Workflow Rules
 

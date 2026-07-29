@@ -26,7 +26,7 @@ export interface SelectInputProps {
   required?: boolean;
   id?: string;
   compact?: boolean;
-  control?: Control<any>;
+  control?: Control<any> | any;
   name?: string;
 }
 

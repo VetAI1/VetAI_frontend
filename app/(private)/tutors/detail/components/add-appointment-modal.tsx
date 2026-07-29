@@ -1,14 +1,21 @@
 'use client';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
 import { DateInput } from '@/app/components/forms/date-input';
+import { FormTextarea } from '@/app/components/forms/form-textarea';
+import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { TimeInput } from '@/app/components/forms/time-input';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import {
+  appointmentSchema,
+  type AppointmentFormData,
+} from '@/schemas/appointment';
 import { appointmentsService } from '@/services/appointments.service';
 import {
   APPOINTMENT_TYPE_LABELS,
@@ -24,134 +31,160 @@ interface AddAppointmentModalProps {
   onSuccess: (appointment: Appointment) => void;
 }
 
-const inputCls = 'w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500';
-
-const TYPE_OPTIONS = (Object.keys(APPOINTMENT_TYPE_LABELS) as AppointmentType[]).map((t) => ({
+const TYPE_OPTIONS = (
+  Object.keys(APPOINTMENT_TYPE_LABELS) as AppointmentType[]
+).map((t) => ({
   value: t,
   label: APPOINTMENT_TYPE_LABELS[t],
 }));
 
-export function AddAppointmentModal({ tutorId, pets, onClose, onSuccess }: AddAppointmentModalProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [type, setType] = useState<AppointmentType>('CONSULTATION');
-  const [patientId, setPatientId] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+export function AddAppointmentModal({
+  tutorId,
+  pets,
+  onClose,
+  onSuccess,
+}: AddAppointmentModalProps) {
+  const [generalError, setGeneralError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<AppointmentFormData>({
+    resolver: yupResolver(appointmentSchema) as any,
+    defaultValues: {
+      title: '',
+      description: '',
+      date: '',
+      start_time: '',
+      end_time: '',
+      type: 'CONSULTATION',
+      tutor_id: tutorId,
+      patient_id: '',
+    },
+  });
 
   const petOptions = pets.map((p) => ({ value: p.id, label: p.name }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs: Record<string, string> = {};
-    if (!title.trim()) errs.title = 'Título é obrigatório';
-    if (!date) errs.date = 'Data é obrigatória';
-    if (!startTime) errs.startTime = 'Horário de início é obrigatório';
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    setErrors({});
-    setSaving(true);
+  const onSubmit = async (data: AppointmentFormData) => {
+    setGeneralError(null);
     try {
       const result = await appointmentsService.create({
-        title: title.trim(),
-        ...(description.trim() ? { description: description.trim() } : {}),
-        date,
-        start_time: startTime,
-        ...(endTime ? { end_time: endTime } : {}),
-        type,
+        title: data.title.trim(),
+        ...(data.description?.trim()
+          ? { description: data.description.trim() }
+          : {}),
+        date: data.date,
+        start_time: data.start_time,
+        ...(data.end_time ? { end_time: data.end_time } : {}),
+        type: data.type as AppointmentType,
         tutor_id: tutorId,
-        ...(patientId ? { patient_id: patientId } : {}),
+        ...(data.patient_id ? { patient_id: data.patient_id } : {}),
       });
       onSuccess(result);
     } catch {
-      setErrors({ general: 'Erro ao salvar. Tente novamente.' });
-    } finally {
-      setSaving(false);
+      setGeneralError('Erro ao salvar. Tente novamente.');
     }
   };
 
   return (
-    <Modal title="Novo Agendamento" description="Agende uma atividade para este tutor" onClose={onClose}>
-      <form onSubmit={(e) => { void handleSubmit(e); }} className="flex flex-col gap-4">
-
-        <div>
-          <Label required className="mb-1.5">Título</Label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Ex: Consulta de rotina"
-            className={inputCls}
-          />
-          {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
-        </div>
+    <Modal
+      title="Novo Agendamento"
+      description="Agende uma atividade para este tutor"
+      onClose={onClose}
+    >
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
+        <InputWithLabel
+          label="Título"
+          required
+          placeholder="Ex: Consulta de rotina"
+          error={errors.title?.message}
+          {...register('title')}
+        />
 
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <DateInput
-              label="Data"
-              value={date}
-              onChange={setDate}
-              required
-              error={errors.date}
-            />
-          </div>
-          <div>
-            <Label required className="mb-1.5">Tipo</Label>
-            <SelectInput
-              value={type}
-              onChange={(v) => setType(v as AppointmentType)}
-              options={TYPE_OPTIONS}
-            />
-          </div>
+          <DateInput
+            label="Data"
+            value={watch('date') ?? ''}
+            onChange={(v) => setValue('date', v, { shouldValidate: true })}
+            required
+            error={errors.date?.message}
+          />
+          <SelectInput
+            label="Tipo"
+            required
+            control={control}
+            name="type"
+            options={TYPE_OPTIONS}
+            error={errors.type?.message}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <TimeInput
             label="Horário início"
             required
-            value={startTime}
-            onChange={setStartTime}
+            value={watch('start_time') ?? ''}
+            onChange={(v) =>
+              setValue('start_time', v, { shouldValidate: true })
+            }
+            error={errors.start_time?.message}
           />
           <TimeInput
             label="Horário fim"
-            value={endTime}
-            onChange={setEndTime}
+            value={watch('end_time') ?? ''}
+            onChange={(v) => setValue('end_time', v)}
+            error={errors.end_time?.message}
           />
         </div>
-        {errors.startTime && <p className="-mt-2 text-xs text-red-500">{errors.startTime}</p>}
 
         {petOptions.length > 0 && (
-          <div>
-            <Label className="mb-1.5">Pet (opcional)</Label>
-            <SelectInput
-              value={patientId}
-              onChange={setPatientId}
-              options={petOptions}
-              placeholder="Selecione um pet..."
-            />
-          </div>
+          <SelectInput
+            label="Pet (opcional)"
+            control={control}
+            name="patient_id"
+            options={petOptions}
+            placeholder="Selecione um pet..."
+            error={errors.patient_id?.message}
+          />
         )}
 
-        <div>
-          <Label className="mb-1.5">Descrição</Label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Observações..."
-            rows={2}
-            className={`${inputCls} resize-none`}
-          />
-        </div>
+        <FormTextarea
+          label="Descrição"
+          placeholder="Observações..."
+          rows={2}
+          control={control}
+          name="description"
+          error={errors.description?.message}
+        />
 
-        {errors.general && <p className="text-sm text-red-500">{errors.general}</p>}
+        {generalError && <p className="text-sm text-red-500">{generalError}</p>}
 
         <div className="flex justify-end gap-2 pt-1">
-          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
-          <Button type="submit" disabled={saving} className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600">
-            {saving ? <Loader2 size={16} className="animate-spin" /> : 'Agendar'}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600"
+          >
+            {isSubmitting ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              'Agendar'
+            )}
           </Button>
         </div>
       </form>
