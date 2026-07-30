@@ -1,8 +1,13 @@
 'use client';
 
+import { useState } from 'react';
+
 import { fmtDateTime } from '../utils';
 
+import { Modal } from '@/app/components/common/modal';
+import { Button } from '@/components/ui/button';
 import {
+  EVALUATION_LABELS,
   EVALUATION_TEXT_COLORS,
   VITAL_DEFINITIONS,
   evaluateVital,
@@ -19,6 +24,7 @@ export function VitalHistoryTable({
   specie,
   records,
 }: VitalHistoryTableProps) {
+  const [selected, setSelected] = useState<VitalRecord | null>(null);
   const ordered = [...records].reverse();
 
   if (ordered.length === 0) {
@@ -55,7 +61,9 @@ export function VitalHistoryTable({
           {ordered.map((record) => (
             <tr
               key={record.id}
-              className="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+              onClick={() => setSelected(record)}
+              title="Clique para ver os detalhes da aferição"
+              className="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer"
             >
               <td className="p-3 whitespace-nowrap text-slate-600 dark:text-slate-300">
                 {fmtDateTime(record.measured_at)}
@@ -95,6 +103,88 @@ export function VitalHistoryTable({
           ))}
         </tbody>
       </table>
+
+      {selected && (
+        <Modal
+          title="Detalhes da Aferição"
+          description={`${fmtDateTime(selected.measured_at)}${selected.recorded_by ? ` · ${selected.recorded_by.name}` : ''}`}
+          onClose={() => setSelected(null)}
+          maxWidth="lg"
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {VITAL_DEFINITIONS.map((def) => {
+                const value = selected[def.key];
+                const hasValue = value !== undefined && value !== null;
+                const evaluation = evaluateVital(specie, def.key, value);
+                return (
+                  <div
+                    key={def.key}
+                    className="rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 px-3 py-2"
+                  >
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                      {def.label}
+                    </p>
+                    <p
+                      className={`text-sm font-semibold ${hasValue ? EVALUATION_TEXT_COLORS[evaluation] : 'text-slate-300 dark:text-slate-600'}`}
+                    >
+                      {hasValue ? `${value} ${def.unit}` : '—'}
+                    </p>
+                    {hasValue &&
+                      evaluation !== 'normal' &&
+                      evaluation !== 'unknown' && (
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                        {EVALUATION_LABELS[evaluation]} da faixa
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {(selected.clinical_values?.length ?? 0) > 0 && (
+              <div>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Parâmetros Clínicos
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {selected.clinical_values?.map((item) => (
+                    <div
+                      key={item.name}
+                      className="rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 px-3 py-2"
+                    >
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                        {item.name}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                        {item.value}
+                        {item.unit ? ` ${item.unit}` : ''}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {selected.notes && (
+              <div>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Observações
+                </p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  {selected.notes}
+                </p>
+              </div>
+            )}
+
+            <div className="flex justify-end pt-2">
+              <Button variant="outline" onClick={() => setSelected(null)}>
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

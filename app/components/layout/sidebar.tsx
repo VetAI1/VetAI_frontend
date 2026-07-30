@@ -86,7 +86,7 @@ export function Sidebar() {
     {
       href: '/monitoring',
       icon: SquareActivity,
-      label: 'Monitoramento',
+      label: 'Internação',
       permission: 'monitoring:view',
     },
     {

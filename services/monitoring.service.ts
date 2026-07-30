@@ -3,6 +3,7 @@ import type { PaginatedResponse, QueryParams } from '@/types/common';
 import type {
   Box,
   ClinicalParameter,
+  ClinicalParameterValueType,
   CreateEventPayload,
   CreateHospitalizationPayload,
   CreatePrescriptionPayload,
@@ -232,7 +233,11 @@ export const monitoringService = {
   listParameters: () =>
     httpClient<ClinicalParameter[]>('monitoring/clinical-parameters'),
 
-  createParameter: (data: { name: string; unit?: string }) =>
+  createParameter: (data: {
+    name: string;
+    unit?: string;
+    value_type?: ClinicalParameterValueType;
+  }) =>
     httpClient<ClinicalParameter>('monitoring/clinical-parameters', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -243,6 +248,7 @@ export const monitoringService = {
     data: {
       name?: string | undefined;
       unit?: string | undefined;
+      value_type?: ClinicalParameterValueType | undefined;
       active?: boolean | undefined;
     },
   ) =>

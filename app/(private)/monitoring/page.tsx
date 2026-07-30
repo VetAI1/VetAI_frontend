@@ -43,7 +43,7 @@ export default function Monitoring() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
-        <Header title="Monitoramento" showStorage={false} />
+        <Header title="Internação" showStorage={false} />
 
         <div className="border-b border-slate-200 dark:border-slate-700 mb-6 -mt-2 overflow-x-auto overflow-y-hidden scrollbar-thin">
           <nav className="flex gap-1 min-w-max">

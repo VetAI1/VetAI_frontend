@@ -174,6 +174,10 @@ export type BoxFormData = yup.InferType<typeof boxSchema>;
 export const clinicalParameterSchema = yup.object({
   name: yup.string().trim().required('Nome é obrigatório'),
   unit: yup.string().optional(),
+  value_type: yup
+    .mixed<'NUMBER' | 'TEXT'>()
+    .oneOf(['NUMBER', 'TEXT'], 'Tipo inválido')
+    .required('Tipo é obrigatório'),
 });
 
 export type ClinicalParameterFormData = yup.InferType<

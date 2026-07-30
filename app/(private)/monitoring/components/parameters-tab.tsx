@@ -9,6 +9,7 @@ import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import { Modal } from '@/app/components/common/modal';
 import { SectionCard } from '@/app/components/data/section-card';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
+import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
 import {
   clinicalParameterSchema,
@@ -40,6 +41,7 @@ function ParameterFormModal({
     defaultValues: {
       name: parameter?.name ?? '',
       unit: parameter?.unit ?? '',
+      value_type: parameter?.value_type ?? 'TEXT',
     },
   });
 
@@ -50,11 +52,13 @@ function ParameterFormModal({
         await monitoringService.updateParameter(parameter.id, {
           name: data.name,
           unit: data.unit || undefined,
+          value_type: data.value_type,
         });
       } else {
         await monitoringService.createParameter({
           name: data.name,
           ...(data.unit ? { unit: data.unit } : {}),
+          value_type: data.value_type,
         });
       }
       onSuccess();
@@ -84,19 +88,38 @@ function ParameterFormModal({
             />
           )}
         />
-        <Controller
-          name="unit"
-          control={control}
-          render={({ field }) => (
-            <InputWithLabel
-              label="Unidade"
-              placeholder="Ex: mg/dL (opcional)"
-              value={field.value ?? ''}
-              onChange={field.onChange}
-              error={errors.unit?.message}
-            />
-          )}
-        />
+        <div className="grid grid-cols-2 gap-3">
+          <Controller
+            name="unit"
+            control={control}
+            render={({ field }) => (
+              <InputWithLabel
+                label="Unidade"
+                placeholder="Ex: mg/dL (opcional)"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                error={errors.unit?.message}
+              />
+            )}
+          />
+          <Controller
+            name="value_type"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                label="Tipo do valor"
+                required
+                value={field.value}
+                onChange={field.onChange}
+                options={[
+                  { value: 'NUMBER', label: 'Número' },
+                  { value: 'TEXT', label: 'Texto' },
+                ]}
+                error={errors.value_type?.message}
+              />
+            )}
+          />
+        </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
@@ -184,7 +207,7 @@ export function ParametersTab() {
               key={parameter.id}
               className="flex items-center justify-between gap-3 py-3"
             >
-              <div className="min-w-0">
+              <div className="min-w-0 flex items-center gap-2">
                 <p className="text-sm font-medium text-slate-900 dark:text-white">
                   {parameter.name}
                   {parameter.unit && (
@@ -194,6 +217,9 @@ export function ParametersTab() {
                     </span>
                   )}
                 </p>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 shrink-0">
+                  {parameter.value_type === 'NUMBER' ? 'Número' : 'Texto'}
+                </span>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <button

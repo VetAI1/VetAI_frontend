@@ -14,7 +14,7 @@ import {
   Stethoscope,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { RISK_MAP, STATUS_MAP, daysSince, dayRangeISO, fmtDate, todayLocalISODate } from '../utils';
 import { HospitalizeModal } from './hospitalize-modal';
@@ -38,6 +38,7 @@ import type { PaginatedQueryParams } from '@/types/common';
 import type {
   Box,
   Hospitalization,
+  HospitalizationStatus,
   MonitoringSummary,
 } from '@/types/monitoring';
 import type { Collaborator } from '@/types/settings';
@@ -46,6 +47,22 @@ const SPECIE_ICONS: Record<string, typeof PawPrint> = {
   DOG: Dog,
   CAT: Cat,
   BIRD: Bird,
+};
+
+const GROUP_ORDER: HospitalizationStatus[] = [
+  'HOSPITALIZED',
+  'TRIAGE',
+  'DISCHARGED',
+  'DECEASED',
+  'CANCELLED',
+];
+
+const GROUP_LABELS: Record<HospitalizationStatus, string> = {
+  HOSPITALIZED: 'Internados',
+  TRIAGE: 'Em triagem',
+  DISCHARGED: 'Alta',
+  DECEASED: 'Óbito',
+  CANCELLED: 'Canceladas',
 };
 
 function cadenceFor(hospitalization: Hospitalization) {
@@ -102,6 +119,17 @@ export function HospitalizedTab() {
     mode: 'append',
     debounceMs: 300,
   });
+
+  const groups = useMemo(
+    () =>
+      GROUP_ORDER.map((groupStatus) => ({
+        status: groupStatus,
+        items: hospitalizations.filter(
+          (hospitalization) => hospitalization.status === groupStatus,
+        ),
+      })).filter((group) => group.items.length > 0),
+    [hospitalizations],
+  );
 
   const fetchSummary = useCallback(async () => {
     setSummaryLoading(true);
@@ -246,87 +274,102 @@ export function HospitalizedTab() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-            {hospitalizations.map((hospitalization) => {
-              const SpecieIcon =
+          <div className="space-y-6">
+            {groups.map((group) => (
+              <div key={group.status}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full ${STATUS_MAP[group.status].dot}`}
+                  />
+                  <h2 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">
+                    {GROUP_LABELS[group.status]}
+                  </h2>
+                  <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
+                    ({group.items.length})
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                  {group.items.map((hospitalization) => {
+                    const SpecieIcon =
                 SPECIE_ICONS[hospitalization.patient?.specie ?? ''] ?? PawPrint;
-              const status = STATUS_MAP[hospitalization.status];
-              const risk = RISK_MAP[hospitalization.risk];
-              return (
-                <button
-                  key={hospitalization.id}
-                  type="button"
-                  onClick={() =>
-                    router.push(`/monitoring/detail?id=${hospitalization.id}`)
-                  }
-                  className="text-left bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-teal-300 dark:hover:border-teal-700 transition-all p-4"
-                >
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 shrink-0">
-                        <SpecieIcon size={22} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold text-slate-900 dark:text-white truncate">
-                          {hospitalization.patient?.name}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                          {hospitalization.patient?.breed || '—'}
-                        </p>
-                      </div>
-                    </div>
-                    {hospitalization.allergies.length > 0 && (
-                      <span
-                        title={`Alergias: ${hospitalization.allergies.join(', ')}`}
-                        className="text-amber-500 shrink-0"
+                    const status = STATUS_MAP[hospitalization.status];
+                    const risk = RISK_MAP[hospitalization.risk];
+                    return (
+                      <button
+                        key={hospitalization.id}
+                        type="button"
+                        onClick={() =>
+                          router.push(`/monitoring/detail?id=${hospitalization.id}`)
+                        }
+                        title={risk.label}
+                        className={`text-left bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 border-l-4 ${risk.border} shadow-sm hover:shadow-md transition-all p-4`}
                       >
-                        <AlertTriangle size={18} />
-                      </span>
-                    )}
-                  </div>
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 shrink-0">
+                              <SpecieIcon size={22} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-slate-900 dark:text-white truncate">
+                                {hospitalization.patient?.name}
+                              </p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                                {hospitalization.patient?.breed || '—'}
+                              </p>
+                            </div>
+                          </div>
+                          {hospitalization.allergies.length > 0 && (
+                            <span
+                              title={`Alergias: ${hospitalization.allergies.join(', ')}`}
+                              className="text-amber-500 shrink-0"
+                            >
+                              <AlertTriangle size={18} />
+                            </span>
+                          )}
+                        </div>
 
-                  <div className="flex flex-wrap gap-1.5 mb-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${status.badge}`}>
-                      {status.label}
-                    </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${risk.badge}`}>
-                      {risk.label}
-                    </span>
-                    {hospitalization.clinical_status && (
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${CLINICAL_STATUS_CLASSES[hospitalization.clinical_status]}`}
-                      >
-                        {CLINICAL_STATUS_LABELS[hospitalization.clinical_status]}
-                      </span>
-                    )}
-                    {cadenceFor(hospitalization)?.overdue && (
-                      <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${status.badge}`}>
+                            {status.label}
+                          </span>
+                          {hospitalization.clinical_status && (
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${CLINICAL_STATUS_CLASSES[hospitalization.clinical_status]}`}
+                            >
+                              {CLINICAL_STATUS_LABELS[hospitalization.clinical_status]}
+                            </span>
+                          )}
+                          {cadenceFor(hospitalization)?.overdue && (
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
                         Aferição atrasada
-                      </span>
-                    )}
-                  </div>
+                            </span>
+                          )}
+                        </div>
 
-                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-                    <p className="flex items-center gap-1.5">
-                      <Stethoscope size={13} className="text-slate-400 shrink-0" />
-                      <span className="truncate">{hospitalization.veterinarian?.name ?? '—'}</span>
-                    </p>
-                    <p className="flex items-center gap-1.5">
-                      <BedDouble size={13} className="text-slate-400 shrink-0" />
-                      {hospitalization.box?.name ?? 'Sem box'}
-                    </p>
-                    <p className="flex items-center gap-1.5">
-                      <CalendarClock size={13} className="text-slate-400 shrink-0" />
-                      {daysSince(hospitalization.admitted_at)}{' '}
-                      {daysSince(hospitalization.admitted_at) === 1 ? 'dia' : 'dias'} internado
-                      {hospitalization.expected_discharge_at
-                        ? ` · alta prevista ${fmtDate(hospitalization.expected_discharge_at)}`
-                        : ''}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
+                        <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                          <p className="flex items-center gap-1.5">
+                            <Stethoscope size={13} className="text-slate-400 shrink-0" />
+                            <span className="truncate">{hospitalization.veterinarian?.name ?? '—'}</span>
+                          </p>
+                          <p className="flex items-center gap-1.5">
+                            <BedDouble size={13} className="text-slate-400 shrink-0" />
+                            {hospitalization.box?.name ?? 'Sem box'}
+                          </p>
+                          <p className="flex items-center gap-1.5">
+                            <CalendarClock size={13} className="text-slate-400 shrink-0" />
+                            {daysSince(hospitalization.admitted_at)}{' '}
+                            {daysSince(hospitalization.admitted_at) === 1 ? 'dia' : 'dias'} internado
+                            {hospitalization.expected_discharge_at
+                              ? ` · alta prevista ${fmtDate(hospitalization.expected_discharge_at)}`
+                              : ''}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
 
           {hasMorePage && (

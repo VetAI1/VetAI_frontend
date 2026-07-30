@@ -22,7 +22,7 @@ export const PERMISSION_CATEGORIES = [
   },
   {
     key: 'monitoring',
-    label: 'Monitoramento',
+    label: 'Internação',
     permissions: ['monitoring:view', 'monitoring:edit'],
   },
   {

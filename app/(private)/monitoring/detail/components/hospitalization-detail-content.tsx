@@ -2,6 +2,7 @@
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+  Activity,
   AlertTriangle,
   ArrowLeft,
   ArrowRightLeft,
@@ -12,6 +13,7 @@ import {
   ClipboardList,
   Clock,
   FileDown,
+  History,
   Loader2,
   MessageSquarePlus,
   MoveRight,
@@ -37,7 +39,6 @@ import { HospitalizeModal } from '../../components/hospitalize-modal';
 import { PrescriptionModal } from '../../components/prescription-modal';
 import {
   OccurrenceModal,
-  ParametersModal,
   WeightModal,
 } from '../../components/quick-add-modals';
 import { VitalHistoryTable } from '../../components/vital-history-table';
@@ -50,6 +51,7 @@ import {
   EVENT_TYPE_LABELS,
   fmtDate,
   fmtDateTime,
+  fmtTime,
   FREQUENCY_LABELS,
   nowDateTimeLocal,
   PRESCRIPTION_TYPE_MAP,
@@ -70,6 +72,7 @@ import { Button } from '@/components/ui/button';
 import {
   evaluateCadence,
   formatVitalDuration,
+  SPECIE_LABELS,
   VITAL_DEFINITIONS,
 } from '@/constants';
 import { dischargeSchema, type DischargeFormData } from '@/schemas/monitoring';
@@ -83,8 +86,14 @@ import type {
   VitalRecord,
 } from '@/types/monitoring';
 import type { Specie } from '@/types/patient';
+import { calcAge } from '@/utils/date-format';
 
 type CloseAction = 'discharge' | 'decease' | 'cancel';
+
+const SEX_LABELS: Record<string, string> = {
+  MALE: 'Macho',
+  FEMALE: 'Fêmea',
+};
 
 const CLOSE_ACTION_INFO: Record<
   CloseAction,
@@ -411,6 +420,7 @@ export function HospitalizationDetailContent() {
   const [executingSOS, setExecutingSOS] = useState<HospPrescription | null>(null);
 
   const [quickAdd, setQuickAdd] = useState<'occurrence' | 'weight' | 'parameters' | null>(null);
+  const [detailTab, setDetailTab] = useState<'care' | 'history'>('care');
 
   const [vitals, setVitals] = useState<VitalRecord[]>([]);
   const [vitalsLoading, setVitalsLoading] = useState(false);
@@ -570,8 +580,20 @@ export function HospitalizationDetailContent() {
       });
     }
 
+    for (const vital of vitals) {
+      items.push({
+        key: `vital-${vital.id}`,
+        date: vital.measured_at,
+        icon: Activity,
+        iconClass: 'text-teal-600 bg-teal-50 dark:text-teal-400 dark:bg-teal-900/20',
+        title: 'Realizou uma nova aferição',
+        ...(vital.notes ? { description: vital.notes } : {}),
+        ...(vital.recorded_by?.name ? { user: vital.recorded_by.name } : {}),
+      });
+    }
+
     return items.sort((a, b) => (a.date < b.date ? 1 : -1));
-  }, [events, executions]);
+  }, [events, executions, vitals]);
 
   if (!id) {
     return (
@@ -601,6 +623,30 @@ export function HospitalizationDetailContent() {
     hospitalization.monitoring_interval_minutes,
     lastVital?.measured_at,
   );
+
+  const patientFacts = [
+    {
+      label: 'Espécie',
+      value: SPECIE_LABELS[patientSpecie] ?? hospitalization.patient?.specie ?? '—',
+    },
+    { label: 'Raça', value: hospitalization.patient?.breed || '—' },
+    {
+      label: 'Sexo',
+      value: SEX_LABELS[hospitalization.patient?.sex ?? ''] ?? '—',
+    },
+    {
+      label: 'Idade',
+      value: hospitalization.patient?.birth_date
+        ? calcAge(new Date(hospitalization.patient.birth_date))
+        : '—',
+    },
+    {
+      label: 'Peso',
+      value: hospitalization.weight_kg
+        ? `${hospitalization.weight_kg.toLocaleString('pt-BR')} kg`
+        : '—',
+    },
+  ];
 
   const refreshAll = () => {
     void fetchHospitalization();
@@ -769,6 +815,22 @@ export function HospitalizationDetailContent() {
           </div>
         </div>
 
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+          {patientFacts.map((fact) => (
+            <div
+              key={fact.label}
+              className="rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 px-3 py-2"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                {fact.label}
+              </p>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                {fact.value}
+              </p>
+            </div>
+          ))}
+        </div>
+
         {(hospitalization.complaint ||
           hospitalization.diagnosis ||
           hospitalization.prognosis ||
@@ -816,264 +878,315 @@ export function HospitalizationDetailContent() {
         )}
       </div>
 
-      <SectionCard
-        title="Sinais Vitais"
-        subtitle={
-          cadence?.overdue
-            ? cadence.neverMeasured
-              ? 'Nenhuma aferição registrada desde a admissão'
-              : `Aferição atrasada há ${formatVitalDuration(-(cadence.minutesUntilDue ?? 0))}`
-            : 'Aferições da internação, com faixas de referência por espécie'
-        }
-        headerAction={
-          isActive ? (
-            <Button
-              size="sm"
-              onClick={() => setShowVitalsModal(true)}
-              className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
-            >
-              <Plus size={14} />
-              Aferição
-            </Button>
-          ) : undefined
-        }
-      >
-        {vitalsLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="animate-spin text-teal-600" size={24} />
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <VitalSummaryCards specie={patientSpecie} records={vitals} />
+      <div className="border-b border-slate-200 dark:border-slate-700 overflow-x-auto overflow-y-hidden scrollbar-thin">
+        <nav className="flex gap-1 min-w-max">
+          <button
+            type="button"
+            onClick={() => setDetailTab('care')}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
+              detailTab === 'care'
+                ? 'border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            <Activity size={16} />
+            Acompanhamento
+          </button>
+          <button
+            type="button"
+            onClick={() => setDetailTab('history')}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
+              detailTab === 'history'
+                ? 'border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            <History size={16} />
+            Histórico da Internação
+          </button>
+        </nav>
+      </div>
 
-            {vitals.length > 0 && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {VITAL_DEFINITIONS.map((definition) => (
-                  <VitalsChart
-                    key={definition.key}
-                    specie={patientSpecie}
-                    definition={definition}
-                    records={vitals}
-                  />
-                ))}
+      {detailTab === 'care' && (
+        <>
+          <SectionCard
+            title="Sinais Vitais"
+            subtitle={
+              cadence?.overdue
+                ? cadence.neverMeasured
+                  ? 'Nenhuma aferição registrada desde a admissão'
+                  : `Aferição atrasada há ${formatVitalDuration(-(cadence.minutesUntilDue ?? 0))}`
+                : 'Aferições da internação, com faixas de referência por espécie'
+            }
+            headerAction={
+              isActive ? (
+                <Button
+                  size="sm"
+                  onClick={() => setShowVitalsModal(true)}
+                  className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+                >
+                  <Plus size={14} />
+              Aferição
+                </Button>
+              ) : undefined
+            }
+          >
+            {vitalsLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="animate-spin text-teal-600" size={24} />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <VitalSummaryCards specie={patientSpecie} records={vitals} />
+
+                {vitals.length > 0 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    {VITAL_DEFINITIONS.map((definition) => (
+                      <VitalsChart
+                        key={definition.key}
+                        specie={patientSpecie}
+                        definition={definition}
+                        records={vitals}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <VitalHistoryTable specie={patientSpecie} records={vitals} />
               </div>
             )}
+          </SectionCard>
 
-            <VitalHistoryTable specie={patientSpecie} records={vitals} />
-          </div>
-        )}
-      </SectionCard>
-
-      <SectionCard
-        title="Prescrição Médica"
-        subtitle="Medicamentos, procedimentos e fluidoterapias programados"
-        headerAction={
-          isActive ? (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowApplyTemplate(true)}
-              >
-                <ClipboardList size={14} />
+          <SectionCard
+            title="Prescrição Médica"
+            subtitle="Medicamentos, procedimentos e fluidoterapias programados"
+            headerAction={
+              isActive ? (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowApplyTemplate(true)}
+                  >
+                    <ClipboardList size={14} />
                 Carregar de modelo
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => setShowPrescription(true)}
-                className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
-              >
-                <Plus size={14} />
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setShowPrescription(true)}
+                    className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+                  >
+                    <Plus size={14} />
                 Prescrição
-              </Button>
-            </div>
-          ) : undefined
-        }
-      >
-        {prescriptionsLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 size={24} className="animate-spin text-teal-600" />
-          </div>
-        ) : prescriptions.length === 0 ? (
-          <div className="text-center py-8">
-            <Pill size={40} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
+                  </Button>
+                </div>
+              ) : undefined
+            }
+          >
+            {prescriptionsLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 size={24} className="animate-spin text-teal-600" />
+              </div>
+            ) : prescriptions.length === 0 ? (
+              <div className="text-center py-8">
+                <Pill size={40} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
               Nenhuma prescrição registrada
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {prescriptions.map((prescription) => {
-              const stats = executionStats.get(prescription.id);
-              const typeInfo = PRESCRIPTION_TYPE_MAP[prescription.type];
-              return (
-                <div
-                  key={prescription.id}
-                  className={`p-3 rounded-lg border border-slate-200 dark:border-slate-700 ${
-                    prescription.status === 'STOPPED' ? 'opacity-60' : ''
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-3 flex-wrap">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                          {prescription.name}
-                        </p>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${typeInfo.badge}`}>
-                          {typeInfo.label}
-                        </span>
-                        {prescription.status === 'STOPPED' && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400">
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {prescriptions.map((prescription) => {
+                  const stats = executionStats.get(prescription.id);
+                  const typeInfo = PRESCRIPTION_TYPE_MAP[prescription.type];
+                  return (
+                    <div
+                      key={prescription.id}
+                      className={`p-3 rounded-lg border border-slate-200 dark:border-slate-700 ${
+                        prescription.status === 'STOPPED' ? 'opacity-60' : ''
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                              {prescription.name}
+                            </p>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${typeInfo.badge}`}>
+                              {typeInfo.label}
+                            </span>
+                            {prescription.status === 'STOPPED' && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400">
                             Interrompida
-                          </span>
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            {FREQUENCY_LABELS[prescription.frequency]}
+                            {prescription.frequency === 'RECURRING'
+                              ? ` · a cada ${prescription.interval_hours}h por ${prescription.duration_days} dia(s)`
+                              : ''}
+                            {doseLabel(prescription) ? ` · ${doseLabel(prescription)}` : ''}
+                            {prescription.frequency !== 'AS_NEEDED'
+                              ? ` · início ${fmtDateTime(prescription.start_at)}`
+                              : ''}
+                          </p>
+                          {stats && stats.total > 0 && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1">
+                              <CheckCircle2 size={12} className="text-green-500" />
+                              {stats.done}/{stats.total} execuções concluídas
+                              {stats.nextPending
+                                ? ` · próxima ${fmtDateTime(stats.nextPending)}`
+                                : ''}
+                            </p>
+                          )}
+                          {prescription.notes && (
+                            <p className="text-xs text-slate-400 dark:text-slate-500 italic mt-0.5">
+                              {prescription.notes}
+                            </p>
+                          )}
+                        </div>
+                        {isActive && (
+                          <div className="flex gap-1 shrink-0">
+                            {prescription.frequency === 'AS_NEEDED' &&
+                          prescription.status === 'ACTIVE' && (
+                              <Button
+                                size="sm"
+                                onClick={() => setExecutingSOS(prescription)}
+                                disabled={hospitalization.status === 'TRIAGE'}
+                                className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+                                title={
+                                  hospitalization.status === 'TRIAGE'
+                                    ? 'Disponível quando o paciente estiver Internado'
+                                    : 'Registrar aplicação SOS'
+                                }
+                              >
+                              Executar SOS
+                              </Button>
+                            )}
+                            {prescription.status === 'ACTIVE' &&
+                          prescription.frequency !== 'AS_NEEDED' && (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  onClick={() => setRescheduling(prescription)}
+                                  title="Interromper e reprogramar"
+                                >
+                                  <Clock size={14} />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  onClick={() => setStopping(prescription)}
+                                  title="Interromper"
+                                  className="text-amber-600 hover:text-amber-700"
+                                >
+                                  <OctagonPause size={14} />
+                                </Button>
+                              </>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => setDeletingPrescription(prescription)}
+                              title="Excluir (apenas se nunca executada)"
+                              className="text-red-500 hover:text-red-600"
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </div>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        {FREQUENCY_LABELS[prescription.frequency]}
-                        {prescription.frequency === 'RECURRING'
-                          ? ` · a cada ${prescription.interval_hours}h por ${prescription.duration_days} dia(s)`
-                          : ''}
-                        {doseLabel(prescription) ? ` · ${doseLabel(prescription)}` : ''}
-                        {prescription.frequency !== 'AS_NEEDED'
-                          ? ` · início ${fmtDateTime(prescription.start_at)}`
-                          : ''}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </SectionCard>
+        </>
+      )}
+
+      {detailTab === 'history' && (
+        <SectionCard
+          title="Histórico da Internação"
+          subtitle="Execuções, ocorrências, pesos e parâmetros em ordem cronológica"
+          headerAction={
+            isActive ? (
+              <div className="flex gap-2 flex-wrap">
+                <Button variant="outline" size="sm" onClick={() => setQuickAdd('occurrence')}>
+                  <MessageSquarePlus size={14} />
+                Ocorrência
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setQuickAdd('weight')}>
+                  <Scale size={14} />
+                Peso
+                </Button>
+              </div>
+            ) : undefined
+          }
+        >
+          {timelineLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 size={24} className="animate-spin text-teal-600" />
+            </div>
+          ) : timelineItems.length === 0 ? (
+            <div className="text-center py-8">
+              <CalendarClock size={40} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+              Nenhum registro ainda
+              </p>
+            </div>
+          ) : (
+            <div>
+              {timelineItems.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.key} className="flex gap-3">
+                    <div className="w-20 shrink-0 text-right pt-1">
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
+                        {fmtDate(item.date)}
                       </p>
-                      {stats && stats.total > 0 && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1">
-                          <CheckCircle2 size={12} className="text-green-500" />
-                          {stats.done}/{stats.total} execuções concluídas
-                          {stats.nextPending
-                            ? ` · próxima ${fmtDateTime(stats.nextPending)}`
-                            : ''}
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">
+                        {fmtTime(item.date)}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span
+                        className={`z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${item.iconClass}`}
+                      >
+                        <Icon size={14} />
+                      </span>
+                      {index < timelineItems.length - 1 && (
+                        <span className="w-px flex-1 bg-slate-200 dark:bg-slate-700" />
+                      )}
+                    </div>
+                    <div
+                      className={`min-w-0 flex-1 pt-1 ${
+                        index < timelineItems.length - 1 ? 'pb-7' : ''
+                      }`}
+                    >
+                      <p className="text-sm font-medium text-slate-800 dark:text-slate-100">
+                        {item.title}
+                      </p>
+                      {item.description && (
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          {item.description}
                         </p>
                       )}
-                      {prescription.notes && (
-                        <p className="text-xs text-slate-400 dark:text-slate-500 italic mt-0.5">
-                          {prescription.notes}
+                      {item.user && (
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                          {item.user}
                         </p>
                       )}
                     </div>
-                    {isActive && (
-                      <div className="flex gap-1 shrink-0">
-                        {prescription.frequency === 'AS_NEEDED' &&
-                          prescription.status === 'ACTIVE' && (
-                          <Button
-                            size="sm"
-                            onClick={() => setExecutingSOS(prescription)}
-                            disabled={hospitalization.status === 'TRIAGE'}
-                            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
-                            title={
-                              hospitalization.status === 'TRIAGE'
-                                ? 'Disponível quando o paciente estiver Internado'
-                                : 'Registrar aplicação SOS'
-                            }
-                          >
-                              Executar SOS
-                          </Button>
-                        )}
-                        {prescription.status === 'ACTIVE' &&
-                          prescription.frequency !== 'AS_NEEDED' && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => setRescheduling(prescription)}
-                              title="Interromper e reprogramar"
-                            >
-                              <Clock size={14} />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => setStopping(prescription)}
-                              title="Interromper"
-                              className="text-amber-600 hover:text-amber-700"
-                            >
-                              <OctagonPause size={14} />
-                            </Button>
-                          </>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => setDeletingPrescription(prescription)}
-                          title="Excluir (apenas se nunca executada)"
-                          className="text-red-500 hover:text-red-600"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    )}
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </SectionCard>
-
-      <SectionCard
-        title="Histórico da Internação"
-        subtitle="Execuções, ocorrências, pesos e parâmetros em ordem cronológica"
-        headerAction={
-          isActive ? (
-            <div className="flex gap-2 flex-wrap">
-              <Button variant="outline" size="sm" onClick={() => setQuickAdd('occurrence')}>
-                <MessageSquarePlus size={14} />
-                Ocorrência
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setQuickAdd('weight')}>
-                <Scale size={14} />
-                Peso
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setQuickAdd('parameters')}>
-                <Beaker size={14} />
-                Parâmetros
-              </Button>
+                );
+              })}
             </div>
-          ) : undefined
-        }
-      >
-        {timelineLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 size={24} className="animate-spin text-teal-600" />
-          </div>
-        ) : timelineItems.length === 0 ? (
-          <div className="text-center py-8">
-            <CalendarClock size={40} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
-              Nenhum registro ainda
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-1">
-            {timelineItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.key} className="flex gap-3 py-2">
-                  <div className={`p-1.5 rounded-lg h-fit shrink-0 ${item.iconClass}`}>
-                    <Icon size={15} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm text-slate-800 dark:text-slate-100 font-medium">
-                      {item.title}
-                    </p>
-                    {item.description && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        {item.description}
-                      </p>
-                    )}
-                    <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                      {fmtDateTime(item.date)}
-                      {item.user ? ` · ${item.user}` : ''}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </SectionCard>
+          )}
+        </SectionCard>
+      )}
 
       {showEdit && (
         <HospitalizeModal
@@ -1208,17 +1321,6 @@ export function HospitalizationDetailContent() {
       )}
       {quickAdd === 'weight' && (
         <WeightModal
-          hospitalizationId={hospitalization.id}
-          patientName={hospitalization.patient?.name}
-          onClose={() => setQuickAdd(null)}
-          onSuccess={() => {
-            setQuickAdd(null);
-            void fetchTimeline();
-          }}
-        />
-      )}
-      {quickAdd === 'parameters' && (
-        <ParametersModal
           hospitalizationId={hospitalization.id}
           patientName={hospitalization.patient?.name}
           onClose={() => setQuickAdd(null)}

@@ -4,7 +4,7 @@ import { History, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback } from 'react';
 
-import { fmtDate, RISK_MAP, STATUS_MAP } from '../utils';
+import { fmtDate, fmtDateTime, RISK_MAP, STATUS_MAP } from '../utils';
 
 import { DataTable, type DataTableColumn } from '@/app/components/data/data-table';
 import { SelectInput } from '@/app/components/forms/select-input';
@@ -22,6 +22,12 @@ interface Filters {
   status?: string;
   [key: string]: unknown;
 }
+
+const FINISHED_STATUSES: Hospitalization['status'][] = [
+  'DISCHARGED',
+  'DECEASED',
+  'CANCELLED',
+];
 
 export function HistoryTab() {
   const fetchHospitalizations = useCallback(
@@ -119,7 +125,9 @@ export function HistoryTab() {
       header: 'Saída',
       render: (row) => (
         <span className="text-slate-600 dark:text-slate-300">
-          {row.discharged_at ? fmtDate(row.discharged_at) : '—'}
+          {FINISHED_STATUSES.includes(row.status) && row.discharged_at
+            ? fmtDateTime(row.discharged_at)
+            : '—'}
         </span>
       ),
     },

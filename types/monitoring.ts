@@ -40,6 +40,7 @@ export interface PatientMini {
   specie?: string;
   breed?: string;
   sex?: string;
+  birth_date?: string;
 }
 
 export interface UserMini {
@@ -67,6 +68,7 @@ export interface VitalRecord {
   blood_pressure?: number;
   glucose?: number;
   capillary_refill_time?: number;
+  clinical_values?: ClinicalParameterValue[];
   notes?: string;
   recorded_by?: UserSummary;
   created_at: string;
@@ -79,6 +81,7 @@ export interface CreateVitalRecordPayload {
   blood_pressure?: number;
   glucose?: number;
   capillary_refill_time?: number;
+  clinical_values?: ClinicalParameterValue[];
   notes?: string;
 }
 
@@ -220,10 +223,13 @@ export interface Box {
   created_at: string;
 }
 
+export type ClinicalParameterValueType = 'NUMBER' | 'TEXT';
+
 export interface ClinicalParameter {
   id: string;
   name: string;
   unit?: string;
+  value_type?: ClinicalParameterValueType;
   active: boolean;
   created_at: string;
 }

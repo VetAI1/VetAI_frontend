@@ -46,24 +46,27 @@ export const STATUS_MAP: Record<
 
 export const RISK_MAP: Record<
   HospitalizationRisk,
-  { label: string; badge: string; dot: string }
+  { label: string; badge: string; dot: string; border: string }
 > = {
   LOW: {
     label: 'Baixo risco',
     badge:
       'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
     dot: 'bg-green-500',
+    border: 'border-l-green-500 dark:border-l-green-500',
   },
   MEDIUM: {
     label: 'Risco moderado',
     badge:
       'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
     dot: 'bg-yellow-500',
+    border: 'border-l-yellow-500 dark:border-l-yellow-500',
   },
   HIGH: {
     label: 'Alto risco',
     badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
     dot: 'bg-red-500',
+    border: 'border-l-red-500 dark:border-l-red-500',
   },
 };
 

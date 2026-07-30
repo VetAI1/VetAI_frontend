@@ -2,7 +2,7 @@
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Clock, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm, useWatch, type Resolver } from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
@@ -22,7 +22,12 @@ import {
   type VitalRecordFormData,
 } from '@/schemas/vital-record';
 import { monitoringService } from '@/services/monitoring.service';
-import type { CreateVitalRecordPayload, VitalRecord } from '@/types/monitoring';
+import type {
+  ClinicalParameter,
+  ClinicalParameterValue,
+  CreateVitalRecordPayload,
+  VitalRecord,
+} from '@/types/monitoring';
 import type { Specie } from '@/types/patient';
 
 interface VitalSignsModalProps {
@@ -39,6 +44,17 @@ export function VitalSignsModal({
   onSuccess,
 }: VitalSignsModalProps) {
   const [saving, setSaving] = useState(false);
+  const [parameters, setParameters] = useState<ClinicalParameter[]>([]);
+  const [paramValues, setParamValues] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    void monitoringService
+      .listParameters()
+      .then((data) =>
+        setParameters(data.filter((parameter) => parameter.active)),
+      )
+      .catch(() => undefined);
+  }, []);
 
   const {
     control,
@@ -64,13 +80,22 @@ export function VitalSignsModal({
       }
     }
 
-    if (Object.keys(payload).length === 0) {
+    const clinicalValues: ClinicalParameterValue[] = parameters
+      .filter((parameter) => paramValues[parameter.id]?.trim())
+      .map((parameter) => ({
+        name: parameter.name,
+        value: paramValues[parameter.id]?.trim() ?? '',
+        ...(parameter.unit ? { unit: parameter.unit } : {}),
+      }));
+
+    if (Object.keys(payload).length === 0 && clinicalValues.length === 0) {
       setError('root', {
-        message: 'Informe ao menos um sinal vital.',
+        message: 'Informe ao menos um sinal vital ou parâmetro clínico.',
       });
       return;
     }
 
+    if (clinicalValues.length > 0) payload.clinical_values = clinicalValues;
     if (data.notes?.trim()) payload.notes = data.notes.trim();
 
     clearErrors('root');
@@ -149,6 +174,39 @@ export function VitalSignsModal({
             );
           })}
         </div>
+
+        {parameters.length > 0 && (
+          <div className="space-y-3">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Parâmetros Clínicos
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {parameters.map((parameter) => (
+                <InputWithLabel
+                  key={parameter.id}
+                  label={
+                    parameter.unit
+                      ? `${parameter.name} (${parameter.unit})`
+                      : parameter.name
+                  }
+                  type={parameter.value_type === 'NUMBER' ? 'number' : 'text'}
+                  inputMode={
+                    parameter.value_type === 'NUMBER' ? 'decimal' : 'text'
+                  }
+                  step={parameter.value_type === 'NUMBER' ? 'any' : undefined}
+                  placeholder="Opcional"
+                  value={paramValues[parameter.id] ?? ''}
+                  onChange={(e) =>
+                    setParamValues((prev) => ({
+                      ...prev,
+                      [parameter.id]: e.target.value,
+                    }))
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         <Controller
           name="notes"

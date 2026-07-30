@@ -117,12 +117,15 @@ export function HospitalizeModal({
         });
       }
       setVets(list);
+      if (!isEdit && me) {
+        setValue('veterinarian_id', me.id, { shouldValidate: true });
+      }
     });
     void monitoringService
       .listBoxes()
       .then(setBoxes)
       .catch(() => undefined);
-  }, []);
+  }, [isEdit, setValue]);
 
   const boxOptions = useMemo(() => {
     const currentBoxId = hospitalization?.box?.id;
@@ -326,30 +329,33 @@ export function HospitalizeModal({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Controller
-            name="veterinarian_id"
-            control={control}
-            render={({ field }) => (
-              <SelectInput
-                label="Veterinário responsável"
-                required
-                placeholder="Selecione"
-                value={field.value}
-                onChange={field.onChange}
-                options={vets.map((vet) => ({
-                  value: vet.id,
-                  label: vet.name ?? '',
-                }))}
-                error={errors.veterinarian_id?.message}
-              />
-            )}
-          />
+          {isEdit && (
+            <Controller
+              name="veterinarian_id"
+              control={control}
+              render={({ field }) => (
+                <SelectInput
+                  label="Veterinário responsável"
+                  required
+                  placeholder="Selecione"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={vets.map((vet) => ({
+                    value: vet.id,
+                    label: vet.name ?? '',
+                  }))}
+                  error={errors.veterinarian_id?.message}
+                />
+              )}
+            />
+          )}
           <Controller
             name="box_id"
             control={control}
             render={({ field }) => (
               <SelectInput
                 label="Box"
+                containerClassName={isEdit ? '' : 'sm:col-span-2'}
                 value={field.value ?? ''}
                 onChange={(value) => {
                   if (value.startsWith('occupied-')) return;
