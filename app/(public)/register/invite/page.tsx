@@ -12,10 +12,13 @@ import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/infra/auth-context';
 import type { RegisterPayload } from '@/types/auth';
+import { formatCPF } from '@/utils/masks';
+import { validateCPF } from '@/utils/validations';
 
 interface InviteFormData {
   name: string;
   email: string;
+  cpf: string;
   password: string;
   confirmPassword: string;
 }
@@ -32,6 +35,7 @@ function InviteRegistrationForm() {
     getValues,
     handleSubmit,
     setError,
+    setValue,
     watch,
     formState: { errors },
   } = useForm<InviteFormData>();
@@ -47,12 +51,17 @@ function InviteRegistrationForm() {
       setError('confirmPassword', { message: 'Senhas não conferem' });
       return;
     }
+    if (!validateCPF(data.cpf)) {
+      setError('cpf', { message: 'CPF inválido.' });
+      return;
+    }
 
     setLoading(true);
     try {
       const payload: RegisterPayload = {
         name: data.name,
         email: data.email,
+        cpf: data.cpf.replace(/\D/g, ''),
         password: data.password,
         invite_token: token,
       };
@@ -121,6 +130,20 @@ function InviteRegistrationForm() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 }
+              />
+              <InputWithLabel
+                label="CPF"
+                name="cpf"
+                control={control}
+                error={errors.cpf?.message}
+                onChange={(event) =>
+                  setValue('cpf', formatCPF(event.target.value), {
+                    shouldValidate: true,
+                  })
+                }
+                inputMode="numeric"
+                maxLength={14}
+                required
               />
               <InputWithLabel
                 label="Confirmar senha"

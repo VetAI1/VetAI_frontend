@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
+import { useAuth } from '@/infra/auth-context';
 import { onInsufficientAiCredits } from '@/infra/http-client';
 import { billingService } from '@/services/billing.service';
 import type { AiCredits, BillingStatus } from '@/types/billing';
@@ -23,6 +24,8 @@ const BillingContext = createContext<BillingContextValue | undefined>(undefined)
 
 export function BillingProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
   const [status, setStatus] = useState<BillingStatus | null>(null);
   const [aiCredits, setAiCredits] = useState<AiCredits | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -66,6 +69,16 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     void refetchBilling();
   }, [refetchBilling]);
+
+  useEffect(() => {
+    if (
+      isAuthenticated &&
+      status?.blocked &&
+      !pathname.startsWith('/billing/')
+    ) {
+      router.replace('/billing/canceled');
+    }
+  }, [isAuthenticated, pathname, router, status?.blocked]);
 
   useEffect(() => {
     const unsubscribe = onInsufficientAiCredits(() => {

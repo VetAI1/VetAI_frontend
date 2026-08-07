@@ -28,7 +28,7 @@ export interface Subscription {
   id: string;
   hospitalId: string;
   planId: Plan | string;
-  status: 'active' | 'past_due' | 'canceled' | 'trialing';
+  status: 'active' | 'incomplete' | 'past_due' | 'canceled' | 'trialing';
   additionalUserSeats: number;
   currentPeriodStart: string;
   currentPeriodEnd: string;

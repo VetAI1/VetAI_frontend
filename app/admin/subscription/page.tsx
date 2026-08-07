@@ -13,7 +13,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -68,6 +68,7 @@ function formatDateTime(dateString?: string | null): string {
 
 export default function AdminSubscriptionPage() {
   const { can } = useAuth();
+  const router = useRouter();
   const canPay = can('billing:pay');
 
   const [loading, setLoading] = useState(true);
@@ -113,7 +114,7 @@ export default function AdminSubscriptionPage() {
 
   useEffect(() => {
     if (searchParams.get('success') === 'true') {
-      toast.success('Compra de pacote de créditos de IA efetuada com sucesso!');
+      toast.info('Pagamento recebido. Estamos confirmando seus créditos.');
     } else if (searchParams.get('canceled') === 'true') {
       toast.info('Compra de créditos cancelada.');
     }
@@ -129,7 +130,7 @@ export default function AdminSubscriptionPage() {
       await billingService.cancelSubscription();
       toast.success('Assinatura cancelada com sucesso.');
       setIsCancelModalOpen(false);
-      await loadData(true);
+      router.replace('/billing/canceled');
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : 'Erro ao cancelar assinatura.';
@@ -295,7 +296,7 @@ export default function AdminSubscriptionPage() {
                           <strong>{formatDate(subscription.canceledAt)}</strong>.{' '}
                         </span>
                       )}
-                      Seu acesso ao sistema continua <strong>liberado até {formatDate(subscription.currentPeriodEnd || subscription.nextRenewalAt)}</strong> (término do ciclo faturado).
+                      O acesso ao sistema está bloqueado. Regularize pendências e assine novamente para voltar a usar o VetAI.
                     </p>
                   </div>
                 </div>
@@ -364,7 +365,7 @@ export default function AdminSubscriptionPage() {
                 </div>
                 <span className="text-xs text-slate-500 dark:text-slate-400">
                   {subscription?.status === 'canceled'
-                    ? `Encerrará em ${formatDate(subscription.currentPeriodEnd || subscription.nextRenewalAt)}`
+                    ? 'Acesso bloqueado até uma nova assinatura'
                     : 'Renovação automática ativada'}
                 </span>
               </div>
@@ -503,7 +504,7 @@ export default function AdminSubscriptionPage() {
       {isCancelModalOpen && (
         <ConfirmModal
           title="Cancelar Assinatura"
-          description={`Tem certeza de que deseja cancelar a assinatura do plano ${currentPlan?.name || ''}? Seu acesso ao sistema continuará disponível normalmente até ${formatDate(subscription?.currentPeriodEnd || subscription?.nextRenewalAt)}.`}
+          description={`Tem certeza de que deseja cancelar a assinatura do plano ${currentPlan?.name || ''}? Seu acesso ao sistema será bloqueado imediatamente. Para voltar, será necessário regularizar pendências e assinar novamente.`}
           confirmLabel="Sim, cancelar plano"
           cancelLabel="Manter plano"
           variant="danger"

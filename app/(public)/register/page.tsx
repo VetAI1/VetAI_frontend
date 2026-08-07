@@ -24,12 +24,13 @@ import { useAuth } from '@/infra/auth-context';
 import { billingService } from '@/services/billing.service';
 import type { RegisterPayload } from '@/types/auth';
 import type { Plan } from '@/types/billing';
-import { formatCEP, formatCNPJ, unmaskCEP, unmaskCNPJ } from '@/utils/masks';
-import { validateCEP, validateCNPJ } from '@/utils/validations';
+import { formatCEP, formatCNPJ, formatCPF, unmaskCEP, unmaskCNPJ } from '@/utils/masks';
+import { validateCEP, validateCNPJ, validateCPF } from '@/utils/validations';
 
 interface RegisterPageFormData {
   name: string;
   email: string;
+  cpf: string;
   password: string;
   confirmPassword: string;
   crmv?: string;
@@ -104,6 +105,7 @@ function RegisterForm() {
     const requiredFields: Array<[keyof RegisterPageFormData, string]> = [
       ['name', 'Nome é obrigatório'],
       ['email', 'Email é obrigatório'],
+      ['cpf', 'CPF é obrigatório'],
       ['password', 'Senha é obrigatória'],
       ['confirmPassword', 'Confirmação de senha é obrigatória'],
     ];
@@ -127,6 +129,10 @@ function RegisterForm() {
 
     if (data.cnpj && !validateCNPJ(data.cnpj)) {
       setError('cnpj', { message: 'CNPJ inválido' });
+      hasError = true;
+    }
+    if (data.cpf && !validateCPF(data.cpf)) {
+      setError('cpf', { message: 'CPF inválido' });
       hasError = true;
     }
     if (!data.address?.zipCode) {
@@ -222,6 +228,7 @@ function RegisterForm() {
       const payload: RegisterPayload = {
         name: data.name,
         email: data.email,
+        cpf: data.cpf.replace(/\D/g, ''),
         password: data.password,
         crmv: data.crmv ?? '',
         plan_id: selectedPlan.id,
@@ -469,11 +476,25 @@ function RegisterForm() {
                       required
                     />
                     <InputWithLabel
+                      label="CPF"
+                      name="cpf"
+                      control={control}
+                      error={errors.cpf?.message}
+                      onChange={(event) =>
+                        setValue('cpf', formatCPF(event.target.value), {
+                          shouldValidate: true,
+                        })
+                      }
+                      inputMode="numeric"
+                      autoComplete="off"
+                      maxLength={14}
+                      required
+                    />
+                    <InputWithLabel
                       label="Seu CRMV"
                       name="crmv"
                       control={control}
                       error={errors.crmv?.message}
-                      containerClassName="sm:col-span-2"
                       required
                     />
                     <InputWithLabel
