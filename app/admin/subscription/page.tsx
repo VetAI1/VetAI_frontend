@@ -28,6 +28,7 @@ import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AI_OPERATION_LABELS } from '@/constants';
 import { useAuth } from '@/infra/auth-context';
 import { billingService } from '@/services/billing.service';
 import { collaboratorsService } from '@/services/collaborators.service';
@@ -168,36 +169,27 @@ export default function AdminSubscriptionPage() {
       render: (item) => (
         <div className="flex items-center gap-2 font-medium text-slate-900 dark:text-white">
           <Sparkles className="h-4 w-4 text-teal-500" />
-          <span className="capitalize">
-            {item.operation?.replace(/_/g, ' ') || 'Processamento IA'}
+          <span>
+            {AI_OPERATION_LABELS[item.operation] ?? 'Processamento IA'}
           </span>
         </div>
       ),
     },
     {
-      key: 'model',
-      header: 'Modelo',
-      render: (item) => (
-        <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-mono text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-          {item.model || 'Gemini'}
-        </span>
-      ),
-    },
-    {
-      key: 'chargedCredits',
+      key: 'charged_credits',
       header: 'Créditos',
       render: (item) => (
         <span className="font-semibold text-slate-800 dark:text-slate-200">
-          {item.chargedCredits ?? item.reservedCredits ?? 0}
+          {item.charged_credits || item.reserved_credits || 0}
         </span>
       ),
     },
     {
-      key: 'createdAt',
+      key: 'created_at',
       header: 'Data/Hora',
       render: (item) => (
         <span className="text-slate-500 text-xs dark:text-slate-400">
-          {formatDateTime(item.createdAt)}
+          {formatDateTime(item.created_at)}
         </span>
       ),
     },
@@ -232,7 +224,7 @@ export default function AdminSubscriptionPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 pb-12">
+    <div className="flex w-full flex-col gap-6 pb-12">
       <Header
         title="Plano & Assinatura"
         showStorage={false}
@@ -255,22 +247,22 @@ export default function AdminSubscriptionPage() {
 
       {loading ? (
         <div className="space-y-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
+          <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
             <Skeleton className="h-6 w-40" />
             <div className="grid gap-6 md:grid-cols-3 pt-2">
-              <Skeleton className="h-28 w-full rounded-xl" />
-              <Skeleton className="h-28 w-full rounded-xl" />
-              <Skeleton className="h-28 w-full rounded-xl" />
+              <Skeleton className="h-28 w-full rounded-lg" />
+              <Skeleton className="h-28 w-full rounded-lg" />
+              <Skeleton className="h-28 w-full rounded-lg" />
             </div>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
+            <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
               <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-16 w-full rounded-xl" />
+              <Skeleton className="h-16 w-full rounded-lg" />
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
+            <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
               <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-16 w-full rounded-xl" />
+              <Skeleton className="h-16 w-full rounded-lg" />
             </div>
           </div>
         </div>
@@ -278,7 +270,7 @@ export default function AdminSubscriptionPage() {
         <>
           {/* BANNER SE ESTIVER CANCELADA */}
           {subscription?.status === 'canceled' && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm dark:border-red-900/50 dark:bg-red-950/30">
+            <div className="rounded-xl border border-red-200 bg-red-50 p-6 shadow-sm dark:border-red-900/50 dark:bg-red-950/30">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-4">
                   <div className="rounded-full bg-red-100 p-2.5 text-red-600 dark:bg-red-900/40 dark:text-red-400">
@@ -305,7 +297,7 @@ export default function AdminSubscriptionPage() {
 
           {/* BANNER SE ESTIVER TRIALING */}
           {subscription?.status === 'trialing' && (
-            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm dark:border-blue-900/50 dark:bg-blue-950/30">
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-6 shadow-sm dark:border-blue-900/50 dark:bg-blue-950/30">
               <div className="flex items-start gap-4">
                 <div className="rounded-full bg-blue-100 p-2.5 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
                   <Info className="h-6 w-6" />
@@ -341,7 +333,7 @@ export default function AdminSubscriptionPage() {
             }
           >
             <div className="grid gap-6 md:grid-cols-3">
-              <div className="flex flex-col gap-1.5 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/40">
+              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
                 <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   <Crown size={15} className="text-amber-500" /> Plano Atual
                 </span>
@@ -355,7 +347,7 @@ export default function AdminSubscriptionPage() {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1.5 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/40">
+              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
                 <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   <CheckCircle2 size={15} className="text-teal-500" /> Status da Assinatura
                 </span>
@@ -369,7 +361,7 @@ export default function AdminSubscriptionPage() {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1.5 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/40">
+              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
                 <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   <Calendar size={15} className="text-blue-500" /> Data de Renovação / Vigência
                 </span>
@@ -396,7 +388,7 @@ export default function AdminSubscriptionPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-xl bg-teal-500/10 p-3 text-teal-600 dark:text-teal-400">
+                    <div className="rounded-lg bg-teal-500/10 p-3 text-teal-600 dark:text-teal-400">
                       <Users size={22} />
                     </div>
                     <div>
@@ -453,7 +445,7 @@ export default function AdminSubscriptionPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-xl bg-indigo-500/10 p-3 text-indigo-600 dark:text-indigo-400">
+                    <div className="rounded-lg bg-indigo-500/10 p-3 text-indigo-600 dark:text-indigo-400">
                       <Bot size={22} />
                     </div>
                     <div>
@@ -493,7 +485,11 @@ export default function AdminSubscriptionPage() {
                 Nenhum uso recente de Inteligência Artificial registrado neste período.
               </div>
             ) : (
-              <DataTable data={aiUsageList} columns={usageColumns} />
+              <DataTable
+                data={aiUsageList}
+                columns={usageColumns}
+                getRowKey={(item) => item.id}
+              />
             )}
           </SectionCard>
         </>

@@ -4,14 +4,10 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
-import { nowDateTimeLocal, toISO } from '../utils';
-
 import { Modal } from '@/app/components/common/modal';
-import { DateInput } from '@/app/components/forms/date-input';
 import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
-import { TimeInput } from '@/app/components/forms/time-input';
 import { Button } from '@/components/ui/button';
 import {
   prescriptionFormSchema,
@@ -59,7 +55,6 @@ export function PrescriptionModal({
 }: PrescriptionModalProps) {
   const [saving, setSaving] = useState(false);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
-  const now = nowDateTimeLocal();
 
   const {
     control,
@@ -78,8 +73,6 @@ export function PrescriptionModal({
       frequency: 'RECURRING',
       interval_hours: '',
       duration_days: '',
-      start_date: now.date,
-      start_time: now.time,
       notes: '',
     },
   });
@@ -98,10 +91,7 @@ export function PrescriptionModal({
         type: data.type,
         name: data.name,
         frequency: data.frequency,
-        start_at:
-          data.frequency === 'AS_NEEDED'
-            ? new Date().toISOString()
-            : toISO(data.start_date ?? now.date, data.start_time ?? now.time),
+        start_at: new Date().toISOString(),
         ...(doseValue && data.dose_unit
           ? { dose_value: doseValue, dose_unit: data.dose_unit as DoseUnit }
           : {}),
@@ -280,41 +270,6 @@ export function PrescriptionModal({
                 />
               )}
             />
-          </div>
-        )}
-
-        {frequency !== 'AS_NEEDED' && (
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Controller
-                name="start_date"
-                control={control}
-                render={({ field }) => (
-                  <DateInput
-                    label="Início"
-                    required
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    error={errors.start_date?.message}
-                  />
-                )}
-              />
-            </div>
-            <div className="w-32">
-              <Controller
-                name="start_time"
-                control={control}
-                render={({ field }) => (
-                  <TimeInput
-                    label="Hora"
-                    required
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    error={errors.start_time?.message}
-                  />
-                )}
-              />
-            </div>
           </div>
         )}
 

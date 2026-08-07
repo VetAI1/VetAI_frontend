@@ -3,7 +3,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Activity,
-  AlertTriangle,
   ArrowLeft,
   ArrowRightLeft,
   Beaker,
@@ -15,11 +14,13 @@ import {
   FileDown,
   History,
   Loader2,
+  MapPin,
   MessageSquarePlus,
   MoveRight,
   OctagonPause,
   PawPrint,
   Pencil,
+  Phone,
   Pill,
   Plus,
   RotateCcw,
@@ -27,6 +28,8 @@ import {
   Skull,
   Stethoscope,
   Trash2,
+  User,
+  UserCheck,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -47,6 +50,9 @@ import { VitalSummaryCards } from '../../components/vital-summary-cards';
 import { VitalsChart } from '../../components/vitals-chart';
 import {
   daysSince,
+  DEATH_REASON_OPTIONS,
+  DISCHARGE_REASON_LABELS,
+  DISCHARGE_REASON_OPTIONS,
   doseLabel,
   EVENT_TYPE_LABELS,
   fmtDate,
@@ -62,6 +68,7 @@ import {
 
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import { Modal } from '@/app/components/common/modal';
+import { WhatsAppIcon } from '@/app/components/common/whatsapp-icon';
 import { SectionCard } from '@/app/components/data/section-card';
 import { DateInput } from '@/app/components/forms/date-input';
 import { FormTextarea } from '@/app/components/forms/form-textarea';
@@ -79,6 +86,7 @@ import { dischargeSchema, type DischargeFormData } from '@/schemas/monitoring';
 import { monitoringService } from '@/services/monitoring.service';
 import type {
   Box,
+  DischargeReason,
   Execution,
   Hospitalization,
   HospitalizationEvent,
@@ -87,6 +95,9 @@ import type {
 } from '@/types/monitoring';
 import type { Specie } from '@/types/patient';
 import { calcAge } from '@/utils/date-format';
+import { capitalize } from '@/utils/format';
+import { formatPhone } from '@/utils/masks';
+import { whatsappLink } from '@/utils/phone';
 
 type CloseAction = 'discharge' | 'decease' | 'cancel';
 
@@ -94,6 +105,18 @@ const SEX_LABELS: Record<string, string> = {
   MALE: 'Macho',
   FEMALE: 'Fêmea',
 };
+
+function buildWhatsAppLink(
+  phone: string,
+  tutorName: string,
+  patientName: string,
+  patientSex?: string,
+): string {
+  const article =
+    patientSex === 'FEMALE' ? 'a ' : patientSex === 'MALE' ? 'o ' : '';
+  const message = `Oi ${tutorName.trim()}, Tudo bem? Tenho novidades sobre ${article}${patientName}.`;
+  return whatsappLink(phone, message) ?? '';
+}
 
 const CLOSE_ACTION_INFO: Record<
   CloseAction,
@@ -131,26 +154,41 @@ function CloseActionModal({
   const info = CLOSE_ACTION_INFO[action];
   const now = nowDateTimeLocal();
 
+  const needsDate = action === 'decease';
+  const needsReason = action !== 'cancel';
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<DischargeFormData>({
     resolver: yupResolver(dischargeSchema) as Resolver<DischargeFormData>,
-    defaultValues: { date: now.date, time: now.time, notes: '' },
+    defaultValues: {
+      needs_date: needsDate,
+      needs_reason: needsReason,
+      date: now.date,
+      time: now.time,
+      reason: '',
+      notes: '',
+    },
   });
 
   const onSubmit = async (data: DischargeFormData) => {
     setSaving(true);
     try {
-      const payload = {
-        date: toISO(data.date, data.time),
-        ...(data.notes ? { notes: data.notes } : {}),
-      };
+      const reason = data.reason as DischargeReason;
       if (action === 'discharge') {
-        await monitoringService.discharge(hospitalizationId, payload);
+        await monitoringService.discharge(hospitalizationId, {
+          date: new Date().toISOString(),
+          reason,
+          ...(data.notes ? { notes: data.notes } : {}),
+        });
       } else if (action === 'decease') {
-        await monitoringService.decease(hospitalizationId, payload);
+        await monitoringService.decease(hospitalizationId, {
+          date: toISO(data.date ?? now.date, data.time ?? now.time),
+          reason,
+          ...(data.notes ? { notes: data.notes } : {}),
+        });
       } else {
         await monitoringService.cancel(hospitalizationId, {
           ...(data.notes ? { notes: data.notes } : {}),
@@ -165,7 +203,17 @@ function CloseActionModal({
   return (
     <Modal title={info.title} onClose={onClose} maxWidth="md">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {action !== 'cancel' && (
+        {action === 'discharge' && (
+          <div className="flex items-start gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40 px-3 py-2.5 text-xs text-slate-500 dark:text-slate-400">
+            <Clock size={14} className="mt-px shrink-0" />
+            <span>
+              A data e o horário da alta são registrados automaticamente no
+              momento da confirmação.
+            </span>
+          </div>
+        )}
+
+        {needsDate && (
           <div className="flex gap-3">
             <div className="flex-1">
               <Controller
@@ -173,9 +221,9 @@ function CloseActionModal({
                 control={control}
                 render={({ field }) => (
                   <DateInput
-                    label="Data"
+                    label="Data do óbito"
                     required
-                    value={field.value}
+                    value={field.value ?? ''}
                     onChange={field.onChange}
                     error={errors.date?.message}
                   />
@@ -190,7 +238,7 @@ function CloseActionModal({
                   <TimeInput
                     label="Hora"
                     required
-                    value={field.value}
+                    value={field.value ?? ''}
                     onChange={field.onChange}
                     error={errors.time?.message}
                   />
@@ -198,6 +246,28 @@ function CloseActionModal({
               />
             </div>
           </div>
+        )}
+
+        {needsReason && (
+          <Controller
+            name="reason"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                label={action === 'discharge' ? 'Tipo de alta' : 'Causa do óbito'}
+                required
+                placeholder="Selecione"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                options={
+                  action === 'discharge'
+                    ? DISCHARGE_REASON_OPTIONS
+                    : DEATH_REASON_OPTIONS
+                }
+                error={errors.reason?.message}
+              />
+            )}
+          />
         )}
         <Controller
           name="notes"
@@ -617,6 +687,10 @@ export function HospitalizationDetailContent() {
   const status = STATUS_MAP[hospitalization.status];
   const risk = RISK_MAP[hospitalization.risk];
 
+  const tutor = hospitalization.patient?.tutor;
+  const restrictions = hospitalization.patient?.restrictions ?? [];
+  const onDutyVet =
+    hospitalization.on_duty_veterinarian ?? hospitalization.veterinarian;
   const patientSpecie = (hospitalization.patient?.specie ?? 'DOG') as Specie;
   const lastVital = vitals.length > 0 ? vitals[vitals.length - 1] : undefined;
   const cadence = evaluateCadence(
@@ -704,7 +778,7 @@ export function HospitalizationDetailContent() {
               <ArrowLeft size={18} />
             </button>
             <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 shrink-0">
-              <PawPrint size={28} />
+              <Stethoscope size={28} />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -722,14 +796,30 @@ export function HospitalizationDetailContent() {
                 </span>
               </div>
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-slate-600 dark:text-slate-300">
-                <span className="flex items-center gap-1.5">
+                <span
+                  className="flex items-center gap-1.5"
+                  title="Veterinário responsável — quem deu entrada"
+                >
                   <Stethoscope size={14} className="text-slate-400" />
+                  <span className="font-semibold">Resp.</span>{' '}
                   {hospitalization.veterinarian?.name ?? '—'}
                 </span>
+                {onDutyVet && (
+                  <span
+                    className="flex items-center gap-1.5"
+                    title="Veterinário de plantão — quem acompanha o paciente agora"
+                  >
+                    <UserCheck size={14} className="text-slate-400" />
+                    <span className="font-semibold">Plantão</span>{' '}
+                    {onDutyVet.name}
+                  </span>
+                )}
                 <span className="flex items-center gap-1.5">
                   <BedDouble size={14} className="text-slate-400" />
                   {hospitalization.box?.name ?? 'Sem box'}
                 </span>
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-slate-600 dark:text-slate-300">
                 <span className="flex items-center gap-1.5">
                   <CalendarClock size={14} className="text-slate-400" />
                   Entrada {fmtDateTime(hospitalization.admitted_at)} (
@@ -746,20 +836,66 @@ export function HospitalizationDetailContent() {
                   <span className="flex items-center gap-1.5">
                     <MoveRight size={14} className="text-slate-400" />
                     Saída {fmtDateTime(hospitalization.discharged_at)}
+                    {hospitalization.discharge_reason
+                      ? ` · ${DISCHARGE_REASON_LABELS[hospitalization.discharge_reason]}`
+                      : ''}
                   </span>
                 )}
               </div>
-              {hospitalization.allergies.length > 0 && (
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  <AlertTriangle size={14} className="text-amber-500 shrink-0" />
-                  {hospitalization.allergies.map((allergy) => (
-                    <span
-                      key={allergy}
-                      className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-                    >
-                      {allergy}
+              {restrictions.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-1.5">
+                    Restrições
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {restrictions.map((restriction) => (
+                      <span
+                        key={restriction}
+                        className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+                      >
+                        {capitalize(restriction)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {tutor && (
+                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-1.5">
+                    Tutor
+                  </p>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600 dark:text-slate-300">
+                    <span className="flex items-center gap-1.5">
+                      <User size={14} className="text-slate-400 shrink-0" />
+                      {tutor.name}
                     </span>
-                  ))}
+                    {tutor.phone && (
+                      <span className="flex items-center gap-1.5">
+                        <Phone size={14} className="text-slate-400 shrink-0" />
+                        {formatPhone(tutor.phone)}
+                        <a
+                          href={buildWhatsAppLink(
+                            tutor.phone,
+                            tutor.name,
+                            hospitalization.patient?.name ?? '',
+                            hospitalization.patient?.sex,
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={`Conversar com ${tutor.name} no WhatsApp`}
+                          className="text-green-600 dark:text-green-500 hover:text-green-700 dark:hover:text-green-400"
+                        >
+                          <WhatsAppIcon />
+                        </a>
+                      </span>
+                    )}
+                    {tutor.address && (
+                      <span className="flex items-center gap-1.5">
+                        <MapPin size={14} className="text-slate-400 shrink-0" />
+                        {tutor.address}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -815,20 +951,25 @@ export function HospitalizationDetailContent() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-          {patientFacts.map((fact) => (
-            <div
-              key={fact.label}
-              className="rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 px-3 py-2"
-            >
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                {fact.label}
-              </p>
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
-                {fact.value}
-              </p>
-            </div>
-          ))}
+        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-2">
+            Informações do paciente
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {patientFacts.map((fact) => (
+              <div
+                key={fact.label}
+                className="rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 px-3 py-2"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                  {fact.label}
+                </p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                  {fact.value}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {(hospitalization.complaint ||

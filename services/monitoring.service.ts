@@ -8,6 +8,7 @@ import type {
   CreateHospitalizationPayload,
   CreatePrescriptionPayload,
   CreateVitalRecordPayload,
+  DischargeReason,
   Execution,
   Hospitalization,
   HospitalizationEvent,
@@ -76,13 +77,19 @@ export const monitoringService = {
       body: JSON.stringify(data),
     }),
 
-  discharge: (id: string, data: { date?: string; notes?: string }) =>
+  discharge: (
+    id: string,
+    data: { date?: string; reason?: DischargeReason; notes?: string },
+  ) =>
     httpClient<Hospitalization>(`monitoring/hospitalizations/${id}/discharge`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
-  decease: (id: string, data: { date?: string; notes?: string }) =>
+  decease: (
+    id: string,
+    data: { date?: string; reason?: DischargeReason; notes?: string },
+  ) =>
     httpClient<Hospitalization>(`monitoring/hospitalizations/${id}/decease`, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -236,6 +243,7 @@ export const monitoringService = {
   createParameter: (data: {
     name: string;
     unit?: string;
+    example?: string;
     value_type?: ClinicalParameterValueType;
   }) =>
     httpClient<ClinicalParameter>('monitoring/clinical-parameters', {
@@ -248,6 +256,7 @@ export const monitoringService = {
     data: {
       name?: string | undefined;
       unit?: string | undefined;
+      example?: string | undefined;
       value_type?: ClinicalParameterValueType | undefined;
       active?: boolean | undefined;
     },

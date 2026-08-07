@@ -33,7 +33,7 @@ export default function RoleDetail() {
   }, [params.id, isNew]);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 pb-12">
+    <div className="flex w-full flex-col gap-6 pb-12">
       <Header
         title={
           isNew

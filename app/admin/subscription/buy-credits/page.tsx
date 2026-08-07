@@ -1,6 +1,14 @@
 'use client';
 
-import { ArrowLeft, Check, Clock, CreditCard, Loader2, Sparkles, Zap } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  CreditCard,
+  Infinity as InfinityIcon,
+  Loader2,
+  Sparkles,
+  Zap,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -11,6 +19,16 @@ import { Button } from '@/components/ui/button';
 import { billingService } from '@/services/billing.service';
 import type { AiCreditPackageConfig, AiCredits } from '@/types/billing';
 import { formatCurrency } from '@/utils/format';
+
+function formatCreditUnitPrice(pkg: AiCreditPackageConfig): string {
+  if (!pkg.credits) return '—';
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 4,
+    maximumFractionDigits: 4,
+  }).format(pkg.price / pkg.credits / 100);
+}
 
 export default function BuyCreditsPage() {
   const [packages, setPackages] = useState<AiCreditPackageConfig[]>([]);
@@ -76,7 +94,7 @@ export default function BuyCreditsPage() {
   const availableCredits = aiCredits?.availableCredits ?? 0;
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pb-12">
+    <div className="flex w-full flex-col gap-6 pb-12">
       <Header
         title="Comprar Créditos de IA"
         showStorage={false}
@@ -96,9 +114,9 @@ export default function BuyCreditsPage() {
       />
 
       {/* BANNER SALDO ATUAL */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-teal-500/10 via-emerald-500/10 to-teal-500/5 border border-teal-500/20 shadow-sm gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 rounded-xl border border-teal-200 bg-teal-50 shadow-sm dark:border-teal-900/50 dark:bg-teal-950/30 gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-3.5 rounded-xl bg-teal-600 text-white shadow-md">
+          <div className="p-3.5 rounded-lg bg-teal-600 text-white">
             <Zap className="h-6 w-6" />
           </div>
           <div>
@@ -112,11 +130,11 @@ export default function BuyCreditsPage() {
             </p>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-900/50 px-5 py-2.5 rounded-xl text-center shadow-sm shrink-0">
+        <div className="bg-white dark:bg-slate-800 border border-teal-200 dark:border-teal-900/50 px-5 py-2.5 rounded-lg text-center shadow-sm shrink-0">
           <span className="text-xs uppercase tracking-wider text-teal-600 dark:text-teal-400 font-semibold block">
             Saldo Disponível
           </span>
-          <span className="text-2xl font-black text-slate-900 dark:text-white">
+          <span className="text-2xl font-bold text-slate-900 dark:text-white">
             {availableCredits.toLocaleString('pt-BR')} <span className="text-xs font-normal text-slate-500">créditos</span>
           </span>
         </div>
@@ -141,10 +159,10 @@ export default function BuyCreditsPage() {
                   <div
                     key={pkg.id}
                     onClick={() => setSelectedPackageId(pkg.id)}
-                    className={`relative flex flex-col justify-between p-6 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${
+                    className={`relative flex flex-col justify-between p-6 rounded-xl border-2 cursor-pointer transition-colors ${
                       isSelected
-                        ? 'border-teal-600 bg-teal-50/40 dark:bg-teal-950/30 shadow-lg ring-2 ring-teal-500/20'
-                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900/60'
+                        ? 'border-teal-600 bg-teal-50/40 dark:bg-teal-950/30 shadow-sm ring-2 ring-teal-500/20'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-700 bg-white dark:bg-slate-800'
                     }`}
                   >
                     {isSelected && (
@@ -162,20 +180,23 @@ export default function BuyCreditsPage() {
                       </div>
 
                       <div>
-                        <div className="text-3xl font-black text-slate-900 dark:text-white">
-                          {pkg.credits}{' '}
+                        <div className="text-3xl font-bold text-slate-900 dark:text-white">
+                          {pkg.credits.toLocaleString('pt-BR')}{' '}
                           <span className="text-sm font-normal text-slate-500">créditos</span>
                         </div>
                         <div className="text-xl font-bold text-teal-600 dark:text-teal-400 mt-1">
                           {formatCurrency(pkg.price)}
                         </div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                          {formatCreditUnitPrice(pkg)} por crédito
+                        </div>
                       </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                       <span className="flex items-center gap-1.5 font-medium">
-                        <Clock className="h-4 w-4 text-slate-400" />
-                        Válido por {pkg.durabilityDays ?? 30} dias
+                        <InfinityIcon className="h-4 w-4 text-slate-400" />
+                        Sem prazo de validade
                       </span>
                       <span className="font-semibold text-teal-600 dark:text-teal-400">
                         Acumulativo
@@ -188,15 +209,18 @@ export default function BuyCreditsPage() {
 
             {/* CARD DE RESUMO E REDIRECIONAMENTO */}
             {selectedPackage && (
-              <div className="flex flex-col sm:flex-row items-center justify-between p-6 rounded-2xl bg-slate-900 text-white shadow-xl gap-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between p-6 rounded-xl border border-slate-200 bg-slate-50/50 dark:border-slate-600 dark:bg-slate-700/30 gap-4">
                 <div className="space-y-1 text-center sm:text-left">
-                  <div className="text-sm text-slate-400">
-                    Pacote selecionado: <strong className="text-white">{selectedPackage.name}</strong>
+                  <div className="text-sm text-slate-500 dark:text-slate-400">
+                    Pacote selecionado:{' '}
+                    <strong className="text-slate-900 dark:text-white">
+                      {selectedPackage.name}
+                    </strong>
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white">
                     +{selectedPackage.credits} Créditos por {formatCurrency(selectedPackage.price)}
                   </div>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Você será redirecionado para o ambiente seguro de pagamento (Cartão de Crédito ou Boleto).
                   </p>
                 </div>
@@ -205,7 +229,7 @@ export default function BuyCreditsPage() {
                   size="lg"
                   onClick={handleCheckout}
                   disabled={purchasing}
-                  className="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-8 shadow-lg shrink-0 w-full sm:w-auto"
+                  className="bg-teal-600 hover:bg-teal-700 text-white px-8 shrink-0 w-full sm:w-auto"
                 >
                   {purchasing ? (
                     <Loader2 className="h-5 w-5 animate-spin mr-2" />
@@ -221,7 +245,7 @@ export default function BuyCreditsPage() {
       </SectionCard>
 
       {/* TERMOS E REGRAS DE RETENÇÃO DE CRÉDITOS */}
-      <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-2">
+      <div className="p-5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-xs text-slate-600 dark:text-slate-400 space-y-2">
         <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
           ℹ️ Regras dos Pacotes de Créditos Comprados
         </h4>
@@ -230,10 +254,13 @@ export default function BuyCreditsPage() {
             Ao finalizar o pagamento, os créditos são adicionados instantaneamente ao saldo da sua clínica.
           </li>
           <li>
-            <strong>Retenção na Renovação Mensal</strong>: Quando o ciclo da sua assinatura renovar, os créditos comprados que ainda possuírem validade (30 dias) <strong>não serão zerados</strong> e continuarão disponíveis.
+            <strong>Sem prazo de validade</strong>: os créditos comprados valem até serem usados. Na renovação da assinatura eles <strong>não são zerados</strong> e continuam somados aos créditos do mês.
           </li>
           <li>
             Os créditos do plano mensal são consumidos primeiro. Os pacotes comprados só entram em uso após os créditos mensais do plano esgotarem.
+          </li>
+          <li>
+            Cada operação de IA desconta créditos conforme o consumo real do modelo — perguntas curtas custam menos que a análise de um exame completo.
           </li>
         </ul>
       </div>

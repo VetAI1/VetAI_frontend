@@ -10,7 +10,7 @@ import type {
 
 export interface UpdateProfilePayload {
   name?: string;
-  crmv?: string;
+  specialty?: string;
   phone?: string;
   address?: Partial<UserAddress>;
 }

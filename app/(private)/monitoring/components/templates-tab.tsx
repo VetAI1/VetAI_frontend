@@ -222,6 +222,7 @@ function TemplateFormModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <SelectInput
               label="Tipo"
+              required
               value={draft.type}
               onChange={(value) =>
                 setDraft((prev) => ({ ...prev, type: value as PrescriptionType }))
@@ -234,6 +235,7 @@ function TemplateFormModal({
             />
             <SelectInput
               label="Frequência"
+              required
               value={draft.frequency}
               onChange={(value) =>
                 setDraft((prev) => ({
@@ -250,6 +252,7 @@ function TemplateFormModal({
           </div>
           <InputWithLabel
             label="Nome"
+            required
             placeholder="Ex: Dipirona 500mg"
             value={draft.name}
             onChange={(e) => setDraft((prev) => ({ ...prev, name: e.target.value }))}
@@ -286,6 +289,7 @@ function TemplateFormModal({
               <>
                 <InputWithLabel
                   label="A cada (h)"
+                  required
                   type="number"
                   min="1"
                   placeholder="8"
@@ -296,6 +300,7 @@ function TemplateFormModal({
                 />
                 <InputWithLabel
                   label="Durante (dias)"
+                  required
                   type="number"
                   min="1"
                   placeholder="3"
@@ -398,67 +403,99 @@ export function TemplatesTab() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-          {templates.map((template) => (
-            <div
-              key={template.id}
-              className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-700 transition-colors"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="font-semibold text-slate-900 dark:text-white truncate">
-                    {template.name}
-                  </p>
-                  {template.description && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                      {template.description}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {templates.map((template) => {
+            const visibleItems = template.items.slice(0, 3);
+            const hiddenCount = template.items.length - visibleItems.length;
+
+            return (
+              <div
+                key={template.id}
+                className="flex flex-col rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-md transition-all"
+              >
+                <div className="flex items-start gap-3 p-4 pb-3">
+                  <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 shrink-0">
+                    <ClipboardList size={18} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <p className="font-semibold text-slate-900 dark:text-white truncate">
+                        {template.name}
+                      </p>
+                      <span className="shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                        {template.items.length}{' '}
+                        {template.items.length === 1 ? 'item' : 'itens'}
+                      </span>
+                    </div>
+                    {template.description && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                        {template.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-0.5 shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => setEditing(template)}
+                      title="Editar"
+                    >
+                      <Pencil size={14} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => setDeleting(template)}
+                      title="Excluir"
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex-1 px-4 pb-4 space-y-1.5">
+                  {visibleItems.map((item, index) => {
+                    const details = [
+                      doseLabel(item),
+                      item.frequency === 'RECURRING'
+                        ? `a cada ${item.interval_hours}h por ${item.duration_days} ${item.duration_days === 1 ? 'dia' : 'dias'}`
+                        : FREQUENCY_LABELS[item.frequency],
+                    ]
+                      .filter(Boolean)
+                      .join(' · ');
+
+                    return (
+                      <div
+                        key={index}
+                        className="rounded-lg bg-slate-50 dark:bg-slate-700/30 px-2.5 py-2"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold ${PRESCRIPTION_TYPE_MAP[item.type].badge}`}
+                          >
+                            {PRESCRIPTION_TYPE_MAP[item.type].label}
+                          </span>
+                          <p className="text-xs font-medium text-slate-800 dark:text-slate-100 truncate">
+                            {item.name}
+                          </p>
+                        </div>
+                        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                          {details}
+                        </p>
+                      </div>
+                    );
+                  })}
+                  {hiddenCount > 0 && (
+                    <p className="pl-1 text-[11px] text-slate-400 dark:text-slate-500">
+                      + {hiddenCount}{' '}
+                      {hiddenCount === 1 ? 'outro item' : 'outros itens'}
                     </p>
                   )}
                 </div>
-                <div className="flex gap-1 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => setEditing(template)}
-                    title="Editar"
-                  >
-                    <Pencil size={14} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => setDeleting(template)}
-                    title="Excluir"
-                    className="text-red-500 hover:text-red-600"
-                  >
-                    <Trash2 size={14} />
-                  </Button>
-                </div>
               </div>
-              <div className="mt-3 space-y-1">
-                {template.items.slice(0, 3).map((item, index) => (
-                  <p
-                    key={index}
-                    className="text-xs text-slate-600 dark:text-slate-300 truncate"
-                  >
-                    • {item.name}
-                    <span className="text-slate-400 dark:text-slate-500">
-                      {' '}
-                      — {FREQUENCY_LABELS[item.frequency]}
-                      {item.frequency === 'RECURRING'
-                        ? `, a cada ${item.interval_hours}h`
-                        : ''}
-                    </span>
-                  </p>
-                ))}
-                {template.items.length > 3 && (
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
-                    + {template.items.length - 3} item(ns)
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

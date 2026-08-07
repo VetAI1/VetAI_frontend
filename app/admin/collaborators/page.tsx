@@ -4,15 +4,17 @@ import { Loader2, Send, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { Badge } from '@/app/components/common/badge';
 import { Modal } from '@/app/components/common/modal';
 import {
   DataTable,
   type DataTableColumn,
 } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
+import { InputWithLabel } from '@/app/components/forms/input-with-label';
+import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuth } from '@/infra/auth-context';
 import { ApiError } from '@/infra/http-client';
 import { billingService } from '@/services/billing.service';
@@ -111,6 +113,11 @@ export default function AdminCollaborators() {
     await load();
   }
 
+  const roleOptions = roles.map((role) => ({
+    value: role.id,
+    label: role.name,
+  }));
+
   const columns: DataTableColumn<Collaborator>[] = [
     {
       key: 'name',
@@ -129,11 +136,12 @@ export default function AdminCollaborators() {
     {
       key: 'status',
       header: 'Status',
-      render: (c) => (
-        <span className="text-sm">
-          {c.status === 'pending' ? 'Pendente' : 'Ativo'}
-        </span>
-      ),
+      render: (c) =>
+        c.status === 'pending' ? (
+          <Badge color="yellow">Pendente</Badge>
+        ) : (
+          <Badge color="green">Ativo</Badge>
+        ),
     },
     {
       key: 'role',
@@ -141,21 +149,14 @@ export default function AdminCollaborators() {
       render: (c) => {
         if (c.status === 'active') {
           return (
-            <select
+            <SelectInput
               value={c.role_id ?? ''}
-              onChange={(e) => updateRole(c.id, e.target.value)}
+              onChange={(value) => void updateRole(c.id, value)}
+              options={roleOptions}
+              placeholder="Selecione"
               disabled={!canEdit}
-              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
-            >
-              <option value="" disabled>
-                Selecione
-              </option>
-              {roles.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
+              containerClassName="max-w-52"
+            />
           );
         }
         return (
@@ -166,7 +167,7 @@ export default function AdminCollaborators() {
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 pb-12">
+    <div className="flex w-full flex-col gap-6 pb-12">
       <Header
         title="Colaboradores"
         showStorage={false}
@@ -203,34 +204,24 @@ export default function AdminCollaborators() {
           onClose={() => setIsInviteOpen(false)}
         >
           <div className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                E-mail
-              </label>
-              <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@exemplo.com"
-                disabled={saving}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Papel administrativo
-              </label>
-              <select
-                value={roleId}
-                onChange={(e) => setRoleId(e.target.value)}
-                disabled={saving}
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
-              >
-                {roles.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <InputWithLabel
+              label="E-mail"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="email@exemplo.com"
+              disabled={saving}
+              required
+            />
+            <SelectInput
+              label="Papel administrativo"
+              value={roleId}
+              onChange={setRoleId}
+              options={roleOptions}
+              placeholder="Selecione o papel"
+              disabled={saving}
+              required
+            />
             <div className="flex justify-end gap-3 pt-2">
               <Button
                 variant="outline"

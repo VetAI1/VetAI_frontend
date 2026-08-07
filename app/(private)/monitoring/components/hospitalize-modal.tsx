@@ -67,7 +67,10 @@ export function HospitalizeModal({
       monitoring_interval_minutes: String(
         hospitalization?.monitoring_interval_minutes ?? 240,
       ),
-      veterinarian_id: hospitalization?.veterinarian?.id ?? '',
+      veterinarian_id:
+        hospitalization?.on_duty_veterinarian?.id ??
+        hospitalization?.veterinarian?.id ??
+        '',
       box_id: hospitalization?.box?.id ?? '',
       expected_discharge_date: hospitalization?.expected_discharge_at
         ? hospitalization.expected_discharge_at.slice(0, 10)
@@ -79,10 +82,6 @@ export function HospitalizeModal({
       observations: hospitalization?.observations ?? '',
     },
   });
-
-  const [allergies, setAllergies] = useState(
-    hospitalization?.allergies.join(', ') ?? '',
-  );
 
   const {
     items: patients,
@@ -111,7 +110,7 @@ export function HospitalizeModal({
           id: me.id,
           name: me.name,
           email: me.email,
-          role: me.role,
+          role: me.role_name ?? '',
           status: 'active',
           addedAt: new Date().toISOString(),
         });
@@ -152,11 +151,6 @@ export function HospitalizeModal({
     }
     setSaving(true);
     try {
-      const allergiesList = allergies
-        .split(',')
-        .map((item) => item.trim())
-        .filter(Boolean);
-
       const payload = {
         status: data.status,
         risk: data.risk,
@@ -170,7 +164,6 @@ export function HospitalizeModal({
             ),
           }
           : {}),
-        veterinarian_id: data.veterinarian_id,
         ...(data.box_id ? { box_id: data.box_id } : {}),
         ...(data.expected_discharge_date
           ? {
@@ -182,16 +175,19 @@ export function HospitalizeModal({
         ...(data.complaint ? { complaint: data.complaint } : {}),
         ...(data.diagnosis ? { diagnosis: data.diagnosis } : {}),
         ...(data.prognosis ? { prognosis: data.prognosis } : {}),
-        allergies: allergiesList,
         ...(data.accessories ? { accessories: data.accessories } : {}),
         ...(data.observations ? { observations: data.observations } : {}),
       };
 
       if (isEdit && hospitalization) {
-        await monitoringService.updateHospitalization(hospitalization.id, payload);
+        await monitoringService.updateHospitalization(hospitalization.id, {
+          ...payload,
+          on_duty_veterinarian_id: data.veterinarian_id,
+        });
       } else {
         await monitoringService.createHospitalization({
           patient_id: data.patient_id,
+          veterinarian_id: data.veterinarian_id,
           ...payload,
         });
       }
@@ -335,7 +331,7 @@ export function HospitalizeModal({
               control={control}
               render={({ field }) => (
                 <SelectInput
-                  label="Veterinário responsável"
+                  label="Veterinário de plantão"
                   required
                   placeholder="Selecione"
                   value={field.value}
@@ -411,13 +407,6 @@ export function HospitalizeModal({
             )}
           />
         </div>
-
-        <InputWithLabel
-          label="Alergias e marcações"
-          placeholder="Separe por vírgula. Ex: Dipirona, Alergia alimentar"
-          value={allergies}
-          onChange={(e) => setAllergies(e.target.value)}
-        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Controller

@@ -6,6 +6,7 @@ interface SectionCardProps {
   children: ReactNode;
   className?: string;
   headerAction?: ReactNode;
+  clipContent?: boolean;
 }
 
 export function SectionCard({
@@ -14,6 +15,7 @@ export function SectionCard({
   children,
   className = '',
   headerAction,
+  clipContent = false,
 }: SectionCardProps) {
   return (
     <div
@@ -34,7 +36,11 @@ export function SectionCard({
         </div>
         {headerAction && <div className="w-full sm:w-auto">{headerAction}</div>}
       </div>
-      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">{children}</div>
+      <div
+        className={`flex flex-col flex-1 min-h-0 ${clipContent ? 'overflow-hidden' : ''}`}
+      >
+        {children}
+      </div>
     </div>
   );
 }

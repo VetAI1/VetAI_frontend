@@ -59,8 +59,6 @@ export function VitalSignsModal({
   const {
     control,
     handleSubmit,
-    setError,
-    clearErrors,
     formState: { errors },
   } = useForm<VitalRecordFormData>({
     resolver: yupResolver(
@@ -88,17 +86,9 @@ export function VitalSignsModal({
         ...(parameter.unit ? { unit: parameter.unit } : {}),
       }));
 
-    if (Object.keys(payload).length === 0 && clinicalValues.length === 0) {
-      setError('root', {
-        message: 'Informe ao menos um sinal vital ou parâmetro clínico.',
-      });
-      return;
-    }
-
     if (clinicalValues.length > 0) payload.clinical_values = clinicalValues;
     if (data.notes?.trim()) payload.notes = data.notes.trim();
 
-    clearErrors('root');
     setSaving(true);
     try {
       const record = await monitoringService.createVital(
@@ -144,6 +134,7 @@ export function VitalSignsModal({
                   render={({ field }) => (
                     <InputWithLabel
                       label={`${def.label} (${def.unit})`}
+                      required
                       type="number"
                       inputMode="decimal"
                       step={def.step}
@@ -194,7 +185,9 @@ export function VitalSignsModal({
                     parameter.value_type === 'NUMBER' ? 'decimal' : 'text'
                   }
                   step={parameter.value_type === 'NUMBER' ? 'any' : undefined}
-                  placeholder="Opcional"
+                  placeholder={
+                    parameter.example ? `Ex: ${parameter.example}` : 'Opcional'
+                  }
                   value={paramValues[parameter.id] ?? ''}
                   onChange={(e) =>
                     setParamValues((prev) => ({
@@ -222,12 +215,6 @@ export function VitalSignsModal({
             />
           )}
         />
-
-        {errors.root && (
-          <p className="text-sm text-red-500 dark:text-red-400">
-            {errors.root.message}
-          </p>
-        )}
 
         <div className="flex items-center justify-end gap-3 pt-2">
           <Button variant="outline" onClick={onClose} disabled={saving}>

@@ -81,7 +81,6 @@ export interface AiCreditPackageConfig {
   name: string;
   credits: number;
   price: number;
-  durabilityDays: number;
 }
 
 export interface PurchasedAiCreditPackage {
@@ -90,9 +89,7 @@ export interface PurchasedAiCreditPackage {
   creditsTotal: number;
   creditsRemaining: number;
   price: number;
-  durabilityDays: number;
   purchasedAt: string;
-  expiresAt: string;
 }
 
 export interface AiCredits {
@@ -107,23 +104,19 @@ export interface AiCredits {
   periodEnd: string;
 }
 
+export type AiUsageOperation =
+  | 'consultation'
+  | 'study_analysis'
+  | 'study_prevention';
+
 export interface AiUsage {
   id: string;
-  hospitalId: string;
-  userId: string;
-  subscriptionId: string;
-  operation: string;
-  sourceType: string;
-  sourceId: string;
-  requestId: string;
+  operation: AiUsageOperation;
+  source_type: string;
+  source_id: string;
   model: string;
-  reservedCredits: number;
-  chargedCredits?: number;
-  costCents?: number;
-  promptTokens?: number;
-  outputTokens?: number;
-  totalTokens?: number;
   status: 'reserved' | 'completed' | 'failed';
-  error?: string;
-  createdAt: string;
+  reserved_credits: number;
+  charged_credits: number;
+  created_at: string;
 }

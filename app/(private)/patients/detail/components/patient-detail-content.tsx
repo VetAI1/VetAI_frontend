@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  AlertTriangle,
   ArrowLeft,
   Calendar,
   CalendarClock,
@@ -16,6 +17,7 @@ import {
   Pencil,
   Pill,
   Plus,
+  Receipt,
   Scale,
   ShieldCheck,
   Skull,
@@ -37,20 +39,24 @@ import { AddNoteModal } from './add-note-modal';
 import { AddPrescriptionModal } from './add-prescription-modal';
 import { AddVaccineModal } from './add-vaccine-modal';
 import { AddWeightModal } from './add-weight-modal';
+import { BudgetModal } from './budget-modal';
 import { DeleteBtn } from './delete-btn';
 import { InfoCard } from './info-card';
-import { buildPrescriptionHtml, createPrescriptionBlobUrl, downloadPrescriptionAsPdf } from '../utils/prescription-pdf';
+import { buildPrescriptionPdf } from '../utils/prescription-pdf';
 
 import { PatientModal } from '@/app/components/business/patient-modal';
 import { UploadExamModal } from '@/app/components/business/upload-exam-modal';
 import { Card } from '@/app/components/common/card';
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { WhatsAppIcon } from '@/app/components/common/whatsapp-icon';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SPECIE_LABELS, STORAGE_KEYS } from '@/constants';
+import { SPECIE_LABELS } from '@/constants';
+import { useAuth } from '@/infra/auth-context';
 import { documentsService } from '@/services/documents.service';
 import { healthRecordsService } from '@/services/health-records.service';
+import { hospitalsService } from '@/services/hospitals.service';
 import { patientsService } from '@/services/patients.service';
 import { scheduleService } from '@/services/schedule.service';
 import { studiesService } from '@/services/studies.service';
@@ -67,8 +73,12 @@ import type {
 import type { Patient } from '@/types/patient';
 import type { ScheduleEvent } from '@/types/schedule';
 import { EVENT_TYPE_MAP } from '@/types/schedule';
+import type { Hospital } from '@/types/settings';
 import type { Study } from '@/types/study';
 import type { Tutor } from '@/types/tutor';
+import { capitalize } from '@/utils/format';
+import { formatPhone } from '@/utils/masks';
+import { whatsappLink } from '@/utils/phone';
 
 // Autoria do registro clínico, exibida junto da data em cada bloco.
 function byAuthor(record: HealthRecord): string {
@@ -79,12 +89,11 @@ export function PatientDetailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const id = searchParams.get('id');
-  const user = typeof window !== 'undefined'
-    ? (() => { try { const s = localStorage.getItem(STORAGE_KEYS.USER); return s ? (JSON.parse(s) as import('@/types/auth').User) : null; } catch { return null; } })()
-    : null;
+  const { user } = useAuth();
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [tutor, setTutor] = useState<Tutor | null>(null);
+  const [hospital, setHospital] = useState<Hospital | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [showEditModal, setShowEditModal] = useState(false);
@@ -95,10 +104,10 @@ export function PatientDetailContent() {
   const [showAddVaccine, setShowAddVaccine] = useState(false);
   const [showAddNote, setShowAddNote] = useState(false);
   const [showAddPrescription, setShowAddPrescription] = useState(false);
+  const [showBudget, setShowBudget] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [viewingDoc, setViewingDoc] = useState<{ url: string; mimeType: string; fileName: string } | null>(null);
-  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ onConfirm: () => Promise<void> } | null>(null);
   const [confirmDeleting, setConfirmDeleting] = useState(false);
@@ -220,6 +229,7 @@ export function PatientDetailContent() {
   useEffect(() => { void fetchNotes(); }, [fetchNotes]);
   useEffect(() => { void fetchPrescriptions(); }, [fetchPrescriptions]);
   useEffect(() => { void fetchDocuments(); }, [fetchDocuments]);
+  useEffect(() => { hospitalsService.get().then(setHospital).catch(() => null); }, []);
 
   const handleDelete = async () => {
     if (!patient) return;
@@ -352,6 +362,10 @@ export function PatientDetailContent() {
 
   const birthDateObj = patient.birth_date ? parseBirthDate(patient.birth_date) : null;
 
+  const tutorWhatsAppLink = tutor
+    ? whatsappLink(tutor.phone, `Olá ${tutor.name.trim()}, tudo bem?`)
+    : null;
+
   return (
     <>
       <div className="flex items-center gap-4 mb-6">
@@ -365,6 +379,10 @@ export function PatientDetailContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setShowBudget(true)} title="Gerar orçamento de serviços">
+            <Receipt size={16} />
+            Orçamento
+          </Button>
           <Button variant="outline" size="icon" onClick={() => setShowEditModal(true)} title="Editar"><Pencil size={16} /></Button>
           <Button variant="outline" size="icon" onClick={() => setShowDeleteConfirm(true)} title="Excluir" className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200 dark:border-red-800">
             <Trash2 size={16} />
@@ -372,17 +390,38 @@ export function PatientDetailContent() {
         </div>
       </div>
 
+      {patient.restrictions && patient.restrictions.length > 0 && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-l-4 border-red-200 border-l-red-500 bg-red-50/70 px-4 py-3 dark:border-red-900/60 dark:border-l-red-500 dark:bg-red-950/25">
+          <AlertTriangle
+            size={18}
+            className="mt-px shrink-0 text-red-600 dark:text-red-400"
+          />
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1.5">
+            <span className="text-sm font-semibold text-red-900 dark:text-red-200">
+              Restrições
+            </span>
+            {patient.restrictions.map((restriction) => (
+              <span
+                key={restriction}
+                className="rounded-md border border-red-300 bg-white px-2 py-0.5 text-xs font-medium text-red-900 dark:border-red-800 dark:bg-red-950/60 dark:text-red-100"
+              >
+                {capitalize(restriction)}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mb-6">
         <InfoCard
-          iconBg="bg-teal-100 dark:bg-teal-900/40"
-          icon={<PawPrint size={16} className="text-teal-600 dark:text-teal-400" />}
+          icon={PawPrint}
           label="Espécie / Raça"
           value={<p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{SPECIE_LABELS[patient.specie] ?? patient.specie}</p>}
           sub={patient.breed}
         />
         <InfoCard
-          iconBg="bg-blue-100 dark:bg-blue-900/40"
-          icon={<Calendar size={16} className="text-blue-600 dark:text-blue-400" />}
+          icon={Calendar}
+          tone={birthDateObj ? 'accent' : 'neutral'}
           label="Nascimento"
           value={
             birthDateObj
@@ -392,33 +431,35 @@ export function PatientDetailContent() {
           sub={birthDateObj ? calcAge(birthDateObj) : undefined}
         />
         <InfoCard
-          iconBg="bg-zinc-100 dark:bg-zinc-700/40"
-          icon={
-            patient.sex === 'MALE' ? <Mars size={16} className="text-blue-600 dark:text-blue-400" />
-              : patient.sex === 'FEMALE' ? <Venus size={16} className="text-pink-600 dark:text-pink-400" />
-                : <Mars size={16} className="text-slate-400 dark:text-slate-500" />
+          icon={patient.sex === 'FEMALE' ? Venus : Mars}
+          tone={
+            patient.sex === 'MALE'
+              ? 'male'
+              : patient.sex === 'FEMALE'
+                ? 'female'
+                : 'neutral'
           }
           label="Sexo"
           value={<p className="text-sm font-semibold text-slate-900 dark:text-white">{patient.sex === 'MALE' ? 'Macho' : patient.sex === 'FEMALE' ? 'Fêmea' : 'Não informado'}</p>}
           sub={patient.castration_date ? `Castrado em ${fmtDate(patient.castration_date)}` : 'Não castrado'}
         />
         <InfoCard
-          iconBg="bg-cyan-100 dark:bg-cyan-900/40"
-          icon={<Cpu size={16} className="text-cyan-600 dark:text-cyan-400" />}
+          icon={Cpu}
+          tone={patient.microchip ? 'positive' : 'neutral'}
           label="Microchip"
           value={<p className="text-sm font-semibold text-slate-900 dark:text-white">{patient.microchip ? 'Sim' : 'N/A'}</p>}
           sub={patient.microchip ?? 'Não cadastrado'}
         />
         <InfoCard
-          iconBg="bg-slate-100 dark:bg-slate-700"
-          icon={<Skull size={16} className="text-slate-500 dark:text-slate-400" />}
+          icon={Skull}
+          tone={patient.death_date ? 'danger' : 'neutral'}
           label="Falecimento"
           value={<p className="text-sm font-semibold text-slate-900 dark:text-white">{patient.death_date ? 'Sim' : 'N/A'}</p>}
           sub={patient.death_date ? fmtDate(patient.death_date) : undefined}
         />
         <InfoCard
-          iconBg="bg-purple-100 dark:bg-purple-900/40"
-          icon={<User size={16} className="text-purple-600 dark:text-purple-400" />}
+          icon={User}
+          tone={tutor ? 'accent' : 'neutral'}
           label="Tutor"
           className="lg:col-span-2"
           value={
@@ -426,7 +467,31 @@ export function PatientDetailContent() {
               ? <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{tutor.name}</p>
               : <p className="text-sm text-slate-400 dark:text-slate-500">Não informado</p>
           }
-          sub={tutor?.phone}
+          sub={
+            tutor?.phone || tutor?.address ? (
+              <>
+                {tutor.phone && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="truncate">{formatPhone(tutor.phone)}</span>
+                    {tutorWhatsAppLink && (
+                      <a
+                        href={tutorWhatsAppLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={`Conversar com ${tutor.name} no WhatsApp`}
+                        className="shrink-0 text-green-600 hover:text-green-700 dark:text-green-500 dark:hover:text-green-400"
+                      >
+                        <WhatsAppIcon size={14} />
+                      </a>
+                    )}
+                  </span>
+                )}
+                {tutor.address && (
+                  <span className="block truncate">{tutor.address}</span>
+                )}
+              </>
+            ) : undefined
+          }
         />
       </div>
 
@@ -767,12 +832,21 @@ export function PatientDetailContent() {
                           size="icon-sm"
                           title="Visualizar receita"
                           onClick={() => {
-                            if (patient && user) {
-                              const logoUrl = `${window.location.origin}/logo-white.png`;
-                              const html = buildPrescriptionHtml(rec, patient, tutor, user, latestWeight, logoUrl);
-                              const url = createPrescriptionBlobUrl(html);
-                              setViewingDoc({ url, mimeType: 'text/html', fileName: `Receita - ${patient.name}.pdf` });
-                            }
+                            if (!patient || !user) return;
+                            void buildPrescriptionPdf(
+                              rec,
+                              patient,
+                              user,
+                              hospital,
+                              latestWeight,
+                              `${window.location.origin}/logo-white.png`,
+                            ).then((pdf) => {
+                              setViewingDoc({
+                                url: URL.createObjectURL(pdf.output('blob')),
+                                mimeType: 'application/pdf',
+                                fileName: `Receita - ${patient.name}.pdf`,
+                              });
+                            });
                           }}
                           className="text-slate-400 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20"
                         >
@@ -919,33 +993,14 @@ export function PatientDetailContent() {
           <div className="flex items-center justify-between px-4 py-3 bg-teal-700 dark:bg-teal-800 shrink-0">
             <p className="text-white font-medium text-sm truncate">{viewingDoc.fileName}</p>
             <div className="flex items-center gap-1 shrink-0">
-              {viewingDoc.mimeType === 'text/html' ? (
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  title="Baixar PDF"
-                  disabled={downloadingPdf}
-                  onClick={() => {
-                    setDownloadingPdf(true);
-                    fetch(viewingDoc.url)
-                      .then((r) => r.text())
-                      .then((html) => downloadPrescriptionAsPdf(html, viewingDoc.fileName))
-                      .finally(() => setDownloadingPdf(false));
-                  }}
-                  className="text-teal-100 hover:text-white hover:bg-teal-600 dark:hover:bg-teal-700"
-                >
-                  {downloadingPdf ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-                </Button>
-              ) : (
-                <a
-                  href={viewingDoc.url}
-                  download={viewingDoc.fileName}
-                  title="Baixar"
-                  className="inline-flex items-center justify-center rounded-md h-7 w-7 text-teal-100 hover:text-white hover:bg-teal-600 dark:hover:bg-teal-700 transition-colors"
-                >
-                  <Download size={16} />
-                </a>
-              )}
+              <a
+                href={viewingDoc.url}
+                download={viewingDoc.fileName}
+                title="Baixar"
+                className="inline-flex items-center justify-center rounded-md h-7 w-7 text-teal-100 hover:text-white hover:bg-teal-600 dark:hover:bg-teal-700 transition-colors"
+              >
+                <Download size={16} />
+              </a>
               <Button variant="ghost" size="icon-sm" onClick={closeDocViewer} className="text-teal-100 hover:text-white hover:bg-teal-600 dark:hover:bg-teal-700">
                 <X size={18} />
               </Button>
@@ -990,6 +1045,7 @@ export function PatientDetailContent() {
       {showAddVaccine && <AddVaccineModal patientId={patient.id} onClose={() => setShowAddVaccine(false)} onSuccess={() => { setShowAddVaccine(false); void fetchVaccines(); }} />}
       {showAddNote && <AddNoteModal patientId={patient.id} onClose={() => setShowAddNote(false)} onSuccess={() => { setShowAddNote(false); void fetchNotes(); }} />}
       {showAddPrescription && <AddPrescriptionModal patientId={patient.id} onClose={() => setShowAddPrescription(false)} onSuccess={() => { setShowAddPrescription(false); void fetchPrescriptions(); }} />}
+      {showBudget && <BudgetModal patient={patient} tutor={tutor} onClose={() => setShowBudget(false)} />}
     </>
   );
 }

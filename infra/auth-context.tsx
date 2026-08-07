@@ -87,6 +87,10 @@ export function useAuthProvider() {
     clearSession();
   }, [clearSession]);
 
+  const updateUser = useCallback((user: User) => {
+    setState((previous) => ({ ...previous, user }));
+  }, []);
+
   const can = useCallback(
     (permission: string): boolean => {
       if (!state.user) return false;
@@ -103,7 +107,7 @@ export function useAuthProvider() {
     [state.user],
   );
 
-  return { ...state, login, register, logout, can };
+  return { ...state, login, register, logout, updateUser, can };
 }
 
 interface AuthState {
@@ -116,6 +120,7 @@ interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (data: Parameters<typeof authService.register>[0]) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (user: User) => void;
   can: (permission: string) => boolean;
 }
 

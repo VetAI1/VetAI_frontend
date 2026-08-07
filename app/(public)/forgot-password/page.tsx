@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<ForgotPasswordFormData>({
@@ -110,7 +110,8 @@ export default function ForgotPasswordPage() {
                     label="Email"
                     type="email"
                     placeholder="seu@email.com"
-                    {...register('email')}
+                    control={control}
+                    name="email"
                     autoComplete="email"
                     className="h-11"
                     error={errors.email?.message}

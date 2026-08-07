@@ -10,7 +10,13 @@ export const hospitalSchema = yup.object({
       Boolean(value && validateCNPJ(value)),
     )
     .required('CNPJ é obrigatório'),
-  crmv: yup.string().default(''),
+  phone: yup
+    .string()
+    .test('phone-valid', 'Telefone inválido', (value) => {
+      const digits = (value ?? '').replace(/\D/g, '');
+      return digits.length === 10 || digits.length === 11;
+    })
+    .required('Telefone é obrigatório'),
   address: yup.object({
     zipCode: yup
       .string()

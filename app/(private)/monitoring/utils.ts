@@ -1,4 +1,5 @@
 import type {
+  DischargeReason,
   DoseUnit,
   Execution,
   ExecutionStatus,
@@ -46,27 +47,24 @@ export const STATUS_MAP: Record<
 
 export const RISK_MAP: Record<
   HospitalizationRisk,
-  { label: string; badge: string; dot: string; border: string }
+  { label: string; badge: string; dot: string }
 > = {
   LOW: {
     label: 'Baixo risco',
     badge:
       'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
     dot: 'bg-green-500',
-    border: 'border-l-green-500 dark:border-l-green-500',
   },
   MEDIUM: {
     label: 'Risco moderado',
     badge:
       'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
     dot: 'bg-yellow-500',
-    border: 'border-l-yellow-500 dark:border-l-yellow-500',
   },
   HIGH: {
     label: 'Alto risco',
     badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
     dot: 'bg-red-500',
-    border: 'border-l-red-500 dark:border-l-red-500',
   },
 };
 
@@ -87,6 +85,25 @@ export const PRESCRIPTION_TYPE_MAP: Record<
     badge: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300',
   },
 };
+
+export const DISCHARGE_REASON_LABELS: Record<DischargeReason, string> = {
+  MEDICAL: 'Alta médica',
+  REQUESTED: 'Alta solicitada',
+  TRANSFER: 'Transferência',
+  DISEASE: 'Doença',
+  EUTHANASIA: 'Eutanásia',
+};
+
+export const DISCHARGE_REASON_OPTIONS = [
+  { value: 'MEDICAL', label: DISCHARGE_REASON_LABELS.MEDICAL },
+  { value: 'REQUESTED', label: DISCHARGE_REASON_LABELS.REQUESTED },
+  { value: 'TRANSFER', label: DISCHARGE_REASON_LABELS.TRANSFER },
+];
+
+export const DEATH_REASON_OPTIONS = [
+  { value: 'DISEASE', label: DISCHARGE_REASON_LABELS.DISEASE },
+  { value: 'EUTHANASIA', label: DISCHARGE_REASON_LABELS.EUTHANASIA },
+];
 
 export const FREQUENCY_LABELS: Record<PrescriptionFrequency, string> = {
   RECURRING: 'Recorrente',

@@ -52,7 +52,7 @@ export interface Hospital {
   id: string;
   name: string;
   cnpj?: string;
-  crmv?: string;
+  phone?: string;
   address?: HospitalAddress;
   responsible?: HospitalResponsible;
 }
@@ -60,7 +60,7 @@ export interface Hospital {
 export interface UpdateHospitalPayload {
   name: string;
   cnpj: string;
-  crmv?: string;
+  phone?: string;
   address: HospitalAddress;
   responsible: HospitalResponsible;
 }

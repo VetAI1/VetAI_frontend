@@ -56,6 +56,7 @@ export function AddPrescriptionModal({
           usage: 'Oral Veterinário',
         },
       ],
+      recommendations: [],
     },
   });
 
@@ -64,9 +65,22 @@ export function AddPrescriptionModal({
     name: 'medications',
   });
 
+  const {
+    fields: recommendationFields,
+    append: appendRecommendation,
+    remove: removeRecommendation,
+  } = useFieldArray({
+    control,
+    name: 'recommendations',
+  });
+
   const onSubmit = async (data: PrescriptionFormData) => {
     setSaving(true);
     try {
+      const recommendations = (data.recommendations ?? [])
+        .map((item) => item.text?.trim() ?? '')
+        .filter(Boolean);
+
       await healthRecordsService.create(patientId, {
         type: 'PRESCRIPTION',
         date: new Date(data.date).toISOString(),
@@ -79,6 +93,7 @@ export function AddPrescriptionModal({
             posology: medication.posology.trim(),
             usage: medication.usage?.trim() || undefined,
           })),
+          ...(recommendations.length ? { recommendations } : {}),
         },
       });
       onSuccess();
@@ -238,6 +253,56 @@ export function AddPrescriptionModal({
             </div>
           ))}
         </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label>Recomendações</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => appendRecommendation({ text: '' })}
+              className="gap-1.5 text-xs text-teal-600 hover:bg-teal-50 hover:text-teal-700 dark:text-teal-400 dark:hover:bg-teal-900/20 dark:hover:text-teal-300"
+            >
+              <Plus size={14} /> Adicionar recomendação
+            </Button>
+          </div>
+
+          {recommendationFields.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-slate-300 px-3 py-4 text-center text-xs text-slate-400 dark:border-slate-600">
+              Cada recomendação vira um item na receita impressa.
+            </p>
+          ) : (
+            recommendationFields.map((field, index) => (
+              <div key={field.id} className="flex items-center gap-2">
+                <span className="text-slate-400 select-none">•</span>
+                <div className="flex-1">
+                  <Controller
+                    name={`recommendations.${index}.text`}
+                    control={control}
+                    render={({ field: recommendationField }) => (
+                      <InputWithLabel
+                        placeholder="Ex: Manter repouso por 7 dias"
+                        value={recommendationField.value ?? ''}
+                        onChange={recommendationField.onChange}
+                      />
+                    )}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => removeRecommendation(index)}
+                  className="text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                >
+                  <X size={14} />
+                </Button>
+              </div>
+            ))
+          )}
+        </div>
+
         <div className="flex justify-end gap-3 pt-2">
           <Button
             type="button"
