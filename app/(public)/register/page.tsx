@@ -141,7 +141,7 @@ function RegisterForm() {
       setError('cnpj', { message: 'CNPJ inválido' });
       hasError = true;
     }
-if (data.cpf && !validateCPF(data.cpf)) {
+    if (data.cpf && !validateCPF(data.cpf)) {
       setError('cpf', { message: 'CPF inválido' });
       hasError = true;
     }
