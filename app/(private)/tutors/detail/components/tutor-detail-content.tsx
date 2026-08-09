@@ -48,6 +48,7 @@ import {
   type Payment,
 } from '@/types/payment';
 import type { Tutor } from '@/types/tutor';
+import { formatPhone } from '@/utils/masks';
 
 function fmtDate(dateStr?: string | null): string {
   if (!dateStr) return '—';
@@ -256,7 +257,7 @@ export function TutorDetailContent() {
       <SectionCard title={tutor.name} subtitle="Informações do tutor">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <InfoItem icon={<User size={16} className="text-teal-600 dark:text-teal-400" />} iconBg="bg-teal-50 dark:bg-teal-900/30" label="CPF" value={fmtCpf(tutor.cpf)} />
-          <InfoItem icon={<Phone size={16} className="text-blue-600 dark:text-blue-400" />} iconBg="bg-blue-50 dark:bg-blue-900/30" label="Telefone" value={tutor.phone ?? '—'} />
+          <InfoItem icon={<Phone size={16} className="text-blue-600 dark:text-blue-400" />} iconBg="bg-blue-50 dark:bg-blue-900/30" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
           <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? '—'} />
           <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="Endereço" value={tutor.address ?? '—'} />
         </div>

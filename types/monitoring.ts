@@ -9,6 +9,13 @@ export type HospitalizationRisk = 'LOW' | 'MEDIUM' | 'HIGH';
 
 export type ClinicalStatus = 'STABLE' | 'UNSTABLE' | 'AWAITING_TUTOR';
 
+export type DischargeReason =
+  | 'MEDICAL'
+  | 'REQUESTED'
+  | 'TRANSFER'
+  | 'DISEASE'
+  | 'EUTHANASIA';
+
 export type PrescriptionType = 'MEDICATION' | 'PROCEDURE' | 'FLUID';
 
 export type PrescriptionFrequency = 'RECURRING' | 'ONCE' | 'AS_NEEDED';
@@ -34,6 +41,13 @@ export type DoseUnit =
   | 'CAPSULE'
   | 'DROP';
 
+export interface TutorMini {
+  id: string;
+  name: string;
+  phone?: string;
+  address?: string;
+}
+
 export interface PatientMini {
   id: string;
   name: string;
@@ -41,6 +55,8 @@ export interface PatientMini {
   breed?: string;
   sex?: string;
   birth_date?: string;
+  restrictions?: string[];
+  tutor?: TutorMini;
 }
 
 export interface UserMini {
@@ -92,17 +108,18 @@ export interface Hospitalization {
   clinical_status?: ClinicalStatus;
   risk: HospitalizationRisk;
   veterinarian: UserMini;
+  on_duty_veterinarian?: UserMini;
   box?: BoxMini;
   admitted_at: string;
   expected_discharge_at?: string;
   complaint?: string;
   diagnosis?: string;
   prognosis?: string;
-  allergies: string[];
   accessories?: string;
   observations?: string;
   discharged_at?: string;
   discharge_notes?: string;
+  discharge_reason?: DischargeReason;
   weight_kg?: number;
   monitoring_interval_minutes: number;
   latest_vitals?: VitalRecord | null;
@@ -121,7 +138,6 @@ export interface CreateHospitalizationPayload {
   complaint?: string;
   diagnosis?: string;
   prognosis?: string;
-  allergies?: string[];
   accessories?: string;
   observations?: string;
   weight_kg?: number;
@@ -129,8 +145,8 @@ export interface CreateHospitalizationPayload {
 }
 
 export type UpdateHospitalizationPayload = Partial<
-  Omit<CreateHospitalizationPayload, 'patient_id'>
->;
+  Omit<CreateHospitalizationPayload, 'patient_id' | 'veterinarian_id'>
+> & { on_duty_veterinarian_id?: string };
 
 export interface HospPrescription {
   id: string;
@@ -229,6 +245,7 @@ export interface ClinicalParameter {
   id: string;
   name: string;
   unit?: string;
+  example?: string;
   value_type?: ClinicalParameterValueType;
   active: boolean;
   created_at: string;

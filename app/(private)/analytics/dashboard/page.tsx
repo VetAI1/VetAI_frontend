@@ -8,6 +8,7 @@ import { Badge } from '@/app/components/common/badge';
 import { Card } from '@/app/components/common/card';
 import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
+import { Header } from '@/app/components/layout/header';
 import { AnalyticsChart } from '@/components/AnalyticsChart';
 import { MetricCard } from '@/components/MetricCard';
 import { Button } from '@/components/ui/button';
@@ -68,66 +69,48 @@ export default function Dashboard() {
   }, [fetchData]);
 
   return (
-    <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto pb-12">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white">
-            Dashboard Analytics
-          </h1>
-          <p className="text-slate-500 text-sm mt-1">
-            Visualize o desempenho e estatísticas da sua clínica.
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          onClick={fetchData}
-          disabled={loading}
-          className="gap-2 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5"
-        >
-          <RefreshCcw className={cn('h-4 w-4', loading && 'animate-spin')} />
-          Atualizar
-        </Button>
-      </header>
+    <div className="min-h-screen w-full bg-gray-50 dark:bg-slate-900 px-4 sm:px-6 lg:px-8 py-2 pb-12">
+      <Header
+        title="Dashboard"
+        showStorage={false}
+        headerAction={
+          <Button variant="outline" onClick={fetchData} disabled={loading}>
+            <RefreshCcw className={cn('h-4 w-4', loading && 'animate-spin')} />
+            Atualizar
+          </Button>
+        }
+      />
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <MetricCard
           title="Total de Pacientes"
           value={data?.total_patients ?? 0}
-          icon="Users"
-          color="#42A5F5"
           loading={loading}
           tooltip="Número total de pacientes cadastrados na clínica."
         />
         <MetricCard
           title="Total de Exames"
           value={data?.total_studies ?? 0}
-          icon="ClipboardList"
-          color="#FFA726"
           loading={loading}
           tooltip="Total de exames realizados."
         />
         <MetricCard
           title="Hoje"
           value={data?.total_consultations_today ?? 0}
-          icon="Calendar"
-          color="#AB47BC"
           loading={loading}
           tooltip="Consultas agendadas ou realizadas no dia de hoje."
         />
         <MetricCard
           title="Total de Consultas"
           value={data?.total_consultations ?? 0}
-          icon="Stethoscope"
-          color="#66BB6A"
           loading={loading}
           tooltip="Total histórico de consultas médicas concluídas."
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Overtime Chart + Today Activities */}
-        <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {(loading || data?.growth_overtime) && (
             <AnalyticsChart
               type="line"
@@ -245,7 +228,10 @@ export default function Dashboard() {
         >
           <DataTable
             headers={['Data', 'Paciente', 'Título', 'Status', 'Ações']}
-            maxBodyHeight={340}
+            fillHeight
+            {...(!loading && studies.length === 0
+              ? { tableClassName: 'h-full' }
+              : {})}
           >
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (

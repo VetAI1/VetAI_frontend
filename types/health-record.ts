@@ -53,6 +53,7 @@ export interface PrescriptionMedication {
 export interface PrescriptionMetadata {
   include_date: boolean;
   medications: PrescriptionMedication[];
+  recommendations?: string[];
 }
 
 export interface RecordAuthor {

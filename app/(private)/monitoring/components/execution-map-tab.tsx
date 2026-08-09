@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  ChevronLeft,
-  ChevronRight,
-  ClipboardCheck,
-  Loader2,
-  Plus,
-} from 'lucide-react';
+import { ClipboardCheck, Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -17,6 +11,7 @@ import {
   executionVisualStatus,
   fmtTime,
   PRESCRIPTION_TYPE_MAP,
+  toISO,
   todayLocalISODate,
 } from '../utils';
 import { ExecuteModal } from './execute-modal';
@@ -94,13 +89,6 @@ export function ExecutionMapTab() {
     return map;
   }, [executions]);
 
-  const shiftDate = (days: number) => {
-    const next = new Date(`${date}T12:00`);
-    next.setDate(next.getDate() + days);
-    const offset = next.getTimezoneOffset() * 60 * 1000;
-    setDate(new Date(next.getTime() - offset).toISOString().slice(0, 10));
-  };
-
   const chipClass = (cellExecutions: Execution[]): string => {
     const statuses = cellExecutions.map((execution) =>
       executionVisualStatus(execution),
@@ -122,15 +110,9 @@ export function ExecutionMapTab() {
     <div>
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-4 mb-4 flex flex-col sm:flex-row sm:items-end gap-3 sm:justify-between">
         <div className="flex items-end gap-2">
-          <Button variant="outline" size="icon" onClick={() => shiftDate(-1)}>
-            <ChevronLeft size={16} />
-          </Button>
           <div className="w-44">
             <DateInput label="Dia" value={date} onChange={setDate} />
           </div>
-          <Button variant="outline" size="icon" onClick={() => shiftDate(1)}>
-            <ChevronRight size={16} />
-          </Button>
           {!isToday && (
             <Button variant="outline" onClick={() => setDate(todayLocalISODate())}>
               Hoje
@@ -362,8 +344,7 @@ export function ExecutionMapTab() {
         <OccurrenceModal
           hospitalizationId={quickAdd.hospitalization.id}
           patientName={quickAdd.hospitalization.patient?.name}
-          defaultDate={date}
-          defaultTime={`${String(quickAdd.hour).padStart(2, '0')}:00`}
+          recordedAt={toISO(date, `${String(quickAdd.hour).padStart(2, '0')}:00`)}
           onClose={() => setQuickAdd(null)}
           onSuccess={closeAllAndRefresh}
         />
@@ -372,8 +353,7 @@ export function ExecutionMapTab() {
         <WeightModal
           hospitalizationId={quickAdd.hospitalization.id}
           patientName={quickAdd.hospitalization.patient?.name}
-          defaultDate={date}
-          defaultTime={`${String(quickAdd.hour).padStart(2, '0')}:00`}
+          recordedAt={toISO(date, `${String(quickAdd.hour).padStart(2, '0')}:00`)}
           onClose={() => setQuickAdd(null)}
           onSuccess={closeAllAndRefresh}
         />
@@ -382,8 +362,7 @@ export function ExecutionMapTab() {
         <ParametersModal
           hospitalizationId={quickAdd.hospitalization.id}
           patientName={quickAdd.hospitalization.patient?.name}
-          defaultDate={date}
-          defaultTime={`${String(quickAdd.hour).padStart(2, '0')}:00`}
+          recordedAt={toISO(date, `${String(quickAdd.hour).padStart(2, '0')}:00`)}
           onClose={() => setQuickAdd(null)}
           onSuccess={closeAllAndRefresh}
         />

@@ -1,10 +1,11 @@
 'use client';
 
-import { History, Loader2 } from 'lucide-react';
+import { FileText, History, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { fmtDate, fmtDateTime, RISK_MAP, STATUS_MAP } from '../utils';
+import { ReportModal } from './report-modal';
 
 import { DataTable, type DataTableColumn } from '@/app/components/data/data-table';
 import { SelectInput } from '@/app/components/forms/select-input';
@@ -29,7 +30,11 @@ const FINISHED_STATUSES: Hospitalization['status'][] = [
   'CANCELLED',
 ];
 
+// Internações canceladas não geram prontuário: não houve atendimento.
+const REPORT_STATUSES: Hospitalization['status'][] = ['DISCHARGED', 'DECEASED'];
+
 export function HistoryTab() {
+  const [reportOf, setReportOf] = useState<Hospitalization | null>(null);
   const fetchHospitalizations = useCallback(
     (params: PaginatedQueryParams<Filters>) =>
       monitoringService.listHospitalizations({
@@ -123,6 +128,7 @@ export function HistoryTab() {
     {
       key: 'discharged_at',
       header: 'Saída',
+      align: 'left',
       render: (row) => (
         <span className="text-slate-600 dark:text-slate-300">
           {FINISHED_STATUSES.includes(row.status) && row.discharged_at
@@ -130,6 +136,26 @@ export function HistoryTab() {
             : '—'}
         </span>
       ),
+    },
+    {
+      key: 'report',
+      header: 'Prontuário',
+      align: 'right',
+      render: (row) =>
+        REPORT_STATUSES.includes(row.status) ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setReportOf(row)}
+            title="Abrir prontuário completo da internação"
+          >
+            <FileText size={14} />
+            Abrir
+          </Button>
+        ) : (
+          <span className="text-slate-400 dark:text-slate-500">—</span>
+        ),
     },
   ];
 
@@ -186,6 +212,13 @@ export function HistoryTab() {
             Carregar mais
           </Button>
         </div>
+      )}
+
+      {reportOf && (
+        <ReportModal
+          hospitalization={reportOf}
+          onClose={() => setReportOf(null)}
+        />
       )}
     </div>
   );

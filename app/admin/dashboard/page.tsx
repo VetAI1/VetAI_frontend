@@ -29,10 +29,10 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 pb-12">
+    <div className="flex w-full flex-col gap-6 pb-12">
       <Header title="Dashboard administrativo" showStorage={false} />
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
         <MetricCard
           title="Colaboradores"
           value={data?.total_collaborators ?? 0}

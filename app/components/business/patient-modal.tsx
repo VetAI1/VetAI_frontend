@@ -26,6 +26,13 @@ import type { Tutor } from '@/types/tutor';
 
 const SPECIES = Object.entries(SPECIE_LABELS) as [string, string][];
 
+function parseRestrictions(value?: string | null): string[] {
+  return (value ?? '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 interface PatientModalProps {
   patient?: Patient;
   onClose: () => void;
@@ -65,6 +72,7 @@ export function PatientModal({
       deathDate: patient?.death_date ? patient.death_date.slice(0, 10) : '',
       microchip: patient?.microchip ?? '',
       observations: patient?.observations ?? '',
+      restrictions: patient?.restrictions?.join(', ') ?? '',
       tutorId: patient?.tutor_id ?? '',
     },
   });
@@ -118,6 +126,7 @@ export function PatientModal({
         if (data.deathDate) payload.death_date = data.deathDate;
         if (data.microchip?.trim()) payload.microchip = data.microchip.trim();
         payload.observations = data.observations?.trim() ?? '';
+        payload.restrictions = parseRestrictions(data.restrictions);
         result = await patientsService.update(patient.id, payload);
       } else {
         const payload = {
@@ -133,6 +142,8 @@ export function PatientModal({
         if (data.microchip?.trim()) payload.microchip = data.microchip.trim();
         if (data.observations?.trim())
           payload.observations = data.observations.trim();
+        const restrictions = parseRestrictions(data.restrictions);
+        if (restrictions.length) payload.restrictions = restrictions;
         result = await patientsService.create(payload);
       }
       onSuccess(result);
@@ -280,16 +291,32 @@ export function PatientModal({
           </div>
 
           <Controller
+            name="restrictions"
+            control={control}
+            render={({ field }) => (
+              <InputWithLabel
+                label="Restrições"
+                tooltip="Alergias e demais restrições do pet. Separe por vírgula — elas aparecem destacadas na ficha e nas internações."
+                type="text"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Ex: Alergia a dipirona, Não pode anti-inflamatório"
+                error={errors.restrictions?.message}
+              />
+            )}
+          />
+
+          <Controller
             name="observations"
             control={control}
             render={({ field }) => (
               <InputWithLabel
                 label="Observações"
-                tooltip="Alertas permanentes do pet, destacados nas fichas — ex.: alergias e cuidados especiais"
+                tooltip="Anotações gerais sobre o pet"
                 type="text"
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Ex: Alergia a dipirona"
+                placeholder="Ex: Fica agitado durante o banho"
                 maxLength={500}
                 error={errors.observations?.message}
               />

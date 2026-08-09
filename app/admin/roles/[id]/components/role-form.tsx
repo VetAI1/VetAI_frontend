@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { SectionCard } from '@/app/components/data/section-card';
+import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -153,16 +154,19 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
         subtitle="Nome e descrição exibidos no administrativo"
       >
         <div className="grid gap-4 md:grid-cols-2">
-          <Input
+          <InputWithLabel
+            label="Nome"
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Nome do papel administrativo"
             disabled={readonly}
+            required
           />
-          <Input
+          <InputWithLabel
+            label="Descrição"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="Descrição"
+            placeholder="Descrição exibida no administrativo"
             disabled={readonly}
           />
         </div>
@@ -188,7 +192,7 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
           {PERMISSION_CATEGORIES.map((category) => (
             <div
               key={category.key}
-              className="rounded-xl border border-slate-200 p-4 dark:border-slate-700"
+              className="rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <h3 className="font-semibold text-slate-900 dark:text-white">
@@ -256,23 +260,23 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
                 className="pl-9"
               />
               {showCollaboratorOptions && !readonly && (
-                <div className="absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-900">
+                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
                   {collaboratorOptions.length === 0 ? (
-                    <div className="px-3 py-4 text-center text-sm text-slate-500">
+                    <p className="p-3 text-center text-sm text-slate-500 dark:text-slate-400">
                       Nenhum colaborador encontrado.
-                    </div>
+                    </p>
                   ) : (
                     collaboratorOptions.map((collaborator) => (
                       <button
                         key={collaborator.id}
                         type="button"
                         onClick={() => addCollaborator(collaborator.id)}
-                        className="flex w-full flex-col rounded-lg px-3 py-2 text-left hover:bg-teal-50 dark:hover:bg-teal-950/30"
+                        className="flex w-full flex-col border-b border-slate-100 px-3 py-2.5 text-left last:border-0 hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-800"
                       >
-                        <span className="font-medium text-slate-900 dark:text-white">
+                        <span className="text-sm font-medium text-slate-900 dark:text-white">
                           {collaborator.name}
                         </span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           {collaborator.email}
                         </span>
                       </button>

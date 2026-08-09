@@ -32,6 +32,8 @@ interface DataTableProps<T> {
   centerHeaders?: boolean;
   columnWidths?: string[];
   className?: string;
+  tableClassName?: string;
+  fillHeight?: boolean;
   maxBodyHeight?: number;
 }
 
@@ -51,11 +53,15 @@ export function DataTable<T>({
   centerHeaders = false,
   columnWidths,
   className,
+  tableClassName,
+  fillHeight = false,
   maxBodyHeight,
 }: DataTableProps<T>) {
   const [searchValue, setSearchValue] = useState('');
   const tableHeaders = columns?.map((column) => column.header) ?? headers ?? [];
   const colSpan = Math.max(tableHeaders.length, 1);
+  const stretchEmptyState =
+    fillHeight && !loading && columns !== undefined && data?.length === 0;
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -64,7 +70,7 @@ export function DataTable<T>({
 
   return (
     <Card
-      className={`overflow-hidden flex flex-col min-h-0${className ? ` ${className}` : ''}`}
+      className={`overflow-hidden flex flex-col min-h-0${fillHeight ? ' flex-1' : ''}${className ? ` ${className}` : ''}`}
     >
       {(showSearch || actions) && (
         <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0">
@@ -90,7 +96,9 @@ export function DataTable<T>({
         className="overflow-x-auto overflow-y-auto flex-1"
         style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}
       >
-        <table className="w-full text-left text-sm">
+        <table
+          className={`w-full text-left text-sm${stretchEmptyState ? ' h-full' : ''}${tableClassName ? ` ${tableClassName}` : ''}`}
+        >
           <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 sticky top-0 z-10">
             <tr>
               {tableHeaders.map((header, index) => {

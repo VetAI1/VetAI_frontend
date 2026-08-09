@@ -14,7 +14,7 @@ import type {
   Tutor,
   UpdateTutorPayload,
 } from '@/types/tutor';
-import { formatCPF } from '@/utils/validations';
+import { formatCPF, formatPhone } from '@/utils/validations';
 
 interface TutorModalProps {
   tutor?: Tutor;
@@ -35,7 +35,7 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
     defaultValues: {
       name: tutor?.name ?? '',
       cpf: tutor?.cpf ?? '',
-      phone: tutor?.phone ?? '',
+      phone: formatPhone(tutor?.phone ?? ''),
       email: tutor?.email ?? '',
       address: tutor?.address ?? '',
     },
@@ -146,8 +146,10 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
                 label="Telefone"
                 required
                 type="tel"
+                inputMode="numeric"
+                maxLength={15}
                 value={field.value}
-                onChange={field.onChange}
+                onChange={(e) => field.onChange(formatPhone(e.target.value))}
                 placeholder="Ex: (11) 99999-9999"
                 error={errors.phone?.message}
               />

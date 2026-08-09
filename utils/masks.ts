@@ -41,3 +41,24 @@ export const formatPhone = (value: string): string => {
   if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 };
+
+// Máscara de digitação: os dígitos entram pela direita, como centavos.
+// "15" -> R$ 0,15 -> "150" -> R$ 1,50
+export const formatCurrency = (value: string): string => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (!digits) return '';
+  return (parseInt(digits, 10) / 100).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+};
+
+export const unmaskCurrency = (value: string): number => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  return digits ? parseInt(digits, 10) / 100 : 0;
+};
+
+export const currencyToMasked = (value: number): string =>
+  value > 0
+    ? value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    : '';

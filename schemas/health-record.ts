@@ -68,6 +68,9 @@ export const prescriptionSchema = yup.object({
     )
     .required('Adicione ao menos um medicamento com nome e posologia.')
     .min(1, 'Adicione ao menos um medicamento com nome e posologia.'),
+  recommendations: yup
+    .array(yup.object({ text: yup.string().default('') }))
+    .default([]),
 });
 
 export type WeightRecordFormData = yup.InferType<typeof weightRecordSchema>;

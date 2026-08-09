@@ -41,6 +41,7 @@ function ParameterFormModal({
     defaultValues: {
       name: parameter?.name ?? '',
       unit: parameter?.unit ?? '',
+      example: parameter?.example ?? '',
       value_type: parameter?.value_type ?? 'TEXT',
     },
   });
@@ -52,12 +53,14 @@ function ParameterFormModal({
         await monitoringService.updateParameter(parameter.id, {
           name: data.name,
           unit: data.unit || undefined,
+          example: data.example || undefined,
           value_type: data.value_type,
         });
       } else {
         await monitoringService.createParameter({
           name: data.name,
           ...(data.unit ? { unit: data.unit } : {}),
+          ...(data.example ? { example: data.example } : {}),
           value_type: data.value_type,
         });
       }
@@ -120,6 +123,20 @@ function ParameterFormModal({
             )}
           />
         </div>
+        <Controller
+          name="example"
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label="Exemplo de preenchimento"
+              placeholder="Ex: 38,5 ou Normal, reduzido, ausente"
+              tooltip="Aparece como dica dentro do campo na hora de registrar os sinais vitais."
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              error={errors.example?.message}
+            />
+          )}
+        />
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Cancelar

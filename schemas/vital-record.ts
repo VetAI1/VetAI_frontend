@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
-// Campos vêm de <input type="number">: string vazia significa "não aferido",
-// não zero.
+// Campos vêm de <input type="number">: string vazia vira undefined para cair
+// na mensagem de obrigatório, não em "valor inválido".
 const vitalField = yup
   .number()
   .transform((value: number, original: unknown) =>
@@ -9,7 +9,7 @@ const vitalField = yup
   )
   .typeError('Valor inválido')
   .min(0, 'Valor inválido')
-  .optional();
+  .required('Campo obrigatório');
 
 export const vitalRecordSchema = yup.object({
   heart_rate: vitalField,

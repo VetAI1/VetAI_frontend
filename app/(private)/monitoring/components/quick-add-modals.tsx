@@ -1,18 +1,16 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Beaker, MessageSquarePlus, Scale } from 'lucide-react';
+import { Beaker, Clock, MessageSquarePlus, Scale } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
-import { nowDateTimeLocal, toISO } from '../utils';
+import { fmtDateTime } from '../utils';
 
 import { Modal } from '@/app/components/common/modal';
-import { DateInput } from '@/app/components/forms/date-input';
 import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
-import { TimeInput } from '@/app/components/forms/time-input';
 import { Button } from '@/components/ui/button';
 import {
   monitoringWeightSchema,
@@ -89,22 +87,36 @@ export function QuickAddChooserModal({
 interface QuickAddBaseProps {
   hospitalizationId: string;
   patientName?: string;
-  defaultDate?: string;
-  defaultTime?: string;
+  recordedAt?: string;
   onClose: () => void;
   onSuccess: () => void;
+}
+
+function recordDate(recordedAt?: string): string {
+  return recordedAt ?? new Date().toISOString();
+}
+
+function RecordTimeHint({ recordedAt }: { recordedAt?: string }) {
+  return (
+    <div className="flex items-start gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40 px-3 py-2.5 text-xs text-slate-500 dark:text-slate-400">
+      <Clock size={14} className="mt-px shrink-0" />
+      <span>
+        {recordedAt
+          ? `Será registrado em ${fmtDateTime(recordedAt)}, o horário do slot selecionado.`
+          : 'A data e o horário são registrados automaticamente no momento do envio.'}
+      </span>
+    </div>
+  );
 }
 
 export function OccurrenceModal({
   hospitalizationId,
   patientName,
-  defaultDate,
-  defaultTime,
+  recordedAt,
   onClose,
   onSuccess,
 }: QuickAddBaseProps) {
   const [saving, setSaving] = useState(false);
-  const now = nowDateTimeLocal();
 
   const {
     control,
@@ -115,8 +127,6 @@ export function OccurrenceModal({
     defaultValues: {
       title: '',
       description: '',
-      date: defaultDate ?? now.date,
-      time: defaultTime ?? now.time,
     },
   });
 
@@ -125,7 +135,7 @@ export function OccurrenceModal({
     try {
       await monitoringService.createEvent(hospitalizationId, {
         type: 'OCCURRENCE',
-        date: toISO(data.date, data.time),
+        date: recordDate(recordedAt),
         title: data.title,
         ...(data.description ? { description: data.description } : {}),
       });
@@ -143,6 +153,7 @@ export function OccurrenceModal({
       maxWidth="md"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <RecordTimeHint {...(recordedAt ? { recordedAt } : {})} />
         <Controller
           name="title"
           control={control}
@@ -171,38 +182,6 @@ export function OccurrenceModal({
             />
           )}
         />
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <Controller
-              name="date"
-              control={control}
-              render={({ field }) => (
-                <DateInput
-                  label="Data"
-                  required
-                  value={field.value}
-                  onChange={field.onChange}
-                  error={errors.date?.message}
-                />
-              )}
-            />
-          </div>
-          <div className="w-32">
-            <Controller
-              name="time"
-              control={control}
-              render={({ field }) => (
-                <TimeInput
-                  label="Hora"
-                  required
-                  value={field.value}
-                  onChange={field.onChange}
-                  error={errors.time?.message}
-                />
-              )}
-            />
-          </div>
-        </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
@@ -223,13 +202,11 @@ export function OccurrenceModal({
 export function WeightModal({
   hospitalizationId,
   patientName,
-  defaultDate,
-  defaultTime,
+  recordedAt,
   onClose,
   onSuccess,
 }: QuickAddBaseProps) {
   const [saving, setSaving] = useState(false);
-  const now = nowDateTimeLocal();
 
   const {
     control,
@@ -242,8 +219,6 @@ export function WeightModal({
     defaultValues: {
       value: '',
       unit: 'KG',
-      date: defaultDate ?? now.date,
-      time: defaultTime ?? now.time,
       notes: '',
     },
   });
@@ -253,7 +228,7 @@ export function WeightModal({
     try {
       await monitoringService.createEvent(hospitalizationId, {
         type: 'WEIGHT',
-        date: toISO(data.date, data.time),
+        date: recordDate(recordedAt),
         ...(data.notes ? { description: data.notes } : {}),
         data: {
           value: Number(data.value.replace(',', '.')),
@@ -274,6 +249,7 @@ export function WeightModal({
       maxWidth="sm"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <RecordTimeHint {...(recordedAt ? { recordedAt } : {})} />
         <div className="flex gap-3">
           <div className="flex-1">
             <Controller
@@ -313,38 +289,6 @@ export function WeightModal({
             />
           </div>
         </div>
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <Controller
-              name="date"
-              control={control}
-              render={({ field }) => (
-                <DateInput
-                  label="Data"
-                  required
-                  value={field.value}
-                  onChange={field.onChange}
-                  error={errors.date?.message}
-                />
-              )}
-            />
-          </div>
-          <div className="w-32">
-            <Controller
-              name="time"
-              control={control}
-              render={({ field }) => (
-                <TimeInput
-                  label="Hora"
-                  required
-                  value={field.value}
-                  onChange={field.onChange}
-                  error={errors.time?.message}
-                />
-              )}
-            />
-          </div>
-        </div>
         <Controller
           name="notes"
           control={control}
@@ -378,8 +322,7 @@ export function WeightModal({
 export function ParametersModal({
   hospitalizationId,
   patientName,
-  defaultDate,
-  defaultTime,
+  recordedAt,
   onClose,
   onSuccess,
 }: QuickAddBaseProps) {
@@ -387,9 +330,6 @@ export function ParametersModal({
   const [parameters, setParameters] = useState<ClinicalParameter[]>([]);
   const [loading, setLoading] = useState(true);
   const [values, setValues] = useState<Record<string, string>>({});
-  const now = nowDateTimeLocal();
-  const [date, setDate] = useState(defaultDate ?? now.date);
-  const [time, setTime] = useState(defaultTime ?? now.time);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -419,7 +359,7 @@ export function ParametersModal({
     try {
       await monitoringService.createEvent(hospitalizationId, {
         type: 'CLINICAL_PARAMETERS',
-        date: toISO(date, time),
+        date: recordDate(recordedAt),
         data: { values: filled },
       });
       onSuccess();
@@ -436,6 +376,7 @@ export function ParametersModal({
       maxWidth="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        <RecordTimeHint {...(recordedAt ? { recordedAt } : {})} />
         {loading ? (
           <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">
             Carregando parâmetros...
@@ -450,7 +391,7 @@ export function ParametersModal({
                     ? `${parameter.name} (${parameter.unit})`
                     : parameter.name
                 }
-                placeholder="—"
+                placeholder={parameter.example ? `Ex: ${parameter.example}` : '—'}
                 value={values[parameter.id] ?? ''}
                 onChange={(e) =>
                   setValues((prev) => ({
@@ -462,15 +403,6 @@ export function ParametersModal({
             ))}
           </div>
         )}
-
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <DateInput label="Data" required value={date} onChange={setDate} />
-          </div>
-          <div className="w-32">
-            <TimeInput label="Hora" required value={time} onChange={setTime} />
-          </div>
-        </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 

@@ -1,6 +1,12 @@
 'use client';
 
-import { Check, Clock, Loader2, Sparkles, Zap } from 'lucide-react';
+import {
+  Check,
+  Infinity as InfinityIcon,
+  Loader2,
+  Sparkles,
+  Zap,
+} from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -151,8 +157,8 @@ export function BuyAiCreditsModal({
 
                   <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5 text-slate-400" />
-                      {pkg.durabilityDays ?? 30} dias
+                      <InfinityIcon className="h-3.5 w-3.5 text-slate-400" />
+                      Sem validade
                     </span>
                     <span className="font-medium text-teal-600 dark:text-teal-400">
                       Acumulativo
@@ -173,7 +179,7 @@ export function BuyAiCreditsModal({
             • Ao comprar um pacote, os créditos são adicionados imediatamente ao seu saldo.
           </p>
           <p>
-            • Quando sua assinatura renovar no final do mês, <strong>seus créditos comprados não expirados serão mantidos</strong> e somados aos créditos da nova renovação.
+            • Os créditos comprados <strong>não têm prazo de validade</strong>: valem até serem usados e são somados aos créditos de cada renovação.
           </p>
         </div>
 

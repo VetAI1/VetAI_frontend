@@ -11,11 +11,13 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  cpf?: string;
-  role: string;
+cpf?: string;
+  role?: string;
+  role_name?: string;
   role_id?: string;
   permissions: string[];
   crmv?: string;
+  specialty?: string;
   phone?: string;
   address?: UserAddress;
   hospital_id?: string;
@@ -50,9 +52,11 @@ export interface RegisterPayload {
   cpf: string;
   password: string;
   crmv?: string;
+  specialty?: string;
   invite_token?: string;
   plan_id?: string;
   hospital_name?: string;
+  hospital_phone?: string;
   cnpj?: string;
   address?: {
     zip_code: string;

@@ -173,9 +173,7 @@ export function BoxesTab() {
                   <BedDouble
                     size={18}
                     className={
-                      box.occupied
-                        ? 'text-red-500 shrink-0'
-                        : 'text-green-500 shrink-0'
+                      'text-slate-900 dark:text-white'
                     }
                   />
                   <p className="font-semibold text-slate-900 dark:text-white truncate">

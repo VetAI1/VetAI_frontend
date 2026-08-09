@@ -3,10 +3,7 @@
 import {
   AlertTriangle,
   BedDouble,
-  Bird,
-  Cat,
   CalendarClock,
-  Dog,
   Loader2,
   PawPrint,
   Plus,
@@ -42,12 +39,6 @@ import type {
   MonitoringSummary,
 } from '@/types/monitoring';
 import type { Collaborator } from '@/types/settings';
-
-const SPECIE_ICONS: Record<string, typeof PawPrint> = {
-  DOG: Dog,
-  CAT: Cat,
-  BIRD: Bird,
-};
 
 const GROUP_ORDER: HospitalizationStatus[] = [
   'HOSPITALIZED',
@@ -157,7 +148,7 @@ export function HospitalizedTab() {
           id: me.id,
           name: me.name,
           email: me.email,
-          role: me.role,
+          role: me.role_name ?? '',
           status: 'active',
           addedAt: new Date().toISOString(),
         });
@@ -290,9 +281,6 @@ export function HospitalizedTab() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                   {group.items.map((hospitalization) => {
-                    const SpecieIcon =
-                SPECIE_ICONS[hospitalization.patient?.specie ?? ''] ?? PawPrint;
-                    const status = STATUS_MAP[hospitalization.status];
                     const risk = RISK_MAP[hospitalization.risk];
                     return (
                       <button
@@ -302,12 +290,16 @@ export function HospitalizedTab() {
                           router.push(`/monitoring/detail?id=${hospitalization.id}`)
                         }
                         title={risk.label}
-                        className={`text-left bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 border-l-4 ${risk.border} shadow-sm hover:shadow-md transition-all p-4`}
+                        className="relative overflow-hidden text-left bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all p-4 pl-6"
                       >
+                        <span
+                          aria-hidden="true"
+                          className={`absolute inset-y-0 left-0 w-2 ${risk.dot}`}
+                        />
                         <div className="flex items-start justify-between gap-2 mb-3">
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 shrink-0">
-                              <SpecieIcon size={22} />
+                              <Stethoscope size={22} />
                             </div>
                             <div className="min-w-0">
                               <p className="font-semibold text-slate-900 dark:text-white truncate">
@@ -318,9 +310,9 @@ export function HospitalizedTab() {
                               </p>
                             </div>
                           </div>
-                          {hospitalization.allergies.length > 0 && (
+                          {(hospitalization.patient?.restrictions?.length ?? 0) > 0 && (
                             <span
-                              title={`Alergias: ${hospitalization.allergies.join(', ')}`}
+                              title={`Restrições: ${hospitalization.patient.restrictions?.join(', ')}`}
                               className="text-amber-500 shrink-0"
                             >
                               <AlertTriangle size={18} />
@@ -329,9 +321,6 @@ export function HospitalizedTab() {
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 mb-3">
-                          <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${status.badge}`}>
-                            {status.label}
-                          </span>
                           {hospitalization.clinical_status && (
                             <span
                               className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${CLINICAL_STATUS_CLASSES[hospitalization.clinical_status]}`}
@@ -347,9 +336,16 @@ export function HospitalizedTab() {
                         </div>
 
                         <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-                          <p className="flex items-center gap-1.5">
+                          <p
+                            className="flex items-center gap-1.5"
+                            title="Veterinário de plantão"
+                          >
                             <Stethoscope size={13} className="text-slate-400 shrink-0" />
-                            <span className="truncate">{hospitalization.veterinarian?.name ?? '—'}</span>
+                            <span className="truncate">
+                              {hospitalization.on_duty_veterinarian?.name ??
+                                hospitalization.veterinarian?.name ??
+                                '—'}
+                            </span>
                           </p>
                           <p className="flex items-center gap-1.5">
                             <BedDouble size={13} className="text-slate-400 shrink-0" />

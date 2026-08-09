@@ -19,6 +19,7 @@ interface InviteFormData {
   name: string;
   email: string;
   cpf: string;
+  specialty?: string;
   password: string;
   confirmPassword: string;
 }
@@ -64,6 +65,7 @@ function InviteRegistrationForm() {
         cpf: data.cpf.replace(/\D/g, ''),
         password: data.password,
         invite_token: token,
+        ...(data.specialty?.trim() ? { specialty: data.specialty.trim() } : {}),
       };
       await registerAccount(payload);
     } finally {
@@ -112,6 +114,14 @@ function InviteRegistrationForm() {
                 error={errors.email?.message}
                 autoComplete="email"
                 required
+              />
+              <InputWithLabel
+                label="Área de atuação"
+                name="specialty"
+                control={control}
+                error={errors.specialty?.message}
+                placeholder="Ex.: Clínico Geral"
+                containerClassName="sm:col-span-2"
               />
               <InputWithLabel
                 label="Senha"

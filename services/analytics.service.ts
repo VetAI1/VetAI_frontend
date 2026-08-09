@@ -1,3 +1,4 @@
+import { chartColor, chartFill } from '@/constants/charts';
 import { httpClient } from '@/infra/http-client';
 import type { Patient } from '@/types/patient';
 import type { Study } from '@/types/study';
@@ -29,7 +30,8 @@ export interface DashboardData {
 
 /**
  * Maps the snake_case properties from the backend API (background_color, border_color)
- * to camelCase (backgroundColor, borderColor) required by Chart.js.
+ * to camelCase (backgroundColor, borderColor) required by Chart.js, applying the
+ * system palette on top — a cor é decisão de apresentação, não da API.
  */
 type RawDataset = ChartDataset & {
   background_color?: string | string[];
@@ -46,20 +48,28 @@ function mapChartData(
   return {
     ...data,
     labels: formatLabels ? formatLabels(data.labels ?? []) : data.labels,
-    datasets: data.datasets.map((ds) => ({
-      label: ds.label,
-      data: ds.data,
-      ...(ds.background_color !== undefined
-        ? { backgroundColor: ds.background_color }
-        : ds.backgroundColor !== undefined
-          ? { backgroundColor: ds.backgroundColor }
-          : {}),
-      ...(ds.border_color !== undefined
-        ? { borderColor: ds.border_color }
-        : ds.borderColor !== undefined
-          ? { borderColor: ds.borderColor }
-          : {}),
-    })),
+    datasets: data.datasets.map((ds, index) => {
+      // Uma cor por ponto (rosca, barras) ou uma por série (linha) — o formato
+      // que o backend usou indica qual dos dois é o caso.
+      const perPoint = Array.isArray(ds.background_color ?? ds.backgroundColor);
+
+      if (perPoint) {
+        return {
+          label: ds.label,
+          data: ds.data,
+          backgroundColor: ds.data.map((_, pointIndex) =>
+            chartColor(pointIndex),
+          ),
+        };
+      }
+
+      return {
+        label: ds.label,
+        data: ds.data,
+        backgroundColor: chartFill(index),
+        borderColor: chartColor(index),
+      };
+    }),
   };
 }
 

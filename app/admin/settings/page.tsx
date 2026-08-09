@@ -1,18 +1,20 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Building2, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
+import { SectionCard } from '@/app/components/data/section-card';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
+import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/infra/auth-context';
 import { hospitalSchema, type HospitalFormData } from '@/schemas/hospital';
 import { hospitalsService } from '@/services/hospitals.service';
-import { formatCEP, formatCNPJ, unmaskCEP, unmaskCNPJ } from '@/utils/masks';
+import { formatCEP, formatCNPJ, formatPhone, unmaskCEP, unmaskCNPJ } from '@/utils/masks';
 
 export default function SettingsPage() {
   const { can } = useAuth();
@@ -34,7 +36,7 @@ export default function SettingsPage() {
         reset({
           name: hospital.name,
           cnpj: formatCNPJ(hospital.cnpj ?? ''),
-          crmv: hospital.crmv ?? '',
+          phone: formatPhone(hospital.phone ?? ''),
           address: {
             zipCode: formatCEP(hospital.address.zip_code),
             street: hospital.address.street,
@@ -76,70 +78,72 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <main className="mx-auto w-full max-w-5xl space-y-8 p-4 sm:p-6">
-        <div className="flex items-start gap-4">
-          <Skeleton className="h-12 w-12 rounded-xl" />
-          <div className="space-y-2">
-            <Skeleton className="h-7 w-64" />
-            <Skeleton className="h-4 w-80" />
+      <div className="flex w-full flex-col gap-6 pb-12">
+        <Header title="Configurações da clínica" showStorage={false} />
+        <SectionCard
+          title="Identificação"
+          subtitle="Dados usados para identificar sua clínica"
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
           </div>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-950 space-y-5">
-          <Skeleton className="h-6 w-32" />
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
+        </SectionCard>
+        <SectionCard
+          title="Endereço"
+          subtitle="Endereço completo da clínica"
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
           </div>
-        </div>
-      </main>
+        </SectionCard>
+      </div>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-8 p-4 sm:p-6">
-      <div className="flex items-start gap-4">
-        <div className="rounded-xl bg-teal-100 p-3 text-teal-700 dark:bg-teal-950 dark:text-teal-300">
-          <Building2 size={24} />
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex w-full flex-col gap-6 pb-12"
+    >
+      <Header title="Configurações da clínica" showStorage={false} />
+
+      <SectionCard
+        title="Identificação"
+        subtitle="Dados usados para identificar sua clínica"
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <InputWithLabel label="Nome da clínica" name="name" control={control} error={errors.name?.message} disabled={!canEdit} required />
+          <InputWithLabel label="CNPJ" name="cnpj" control={control} error={errors.cnpj?.message} onChange={(event) => setValue('cnpj', formatCNPJ(event.target.value), { shouldValidate: true })} disabled={!canEdit} maxLength={18} required />
+          <InputWithLabel label="Telefone da clínica" name="phone" control={control} error={errors.phone?.message} onChange={(event) => setValue('phone', formatPhone(event.target.value), { shouldValidate: true })} disabled={!canEdit} maxLength={15} required />
+          <InputWithLabel label="Responsável técnico" name="responsible.name" control={control} error={errors.responsible?.name?.message} disabled={!canEdit} required />
+          <InputWithLabel label="CRMV do responsável" name="responsible.crmv" control={control} error={errors.responsible?.crmv?.message} disabled={!canEdit} required />
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Configurações da clínica
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Atualize os dados usados para identificar sua clínica.
-          </p>
+      </SectionCard>
+
+      <SectionCard title="Endereço" subtitle="Endereço completo da clínica">
+        <div className="grid gap-4 md:grid-cols-3">
+          <InputWithLabel label="CEP" name="address.zipCode" control={control} error={errors.address?.zipCode?.message} onChange={(event) => setValue('address.zipCode', formatCEP(event.target.value), { shouldValidate: true })} disabled={!canEdit} maxLength={9} required />
+          <InputWithLabel label="Estado" name="address.state" control={control} error={errors.address?.state?.message} disabled={!canEdit} maxLength={2} required />
+          <InputWithLabel label="Cidade" name="address.city" control={control} error={errors.address?.city?.message} disabled={!canEdit} required />
+          <InputWithLabel label="Rua" name="address.street" control={control} error={errors.address?.street?.message} containerClassName="md:col-span-2" disabled={!canEdit} required />
+          <InputWithLabel label="Número" name="address.number" control={control} error={errors.address?.number?.message} disabled={!canEdit} required />
+          <InputWithLabel label="Bairro" name="address.neighborhood" control={control} error={errors.address?.neighborhood?.message} disabled={!canEdit} required />
+          <InputWithLabel label="Complemento" name="address.complement" control={control} disabled={!canEdit} />
         </div>
-      </div>
+      </SectionCard>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-950 sm:p-6">
-          <h2 className="mb-5 font-semibold text-slate-900 dark:text-white">Identificação</h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <InputWithLabel label="Nome da clínica" name="name" control={control} error={errors.name?.message} disabled={!canEdit} required />
-            <InputWithLabel label="CNPJ" name="cnpj" control={control} error={errors.cnpj?.message} onChange={(event) => setValue('cnpj', formatCNPJ(event.target.value), { shouldValidate: true })} disabled={!canEdit} maxLength={18} required />
-            <InputWithLabel label="CRMV da clínica" name="crmv" control={control} error={errors.crmv?.message} disabled={!canEdit} />
-            <InputWithLabel label="Responsável técnico" name="responsible.name" control={control} error={errors.responsible?.name?.message} disabled={!canEdit} required />
-            <InputWithLabel label="CRMV do responsável" name="responsible.crmv" control={control} error={errors.responsible?.crmv?.message} disabled={!canEdit} required />
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-950 sm:p-6">
-          <h2 className="mb-5 font-semibold text-slate-900 dark:text-white">Endereço</h2>
-          <div className="grid gap-5 sm:grid-cols-3">
-            <InputWithLabel label="CEP" name="address.zipCode" control={control} error={errors.address?.zipCode?.message} onChange={(event) => setValue('address.zipCode', formatCEP(event.target.value), { shouldValidate: true })} disabled={!canEdit} maxLength={9} required />
-            <InputWithLabel label="Estado" name="address.state" control={control} error={errors.address?.state?.message} disabled={!canEdit} maxLength={2} required />
-            <InputWithLabel label="Cidade" name="address.city" control={control} error={errors.address?.city?.message} disabled={!canEdit} required />
-            <InputWithLabel label="Rua" name="address.street" control={control} error={errors.address?.street?.message} containerClassName="sm:col-span-2" disabled={!canEdit} required />
-            <InputWithLabel label="Número" name="address.number" control={control} error={errors.address?.number?.message} disabled={!canEdit} required />
-            <InputWithLabel label="Bairro" name="address.neighborhood" control={control} error={errors.address?.neighborhood?.message} disabled={!canEdit} required />
-            <InputWithLabel label="Complemento" name="address.complement" control={control} disabled={!canEdit} />
-          </div>
-        </section>
-
-        {canEdit && <div className="flex justify-end"><Button type="submit" loading={isSubmitting} className="bg-teal-600 text-white hover:bg-teal-700"><Save size={16} />Salvar alterações</Button></div>}
-      </form>
-    </main>
+      {canEdit && (
+        <div className="flex justify-end">
+          <Button type="submit" loading={isSubmitting} className="bg-teal-600 text-white hover:bg-teal-700">
+            <Save size={16} />Salvar alterações
+          </Button>
+        </div>
+      )}
+    </form>
   );
 }

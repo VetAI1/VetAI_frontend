@@ -23,6 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { tutorsService } from '@/services/tutors.service';
 import type { Tutor } from '@/types/tutor';
+import { formatPhone } from '@/utils/masks';
 
 export default function TutorsPage() {
   const [showModal, setShowModal] = useState(false);
@@ -146,10 +147,10 @@ export default function TutorsPage() {
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
                         <User
                           size={16}
-                          className="text-purple-600 dark:text-purple-400"
+                          className="text-teal-600 dark:text-teal-400"
                         />
                       </div>
                       <p className="font-medium text-slate-900 dark:text-white">
@@ -168,7 +169,7 @@ export default function TutorsPage() {
                     {tutor.phone ? (
                       <span className="flex items-center gap-1.5">
                         <Phone size={13} className="text-slate-400" />
-                        {tutor.phone}
+                        {formatPhone(tutor.phone)}
                       </span>
                     ) : (
                       <span className="text-slate-400 dark:text-slate-500">

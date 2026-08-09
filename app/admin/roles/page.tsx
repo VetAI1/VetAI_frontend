@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import {
   DataTable,
   type DataTableColumn,
@@ -20,6 +21,8 @@ export default function AdminRoles() {
   const { can } = useAuth();
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
+  const [roleToRemove, setRoleToRemove] = useState<Role | null>(null);
+  const [removing, setRemoving] = useState(false);
   const canEdit = can('roles:edit');
 
   async function load() {
@@ -36,10 +39,15 @@ export default function AdminRoles() {
   }, []);
 
   async function removeRole(role: Role) {
-    if (!confirm(`Excluir o papel administrativo ${role.name}?`)) return;
-    await rolesService.delete(role.id);
-    toast.success('Papel administrativo excluído.');
-    await load();
+    setRemoving(true);
+    try {
+      await rolesService.delete(role.id);
+      toast.success('Papel administrativo excluído.');
+      setRoleToRemove(null);
+      await load();
+    } finally {
+      setRemoving(false);
+    }
   }
 
   const columns: DataTableColumn<Role>[] = [
@@ -87,7 +95,7 @@ export default function AdminRoles() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => removeRole(role)}
+            onClick={() => setRoleToRemove(role)}
             disabled={
               !canEdit || role.is_default || role.permissions?.includes('*')
             }
@@ -101,7 +109,7 @@ export default function AdminRoles() {
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 pb-12">
+    <div className="flex w-full flex-col gap-6 pb-12">
       <Header title="Papel administrativo" showStorage={false} />
 
       <SectionCard
@@ -127,6 +135,17 @@ export default function AdminRoles() {
           loading={loading}
         />
       </SectionCard>
+
+      {roleToRemove && (
+        <ConfirmModal
+          title="Excluir papel administrativo"
+          description={`O papel ${roleToRemove.name} será removido permanentemente.`}
+          confirmLabel="Excluir papel"
+          loading={removing}
+          onConfirm={() => void removeRole(roleToRemove)}
+          onClose={() => setRoleToRemove(null)}
+        />
+      )}
     </div>
   );
 }

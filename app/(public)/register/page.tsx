@@ -24,7 +24,14 @@ import { useAuth } from '@/infra/auth-context';
 import { billingService } from '@/services/billing.service';
 import type { RegisterPayload } from '@/types/auth';
 import type { Plan } from '@/types/billing';
-import { formatCEP, formatCNPJ, formatCPF, unmaskCEP, unmaskCNPJ } from '@/utils/masks';
+import {
+  formatCEP,
+  formatCNPJ,
+  formatCPF,
+  formatPhone,
+  unmaskCEP,
+  unmaskCNPJ,
+} from '@/utils/masks';
 import { validateCEP, validateCNPJ, validateCPF } from '@/utils/validations';
 
 interface RegisterPageFormData {
@@ -34,8 +41,10 @@ interface RegisterPageFormData {
   password: string;
   confirmPassword: string;
   crmv?: string;
+  specialty?: string;
   planId?: string;
   hospitalName?: string;
+  hospitalPhone?: string;
   cnpj?: string;
   isUserResponsible?: boolean;
   address?: {
@@ -112,6 +121,7 @@ function RegisterForm() {
 
     requiredFields.push(
       ['hospitalName', 'Nome da clínica é obrigatório'],
+      ['hospitalPhone', 'Telefone da clínica é obrigatório'],
       ['cnpj', 'CNPJ é obrigatório'],
     );
 
@@ -131,9 +141,16 @@ function RegisterForm() {
       setError('cnpj', { message: 'CNPJ inválido' });
       hasError = true;
     }
-    if (data.cpf && !validateCPF(data.cpf)) {
+if (data.cpf && !validateCPF(data.cpf)) {
       setError('cpf', { message: 'CPF inválido' });
       hasError = true;
+    }
+    if (data.hospitalPhone) {
+      const digits = data.hospitalPhone.replace(/\D/g, '');
+      if (digits.length !== 10 && digits.length !== 11) {
+        setError('hospitalPhone', { message: 'Telefone inválido' });
+        hasError = true;
+      }
     }
     if (!data.address?.zipCode) {
       setError('address.zipCode', { message: 'CEP é obrigatório' });
@@ -219,7 +236,13 @@ function RegisterForm() {
 
   async function submitRegistration() {
     const data = getValues();
-    if (!selectedPlan || !data.hospitalName || !data.cnpj || !data.address)
+    if (
+      !selectedPlan ||
+      !data.hospitalName ||
+      !data.hospitalPhone ||
+      !data.cnpj ||
+      !data.address
+    )
       return;
     if (!data.isUserResponsible && !data.responsible) return;
 
@@ -233,7 +256,9 @@ function RegisterForm() {
         crmv: data.crmv ?? '',
         plan_id: selectedPlan.id,
         hospital_name: data.hospitalName,
+        hospital_phone: data.hospitalPhone,
         cnpj: unmaskCNPJ(data.cnpj),
+        ...(data.specialty?.trim() ? { specialty: data.specialty.trim() } : {}),
         address: {
           zip_code: unmaskCEP(data.address.zipCode ?? ''),
           street: data.address.street ?? '',
@@ -343,6 +368,23 @@ function RegisterForm() {
                         }
                         autoCapitalize="characters"
                         maxLength={18}
+                        required
+                      />
+                      <InputWithLabel
+                        label="Telefone da clínica"
+                        name="hospitalPhone"
+                        control={control}
+                        error={errors.hospitalPhone?.message}
+                        onChange={(event) =>
+                          setValue(
+                            'hospitalPhone',
+                            formatPhone(event.target.value),
+                          )
+                        }
+                        placeholder="(11) 3456-7890"
+                        inputMode="tel"
+                        containerClassName="sm:col-span-2"
+                        maxLength={15}
                         required
                       />
                       <div className="flex items-center gap-2 pt-2 sm:col-span-2">
@@ -498,6 +540,13 @@ function RegisterForm() {
                       required
                     />
                     <InputWithLabel
+                      label="Área de atuação"
+                      name="specialty"
+                      control={control}
+                      error={errors.specialty?.message}
+                      placeholder="Ex.: Clínico Geral"
+                    />
+                    <InputWithLabel
                       label="Senha"
                       type={showPassword ? 'text' : 'password'}
                       name="password"
@@ -638,6 +687,9 @@ function RegisterForm() {
                     </p>
                     <p className="text-sm text-slate-600 dark:text-slate-300">
                       {data.cnpj}
+                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300">
+                      {data.hospitalPhone}
                     </p>
                     <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
                       {data.address?.street}, {data.address?.number} -{' '}

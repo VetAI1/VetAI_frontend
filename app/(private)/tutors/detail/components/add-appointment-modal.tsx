@@ -47,7 +47,6 @@ export function AddAppointmentModal({
   const [generalError, setGeneralError] = useState<string | null>(null);
 
   const {
-    register,
     handleSubmit,
     control,
     watch,
@@ -105,7 +104,8 @@ export function AddAppointmentModal({
           required
           placeholder="Ex: Consulta de rotina"
           error={errors.title?.message}
-          {...register('title')}
+          control={control}
+          name="title"
         />
 
         <div className="grid grid-cols-2 gap-3">

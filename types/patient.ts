@@ -6,6 +6,7 @@ export interface Patient {
   name: string;
   record_number?: number;
   observations?: string;
+  restrictions?: string[];
   specie: Specie;
   breed?: string;
   birth_date?: string;
@@ -21,6 +22,7 @@ export interface Patient {
 export interface CreatePatientPayload {
   name: string;
   observations?: string;
+  restrictions?: string[];
   specie: Specie;
   breed?: string;
   birth_date?: string;
@@ -34,6 +36,7 @@ export interface CreatePatientPayload {
 export interface UpdatePatientPayload {
   name?: string;
   observations?: string;
+  restrictions?: string[];
   specie?: Specie;
   breed?: string;
   birth_date?: string;

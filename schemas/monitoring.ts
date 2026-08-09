@@ -73,22 +73,6 @@ export const prescriptionFormSchema = yup.object({
         .test('positive', 'Duração inválida', (value) => Number(value) > 0),
     otherwise: (schema) => schema.optional(),
   }),
-  start_date: yup.string().when('frequency', {
-    is: (value: string) => value !== 'AS_NEEDED',
-    then: (schema) =>
-      schema
-        .required('Data de início é obrigatória')
-        .matches(dateRegex, 'Data inválida'),
-    otherwise: (schema) => schema.optional(),
-  }),
-  start_time: yup.string().when('frequency', {
-    is: (value: string) => value !== 'AS_NEEDED',
-    then: (schema) =>
-      schema
-        .required('Hora de início é obrigatória')
-        .matches(timeRegex, 'Hora inválida'),
-    otherwise: (schema) => schema.optional(),
-  }),
   notes: yup.string().optional(),
 });
 
@@ -111,14 +95,6 @@ export type ExecuteFormData = yup.InferType<typeof executeSchema>;
 export const occurrenceSchema = yup.object({
   title: yup.string().trim().required('Resumo é obrigatório'),
   description: yup.string().optional(),
-  date: yup
-    .string()
-    .required('Data é obrigatória')
-    .matches(dateRegex, 'Data inválida'),
-  time: yup
-    .string()
-    .required('Hora é obrigatória')
-    .matches(timeRegex, 'Hora inválida'),
 });
 
 export type OccurrenceFormData = yup.InferType<typeof occurrenceSchema>;
@@ -135,14 +111,6 @@ export const monitoringWeightSchema = yup.object({
     .mixed<'KG' | 'G'>()
     .oneOf(['KG', 'G'], 'Unidade inválida')
     .required('Unidade é obrigatória'),
-  date: yup
-    .string()
-    .required('Data é obrigatória')
-    .matches(dateRegex, 'Data inválida'),
-  time: yup
-    .string()
-    .required('Hora é obrigatória')
-    .matches(timeRegex, 'Hora inválida'),
   notes: yup.string().optional(),
 });
 
@@ -150,15 +118,28 @@ export type MonitoringWeightFormData = yup.InferType<
   typeof monitoringWeightSchema
 >;
 
+// Data e hora só são informadas no óbito. A alta usa o momento do registro e
+// o cancelamento não tem data própria.
 export const dischargeSchema = yup.object({
-  date: yup
-    .string()
-    .required('Data é obrigatória')
-    .matches(dateRegex, 'Data inválida'),
-  time: yup
-    .string()
-    .required('Hora é obrigatória')
-    .matches(timeRegex, 'Hora inválida'),
+  needs_date: yup.boolean().default(false),
+  date: yup.string().when('needs_date', {
+    is: true,
+    then: (schema) =>
+      schema.required('Data é obrigatória').matches(dateRegex, 'Data inválida'),
+    otherwise: (schema) => schema.optional(),
+  }),
+  time: yup.string().when('needs_date', {
+    is: true,
+    then: (schema) =>
+      schema.required('Hora é obrigatória').matches(timeRegex, 'Hora inválida'),
+    otherwise: (schema) => schema.optional(),
+  }),
+  needs_reason: yup.boolean().default(false),
+  reason: yup.string().when('needs_reason', {
+    is: true,
+    then: (schema) => schema.required('Selecione o motivo'),
+    otherwise: (schema) => schema.optional(),
+  }),
   notes: yup.string().optional(),
 });
 
@@ -174,6 +155,7 @@ export type BoxFormData = yup.InferType<typeof boxSchema>;
 export const clinicalParameterSchema = yup.object({
   name: yup.string().trim().required('Nome é obrigatório'),
   unit: yup.string().optional(),
+  example: yup.string().optional(),
   value_type: yup
     .mixed<'NUMBER' | 'TEXT'>()
     .oneOf(['NUMBER', 'TEXT'], 'Tipo inválido')

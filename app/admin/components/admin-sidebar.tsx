@@ -13,43 +13,51 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { useTheme } from '@/contexts/theme-context';
 import { useAuth } from '@/infra/auth-context';
+import type { Permission } from '@/types/permissions';
 
-const items = [
-  { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+const items: Array<{
+  href: string;
+  icon: typeof LayoutDashboard;
+  label: string;
+  permission?: Permission;
+}> = [
+  { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   {
     href: '/admin/subscription',
-    label: 'Plano & Assinatura',
     icon: CreditCard,
+    label: 'Plano & Assinatura',
     permission: 'billing:view',
   },
   {
     href: '/admin/collaborators',
-    label: 'Colaboradores',
     icon: Users,
+    label: 'Colaboradores',
     permission: 'collaborators:view',
   },
   {
     href: '/admin/roles',
-    label: 'Papel administrativo',
     icon: ShieldCheck,
+    label: 'Papel administrativo',
     permission: 'roles:view',
   },
   {
     href: '/admin/settings',
-    label: 'Configurações da clínica',
     icon: Settings,
+    label: 'Configurações da clínica',
     permission: 'settings:view',
   },
 ];
 
+const footerItemClassName =
+  'flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg w-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
+
 export function AdminSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { can } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -58,55 +66,66 @@ export function AdminSidebar() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed left-4 top-4 z-50 rounded-lg border border-slate-700 bg-slate-900 p-2 text-white shadow-lg md:hidden"
+        className="md:hidden print:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg"
       >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
+        {isOpen ? (
+          <X size={24} className="text-slate-900 dark:text-white" />
+        ) : (
+          <Menu size={24} className="text-slate-900 dark:text-white" />
+        )}
       </button>
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
           onClick={() => setIsOpen(false)}
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
         />
       )}
 
       <aside
-        className={`fixed md:relative z-40 flex h-full w-72 flex-col border-r border-slate-800 bg-slate-950 text-white transition-transform duration-300 ${
+        className={`fixed md:relative print:hidden z-40 flex h-full w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        <div className="flex h-16 items-center gap-3 border-b border-slate-800 px-6">
-          <div className="rounded-xl bg-teal-500/10 p-2">
-            <ShieldCheck className="text-teal-400" size={22} />
+        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center">
+            <ShieldCheck className="text-teal-600 mr-2" />
+            <span className="font-bold text-lg tracking-tight">VetAI</span>
           </div>
-          <div>
-            <p className="font-bold tracking-tight">VetAI Admin</p>
-            <p className="text-xs text-slate-400">Área administrativa</p>
-          </div>
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300">
+            ADMIN
+          </span>
         </div>
 
-        <nav className="flex-1 space-y-2 p-4">
+        <nav className="flex-1 p-4 space-y-2">
           {items.map((item) => {
             const Icon = item.icon;
             const isActive =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const disabled = item.permission ? !can(item.permission) : false;
-            const className = `flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-              disabled
-                ? 'cursor-not-allowed text-slate-600'
+            const isDisabled = item.permission ? !can(item.permission) : false;
+
+            const className = `w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              isDisabled
+                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-60'
                 : isActive
-                  ? 'bg-teal-600 text-white shadow-sm'
-                  : 'text-slate-300 hover:bg-slate-900'
+                  ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`;
 
-            if (disabled) {
+            const content = (
+              <>
+                <Icon size={20} /> {item.label}
+              </>
+            );
+
+            if (isDisabled) {
               return (
                 <span
                   key={item.href}
                   className={className}
                   aria-disabled="true"
                 >
-                  <Icon size={19} /> {item.label}
+                  {content}
                 </span>
               );
             }
@@ -115,29 +134,27 @@ export function AdminSidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={className}
                 onClick={() => setIsOpen(false)}
+                className={className}
               >
-                <Icon size={19} /> {item.label}
+                {content}
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-slate-800 p-4 space-y-2">
-          <button
-            onClick={toggleTheme}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-900"
-          >
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+          <button onClick={toggleTheme} className={footerItemClassName}>
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
           </button>
-          <button
-            onClick={() => router.push('/analytics/dashboard')}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-900"
+          <Link
+            href="/analytics/dashboard"
+            onClick={() => setIsOpen(false)}
+            className={footerItemClassName}
           >
             <ArrowLeft size={18} /> Voltar para o sistema
-          </button>
+          </Link>
         </div>
       </aside>
     </>

@@ -44,6 +44,7 @@ export const patientSchema = yup.object({
     .nullable()
     .optional()
     .max(500, 'Observações deve ter no máximo 500 caracteres'),
+  restrictions: yup.string().nullable().optional(),
   tutorId: yup.string().required('Tutor é obrigatório'),
 });
 
@@ -57,5 +58,6 @@ export interface PatientFormData {
   deathDate: string;
   microchip: string;
   observations: string;
+  restrictions: string;
   tutorId: string;
 }

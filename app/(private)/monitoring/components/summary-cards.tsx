@@ -9,44 +9,41 @@ interface SummaryCardsProps {
   loading?: boolean;
 }
 
+const ICON_CLASS =
+  'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/20';
+
 const CARDS = [
   {
     key: 'hospitalized' as const,
     label: 'Internados agora',
     icon: PawPrint,
-    iconClass: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/20',
   },
   {
     key: 'triage' as const,
     label: 'Em triagem',
     icon: Stethoscope,
-    iconClass:
-      'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20',
   },
   {
     key: 'expected_discharges_today' as const,
     label: 'Altas previstas hoje',
     icon: CalendarCheck,
-    iconClass:
-      'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20',
   },
   {
     key: 'late_executions' as const,
     label: 'Tarefas atrasadas',
     icon: AlarmClockOff,
-    iconClass: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20',
   },
 ];
 
 export function SummaryCards({ summary, loading = false }: SummaryCardsProps) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      {CARDS.map(({ key, label, icon: Icon, iconClass }) => (
+      {CARDS.map(({ key, label, icon: Icon }) => (
         <div
           key={key}
           className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 flex items-center gap-3"
         >
-          <div className={`p-2.5 rounded-lg shrink-0 ${iconClass}`}>
+          <div className={`p-2.5 rounded-lg shrink-0 ${ICON_CLASS}`}>
             <Icon size={20} />
           </div>
           <div className="min-w-0">
