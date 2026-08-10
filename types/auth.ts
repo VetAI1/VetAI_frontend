@@ -11,6 +11,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+cpf?: string;
   role?: string;
   role_name?: string;
   role_id?: string;
@@ -48,6 +49,7 @@ export interface LoginPayload {
 export interface RegisterPayload {
   name: string;
   email: string;
+  cpf: string;
   password: string;
   crmv?: string;
   specialty?: string;

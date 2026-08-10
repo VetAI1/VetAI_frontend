@@ -27,15 +27,17 @@ import type { Plan } from '@/types/billing';
 import {
   formatCEP,
   formatCNPJ,
+  formatCPF,
   formatPhone,
   unmaskCEP,
   unmaskCNPJ,
 } from '@/utils/masks';
-import { validateCEP, validateCNPJ } from '@/utils/validations';
+import { validateCEP, validateCNPJ, validateCPF } from '@/utils/validations';
 
 interface RegisterPageFormData {
   name: string;
   email: string;
+  cpf: string;
   password: string;
   confirmPassword: string;
   crmv?: string;
@@ -112,6 +114,7 @@ function RegisterForm() {
     const requiredFields: Array<[keyof RegisterPageFormData, string]> = [
       ['name', 'Nome é obrigatório'],
       ['email', 'Email é obrigatório'],
+      ['cpf', 'CPF é obrigatório'],
       ['password', 'Senha é obrigatória'],
       ['confirmPassword', 'Confirmação de senha é obrigatória'],
     ];
@@ -136,6 +139,10 @@ function RegisterForm() {
 
     if (data.cnpj && !validateCNPJ(data.cnpj)) {
       setError('cnpj', { message: 'CNPJ inválido' });
+      hasError = true;
+    }
+    if (data.cpf && !validateCPF(data.cpf)) {
+      setError('cpf', { message: 'CPF inválido' });
       hasError = true;
     }
     if (data.hospitalPhone) {
@@ -244,6 +251,7 @@ function RegisterForm() {
       const payload: RegisterPayload = {
         name: data.name,
         email: data.email,
+        cpf: data.cpf.replace(/\D/g, ''),
         password: data.password,
         crmv: data.crmv ?? '',
         plan_id: selectedPlan.id,
@@ -507,6 +515,21 @@ function RegisterForm() {
                       control={control}
                       error={errors.email?.message}
                       autoComplete="email"
+                      required
+                    />
+                    <InputWithLabel
+                      label="CPF"
+                      name="cpf"
+                      control={control}
+                      error={errors.cpf?.message}
+                      onChange={(event) =>
+                        setValue('cpf', formatCPF(event.target.value), {
+                          shouldValidate: true,
+                        })
+                      }
+                      inputMode="numeric"
+                      autoComplete="off"
+                      maxLength={14}
                       required
                     />
                     <InputWithLabel
