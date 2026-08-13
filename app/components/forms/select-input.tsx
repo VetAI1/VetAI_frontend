@@ -71,7 +71,7 @@ function Dropdown({
         e.preventDefault();
         e.stopPropagation();
       }}
-      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-slate-900/60 py-1.5 animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden"
+      className="animate-in overflow-hidden rounded-xl border border-border bg-popover py-1.5 text-popover-foreground shadow-[var(--shadow-card)] fade-in-0 zoom-in-95 duration-150"
     >
       <div className="overflow-y-auto" style={{ maxHeight: MAX_HEIGHT }}>
         {options.map((opt) => {
@@ -87,13 +87,13 @@ function Dropdown({
               className={cn(
                 'w-full flex items-center justify-between gap-2 px-3 py-2 text-sm text-left transition-colors',
                 isSelected
-                  ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 font-medium'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60',
+                  ? 'bg-secondary text-secondary-foreground font-semibold'
+                  : 'text-foreground hover:bg-muted',
               )}
             >
               <span>{opt.label}</span>
               {isSelected && (
-                <Check size={14} className="shrink-0 text-teal-500" />
+                <Check size={14} className="shrink-0 text-primary" />
               )}
             </button>
           );
@@ -171,10 +171,10 @@ function SelectInputInner({
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block"
+          className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-foreground"
         >
           {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
+          {required && <span className="ml-0.5 text-destructive">*</span>}
         </label>
       )}
 
@@ -193,20 +193,20 @@ function SelectInputInner({
           }
         }}
         className={cn(
-          'w-full flex items-center justify-between gap-2 border rounded-lg bg-white dark:bg-slate-700 cursor-pointer select-none transition-colors',
+          'flex w-full cursor-pointer select-none items-center justify-between gap-2 rounded-xl border border-input bg-card text-foreground transition-colors duration-200 hover:border-primary/35',
           compact ? 'px-2 py-1 text-xs' : 'px-3 py-2.5 text-sm',
           open
-            ? 'ring-2 ring-teal-500 border-teal-500'
+            ? 'border-primary ring-2 ring-ring/30'
             : error
-              ? 'border-red-400 dark:border-red-500'
-              : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500',
+              ? 'border-destructive bg-destructive/5'
+              : '',
           disabled && 'opacity-60 cursor-not-allowed pointer-events-none',
           className,
         )}
       >
         <span
           className={cn(
-            selectedLabel ? 'text-slate-900 dark:text-white' : 'text-slate-400',
+            selectedLabel ? 'text-foreground' : 'text-muted-foreground',
           )}
         >
           {selectedLabel ?? placeholder}
@@ -214,14 +214,14 @@ function SelectInputInner({
         <ChevronDown
           size={compact ? 13 : 15}
           className={cn(
-            'shrink-0 transition-transform duration-150 text-slate-400',
-            open && 'rotate-180 text-teal-500',
+            'shrink-0 text-muted-foreground transition-transform duration-150',
+            open && 'rotate-180 text-primary',
           )}
         />
       </div>
 
       {error && (
-        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{error}</p>
+        <p className="mt-1.5 text-xs font-medium text-destructive">{error}</p>
       )}
 
       {mounted &&

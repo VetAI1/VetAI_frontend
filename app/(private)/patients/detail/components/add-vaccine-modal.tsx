@@ -2,7 +2,7 @@
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
@@ -29,12 +29,9 @@ export function AddVaccineModal({
   onClose,
   onSuccess,
 }: AddVaccineModalProps) {
-  const [showVaccineDropdown, setShowVaccineDropdown] = useState(false);
   const [selectedVaccine, setSelectedVaccine] = useState<Vaccine | null>(null);
   const [loadingPrevDose, setLoadingPrevDose] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
     items: catalogVaccines,
@@ -44,6 +41,8 @@ export function AddVaccineModal({
     loadNextPage: loadNextCatalogPage,
     search: vaccineSearch,
     setSearch: setVaccineSearch,
+    open: showVaccineDropdown,
+    setOpen: setShowVaccineDropdown,
   } = useAutoComplete<Vaccine>({
     fetcher: vaccinesService.list,
     pageSize: 20,
@@ -80,19 +79,6 @@ export function AddVaccineModal({
     nextDate.setDate(nextDate.getDate() + periodDays);
     return nextDate.toISOString().slice(0, 10);
   };
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
-        setShowVaccineDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
 
   const handleSelectVaccine = async (vaccine: Vaccine) => {
     setSelectedVaccine(vaccine);

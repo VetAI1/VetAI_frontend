@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Activity,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -16,6 +15,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { BrandLogo } from '@/app/components/brand/brand-logo';
 import { AuthPanel } from '@/app/components/common/auth-panel';
 import { PasswordStrength } from '@/app/components/common/password-strength';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
@@ -297,17 +297,11 @@ function RegisterForm() {
             ? 'Crie sua conta para entrar na equipe da clínica.'
             : 'Organize sua clínica, escolha um plano e finalize com pagamento seguro.'
         }
-        gradient="from-emerald-600 via-teal-700 to-cyan-800"
       />
 
-      <div className="flex-1 bg-white p-6 dark:bg-slate-950 sm:p-8 lg:overflow-y-auto">
+      <div className="flex-1 bg-background p-6 sm:p-8 lg:overflow-y-auto">
         <div className="mx-auto w-full max-w-3xl">
-          <div className="mb-8 flex items-center gap-2 lg:hidden">
-            <Activity className="text-teal-600" size={28} />
-            <span className="text-xl font-bold text-slate-900 dark:text-white">
-              VetAI
-            </span>
-          </div>
+          <div className="mb-10 lg:hidden"><BrandLogo /></div>
 
           {!isInvite && (
             <div className="mb-8 flex items-center gap-2">
@@ -317,13 +311,13 @@ function RegisterForm() {
                   className="flex flex-1 items-center gap-2 last:flex-none"
                 >
                   <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${step >= number ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500 dark:bg-slate-800'}`}
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${step >= number ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
                   >
                     {number}
                   </div>
                   {number < 3 && (
                     <div
-                      className={`h-px flex-1 ${step > number ? 'bg-teal-600' : 'bg-slate-200 dark:bg-slate-800'}`}
+                      className={`h-px flex-1 ${step > number ? 'bg-primary' : 'bg-border'}`}
                     />
                   )}
                 </div>
@@ -338,10 +332,10 @@ function RegisterForm() {
             {step === 1 && (
               <>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
                     {isInvite ? 'Criar sua conta' : 'Dados da clínica e acesso'}
                   </h1>
-                  <p className="mt-2 text-slate-500 dark:text-slate-400">
+                  <p className="mt-2 text-muted-foreground">
                     {isInvite
                       ? 'Preencha seus dados para aceitar o convite.'
                       : 'Estas informações identificam sua clínica e seu responsável.'}
@@ -392,11 +386,11 @@ function RegisterForm() {
                           type="checkbox"
                           id="isUserResponsible"
                           {...registerField('isUserResponsible')}
-                          className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500 dark:border-slate-700 dark:bg-slate-900"
+                          className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
                         />
                         <label
                           htmlFor="isUserResponsible"
-                          className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none"
+                          className="cursor-pointer select-none text-sm font-semibold text-foreground"
                         >
                           Eu sou o responsável
                         </label>
@@ -420,8 +414,8 @@ function RegisterForm() {
                         </>
                       )}
                     </div>
-                    <div className="border-t border-slate-200 pt-6 dark:border-slate-800">
-                      <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
+                    <div className="border-t border-border pt-6">
+                      <h2 className="mb-4 text-base font-semibold text-foreground">
                         Endereço da clínica
                       </h2>
                       <div className="grid gap-5 sm:grid-cols-3">
@@ -486,7 +480,7 @@ function RegisterForm() {
                       </div>
                       {(cepLookupLoading || cepLookupError) && (
                         <p
-                          className={`mt-3 text-sm ${cepLookupError ? 'text-red-500' : 'text-slate-500'}`}
+                          className={`mt-3 text-sm ${cepLookupError ? 'text-destructive' : 'text-muted-foreground'}`}
                         >
                           {cepLookupError ?? 'Buscando endereço...'}
                         </p>
@@ -495,8 +489,8 @@ function RegisterForm() {
                   </section>
                 )}
 
-                <section className="border-t border-slate-200 pt-6 dark:border-slate-800">
-                  <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
+                <section className="border-t border-border pt-6">
+                  <h2 className="mb-4 text-base font-semibold text-foreground">
                     Dados de acesso
                   </h2>
                   <div className="grid gap-5 sm:grid-cols-2">
@@ -558,7 +552,7 @@ function RegisterForm() {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="text-slate-400"
+                          className="text-muted-foreground transition-colors hover:text-primary"
                         >
                           {showPassword ? (
                             <EyeOff size={18} />
@@ -582,7 +576,7 @@ function RegisterForm() {
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
                           }
-                          className="text-slate-400"
+                          className="text-muted-foreground transition-colors hover:text-primary"
                         >
                           {showConfirmPassword ? (
                             <EyeOff size={18} />
@@ -601,16 +595,16 @@ function RegisterForm() {
             {!isInvite && step === 2 && (
               <>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
                     Escolha seu plano
                   </h1>
-                  <p className="mt-2 text-slate-500 dark:text-slate-400">
+                  <p className="mt-2 text-muted-foreground">
                     Todos os limites e recursos abaixo são definidos pelo seu
                     plano.
                   </p>
                 </div>
                 {plansLoading ? (
-                  <p className="text-sm text-slate-500">Carregando planos...</p>
+                  <p className="text-sm text-muted-foreground">Carregando planos...</p>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
                     {plans.map((plan) => (
@@ -618,26 +612,26 @@ function RegisterForm() {
                         key={plan.id}
                         type="button"
                         onClick={() => setValue('planId', plan.id)}
-                        className={`rounded-2xl border p-5 text-left ${planId === plan.id ? 'border-teal-600 bg-teal-50 ring-1 ring-teal-600 dark:bg-teal-950/30' : 'border-slate-200 dark:border-slate-800'}`}
+                        className={`rounded-2xl border p-5 text-left transition-colors ${planId === plan.id ? 'border-primary bg-secondary ring-1 ring-primary/25' : 'border-border bg-card hover:border-primary/30'}`}
                       >
                         <div className="flex justify-between gap-4">
                           <div>
-                            <h2 className="font-semibold text-slate-900 dark:text-white">
+                            <h2 className="font-semibold text-foreground">
                               {plan.name}
                             </h2>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <p className="mt-1 text-sm text-muted-foreground">
                               {plan.description}
                             </p>
                           </div>
                           {planId === plan.id && (
-                            <Check className="text-teal-600" />
+                            <Check className="text-primary" />
                           )}
                         </div>
-                        <p className="mt-4 text-2xl font-bold text-teal-700 dark:text-teal-300">
+                        <p className="font-data mt-4 text-2xl font-semibold text-primary">
                           {formatPrice(plan.monthlyPrice)}
                           <span className="text-sm font-normal">/mês</span>
                         </p>
-                        <ul className="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                        <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
                           <li className="flex gap-2">
                             <Users size={16} />
                             Até {plan.userLimit}{' '}
@@ -649,7 +643,7 @@ function RegisterForm() {
                           </li>
                           {plan.features.map((feature) => (
                             <li key={feature.key} className="flex gap-2">
-                              <Check size={16} className="text-teal-600" />
+                              <Check size={16} className="text-primary" />
                               {feature.label}
                             </li>
                           ))}
@@ -669,53 +663,55 @@ function RegisterForm() {
             {!isInvite && step === 3 && selectedPlan && (
               <>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
                     Revise e prossiga para o pagamento
                   </h1>
-                  <p className="mt-2 text-slate-500 dark:text-slate-400">
+                  <p className="mt-2 text-muted-foreground">
                     Você será direcionado ao ambiente seguro da Stripe para
                     inserir os dados do cartão.
                   </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-                    <h2 className="font-semibold text-slate-900 dark:text-white">
+                  <div className="rounded-2xl border border-border bg-card p-5">
+                    <h2 className="font-semibold text-foreground">
                       Clínica
                     </h2>
-                    <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+                    <p className="mt-3 text-sm text-muted-foreground">
                       {data.hospitalName}
                     </p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300">
+                    <p className="text-sm text-muted-foreground">
                       {data.cnpj}
                     </p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300">
-                      {data.hospitalPhone}
-                    </p>
-                    <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+                    {data.hospitalPhone && (
+                      <p className="text-sm text-muted-foreground">
+                        {data.hospitalPhone}
+                      </p>
+                    )}
+                    <p className="mt-3 text-sm text-muted-foreground">
                       {data.address?.street}, {data.address?.number} -{' '}
                       {data.address?.city}/{data.address?.state}
                     </p>
                   </div>
-                  <div className="rounded-xl border border-teal-200 bg-teal-50 p-5 dark:border-teal-900 dark:bg-teal-950/30">
-                    <h2 className="font-semibold text-slate-900 dark:text-white">
+                  <div className="rounded-2xl border border-primary/25 bg-secondary p-5">
+                    <h2 className="font-semibold text-foreground">
                       {selectedPlan.name}
                     </h2>
-                    <p className="mt-2 text-2xl font-bold text-teal-700 dark:text-teal-300">
+                    <p className="font-data mt-2 text-2xl font-semibold text-primary">
                       {formatPrice(selectedPlan.monthlyPrice)}
                       <span className="text-sm font-normal">/mês</span>
                     </p>
-                    <p className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
                       <Users size={16} />
                       Até {selectedPlan.userLimit} usuários
                     </p>
-                    <p className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                       <Sparkles size={16} />
                       {selectedPlan.aiCredits} créditos de IA/mês
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
-                  <ShieldCheck className="shrink-0 text-teal-600" size={20} />O
+                <div className="flex items-center gap-3 rounded-2xl bg-secondary p-4 text-sm text-secondary-foreground">
+                  <ShieldCheck className="shrink-0 text-primary" size={20} />O
                   pagamento é processado de forma segura pela Stripe. O VetAI
                   não armazena os dados do seu cartão.
                 </div>
@@ -742,7 +738,6 @@ function RegisterForm() {
                     if (validateAccountAndClinic()) void submitRegistration();
                   }}
                   loading={loading}
-                  className="bg-teal-600 text-white hover:bg-teal-700"
                 >
                   Aceitar convite
                 </Button>
@@ -750,7 +745,6 @@ function RegisterForm() {
                 <Button
                   type="button"
                   onClick={nextStep}
-                  className="bg-teal-600 text-white hover:bg-teal-700"
                 >
                   Continuar
                   <ChevronRight size={16} />
@@ -759,7 +753,6 @@ function RegisterForm() {
                 <Button
                   type="submit"
                   loading={loading}
-                  className="bg-teal-600 text-white hover:bg-teal-700"
                 >
                   Ir para pagamento seguro
                   <ChevronRight size={16} />
@@ -768,11 +761,11 @@ function RegisterForm() {
             </div>
           </form>
 
-          <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-8 text-center text-sm text-muted-foreground">
             Já tem uma conta?{' '}
             <Link
               href="/login"
-              className="font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400"
+              className="font-bold text-primary hover:underline"
             >
               Entrar
             </Link>
@@ -787,8 +780,8 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
-          <p className="text-slate-500">Carregando...</p>
+        <div className="flex min-h-screen items-center justify-center bg-background">
+          <p className="text-muted-foreground">Carregando...</p>
         </div>
       }
     >

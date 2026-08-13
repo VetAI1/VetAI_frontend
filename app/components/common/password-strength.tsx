@@ -49,7 +49,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
           <div
             className={`h-full rounded-full transition-all duration-300 ${barColor}`}
             style={{ width: `${strength * 100}%` }}
@@ -76,14 +76,14 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
             ) : (
               <X
                 size={12}
-                className="text-slate-400 dark:text-slate-500 shrink-0"
+                className="shrink-0 text-muted-foreground"
               />
             )}
             <span
               className={`text-xs transition-colors ${
                 rule.passed
                   ? 'text-green-600 dark:text-green-400'
-                  : 'text-slate-400 dark:text-slate-500'
+                  : 'text-muted-foreground'
               }`}
             >
               {rule.label}

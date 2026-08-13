@@ -4,12 +4,14 @@ import { Loader2 } from 'lucide-react';
 import {
   useEffect,
   useRef,
+  type CSSProperties,
   type ReactNode,
 } from 'react';
 
 interface InfiniteScrollProps {
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
   hasMore: boolean;
   loading?: boolean;
   onLoadMore: () => void;
@@ -18,6 +20,7 @@ interface InfiniteScrollProps {
 export function InfiniteScroll({
   children,
   className,
+  style,
   hasMore,
   loading = false,
   onLoadMore,
@@ -48,7 +51,7 @@ export function InfiniteScroll({
   }, [hasMore, loading]);
 
   return (
-    <div ref={containerRef} className={className}>
+    <div ref={containerRef} className={className} style={style}>
       {children}
       {hasMore && (
         <div ref={sentinelRef} className="flex min-h-10 items-center justify-center">

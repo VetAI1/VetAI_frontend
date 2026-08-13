@@ -1,17 +1,7 @@
 'use client';
 
-import {
-  Check,
-  ChevronDown,
-  CreditCard,
-  Loader2,
-  Pencil,
-  Plus,
-  Trash2,
-  User,
-  X,
-} from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { CreditCard, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { PaymentModal } from './components/payment-modal';
@@ -21,6 +11,7 @@ import {
   type DataTableColumn,
 } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
+import { Autocomplete } from '@/app/components/forms/autocomplete';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -44,120 +35,6 @@ const STATUS_FILTER_OPTIONS = [
     label: PAYMENT_STATUS_LABELS[s],
   })),
 ];
-
-interface TutorFilter {
-  id: string;
-  name: string;
-}
-
-function TutorFilterComboBox({
-  value,
-  onSelect,
-  onClear,
-}: {
-  value: TutorFilter | null;
-  onSelect: (t: TutorFilter) => void;
-  onClear: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const {
-    items: tutors,
-    search,
-    loading,
-    setSearch,
-  } = useAutoComplete<Tutor>({
-    fetcher: tutorsService.list,
-    pageSize: 8,
-    enabled: open,
-  });
-
-  useEffect(() => {
-    const handle = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handle);
-    return () => document.removeEventListener('mousedown', handle);
-  }, []);
-
-  if (value) {
-    return (
-      <div className="flex items-center gap-1.5 h-9 pl-3 pr-2 rounded-lg border border-teal-400 dark:border-teal-600 bg-teal-50 dark:bg-teal-900/20 text-sm text-teal-700 dark:text-teal-300 font-medium">
-        <User size={13} className="shrink-0" />
-        <span className="truncate max-w-40">{value.name}</span>
-        <button
-          type="button"
-          onClick={onClear}
-          className="ml-1 text-teal-500 hover:text-red-500 transition-colors"
-        >
-          <X size={13} />
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div ref={ref} className="relative">
-      <div className="relative">
-        <User
-          size={14}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-        />
-        <input
-          className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 pl-8 pr-8 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
-          placeholder="Filtrar por tutor..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => setOpen(true)}
-        />
-        <ChevronDown
-          size={14}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-        />
-      </div>
-      {open && (
-        <div className="absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-lg max-h-52 overflow-y-auto">
-          {loading ? (
-            <p className="text-xs text-slate-400 px-3 py-2 flex items-center gap-2">
-              <Loader2 size={12} className="animate-spin" /> Buscando...
-            </p>
-          ) : tutors.length === 0 ? (
-            <p className="text-xs text-slate-400 px-3 py-2">
-              {search.length < 2
-                ? 'Digite ao menos 2 caracteres...'
-                : 'Nenhum tutor encontrado'}
-            </p>
-          ) : (
-            tutors.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onSelect({ id: t.id, name: t.name });
-                  setOpen(false);
-                  setSearch('');
-                }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-              >
-                <Check size={12} className="text-teal-500 opacity-0" />
-                <span className="text-slate-900 dark:text-white">
-                  {t.name}
-                </span>
-              </button>
-            ))
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function fmtDate(iso?: string) {
   if (!iso) return '—';
@@ -184,7 +61,7 @@ interface PaymentFilters {
 
 export default function PaymentsPage() {
   const { confirm } = useConfirmation();
-  const [tutorFilter, setTutorFilter] = useState<TutorFilter | null>(null);
+  const [tutorFilter, setTutorFilter] = useState<Tutor | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingPayment, setEditingPayment] = useState<Payment | undefined>(
     undefined,
@@ -207,11 +84,26 @@ export default function PaymentsPage() {
     pageSize: 15,
   });
 
+  const {
+    items: tutors,
+    search: tutorSearch,
+    loading: tutorsLoading,
+    loadingMore: tutorsLoadingMore,
+    hasMorePage: hasMoreTutors,
+    open: tutorFilterOpen,
+    setOpen: setTutorFilterOpen,
+    setSearch: setTutorSearch,
+    loadNextPage: loadNextTutorPage,
+  } = useAutoComplete<Tutor>({
+    fetcher: tutorsService.list,
+    pageSize: 8,
+  });
+
   const handleStatusChange = (status: string) => {
     setFilters((prev) => ({ ...prev, status }));
   };
 
-  const handleTutorSelect = (t: TutorFilter) => {
+  const handleTutorSelect = (t: Tutor) => {
     setTutorFilter(t);
     setFilters((prev) => ({ ...prev, tutor_id: t.id }));
   };
@@ -400,10 +292,31 @@ export default function PaymentsPage() {
               />
             </div>
             <div className="w-64">
-              <TutorFilterComboBox
-                value={tutorFilter}
+              <Autocomplete
+                placeholder="Filtrar por tutor..."
+                search={tutorSearch}
+                onSearchChange={setTutorSearch}
+                items={tutors}
+                getOptionLabel={(tutor) => tutor.name}
+                getOptionDescription={(tutor) => tutor.email}
+                loading={tutorsLoading}
+                loadingMore={tutorsLoadingMore}
+                hasMorePage={hasMoreTutors}
+                onLoadNextPage={loadNextTutorPage}
+                open={tutorFilterOpen}
+                onOpenChange={setTutorFilterOpen}
+                selectedOption={
+                  tutorFilter
+                    ? {
+                      id: tutorFilter.id,
+                      label: tutorFilter.name,
+                      description: tutorFilter.email,
+                    }
+                    : null
+                }
                 onSelect={handleTutorSelect}
                 onClear={handleTutorClear}
+                emptyMessage="Nenhum tutor encontrado"
               />
             </div>
           </div>

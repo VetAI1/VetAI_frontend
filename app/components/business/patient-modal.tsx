@@ -47,7 +47,6 @@ export function PatientModal({
   const isEdit = !!patient;
 
   const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null);
-  const [showTutorDropdown, setShowTutorDropdown] = useState(false);
 
   const [saving, setSaving] = useState(false);
 
@@ -85,6 +84,8 @@ export function PatientModal({
     loadNextPage: loadNextTutorPage,
     search: tutorSearch,
     setSearch: setTutorSearch,
+    open: showTutorDropdown,
+    setOpen: setShowTutorDropdown,
   } = useAutoComplete<Tutor>({
     fetcher: tutorsService.list,
     pageSize: 8,

@@ -113,10 +113,10 @@ function TimeInputInner({
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block"
+          className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-foreground"
         >
           {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
+          {required && <span className="ml-0.5 text-destructive">*</span>}
         </label>
       )}
       <div className="relative">
@@ -131,10 +131,10 @@ function TimeInputInner({
           maxLength={5}
           disabled={disabled}
           className={cn(
-            'w-full px-3 py-2.5 pr-10 text-sm border rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors',
+            'w-full rounded-xl border border-input bg-card px-3 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-200 hover:border-primary/35 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30',
             error
-              ? 'border-red-400 dark:border-red-500 focus:ring-red-500 focus:border-red-500'
-              : 'border-slate-200 dark:border-slate-600',
+              ? 'border-destructive bg-destructive/5 focus:border-destructive focus:ring-destructive/20'
+              : '',
             disabled && 'opacity-60 cursor-not-allowed',
             className,
           )}
@@ -145,14 +145,14 @@ function TimeInputInner({
           onClick={setNow}
           disabled={disabled}
           title="Usar o horário atual"
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors disabled:cursor-not-allowed"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-primary disabled:cursor-not-allowed"
         >
           <Clock size={15} />
         </button>
       </div>
 
       {error && (
-        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{error}</p>
+        <p className="mt-1.5 text-xs font-medium text-destructive">{error}</p>
       )}
     </div>
   );

@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Activity,
   BookOpen,
   CalendarDays,
   CreditCard,
@@ -27,6 +26,7 @@ import { useState } from 'react';
 
 import { NotificationBell } from './notification-bell';
 
+import { BrandLogo } from '@/app/components/brand/brand-logo';
 import { useTheme } from '@/contexts/theme-context';
 import { useAuth } from '@/infra/auth-context';
 import type { Permission } from '@/types/permissions';
@@ -131,8 +131,7 @@ export function Sidebar() {
       >
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center">
-            <Activity className="text-teal-600 mr-2" />
-            <span className="font-bold text-lg tracking-tight">VetAI</span>
+            <BrandLogo />
           </div>
           <NotificationBell />
         </div>

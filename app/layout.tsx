@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { IBM_Plex_Mono, Plus_Jakarta_Sans, Space_Grotesk } from 'next/font/google';
 import { Toaster } from 'sonner';
 
 import '@/app/globals.css';
@@ -9,14 +9,20 @@ import { ModalProvider } from '@/contexts/modal-context';
 import { ThemeProvider } from '@/contexts/theme-context';
 import { AuthProvider } from '@/infra/auth-context';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const jakarta = Plus_Jakarta_Sans({
+  variable: '--font-jakarta',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const spaceGrotesk = Space_Grotesk({
+  variable: '--font-space-grotesk',
   subsets: ['latin'],
+});
+
+const plexMono = IBM_Plex_Mono({
+  variable: '--font-plex-mono',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang='pt-br' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${jakarta.variable} ${spaceGrotesk.variable} ${plexMono.variable} antialiased`}
         suppressHydrationWarning
       >
         <ThemeProvider>

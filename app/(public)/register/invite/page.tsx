@@ -1,11 +1,12 @@
 'use client';
 
-import { Activity, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { BrandLogo } from '@/app/components/brand/brand-logo';
 import { AuthPanel } from '@/app/components/common/auth-panel';
 import { PasswordStrength } from '@/app/components/common/password-strength';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
@@ -78,22 +79,16 @@ function InviteRegistrationForm() {
       <AuthPanel
         title="Você foi convidado"
         description="Crie sua conta para entrar na equipe da clínica."
-        gradient="from-emerald-600 via-teal-700 to-cyan-800"
       />
-      <div className="flex-1 bg-white p-6 dark:bg-slate-950 sm:p-8">
+      <div className="flex-1 bg-background p-6 sm:p-8">
         <div className="mx-auto w-full max-w-xl">
-          <div className="mb-8 flex items-center gap-2 lg:hidden">
-            <Activity className="text-teal-600" size={28} />
-            <span className="text-xl font-bold text-slate-900 dark:text-white">
-              VetAI
-            </span>
-          </div>
+          <div className="mb-10 lg:hidden"><BrandLogo /></div>
           <form onSubmit={handleSubmit(submit)} className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
                 Criar sua conta
               </h1>
-              <p className="mt-2 text-slate-500 dark:text-slate-400">
+              <p className="mt-2 text-muted-foreground">
                 Preencha seus dados para aceitar o convite.
               </p>
             </div>
@@ -135,7 +130,7 @@ function InviteRegistrationForm() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-slate-400"
+                    className="text-muted-foreground transition-colors hover:text-primary"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -167,7 +162,7 @@ function InviteRegistrationForm() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="text-slate-400"
+                    className="text-muted-foreground transition-colors hover:text-primary"
                   >
                     {showConfirmPassword ? (
                       <EyeOff size={18} />
@@ -183,17 +178,16 @@ function InviteRegistrationForm() {
               <Button
                 type="submit"
                 loading={loading}
-                className="bg-teal-600 text-white hover:bg-teal-700"
               >
                 Aceitar convite
               </Button>
             </div>
           </form>
-          <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-8 text-center text-sm text-muted-foreground">
             Já tem uma conta?{' '}
             <Link
               href="/login"
-              className="font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400"
+              className="font-bold text-primary hover:underline"
             >
               Entrar
             </Link>
@@ -207,7 +201,7 @@ function InviteRegistrationForm() {
 export default function InviteRegistrationPage() {
   return (
     <Suspense
-      fallback={<div className="min-h-screen bg-white dark:bg-slate-950" />}
+      fallback={<div className="min-h-screen bg-background" />}
     >
       <InviteRegistrationForm />
     </Suspense>

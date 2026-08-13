@@ -22,14 +22,14 @@ export function FieldShell({
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        <label className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-foreground">
           {label}
-          {required && <span className="ml-0.5 text-red-500">*</span>}
+          {required && <span className="ml-0.5 text-destructive">*</span>}
         </label>
       )}
       {children}
       {error && (
-        <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
+        <p className="mt-1.5 text-xs font-medium text-destructive">{error}</p>
       )}
     </div>
   );

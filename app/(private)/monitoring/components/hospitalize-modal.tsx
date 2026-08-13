@@ -41,7 +41,6 @@ export function HospitalizeModal({
   const [vets, setVets] = useState<Collaborator[]>([]);
   const [boxes, setBoxes] = useState<Box[]>([]);
 
-  const [patientOpen, setPatientOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<{
     id: string;
     label: string;
@@ -91,6 +90,8 @@ export function HospitalizeModal({
     hasMorePage: hasMorePatients,
     setSearch: setPatientSearch,
     loadNextPage: loadNextPatientPage,
+    open: patientOpen,
+    setOpen: setPatientOpen,
   } = useAutoComplete({
     fetcher: patientsService.list,
     pageSize: 10,

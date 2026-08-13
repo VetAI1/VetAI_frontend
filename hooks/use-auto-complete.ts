@@ -29,6 +29,7 @@ export function useAutoComplete<
 }: UseAutoCompleteOptions<TItem, TFilters>) {
   const [items, setItems] = useState<TItem[]>([]);
   const [search, setSearch] = useState('');
+  const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMorePage, setHasMorePage] = useState(false);
   const [loading, setLoading] = useState(enabled);
@@ -101,6 +102,8 @@ export function useAutoComplete<
     loading,
     loadingMore,
     hasMorePage,
+    open,
+    setOpen,
     setSearch,
     loadNextPage,
   };

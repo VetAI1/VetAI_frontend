@@ -59,7 +59,7 @@ const InputWithLabelInner = React.forwardRef<
               <div className="mb-2 flex items-center gap-2">
                 <Label
                   {...(required ? { required } : {})}
-                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  className="text-sm font-semibold tracking-[-0.01em] text-foreground"
                 >
                   {label}
                 </Label>
@@ -74,7 +74,7 @@ const InputWithLabelInner = React.forwardRef<
                           onMouseEnter={() => setOpen(true)}
                           onMouseLeave={() => setOpen(false)}
                         >
-                          <Info className="h-4 w-4 cursor-help text-slate-400 dark:text-slate-500" />
+                          <Info className="h-4 w-4 cursor-help text-muted-foreground" />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
@@ -89,7 +89,7 @@ const InputWithLabelInner = React.forwardRef<
               <Input
                 className={cn(
                   error &&
-              'border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500 dark:border-red-500',
+                    'border-destructive bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/20',
                   className,
                 )}
                 ref={ref}
@@ -98,13 +98,13 @@ const InputWithLabelInner = React.forwardRef<
                 {...props}
               />
               {endAdornment && (
-                <div className="absolute inset-y-0 right-3 flex items-center">
+                <div className="absolute inset-y-0 right-3 flex items-center text-muted-foreground">
                   {endAdornment}
                 </div>
               )}
             </div>
             {error && (
-              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
+              <p className="mt-1.5 text-xs font-medium text-destructive">{error}</p>
             )}
           </div>
         );

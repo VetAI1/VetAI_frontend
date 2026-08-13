@@ -1,11 +1,12 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Activity, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { BrandLogo } from '@/app/components/brand/brand-logo';
 import { AuthPanel } from '@/app/components/common/auth-panel';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
@@ -41,22 +42,17 @@ export default function LoginPage() {
       <AuthPanel
         title="Bem-vindo de volta"
         description="Acesse sua conta e continue cuidando dos seus pacientes com o poder da inteligncia artificial."
-        gradient="from-teal-600 via-teal-700 to-emerald-800"
       />
 
-      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-slate-950">
+      <div className="flex flex-1 items-center justify-center bg-background p-6 sm:p-8">
         <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center gap-2 mb-8">
-            <Activity className="text-teal-600" size={28} />
-            <span className="font-bold text-xl text-slate-900 dark:text-white">
-              VetAI
-            </span>
-          </div>
+          <div className="mb-10 lg:hidden"><BrandLogo /></div>
 
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <span className="inline-flex rounded-full bg-secondary px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-secondary-foreground">Acesso seguro</span>
+          <h1 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-foreground">
             Entrar na sua conta
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mb-8">
+          <p className="mb-8 mt-2 text-muted-foreground">
             Digite suas credenciais para acessar o painel.
           </p>
 
@@ -76,12 +72,12 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <Label className="text-sm font-semibold text-foreground">
                   Senha
                 </Label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-teal-600 hover:text-teal-700 dark:text-teal-400 hover:underline font-medium"
+                  className="text-xs font-bold text-primary hover:underline"
                 >
                   Esqueceu a senha?
                 </Link>
@@ -99,7 +95,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-slate-400 hover:text-slate-600"
+                    className="text-muted-foreground transition-colors hover:text-primary"
                   >
                     {showPassword ? (
                       <EyeOff size={18} />
@@ -114,17 +110,17 @@ export default function LoginPage() {
             <Button
               type="submit"
               loading={loading}
-              className="w-full h-11 bg-teal-600 hover:bg-teal-700 text-white"
+              className="h-11 w-full"
             >
               Entrar
             </Button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-8 text-center text-sm text-muted-foreground">
             Não tem uma conta?{' '}
             <Link
               href="/register"
-              className="text-teal-600 hover:text-teal-700 dark:text-teal-400 font-medium"
+              className="font-bold text-primary hover:underline"
             >
               Criar conta
             </Link>

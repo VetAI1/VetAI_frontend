@@ -50,8 +50,6 @@ export function AddEventModal({
   maxHour = 23,
 }: AddEventModalProps) {
   const isEditing = !!editingEvent;
-  const [patientOpen, setPatientOpen] = useState(false);
-  const [tutorOpen, setTutorOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<
     (ComboBoxItem & { tutorId?: string }) | null
       >(
@@ -73,6 +71,8 @@ export function AddEventModal({
     loadNextPage: loadNextPatientPage,
     search: patientSearch,
     setSearch: setPatientSearch,
+    open: patientOpen,
+    setOpen: setPatientOpen,
   } = useAutoComplete<Patient>({
     fetcher: patientsService.list,
     pageSize: 8,
@@ -87,6 +87,8 @@ export function AddEventModal({
     loadNextPage: loadNextTutorPage,
     search: tutorSearch,
     setSearch: setTutorSearch,
+    open: tutorOpen,
+    setOpen: setTutorOpen,
   } = useAutoComplete<Tutor>({
     fetcher: tutorsService.list,
     pageSize: 8,

@@ -8,7 +8,7 @@ interface CardProps {
 export function Card({ children, className = '', style, onClick }: CardProps) {
   return (
     <div
-      className={`bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm ${className}`}
+      className={`rounded-2xl border border-border bg-card shadow-[var(--shadow-card)] ${className}`}
       style={style}
       onClick={onClick}
     >

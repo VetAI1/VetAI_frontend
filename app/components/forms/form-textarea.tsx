@@ -41,10 +41,10 @@ const FormTextareaInner = React.forwardRef<
             {label && (
               <label
                 htmlFor={inputId}
-                className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-foreground"
               >
                 {label}
-                {required && <span className="ml-0.5 text-red-500">*</span>}
+                {required && <span className="ml-0.5 text-destructive">*</span>}
               </label>
             )}
             <textarea
@@ -53,16 +53,16 @@ const FormTextareaInner = React.forwardRef<
               value={value}
               onChange={onChange}
               className={cn(
-                'w-full resize-y rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 transition-colors placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-slate-700 dark:text-white',
+                'w-full resize-y rounded-xl border border-input bg-card px-3 py-2.5 text-sm text-foreground transition-colors duration-200 placeholder:text-muted-foreground hover:border-primary/35 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50',
                 error
-                  ? 'border-red-400 focus:border-red-500 focus:ring-red-500 dark:border-red-500'
-                  : 'border-slate-200 dark:border-slate-600',
+                  ? 'border-destructive bg-destructive/5 focus:border-destructive focus:ring-destructive/20'
+                  : '',
                 className,
               )}
               {...props}
             />
             {error && (
-              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
+              <p className="mt-1.5 text-xs font-medium text-destructive">{error}</p>
             )}
           </div>
         );

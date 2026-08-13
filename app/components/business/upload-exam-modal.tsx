@@ -32,7 +32,6 @@ export function UploadExamModal({
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(
     preselectedPatient ?? null,
   );
-  const [showDropdown, setShowDropdown] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const {
@@ -43,6 +42,8 @@ export function UploadExamModal({
     loadNextPage: loadNextPatientPage,
     search: patientSearch,
     setSearch: setPatientSearch,
+    open: showDropdown,
+    setOpen: setShowDropdown,
   } = useAutoComplete<Patient>({
     fetcher: patientsService.list,
     pageSize: 8,
