@@ -185,21 +185,21 @@ export default function Consultation() {
 
   const getSeverityColor = (severity: 'red' | 'yellow' | 'green') => {
     const colors = {
-      red: 'text-red-600 dark:text-red-400',
-      yellow: 'text-yellow-600 dark:text-yellow-400',
-      green: 'text-green-600 dark:text-green-400',
+      red: 'text-danger',
+      yellow: 'text-warning',
+      green: 'text-success',
     };
     return colors[severity];
   };
 
   if (isCheckingInProgress) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+      <div className="min-h-screen bg-background w-full">
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <Header title="Consulta" showStorage={false} />
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 size={32} className="animate-spin text-teal-600 mb-4" />
-            <p className="text-slate-500 dark:text-slate-400">
+            <Loader2 size={32} className="animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">
               Verificando consultas...
             </p>
           </div>
@@ -210,15 +210,15 @@ export default function Consultation() {
 
   if (!consultationId) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+      <div className="min-h-screen bg-background w-full">
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <Header title="Consulta" showStorage={false} />
           <div className="flex flex-col items-center justify-center py-20">
-            <Bot size={64} className="text-teal-600 dark:text-teal-400 mb-6" />
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            <Bot size={64} className="text-primary mb-6" />
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Assistente de Anamnese IA
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-center max-w-md mb-8">
+            <p className="text-muted-foreground text-center max-w-md mb-8">
               Inicie uma nova consulta para receber auxílio da inteligência
               artificial no diagnóstico veterinário.
             </p>
@@ -226,7 +226,7 @@ export default function Consultation() {
               <Button
                 onClick={handleNewConsultation}
                 disabled={isCreating}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-6 h-11"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 h-11"
               >
                 {isCreating ? (
                   <>
@@ -256,22 +256,22 @@ export default function Consultation() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-background w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Consulta" showStorage={false} />
 
         {isFinished && summary && (
-          <div className="mb-4 p-4 rounded-lg bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800">
+          <div className="mb-4 p-4 rounded-lg bg-primary/10 border border-primary/40">
             <div className="flex items-start gap-3">
               <CheckCircle
                 size={20}
-                className="text-teal-600 dark:text-teal-400 mt-0.5"
+                className="text-primary mt-0.5"
               />
               <div className="flex-1">
-                <h3 className="font-semibold text-teal-800 dark:text-teal-200 mb-1">
+                <h3 className="font-semibold text-primary mb-1">
                   Consulta finalizada
                 </h3>
-                <p className="text-sm text-teal-700 dark:text-teal-300">
+                <p className="text-sm text-primary">
                   {summary}
                 </p>
               </div>
@@ -279,7 +279,7 @@ export default function Consultation() {
             <div className="mt-4 flex gap-2">
               <Button
                 onClick={handleNewConsultation}
-                className="bg-teal-600 hover:bg-teal-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 size="sm"
               >
                 <Plus size={16} /> Nova consulta
@@ -308,7 +308,7 @@ export default function Consultation() {
                       size="sm"
                       onClick={handleFinishClick}
                       disabled={isLoading || isFinishing || messages.length < 3}
-                      className="text-amber-600 border-amber-300 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-700 dark:hover:bg-amber-900/20"
+                      className="text-warning border-warning/40 hover:bg-warning-soft"
                     >
                       {isFinishing ? (
                         <>
@@ -330,7 +330,7 @@ export default function Consultation() {
 
                 <div
                   ref={messagesContainerRef}
-                  className="flex-1 overflow-y-auto space-y-4 mb-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg scrollbar-thin"
+                  className="flex-1 overflow-y-auto space-y-4 mb-4 p-4 bg-secondary rounded-lg scrollbar-thin"
                 >
                   {messages.map((message) => (
                     <div
@@ -340,8 +340,8 @@ export default function Consultation() {
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                           message.role === 'user'
-                            ? 'bg-teal-600 dark:bg-teal-700 self-start'
-                            : 'bg-slate-600 dark:bg-slate-700'
+                            ? 'bg-primary self-start'
+                            : 'bg-secondary'
                         }`}
                         style={
                           message.role === 'user'
@@ -365,25 +365,25 @@ export default function Consultation() {
                           >
                             <button
                               onClick={() => handleCopyMessage(message.content)}
-                              className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                              className="p-1 rounded hover:bg-muted transition-colors"
                               title="Copiar mensagem"
                             >
                               <Copy
                                 size={12}
-                                className="text-slate-500 dark:text-slate-400"
+                                className="text-muted-foreground"
                               />
                             </button>
                             <button
                               onClick={() =>
                                 handleResendMessage(message.content)
                               }
-                              className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                              className="p-1 rounded hover:bg-muted transition-colors"
                               title="Reenviar mensagem"
                               disabled={isLoading}
                             >
                               <RotateCcw
                                 size={12}
-                                className="text-slate-500 dark:text-slate-400"
+                                className="text-muted-foreground"
                               />
                             </button>
                           </div>
@@ -391,8 +391,8 @@ export default function Consultation() {
                         <div
                           className={`inline-block p-3 rounded-lg ${
                             message.role === 'user'
-                              ? 'bg-teal-600 dark:bg-teal-700 text-white'
-                              : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600'
+                              ? 'bg-primary text-white'
+                              : 'bg-card text-foreground border border-border'
                           }`}
                         >
                           {message.role === 'assistant' && message.isTyping ? (
@@ -411,7 +411,7 @@ export default function Consultation() {
                             )}
                         </div>
                         <p
-                          className={`text-xs text-slate-500 dark:text-slate-400 mt-1 px-1 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
+                          className={`text-xs text-muted-foreground mt-1 px-1 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
                         >
                           {message.timestamp.toLocaleTimeString('pt-BR', {
                             hour: '2-digit',
@@ -424,7 +424,7 @@ export default function Consultation() {
                 </div>
 
                 {!isFinished && !isFinishing && (
-                  <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
+                  <div className="border-t border-border pt-4 mt-4">
                     <div className="flex items-center gap-2">
                       <Input
                         placeholder="Digite sua mensagem..."
@@ -442,7 +442,7 @@ export default function Consultation() {
                       <Button
                         onClick={handleSendMessage}
                         disabled={isLoading || !inputMessage.trim()}
-                        className="w-9 h-9 bg-teal-600 hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-9 h-9 bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Send size={17} />
                       </Button>
@@ -464,7 +464,7 @@ export default function Consultation() {
             >
               <div className="space-y-3">
                 {diseases.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <AlertCircle
                       size={32}
                       className="mx-auto mb-2 opacity-50"
@@ -483,10 +483,10 @@ export default function Consultation() {
                     return (
                       <div
                         key={`${disease.name}-${index}`}
-                        className={`p-3 border rounded-lg transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-right cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
+                        className={`p-3 border rounded-lg transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-right cursor-pointer hover:bg-secondary/60 ${
                           isMarked
-                            ? 'border-teal-400 dark:border-teal-600 bg-teal-50/50 dark:bg-teal-900/10 ring-1 ring-teal-400/30'
-                            : 'border-slate-200 dark:border-slate-700'
+                            ? 'border-primary/40 bg-primary/10 ring-1 ring-primary/30'
+                            : 'border-border'
                         }`}
                         style={{ animationDelay: `${index * 50}ms` }}
                         onClick={() => setDetailDisease(disease)}
@@ -497,7 +497,7 @@ export default function Consultation() {
                               size={16}
                               className={`mt-0.5 shrink-0 ${getSeverityColor(disease.severity)}`}
                             />
-                            <h4 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                            <h4 className="text-sm font-semibold text-foreground truncate">
                               {disease.name}
                             </h4>
                           </div>
@@ -510,7 +510,7 @@ export default function Consultation() {
                                     isMarked ? null : index,
                                   );
                                 }}
-                                className={`p-1 rounded transition-colors ${isMarked ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400 hover:text-teal-500 dark:text-slate-500 dark:hover:text-teal-400'}`}
+                                className={`p-1 rounded transition-colors ${isMarked ? 'text-primary' : 'text-muted-foreground/70 hover:text-primary'}`}
                                 title={
                                   isMarked
                                     ? 'Desmarcar como mais provável'
@@ -527,24 +527,24 @@ export default function Consultation() {
                           </div>
                         </div>
                         {disease.reasoning && (
-                          <p className="text-xs text-slate-600 dark:text-slate-400 mb-2 ml-6 line-clamp-2">
+                          <p className="text-xs text-muted-foreground mb-2 ml-6 line-clamp-2">
                             {disease.reasoning}
                           </p>
                         )}
-                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                        <div className="w-full bg-muted rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all duration-500 ${
                               disease.severity === 'red'
-                                ? 'bg-red-600 dark:bg-red-500'
+                                ? 'bg-danger'
                                 : disease.severity === 'yellow'
                                   ? 'bg-yellow-500'
-                                  : 'bg-green-600 dark:bg-green-500'
+                                  : 'bg-success'
                             }`}
                             style={{ width: `${prob}%` }}
                           />
                         </div>
                         {isMarked && (
-                          <div className="mt-2 flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400 font-medium">
+                          <div className="mt-2 flex items-center gap-1 text-xs text-primary font-medium">
                             <Star size={10} fill="currentColor" /> Marcada como
                             mais provável
                           </div>
@@ -565,10 +565,10 @@ export default function Consultation() {
                   {suggestedTreatments.map((treatment, index) => (
                     <div
                       key={index}
-                      className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg animate-in fade-in slide-in-from-right"
+                      className="p-3 border border-border rounded-lg animate-in fade-in slide-in-from-right"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <p className="text-sm text-slate-700 dark:text-slate-300">
+                      <p className="text-sm text-secondary-foreground">
                         {treatment}
                       </p>
                     </div>
@@ -583,7 +583,7 @@ export default function Consultation() {
             >
               <div className="space-y-2">
                 {suggestedInfo.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Info size={32} className="mx-auto mb-2 opacity-50" />
                     <p className="text-sm">
                       Nenhuma informação sugerida ainda.
@@ -595,15 +595,15 @@ export default function Consultation() {
                   suggestedInfo.map((info, index) => (
                     <div
                       key={index}
-                      className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/30 animate-in fade-in slide-in-from-right"
+                      className="p-3 border border-border rounded-lg bg-secondary animate-in fade-in slide-in-from-right"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <div className="flex items-start gap-2">
                         <Info
                           size={14}
-                          className="text-teal-600 dark:text-teal-400 mt-0.5 shrink-0"
+                          className="text-primary mt-0.5 shrink-0"
                         />
-                        <p className="text-sm text-slate-700 dark:text-slate-300">
+                        <p className="text-sm text-secondary-foreground">
                           {info}
                         </p>
                       </div>

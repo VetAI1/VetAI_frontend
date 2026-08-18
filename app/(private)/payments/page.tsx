@@ -163,11 +163,11 @@ export default function PaymentsPage() {
           : '—';
         return (
           <div>
-            <p className="font-medium text-slate-900 dark:text-white">
+            <p className="font-medium text-foreground">
               {itemsSummary}
             </p>
             {p.notes && (
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate max-w-xs">
+              <p className="text-xs text-muted-foreground/70 mt-0.5 truncate max-w-xs">
                 {p.notes}
               </p>
             )}
@@ -180,7 +180,7 @@ export default function PaymentsPage() {
       header: 'Valor',
       width: '120px',
       render: (p) => (
-        <span className="text-slate-700 dark:text-slate-300 font-medium">
+        <span className="text-secondary-foreground font-medium">
           {fmtAmount(p.amount)}
         </span>
       ),
@@ -192,8 +192,8 @@ export default function PaymentsPage() {
       render: (p) => {
         const statusKey = (p.status?.toUpperCase() as PaymentStatus) ?? 'PENDING';
         const colors = PAYMENT_STATUS_COLORS[statusKey] ?? {
-          bg: 'bg-slate-100 dark:bg-slate-800',
-          text: 'text-slate-700 dark:text-slate-300',
+          bg: 'bg-secondary',
+          text: 'text-secondary-foreground',
         };
         const label = PAYMENT_STATUS_LABELS[statusKey] ?? p.status ?? 'Pendente';
         return (
@@ -210,7 +210,7 @@ export default function PaymentsPage() {
       header: 'Vencimento',
       width: '120px',
       render: (p) => (
-        <span className="text-slate-600 dark:text-slate-300 text-sm">
+        <span className="text-muted-foreground text-sm">
           {fmtDate(p.due_date)}
         </span>
       ),
@@ -220,11 +220,11 @@ export default function PaymentsPage() {
       header: 'Pago em',
       width: '120px',
       render: (p) => (
-        <span className="text-slate-600 dark:text-slate-300 text-sm">
+        <span className="text-muted-foreground text-sm">
           {p.paid_at ? (
             fmtDate(p.paid_at)
           ) : (
-            <span className="text-slate-400 dark:text-slate-500">—</span>
+            <span className="text-muted-foreground/70">—</span>
           )}
         </span>
       ),
@@ -242,7 +242,7 @@ export default function PaymentsPage() {
             onClick={() => openEdit(p)}
             title="Editar"
           >
-            <Pencil size={15} className="text-slate-500 dark:text-slate-400" />
+            <Pencil size={15} className="text-muted-foreground" />
           </Button>
           <Button
             variant="ghost"
@@ -250,7 +250,7 @@ export default function PaymentsPage() {
             onClick={() => handleDelete(p)}
             title="Excluir"
           >
-            <Trash2 size={15} className="text-red-500" />
+            <Trash2 size={15} className="text-danger" />
           </Button>
         </div>
       ),
@@ -258,8 +258,8 @@ export default function PaymentsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-background w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Pagamentos" showStorage={false} />
 
         <SectionCard
@@ -275,7 +275,7 @@ export default function PaymentsPage() {
                 setEditingPayment(undefined);
                 setShowModal(true);
               }}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-10"
             >
               <Plus size={18} /> Nova Cobrança
             </Button>
@@ -330,9 +330,9 @@ export default function PaymentsPage() {
               <div className="p-4 text-center">
                 <CreditCard
                   size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                  className="text-muted-foreground/50 mx-auto mb-2"
                 />
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {filters.status || tutorFilter
                     ? 'Nenhuma cobrança encontrada para os filtros selecionados.'
                     : 'Nenhuma cobrança cadastrada ainda.'}
@@ -360,7 +360,7 @@ export default function PaymentsPage() {
                   onClick={() => setPage(n)}
                   className={
                     n === page
-                      ? 'bg-teal-600 text-white hover:bg-teal-700 border-teal-600'
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary'
                       : ''
                   }
                 >

@@ -19,16 +19,16 @@ export function ConfirmFinishModal({
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onCancel}
       />
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
-            <Star size={20} className="text-amber-600 dark:text-amber-400" />
+          <div className="p-2 rounded-lg bg-warning-soft">
+            <Star size={20} className="text-warning" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+          <h3 className="text-lg font-bold text-foreground">
             Marcar diagnóstico?
           </h3>
         </div>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">
+        <p className="text-sm text-muted-foreground mb-5">
           Você ainda não marcou nenhuma doença como a mais provável. Deseja
           continuar sem marcar ou voltar para selecionar?
         </p>
@@ -39,7 +39,7 @@ export function ConfirmFinishModal({
           <Button
             size="sm"
             onClick={onConfirm}
-            className="bg-amber-600 hover:bg-amber-700 text-white"
+            className="bg-warning text-white hover:bg-warning/90 dark:text-stone-950"
           >
             Finalizar assim mesmo
           </Button>

@@ -153,111 +153,109 @@ export default function SchedulePage() {
       : formatWeekRange(weekStart);
 
   return (
-    <main className="flex min-h-screen flex-col items-start gap-4">
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
-          <Header title="Agendamentos" showStorage={false} />
+    <main className="min-h-screen w-full bg-background">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <Header title="Agendamentos" showStorage={false} />
 
-          <div className="flex flex-col xl:flex-row gap-4">
-            <div className="flex-1 bg-white dark:bg-slate-800 rounded-xl shadow p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={prevPeriod}
-                    className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                  >
-                    <ChevronLeft
-                      size={18}
-                      className="text-slate-600 dark:text-slate-300"
-                    />
-                  </button>
-
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white min-w-40 text-center">
-                    {periodLabel}
-                  </h2>
-
-                  <button
-                    onClick={nextPeriod}
-                    className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                  >
-                    <ChevronRight
-                      size={18}
-                      className="text-slate-600 dark:text-slate-300"
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shrink-0">
-                  <button
-                    onClick={() => handleSwitchView('month')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
-                      viewMode === 'month'
-                        ? 'bg-teal-600 text-white'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    <LayoutGrid size={13} />
-                    Mês
-                  </button>
-                  <button
-                    onClick={() => handleSwitchView('week')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors border-l border-slate-200 dark:border-slate-700 ${
-                      viewMode === 'week'
-                        ? 'bg-teal-600 text-white border-teal-600'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    <CalendarDays size={13} />
-                    Semana
-                  </button>
-                </div>
-              </div>
-
-              {viewMode === 'month' ? (
-                <Calendar
-                  year={currentYear}
-                  month={currentMonth}
-                  events={loadingEvents ? [] : events}
-                  selectedDate={selectedDate}
-                  today={todayStr}
-                  onSelectDate={setSelectedDate}
-                  onEventClick={setDetailEvent}
-                />
-              ) : (
-                <WeekCalendar
-                  weekStart={weekStart}
-                  events={loadingEvents ? [] : events}
-                  today={todayStr}
-                  startHour={scheduleSettings.weekStartHour}
-                  endHour={scheduleSettings.weekEndHour}
-                  onEventClick={setDetailEvent}
-                />
-              )}
-
-              <div className="mt-4 flex justify-end">
-                <Button
-                  disabled={loadingEvents}
-                  onClick={() => handleAddClick(selectedDate)}
-                  className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600 gap-1.5"
+        <div className="flex flex-col gap-4 xl:flex-row">
+          <div className="flex-1 rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={prevPeriod}
+                  className="rounded-md p-2 transition-colors hover:bg-secondary"
                 >
-                  <Plus size={16} /> Novo evento
-                </Button>
+                  <ChevronLeft
+                    size={18}
+                    className="text-muted-foreground"
+                  />
+                </button>
+
+                <h2 className="min-w-40 text-center text-base font-bold text-foreground">
+                  {periodLabel}
+                </h2>
+
+                <button
+                  onClick={nextPeriod}
+                  className="rounded-md p-2 transition-colors hover:bg-secondary"
+                >
+                  <ChevronRight
+                    size={18}
+                    className="text-muted-foreground"
+                  />
+                </button>
+              </div>
+
+              <div className="flex shrink-0 items-center overflow-hidden rounded-lg border border-border">
+                <button
+                  onClick={() => handleSwitchView('month')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    viewMode === 'month'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-secondary/60'
+                  }`}
+                >
+                  <LayoutGrid size={13} />
+                  Mês
+                </button>
+                <button
+                  onClick={() => handleSwitchView('week')}
+                  className={`flex items-center gap-1.5 border-l border-border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    viewMode === 'week'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-secondary/60'
+                  }`}
+                >
+                  <CalendarDays size={13} />
+                  Semana
+                </button>
               </div>
             </div>
 
-            <div className="w-full xl:w-80 bg-white dark:bg-slate-800 rounded-xl shadow p-4 sm:p-6 xl:h-fit xl:sticky xl:top-6">
-              <TodayEventsList
-                date={selectedDate}
-                events={selectedEvents}
+            {viewMode === 'month' ? (
+              <Calendar
+                year={currentYear}
+                month={currentMonth}
+                events={loadingEvents ? [] : events}
+                selectedDate={selectedDate}
+                today={todayStr}
+                onSelectDate={setSelectedDate}
                 onEventClick={setDetailEvent}
-                onAddClick={() => handleAddClick(selectedDate)}
-                loading={loadingEvents}
               />
-              <ScheduleSettings
-                settings={scheduleSettings}
-                onChange={setScheduleSettings}
+            ) : (
+              <WeekCalendar
+                weekStart={weekStart}
+                events={loadingEvents ? [] : events}
+                today={todayStr}
+                startHour={scheduleSettings.weekStartHour}
+                endHour={scheduleSettings.weekEndHour}
+                onEventClick={setDetailEvent}
               />
+            )}
+
+            <div className="mt-4 flex justify-end">
+              <Button
+                disabled={loadingEvents}
+                onClick={() => handleAddClick(selectedDate)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Plus size={16} /> Novo evento
+              </Button>
             </div>
+          </div>
+
+          <div className="w-full rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6 xl:sticky xl:top-6 xl:h-fit xl:w-80">
+            <TodayEventsList
+              date={selectedDate}
+              events={selectedEvents}
+              onEventClick={setDetailEvent}
+              onAddClick={() => handleAddClick(selectedDate)}
+              loading={loadingEvents}
+            />
+            <ScheduleSettings
+              settings={scheduleSettings}
+              onChange={setScheduleSettings}
+            />
           </div>
         </div>
       </div>

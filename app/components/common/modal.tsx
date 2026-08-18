@@ -39,18 +39,18 @@ export function Modal({
       />
       <div
         className={cn(
-          'relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col',
+          'relative bg-card rounded-xl shadow-[var(--shadow-card)] w-full animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col',
           MAX_WIDTH_MAP[maxWidth],
           className,
         )}
       >
-        <div className="flex items-start justify-between p-5 border-b border-slate-200 dark:border-slate-700 shrink-0">
+        <div className="flex items-start justify-between p-5 border-b border-border shrink-0">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-bold text-foreground">
               {title}
             </h3>
             {description && (
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {description}
               </p>
             )}
@@ -59,7 +59,8 @@ export function Modal({
             variant="ghost"
             size="icon-sm"
             onClick={onClose}
-            className="ml-4 shrink-0 text-slate-500"
+            aria-label="Fechar"
+            className="ml-4 shrink-0 text-muted-foreground"
           >
             <X size={18} />
           </Button>

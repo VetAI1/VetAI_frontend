@@ -336,7 +336,7 @@ function DateInputInner({
           className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-foreground"
         >
           {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
+          {required && <span className="text-danger ml-0.5">*</span>}
         </label>
       )}
       <div className="relative" ref={containerRef}>
@@ -349,7 +349,7 @@ function DateInputInner({
           maxLength={10}
           disabled={disabled}
           className={cn(
-            'w-full rounded-xl border border-input bg-card px-3 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-200 hover:border-primary/35 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30',
+            'w-full rounded-md border border-input bg-card px-3 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-200 hover:border-primary/35 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30',
             error
               ? 'border-destructive bg-destructive/5 focus:border-destructive focus:ring-destructive/20'
               : '',

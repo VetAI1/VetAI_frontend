@@ -48,7 +48,7 @@ export function AuthPanel({ title, description }: AuthPanelProps) {
         </Link>
 
         <div>
-          <p className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-[#f7be4c]">
+          <p className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-brand-sun">
             Gestão veterinária inteligente
           </p>
           <h2 className="font-display text-4xl font-bold leading-[1.02] tracking-[-0.06em] text-white xl:text-5xl">
@@ -66,7 +66,7 @@ export function AuthPanel({ title, description }: AuthPanelProps) {
                   key={stat.label}
                   className="rounded-2xl border border-white/10 bg-white/[0.08] p-4"
                 >
-                  <Icon size={20} className="mb-2 text-[#f7be4c]" />
+                  <Icon size={20} className="mb-2 text-brand-sun" />
                   <div className="font-data text-2xl font-semibold text-white">
                     <Counter
                       target={stat.value}
@@ -85,11 +85,11 @@ export function AuthPanel({ title, description }: AuthPanelProps) {
 
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 text-xs text-white/60">
-            <div className="size-2 rounded-full bg-[#f7be4c]" />
+            <div className="size-2 rounded-full bg-brand-sun" />
             Criptografia de ponta a ponta
           </div>
           <div className="flex items-center gap-2 text-xs text-white/60">
-            <div className="size-2 rounded-full bg-[#f7be4c]" />
+            <div className="size-2 rounded-full bg-brand-sun" />
             LGPD Compliant
           </div>
         </div>

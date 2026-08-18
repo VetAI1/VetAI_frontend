@@ -144,7 +144,7 @@ function ParameterFormModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             Salvar
           </Button>
@@ -201,7 +201,7 @@ export function ParametersTab() {
       headerAction={
         <Button
           onClick={() => setShowForm(true)}
-          className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
           <Plus size={16} />
           Novo parâmetro
@@ -210,31 +210,31 @@ export function ParametersTab() {
     >
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-teal-600" />
+          <Loader2 size={28} className="animate-spin text-primary" />
         </div>
       ) : parameters.length === 0 ? (
         <div className="text-center py-12">
-          <Beaker size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-          <p className="text-slate-500 dark:text-slate-400">Nenhum parâmetro cadastrado</p>
+          <Beaker size={48} className="mx-auto text-muted-foreground/50 mb-3" />
+          <p className="text-muted-foreground">Nenhum parâmetro cadastrado</p>
         </div>
       ) : (
-        <div className="divide-y divide-slate-100 dark:divide-slate-700/60">
+        <div className="divide-y divide-border/70">
           {parameters.map((parameter) => (
             <div
               key={parameter.id}
               className="flex items-center justify-between gap-3 py-3"
             >
               <div className="min-w-0 flex items-center gap-2">
-                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                <p className="text-sm font-medium text-foreground">
                   {parameter.name}
                   {parameter.unit && (
-                    <span className="text-slate-400 dark:text-slate-500 font-normal">
+                    <span className="text-muted-foreground/70 font-normal">
                       {' '}
                       ({parameter.unit})
                     </span>
                   )}
                 </p>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 shrink-0">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-muted text-secondary-foreground shrink-0">
                   {parameter.value_type === 'NUMBER' ? 'Número' : 'Texto'}
                 </span>
               </div>
@@ -244,8 +244,8 @@ export function ParametersTab() {
                   onClick={() => void toggleActive(parameter)}
                   className={`px-2 py-0.5 rounded-full text-[11px] font-semibold transition-colors ${
                     parameter.active
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                      : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                      ? 'bg-success-soft text-success'
+                      : 'bg-secondary text-muted-foreground'
                   }`}
                   title="Clique para alternar"
                 >
@@ -264,7 +264,7 @@ export function ParametersTab() {
                   size="icon-sm"
                   onClick={() => setDeleting(parameter)}
                   title="Excluir"
-                  className="text-red-500 hover:text-red-600"
+                  className="text-danger"
                 >
                   <Trash2 size={14} />
                 </Button>

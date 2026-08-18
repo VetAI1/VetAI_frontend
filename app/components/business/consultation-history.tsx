@@ -78,13 +78,13 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
           className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           onClick={() => setSelectedConsultation(null)}
         />
-        <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-          <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-5 flex items-center justify-between z-10">
+        <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+          <div className="sticky top-0 bg-card border-b border-border p-5 flex items-center justify-between z-10">
             <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h2 className="text-lg font-bold text-foreground">
                 Detalhes da Consulta
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 {formatDate(selectedConsultation.started_at)}
                 {selectedConsultation.finished_at &&
                   ` — ${formatDate(selectedConsultation.finished_at)}`}
@@ -92,19 +92,19 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
             </div>
             <button
               onClick={() => setSelectedConsultation(null)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+              className="p-1.5 rounded-lg hover:bg-secondary"
             >
-              <X size={18} className="text-slate-500" />
+              <X size={18} className="text-muted-foreground" />
             </button>
           </div>
 
           <div className="overflow-y-auto flex-1 p-5 space-y-5">
             {selectedConsultation.diagnosis?.summary && (
-              <div className="p-4 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg">
-                <h3 className="text-sm font-semibold text-teal-800 dark:text-teal-200 mb-1">
+              <div className="p-4 bg-primary/10 border border-primary/40 rounded-lg">
+                <h3 className="text-sm font-semibold text-primary mb-1">
                   Resumo
                 </h3>
-                <p className="text-sm text-teal-700 dark:text-teal-300">
+                <p className="text-sm text-primary">
                   {selectedConsultation.diagnosis.summary}
                 </p>
               </div>
@@ -112,7 +112,7 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
 
             {selectedConsultation.diagnosis?.diseases?.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
+                <h3 className="text-sm font-semibold text-foreground mb-2">
                   Diagnósticos
                 </h3>
                 <div className="space-y-2">
@@ -125,15 +125,15 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                         key={i}
                         className={`flex items-center justify-between p-3 border rounded-lg ${
                           isSelected
-                            ? 'border-teal-400 dark:border-teal-600 bg-teal-50/50 dark:bg-teal-900/10'
-                            : 'border-slate-200 dark:border-slate-700'
+                            ? 'border-primary/40 bg-primary/10'
+                            : 'border-border'
                         }`}
                       >
                         <div className="flex items-center gap-2">
                           {isSelected ? (
                             <Star
                               size={14}
-                              className="text-teal-600 dark:text-teal-400"
+                              className="text-primary"
                               fill="currentColor"
                             />
                           ) : (
@@ -141,18 +141,18 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                               size={14}
                               className={
                                 d.severity === 'red'
-                                  ? 'text-red-500'
+                                  ? 'text-danger'
                                   : d.severity === 'yellow'
-                                    ? 'text-yellow-500'
-                                    : 'text-green-500'
+                                    ? 'text-warning'
+                                    : 'text-success'
                               }
                             />
                           )}
-                          <span className="text-sm font-medium text-slate-900 dark:text-white">
+                          <span className="text-sm font-medium text-foreground">
                             {d.name}
                           </span>
                           {isSelected && (
-                            <span className="text-xs text-teal-600 dark:text-teal-400 font-medium">
+                            <span className="text-xs text-primary font-medium">
                               (selecionada)
                             </span>
                           )}
@@ -170,7 +170,7 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
             {selectedConsultation.diagnosis?.suggestedTreatments?.length >
               0 && (
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
+                <h3 className="text-sm font-semibold text-foreground mb-2">
                   Tratamentos sugeridos
                 </h3>
                 <div className="space-y-2">
@@ -178,9 +178,9 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                     (t, i) => (
                       <div
                         key={i}
-                        className="p-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg"
+                        className="p-3 bg-muted border border-border rounded-lg"
                       >
-                        <p className="text-sm text-slate-700 dark:text-slate-300">
+                        <p className="text-sm text-muted-foreground">
                           {t}
                         </p>
                       </div>
@@ -191,10 +191,10 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
             )}
 
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
+              <h3 className="text-sm font-semibold text-foreground mb-2">
                 Mensagens
               </h3>
-              <div className="space-y-3 max-h-[400px] overflow-y-auto p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto p-3 bg-secondary rounded-lg">
                 {selectedConsultation.messages.map((msg, i) => (
                   <div
                     key={i}
@@ -202,7 +202,7 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                   >
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                        msg.role === 'user' ? 'bg-teal-600' : 'bg-slate-600'
+                        msg.role === 'user' ? 'bg-primary' : 'bg-secondary'
                       }`}
                     >
                       {msg.role === 'user' ? (
@@ -214,8 +214,8 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                     <div
                       className={`max-w-[80%] p-2.5 rounded-lg text-sm ${
                         msg.role === 'user'
-                          ? 'bg-teal-600 text-white'
-                          : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600'
+                          ? 'bg-primary text-white'
+                          : 'bg-card text-foreground border border-border'
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -236,29 +236,29 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-        <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-5 flex items-center justify-between z-10">
+      <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+        <div className="sticky top-0 bg-card border-b border-border p-5 flex items-center justify-between z-10">
           <div className="flex items-center gap-2">
-            <History size={20} className="text-teal-600" />
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <History size={20} className="text-primary" />
+            <h2 className="text-lg font-bold text-foreground">
               Histórico de consultas
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+            className="p-1.5 rounded-lg hover:bg-secondary"
           >
-            <X size={18} className="text-slate-500" />
+            <X size={18} className="text-muted-foreground" />
           </button>
         </div>
 
         <div className="overflow-y-auto flex-1 p-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 size={24} className="animate-spin text-teal-600" />
+              <Loader2 size={24} className="animate-spin text-primary" />
             </div>
           ) : consultations.length === 0 ? (
-            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+            <div className="text-center py-12 text-muted-foreground">
               <History size={32} className="mx-auto mb-2 opacity-50" />
               <p className="text-sm">Nenhuma consulta realizada ainda.</p>
             </div>
@@ -268,7 +268,7 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                 <button
                   key={c.id}
                   onClick={() => setSelectedConsultation(c)}
-                  className="w-full text-left p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
+                  className="w-full text-left p-4 border border-border rounded-lg hover:bg-secondary transition-colors group"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
@@ -281,17 +281,17 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                             : 'Em andamento'}
                         </Badge>
                         {c.diagnosis?.diseases?.length > 0 && (
-                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                          <span className="text-xs text-muted-foreground">
                             {c.diagnosis.diseases.length} diagnóstico(s)
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <Clock size={12} />
                         <span>{formatDate(c.started_at)}</span>
                       </div>
                       {c.diagnosis?.selectedDiseaseName && (
-                        <div className="flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400 mt-1">
+                        <div className="flex items-center gap-1 text-xs text-primary mt-1">
                           <Star size={10} fill="currentColor" />
                           <span className="font-medium">
                             {c.diagnosis.selectedDiseaseName}
@@ -300,14 +300,14 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                       )}
                       {c.diagnosis?.diseases?.length > 0 &&
                         !c.diagnosis?.selectedDiseaseName && (
-                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 truncate">
+                        <p className="text-xs text-muted-foreground mt-1 truncate">
                           {c.diagnosis.diseases.map((d) => d.name).join(', ')}
                         </p>
                       )}
                     </div>
                     <ChevronRight
                       size={16}
-                      className="text-slate-400 group-hover:text-teal-600 transition-colors shrink-0 ml-2"
+                      className="text-muted-foreground/70 group-hover:text-primary transition-colors shrink-0 ml-2"
                     />
                   </div>
                 </button>

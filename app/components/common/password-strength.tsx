@@ -28,12 +28,12 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
 
   const barColor =
     strength <= 0.25
-      ? 'bg-red-500'
+      ? 'bg-danger'
       : strength <= 0.5
         ? 'bg-orange-500'
         : strength <= 0.75
-          ? 'bg-yellow-500'
-          : 'bg-green-500';
+          ? 'bg-warning'
+          : 'bg-success';
 
   const strengthLabel =
     strength <= 0.25
@@ -58,10 +58,10 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
         <span
           className={`text-xs font-medium ${
             strength <= 0.5
-              ? 'text-red-500'
+              ? 'text-danger'
               : strength <= 0.75
-                ? 'text-yellow-600'
-                : 'text-green-600'
+                ? 'text-warning'
+                : 'text-success'
           }`}
         >
           {strengthLabel}
@@ -72,7 +72,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
         {results.map((rule) => (
           <div key={rule.label} className="flex items-center gap-1.5">
             {rule.passed ? (
-              <Check size={12} className="text-green-500 shrink-0" />
+              <Check size={12} className="text-success shrink-0" />
             ) : (
               <X
                 size={12}
@@ -82,7 +82,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
             <span
               className={`text-xs transition-colors ${
                 rule.passed
-                  ? 'text-green-600 dark:text-green-400'
+                  ? 'text-success'
                   : 'text-muted-foreground'
               }`}
             >

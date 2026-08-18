@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="flex w-full flex-col gap-6 pb-12">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <Header title="Dashboard administrativo" showStorage={false} />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
             <tr>
               <td
                 colSpan={5}
-                className="p-8 text-center text-sm text-slate-500"
+                className="p-8 text-center text-sm text-muted-foreground"
               >
                 Nenhum colaborador ativo.
               </td>
@@ -97,15 +97,17 @@ export default function AdminDashboard() {
             data?.collaborators_activity.map((item) => (
               <tr
                 key={item.id}
-                className="border-t border-slate-100 dark:border-slate-800"
+                className="border-t border-border"
               >
-                <td className="p-4 font-medium text-slate-900 dark:text-white">
+                <td className="px-4 py-3 font-medium text-foreground">
                   {item.name}
                 </td>
-                <td className="p-4 text-sm text-slate-500">{item.email}</td>
-                <td className="p-4 text-sm">{item.patients}</td>
-                <td className="p-4 text-sm">{item.studies}</td>
-                <td className="p-4 text-sm">{item.consultations}</td>
+                <td className="px-4 py-3 text-sm text-muted-foreground">
+                  {item.email}
+                </td>
+                <td className="px-4 py-3 text-sm">{item.patients}</td>
+                <td className="px-4 py-3 text-sm">{item.studies}</td>
+                <td className="px-4 py-3 text-sm">{item.consultations}</td>
               </tr>
             ))
           )}

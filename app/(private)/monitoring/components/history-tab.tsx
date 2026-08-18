@@ -70,7 +70,7 @@ export function HistoryTab() {
       render: (row) => (
         <Link
           href={`/monitoring/detail?id=${row.id}`}
-          className="font-medium text-slate-900 dark:text-white hover:text-teal-600 dark:hover:text-teal-400"
+          className="font-medium text-foreground hover:text-primary"
         >
           {row.patient?.name ?? '—'}
         </Link>
@@ -80,7 +80,7 @@ export function HistoryTab() {
       key: 'veterinarian',
       header: 'Veterinário',
       render: (row) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {row.veterinarian?.name ?? '—'}
         </span>
       ),
@@ -89,7 +89,7 @@ export function HistoryTab() {
       key: 'box',
       header: 'Box',
       render: (row) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {row.box?.name ?? '—'}
         </span>
       ),
@@ -120,7 +120,7 @@ export function HistoryTab() {
       key: 'admitted_at',
       header: 'Entrada',
       render: (row) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {fmtDate(row.admitted_at)}
         </span>
       ),
@@ -130,7 +130,7 @@ export function HistoryTab() {
       header: 'Saída',
       align: 'left',
       render: (row) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {FINISHED_STATUSES.includes(row.status) && row.discharged_at
             ? fmtDateTime(row.discharged_at)
             : '—'}
@@ -154,7 +154,7 @@ export function HistoryTab() {
             Abrir
           </Button>
         ) : (
-          <span className="text-slate-400 dark:text-slate-500">—</span>
+          <span className="text-muted-foreground/70">—</span>
         ),
     },
   ];
@@ -190,12 +190,12 @@ export function HistoryTab() {
         emptyState={
           loading ? (
             <span className="flex items-center justify-center gap-2 py-6">
-              <Loader2 size={18} className="animate-spin text-teal-600" />
+              <Loader2 size={18} className="animate-spin text-primary" />
               Carregando...
             </span>
           ) : (
-            <span className="flex flex-col items-center gap-2 py-6 text-slate-400">
-              <History size={32} className="text-slate-300 dark:text-slate-600" />
+            <span className="flex flex-col items-center gap-2 py-6 text-muted-foreground/70">
+              <History size={32} className="text-muted-foreground/50" />
               Nenhuma internação encontrada
             </span>
           )

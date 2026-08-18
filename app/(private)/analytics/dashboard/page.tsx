@@ -1,6 +1,11 @@
 'use client';
 
-import { CalendarCheck, Microscope, PawPrint, RefreshCcw } from 'lucide-react';
+import {
+  CalendarCheck,
+  Microscope,
+  PawPrint,
+  RefreshCcw,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -8,12 +13,12 @@ import { Badge } from '@/app/components/common/badge';
 import { Card } from '@/app/components/common/card';
 import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
-import { Header } from '@/app/components/layout/header';
 import { AnalyticsChart } from '@/components/AnalyticsChart';
 import { MetricCard } from '@/components/MetricCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS, STUDY_STATUS_MAP } from '@/constants';
+import { useAuth } from '@/infra/auth-context';
 import { cn } from '@/infra/utils';
 import type { DashboardData } from '@/services/analytics.service';
 import { analyticsService } from '@/services/analytics.service';
@@ -35,8 +40,24 @@ function todayIso(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Bom dia';
+  if (h < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
+
+function todayLabel(): string {
+  return new Date().toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+  });
+}
+
 export default function Dashboard() {
   const router = useRouter();
+  const { user } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [todayEvents, setTodayEvents] = useState<ScheduleEvent[]>([]);
@@ -68,48 +89,62 @@ export default function Dashboard() {
     fetchData();
   }, [fetchData]);
 
+  const firstName = user?.name?.split(' ')[0] ?? '';
+
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-slate-900 px-4 sm:px-6 lg:px-8 py-2 pb-12">
-      <Header
-        title="Dashboard"
-        showStorage={false}
-        headerAction={
-          <Button variant="outline" onClick={fetchData} disabled={loading}>
-            <RefreshCcw className={cn('h-4 w-4', loading && 'animate-spin')} />
-            Atualizar
-          </Button>
-        }
-      />
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+            {greeting()}
+            {firstName ? `, ${firstName}` : ''}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {todayLabel()} — acompanhe o resumo da clínica
+          </p>
+        </div>
+        <Button variant="outline" onClick={fetchData} disabled={loading}>
+          <RefreshCcw className={cn('h-4 w-4', loading && 'animate-spin')} />
+          Atualizar
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <MetricCard
           title="Total de Pacientes"
           value={data?.total_patients ?? 0}
           loading={loading}
+          icon="PawPrint"
+          tone="primary"
           tooltip="Número total de pacientes cadastrados na clínica."
         />
         <MetricCard
           title="Total de Exames"
           value={data?.total_studies ?? 0}
           loading={loading}
+          icon="Microscope"
+          tone="info"
           tooltip="Total de exames realizados."
         />
         <MetricCard
           title="Hoje"
           value={data?.total_consultations_today ?? 0}
           loading={loading}
+          icon="Calendar"
+          tone="sun"
           tooltip="Consultas agendadas ou realizadas no dia de hoje."
         />
         <MetricCard
           title="Total de Consultas"
           value={data?.total_consultations ?? 0}
           loading={loading}
+          icon="Stethoscope"
+          tone="success"
           tooltip="Total histórico de consultas médicas concluídas."
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Overtime Chart + Today Activities */}
         <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {(loading || data?.growth_overtime) && (
             <AnalyticsChart
@@ -123,7 +158,6 @@ export default function Dashboard() {
             />
           )}
 
-          {/* Today's Activities */}
           <SectionCard
             title="Atividades de Hoje"
             subtitle="Eventos agendados para o dia de hoje"
@@ -139,9 +173,9 @@ export default function Dashboard() {
                 <div className="flex flex-col items-center justify-center h-full text-center py-4">
                   <CalendarCheck
                     size={32}
-                    className="text-slate-300 dark:text-slate-600 mb-2"
+                    className="text-muted-foreground/40 mb-2"
                   />
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-sm text-muted-foreground">
                     Nenhuma atividade para hoje.
                   </p>
                 </div>
@@ -159,7 +193,7 @@ export default function Dashboard() {
                       >
                         <span
                           className={cn(
-                            'mt-1 h-2 w-2 shrink-0 rounded-full',
+                            'mt-1.5 h-2 w-2 shrink-0 rounded-full',
                             typeInfo.dot,
                           )}
                         />
@@ -173,18 +207,18 @@ export default function Dashboard() {
                             >
                               {event.title}
                             </span>
-                            <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
+                            <span className="shrink-0 font-data text-xs text-muted-foreground">
                               {event.startTime}
                               {event.endTime ? ` – ${event.endTime}` : ''}
                             </span>
                           </div>
                           {event.patientName && (
-                            <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                            <p className="mt-0.5 truncate text-xs text-muted-foreground">
                               {event.patientName}
                             </p>
                           )}
                           {event.description && (
-                            <p className="mt-0.5 truncate text-xs text-slate-400 dark:text-slate-500">
+                            <p className="mt-0.5 truncate text-xs text-muted-foreground/80">
                               {event.description}
                             </p>
                           )}
@@ -198,7 +232,6 @@ export default function Dashboard() {
           </SectionCard>
         </div>
 
-        {/* Species Distribution */}
         {(loading || data?.patients_by_specie) && (
           <AnalyticsChart
             type="doughnut"
@@ -209,7 +242,6 @@ export default function Dashboard() {
           />
         )}
 
-        {/* Consultations Status */}
         {(loading || data?.consultations_status) && (
           <AnalyticsChart
             type="bar"
@@ -220,7 +252,6 @@ export default function Dashboard() {
           />
         )}
 
-        {/* Latest Exams Table */}
         <SectionCard
           title="Exames recentes"
           subtitle="Últimos resultados enviados."
@@ -248,9 +279,9 @@ export default function Dashboard() {
                 <td colSpan={5} className="p-8 text-center">
                   <Microscope
                     size={32}
-                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                    className="text-muted-foreground/40 mx-auto mb-2"
                   />
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-sm text-muted-foreground">
                     Nenhum exame ainda.
                   </p>
                 </td>
@@ -264,17 +295,17 @@ export default function Dashboard() {
                 return (
                   <tr
                     key={study.id}
-                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                    className="hover:bg-muted/40 transition-colors"
                   >
-                    <td className="p-4 text-slate-600 dark:text-slate-300 text-sm">
+                    <td className="p-4 text-muted-foreground text-sm">
                       {fmtDate(study.examDate ?? study.created_at)}
                     </td>
                     <td className="p-4">
-                      <span className="font-medium text-slate-900 dark:text-white text-sm">
+                      <span className="font-medium text-foreground text-sm">
                         {study.patient?.name ?? '-'}
                       </span>
                     </td>
-                    <td className="p-4 text-slate-600 dark:text-slate-300 text-sm">
+                    <td className="p-4 text-muted-foreground text-sm">
                       {study.title ?? 'Sem título'}
                     </td>
                     <td className="p-4">
@@ -287,7 +318,7 @@ export default function Dashboard() {
                         onClick={() =>
                           router.push(`/exams/detail?id=${study.id}`)
                         }
-                        className="text-teal-600 h-auto p-0"
+                        className="text-primary h-auto p-0"
                       >
                         Abrir
                       </Button>
@@ -299,7 +330,6 @@ export default function Dashboard() {
           </DataTable>
         </SectionCard>
 
-        {/* Latest Patients Card List */}
         <SectionCard
           title="Últimos Pacientes"
           subtitle="Pacientes adicionados recentemente"
@@ -309,7 +339,7 @@ export default function Dashboard() {
             <div className="flex flex-col gap-3 mt-4">
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <Card key={i} className="p-4 shadow-sm border-slate-100 dark:border-white/5">
+                  <Card key={i} className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Skeleton className="w-10 h-10 rounded-full" />
@@ -326,38 +356,32 @@ export default function Dashboard() {
                 <div className="text-center py-8">
                   <PawPrint
                     size={32}
-                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                    className="text-muted-foreground/40 mx-auto mb-2"
                   />
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-sm text-muted-foreground">
                     Nenhum paciente ainda.
                   </p>
                 </div>
               ) : (
                 patients.map((patient) => (
-                  <Card
-                    key={patient.id}
-                    className="p-4 shadow-sm border-slate-100 dark:border-white/5"
-                  >
+                  <Card key={patient.id} className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center">
-                          <PawPrint
-                            size={18}
-                            className="text-teal-600 dark:text-teal-400"
-                          />
+                        <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                          <PawPrint size={18} />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                          <h3 className="font-semibold text-foreground text-sm">
                             {patient.name}
                           </h3>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                          <p className="text-xs text-muted-foreground">
                             {SPECIE_LABELS[
                               patient.specie as keyof typeof SPECIE_LABELS
                             ] ?? patient.specie}
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs text-gray-500 dark:text-slate-400">
+                      <span className="font-data text-xs text-muted-foreground">
                         {fmtDate(patient.created_at)}
                       </span>
                     </div>

@@ -237,7 +237,7 @@ export function TutorDetailContent() {
       <div className="flex items-center justify-between gap-4">
         <Link
           href="/tutors"
-          className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft size={16} />
           Voltar para tutores
@@ -256,8 +256,8 @@ export function TutorDetailContent() {
       {/* Info cards */}
       <SectionCard title={tutor.name} subtitle="Informações do tutor">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <InfoItem icon={<User size={16} className="text-teal-600 dark:text-teal-400" />} iconBg="bg-teal-50 dark:bg-teal-900/30" label="CPF" value={fmtCpf(tutor.cpf)} />
-          <InfoItem icon={<Phone size={16} className="text-blue-600 dark:text-blue-400" />} iconBg="bg-blue-50 dark:bg-blue-900/30" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
+          <InfoItem icon={<User size={16} className="text-primary" />} iconBg="bg-primary/10" label="CPF" value={fmtCpf(tutor.cpf)} />
+          <InfoItem icon={<Phone size={16} className="text-info" />} iconBg="bg-info-soft" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
           <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? '—'} />
           <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="Endereço" value={tutor.address ?? '—'} />
         </div>
@@ -271,21 +271,21 @@ export function TutorDetailContent() {
         {petsLoading ? (
           <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 rounded" />)}</div>
         ) : pets.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum pet cadastrado para este tutor.</p>
+          <p className="text-sm text-muted-foreground py-4 text-center">Nenhum pet cadastrado para este tutor.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {pets.map((pet) => (
               <Link
                 key={pet.id}
                 href={`/patients/detail?id=${pet.id}`}
-                className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-teal-400 dark:hover:border-teal-600 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/10 transition-all group"
               >
-                <div className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
-                  <PawPrint size={16} className="text-teal-600 dark:text-teal-400" />
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <PawPrint size={16} className="text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-medium text-slate-900 dark:text-white text-sm truncate group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">{pet.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
+                  <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">{pet.name}</p>
+                  <p className="text-xs text-muted-foreground">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
                 </div>
               </Link>
             ))}
@@ -301,7 +301,7 @@ export function TutorDetailContent() {
           <Button
             size="sm"
             onClick={() => setShowAddAppointment(true)}
-            className="gap-1.5 bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Plus size={14} />
             Novo agendamento
@@ -311,9 +311,9 @@ export function TutorDetailContent() {
         {appointmentsLoading ? (
           <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
         ) : upcomingAppointments.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum agendamento futuro.</p>
+          <p className="text-sm text-muted-foreground py-4 text-center">Nenhum agendamento futuro.</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {upcomingAppointments.map((appt) => (
               <AppointmentRow
                 key={appt.id}
@@ -327,11 +327,11 @@ export function TutorDetailContent() {
 
         {pastAppointments.length > 0 && (
           <details className="mt-4">
-            <summary className="cursor-pointer text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 select-none flex items-center gap-1.5 mb-2">
+            <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground select-none flex items-center gap-1.5 mb-2">
               <History size={14} />
               {pastAppointments.length} atividade{pastAppointments.length !== 1 ? 's' : ''} passada{pastAppointments.length !== 1 ? 's' : ''}
             </summary>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {pastAppointments.map((appt) => (
                 <AppointmentRow
                   key={appt.id}
@@ -354,7 +354,7 @@ export function TutorDetailContent() {
           <Button
             size="sm"
             onClick={() => setShowAddPayment(true)}
-            className="gap-1.5 bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Plus size={14} />
             Registrar cobrança
@@ -364,9 +364,9 @@ export function TutorDetailContent() {
         {paymentsLoading ? (
           <div className="space-y-2">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
         ) : pendingPayments.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum pagamento pendente.</p>
+          <p className="text-sm text-muted-foreground py-4 text-center">Nenhum pagamento pendente.</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {pendingPayments.map((payment) => (
               <PaymentRow
                 key={payment.id}
@@ -388,9 +388,9 @@ export function TutorDetailContent() {
         {paymentsLoading ? (
           <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
         ) : paidPayments.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum histórico de compras.</p>
+          <p className="text-sm text-muted-foreground py-4 text-center">Nenhum histórico de compras.</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {paidPayments.map((payment) => (
               <PaymentRow
                 key={payment.id}
@@ -498,8 +498,8 @@ function InfoItem({
         {icon}
       </div>
       <div className="min-w-0 pl-2">
-        <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-sm font-medium text-foreground truncate">
           {value}
         </p>
       </div>
@@ -522,12 +522,12 @@ function AppointmentRow({
   const statusColors = APPOINTMENT_STATUS_COLORS[appointment.status];
   return (
     <div
-      className={`flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 ${muted ? 'opacity-60' : ''}`}
+      className={`flex items-center gap-3 p-3 rounded-lg border border-border ${muted ? 'opacity-60' : ''}`}
     >
       <div className={`w-2 h-2 rounded-full shrink-0 ${typeColors.dot}`} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-slate-900 dark:text-white truncate">
+          <span className="text-sm font-medium text-foreground truncate">
             {appointment.title}
           </span>
           <span
@@ -541,7 +541,7 @@ function AppointmentRow({
             {APPOINTMENT_STATUS_LABELS[appointment.status]}
           </span>
         </div>
-        <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Calendar size={11} />
             {fmtDate(appointment.date)} às {appointment.start_time}
@@ -556,7 +556,7 @@ function AppointmentRow({
       </div>
       <button
         onClick={onDelete}
-        className="text-slate-400 hover:text-red-500 transition-colors p-1 shrink-0"
+        className="text-muted-foreground/70 hover:text-danger transition-colors p-1 shrink-0"
         aria-label="Excluir agendamento"
       >
         <Trash2 size={14} />
@@ -591,12 +591,12 @@ function PaymentRow({
 
   return (
     <div
-      className={`p-3 rounded-lg border ${isOverdue ? 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10' : 'border-slate-200 dark:border-slate-700'}`}
+      className={`p-3 rounded-lg border ${isOverdue ? 'border-danger/30 bg-danger-soft/50' : 'border-border'}`}
     >
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">
+            <span className="text-sm font-semibold text-foreground">
               {fmtCurrency(payment.amount)}
             </span>
             <span
@@ -605,15 +605,15 @@ function PaymentRow({
               {PAYMENT_STATUS_LABELS[payment.status]}
             </span>
             {isOverdue && (
-              <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+              <span className="text-xs text-danger font-medium">
                 Vencido
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+          <p className="text-xs text-muted-foreground mt-0.5 truncate">
             {itemsSummary}
           </p>
-          <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-400 dark:text-slate-500 flex-wrap">
+          <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground/70 flex-wrap">
             <span className="flex items-center gap-1">
               <Calendar size={11} />
               Vence: {fmtDate(payment.due_date)}
@@ -631,7 +631,7 @@ function PaymentRow({
           {payment.status === 'PENDING' && onMarkPaid && (
             <button
               onClick={onMarkPaid}
-              className="text-slate-400 hover:text-green-600 transition-colors p-1"
+              className="text-muted-foreground/70 hover:text-success transition-colors p-1"
               aria-label="Marcar como pago"
             >
               <CheckCircle2 size={16} />
@@ -640,7 +640,7 @@ function PaymentRow({
           {onDelete && (
             <button
               onClick={onDelete}
-              className="text-slate-400 hover:text-red-500 transition-colors p-1"
+              className="text-muted-foreground/70 hover:text-danger transition-colors p-1"
               aria-label="Excluir cobrança"
             >
               <Trash2 size={14} />
@@ -650,14 +650,14 @@ function PaymentRow({
       </div>
       {payment.items.length > 1 && (
         <details className="mt-2">
-          <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 select-none">
+          <summary className="text-xs text-muted-foreground/70 cursor-pointer hover:text-muted-foreground select-none">
             Ver {payment.items.length} itens
           </summary>
-          <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-slate-200 dark:border-slate-600">
+          <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-border">
             {payment.items.map((item, i) => (
               <div
                 key={i}
-                className="flex justify-between text-xs text-slate-500 dark:text-slate-400"
+                className="flex justify-between text-xs text-muted-foreground"
               >
                 <span>
                   {item.quantity > 1 ? `${item.quantity}× ` : ''}

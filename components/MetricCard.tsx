@@ -32,10 +32,21 @@ const iconsMap = {
   Stethoscope,
 };
 
+type Tone = 'primary' | 'sun' | 'success' | 'info' | 'danger';
+
+const toneClasses: Record<Tone, string> = {
+  primary: 'bg-primary/10 text-primary',
+  sun: 'bg-brand-sun/20 text-brand-sun-strong',
+  success: 'bg-success/10 text-success',
+  info: 'bg-info/10 text-info',
+  danger: 'bg-danger/10 text-danger',
+};
+
 interface MetricCardProps {
   // Sem `icon`, o card fica só com título e valor.
   icon?: keyof typeof iconsMap;
   color?: string;
+  tone?: Tone;
   title: string;
   value: string | number;
   tooltip?: string;
@@ -46,6 +57,7 @@ interface MetricCardProps {
 export function MetricCard({
   icon,
   color,
+  tone = 'primary',
   title,
   value,
   tooltip,
@@ -57,7 +69,7 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm transition-colors hover:border-teal-300 dark:hover:border-teal-700',
+        'rounded-lg border border-border bg-card p-5 transition-colors hover:border-primary/25',
         className,
       )}
     >
@@ -68,13 +80,13 @@ export function MetricCard({
               <Skeleton className="h-4 w-28" />
             ) : (
               <>
-                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-sm font-medium text-muted-foreground">
                   {title}
                 </span>
                 {tooltip && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <HelpCircle className="h-3.5 w-3.5 shrink-0 text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 transition-colors" />
+                      <HelpCircle className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60 hover:text-muted-foreground transition-colors" />
                     </TooltipTrigger>
                     <TooltipContent side="top" align="center">
                       <p className="max-w-[200px] leading-relaxed">{tooltip}</p>
@@ -88,7 +100,7 @@ export function MetricCard({
           {loading ? (
             <Skeleton className="h-9 w-24 mt-2" />
           ) : (
-            <p className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
+            <p className="font-data mt-2 text-3xl font-semibold tracking-tight text-foreground">
               {value}
             </p>
           )}
@@ -96,14 +108,18 @@ export function MetricCard({
 
         {IconComponent && (
           <div
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
-            style={{
-              backgroundColor: !loading ? `${color}1f` : undefined,
-              color: !loading ? color : 'transparent',
-            }}
+            className={cn(
+              'flex h-11 w-11 shrink-0 items-center justify-center rounded-md',
+              !color && toneClasses[tone],
+            )}
+            style={
+              color
+                ? { backgroundColor: `${color}1f`, color }
+                : undefined
+            }
           >
             {loading ? (
-              <Skeleton className="h-11 w-11 rounded-lg" />
+              <Skeleton className="h-11 w-11 rounded-md" />
             ) : (
               <IconComponent size={20} />
             )}

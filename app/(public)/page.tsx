@@ -20,6 +20,9 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { BrandLogo } from '@/app/components/brand/brand-logo';
+import { CopilotDemo } from '@/app/components/brand/copilot-demo';
+import { ProductFrame } from '@/app/components/brand/product-frame';
+import { Shot } from '@/app/components/brand/shot';
 import { Counter } from '@/app/components/common/counter';
 import { Reveal } from '@/app/components/common/reveal';
 import { Button } from '@/components/ui/button';
@@ -93,7 +96,7 @@ function SectionHeading({
   return (
     <div className="max-w-2xl">
       <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-secondary-foreground">
-        <span className="size-1.5 rounded-full bg-[var(--brand-sun)]" />
+        <span className="size-1.5 rounded-full bg-brand-sun" />
         {eyebrow}
       </span>
       <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-foreground sm:text-4xl md:text-5xl">
@@ -151,7 +154,7 @@ export default function LandingPage() {
         <section className="relative isolate pt-32 pb-16 sm:pt-40 md:pb-24">
           <div className="surface-pattern absolute inset-x-0 top-0 -z-10 h-[540px] opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
           <div className="absolute -z-10 right-[7%] top-32 hidden size-40 rounded-full border border-primary/15 bg-secondary/50 md:block" />
-          <div className="absolute -z-10 left-[8%] top-64 hidden size-12 rounded-full bg-[var(--brand-sun)]/65 md:block" />
+          <div className="absolute -z-10 left-[8%] top-64 hidden size-12 rounded-full bg-brand-sun/65 md:block" />
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid items-center gap-14 lg:grid-cols-[1.02fr_0.98fr]">
               <div className="max-w-2xl">
@@ -186,7 +189,7 @@ export default function LandingPage() {
                   <div className="mt-10 flex items-center gap-3 text-sm text-muted-foreground">
                     <div className="flex -space-x-2">
                       {['AP', 'CM', 'MC'].map((initials, index) => (
-                        <span key={initials} className={`grid size-8 place-items-center rounded-full border-2 border-background text-[10px] font-bold text-primary-foreground ${index === 1 ? 'bg-[var(--brand-sun)] text-accent-foreground' : 'bg-primary'}`}>
+                        <span key={initials} className={`grid size-8 place-items-center rounded-full border-2 border-background text-[10px] font-bold text-primary-foreground ${index === 1 ? 'bg-brand-sun text-accent-foreground' : 'bg-primary'}`}>
                           {initials}
                         </span>
                       ))}
@@ -197,21 +200,32 @@ export default function LandingPage() {
               </div>
 
               <Reveal direction="up" delay={180}>
-                <div className="relative mx-auto w-full max-w-[560px]">
-                  <div className="absolute -inset-5 -z-10 rounded-[40px] border border-primary/10 bg-secondary/70 -rotate-3" />
-                  <div className="overflow-hidden rounded-[28px] border border-border bg-card p-3 shadow-[var(--shadow-card)] sm:p-4">
-                    <div className="flex items-center justify-between border-b border-border pb-3">
-                      <BrandLogo compact className="scale-90 origin-left" />
-                      <span className="rounded-full bg-secondary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary-foreground">Hoje</span>
-                    </div>
-                    <div className="grid gap-3 pt-4 sm:grid-cols-[1.2fr_0.8fr]">
+                <Shot
+                  className="mx-auto w-full max-w-[560px]"
+                  floating={
+                    <>
+                      <div className="absolute -right-5 top-12 hidden rounded-2xl border border-border bg-card p-3 shadow-[var(--shadow-card)] lg:block">
+                        <div className="flex items-center gap-2">
+                          <span className="grid size-8 place-items-center rounded-xl bg-brand-sun text-accent-foreground"><HeartPulse size={16} /></span>
+                          <div><p className="text-[10px] font-semibold text-muted-foreground">Acompanhamento</p><p className="text-xs font-bold text-foreground">Sinais estáveis</p></div>
+                        </div>
+                      </div>
+                      <div className="absolute -bottom-5 -left-7 hidden rounded-2xl border border-border bg-card px-3 py-2.5 shadow-[var(--shadow-card)] lg:flex lg:items-center lg:gap-2">
+                        <span className="grid size-7 place-items-center rounded-full bg-secondary text-primary"><PawPrint size={14} /></span>
+                        <span className="text-xs font-bold text-foreground">Luna · retorno em dia</span>
+                      </div>
+                    </>
+                  }
+                >
+                  <ProductFrame badge="Hoje">
+                    <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
                       <div className="rounded-2xl bg-secondary/60 p-4">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-xs font-semibold text-muted-foreground">Paciente em acompanhamento</p>
                             <p className="font-display mt-1 text-xl font-bold tracking-[-0.05em]">Luna</p>
                           </div>
-                          <div className="grid size-10 place-items-center rounded-2xl bg-[var(--brand-sun)] text-accent-foreground"><PawPrint size={19} /></div>
+                          <div className="grid size-10 place-items-center rounded-2xl bg-brand-sun text-accent-foreground"><PawPrint size={19} /></div>
                         </div>
                         <div className="mt-5 flex items-end gap-1.5" aria-label="Evolução estável">
                           {[31, 42, 37, 54, 49, 65, 73].map((height, index) => (
@@ -235,18 +249,8 @@ export default function LandingPage() {
                       </div>
                       <p className="mt-3 text-xs leading-5 text-muted-foreground">Resultados organizados, contexto do paciente e observações prontas para a sua revisão.</p>
                     </div>
-                  </div>
-                  <div className="absolute -right-5 top-12 hidden rounded-2xl border border-border bg-card p-3 shadow-[var(--shadow-card)] lg:block">
-                    <div className="flex items-center gap-2">
-                      <span className="grid size-8 place-items-center rounded-xl bg-[var(--brand-sun)] text-accent-foreground"><HeartPulse size={16} /></span>
-                      <div><p className="text-[10px] font-semibold text-muted-foreground">Acompanhamento</p><p className="text-xs font-bold text-foreground">Sinais estáveis</p></div>
-                    </div>
-                  </div>
-                  <div className="absolute -bottom-5 -left-7 hidden rounded-2xl border border-border bg-card px-3 py-2.5 shadow-[var(--shadow-card)] lg:flex lg:items-center lg:gap-2">
-                    <span className="grid size-7 place-items-center rounded-full bg-secondary text-primary"><PawPrint size={14} /></span>
-                    <span className="text-xs font-bold text-foreground">Luna · retorno em dia</span>
-                  </div>
-                </div>
+                  </ProductFrame>
+                </Shot>
               </Reveal>
             </div>
           </div>
@@ -274,7 +278,7 @@ export default function LandingPage() {
             {FEATURES.map((feature, index) => (
               <Reveal key={feature.title} direction="up" delay={index * 100}>
                 <article className="group h-full rounded-[24px] border border-border bg-card p-7 shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/25">
-                  <div className={`grid size-12 place-items-center rounded-2xl ${index === 1 ? 'bg-[var(--brand-sun)] text-accent-foreground' : 'bg-secondary text-primary'}`}><feature.icon size={23} /></div>
+                  <div className={`grid size-12 place-items-center rounded-2xl ${index === 1 ? 'bg-brand-sun text-accent-foreground' : 'bg-secondary text-primary'}`}><feature.icon size={23} /></div>
                   <p className="mt-7 text-xs font-bold uppercase tracking-[0.12em] text-primary">{feature.eyebrow}</p>
                   <h3 className="font-display mt-3 text-2xl font-bold tracking-[-0.05em] text-foreground">{feature.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">{feature.description}</p>
@@ -282,28 +286,63 @@ export default function LandingPage() {
               </Reveal>
             ))}
           </div>
+
+          <Reveal direction="up" delay={120}>
+            <Shot tilt="right" className="mx-auto mt-16 max-w-4xl">
+              <ProductFrame title="Prontuário vivo" badge="Paciente">
+                <div className="flex items-center justify-between border-b border-border pb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="grid size-10 place-items-center rounded-full bg-primary/10 text-primary"><PawPrint size={18} /></span>
+                    <div>
+                      <p className="font-display text-lg font-bold tracking-[-0.03em]">Luna · SRD</p>
+                      <p className="text-xs text-muted-foreground">CRMV-SP 0000 · Feminino · 3 anos · 4,2 kg</p>
+                    </div>
+                  </div>
+                  <span className="font-data text-xs text-muted-foreground">atualizado há 2h</span>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {[
+                    { label: 'Último peso', value: '4,2 kg' },
+                    { label: 'Vacinas em dia', value: 'Sim' },
+                    { label: 'Próxima dose', value: '20/09' },
+                  ].map((item) => (
+                    <div key={item.label} className="rounded-xl bg-secondary/60 p-3">
+                      <p className="text-[11px] font-semibold text-muted-foreground">{item.label}</p>
+                      <p className="font-data mt-1 text-sm font-semibold text-foreground">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </ProductFrame>
+            </Shot>
+          </Reveal>
         </section>
 
         <section className="border-y border-border bg-secondary/35 py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
-              <Reveal direction="up"><SectionHeading eyebrow="Do exame à conduta" title="Tecnologia presente. Decisão sempre sua." description="O VetAI organiza dados e destaca contexto. Quem cuida, interpreta e decide continua sendo você." /></Reveal>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {[
-                  { icon: FileText, title: 'Envie', text: 'Exames e documentos chegam ao prontuário.' },
-                  { icon: Sparkles, title: 'Revise', text: 'A IA estrutura leituras para sua avaliação.' },
-                  { icon: Stethoscope, title: 'Cuide', text: 'Registre a conduta e acompanhe a evolução.' },
-                ].map((step, index) => (
-                  <Reveal key={step.title} direction="up" delay={index * 100}>
-                    <div className="relative h-full rounded-2xl border border-border bg-card p-5 shadow-sm">
-                      <span className="font-data text-xs font-semibold text-primary">0{index + 1}</span>
-                      <step.icon className="mt-8 text-primary" size={24} />
-                      <h3 className="font-display mt-5 text-xl font-bold tracking-[-0.05em]">{step.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.text}</p>
+              <Reveal direction="up">
+                <SectionHeading eyebrow="Do exame à conduta" title="Tecnologia presente. Decisão sempre sua." description="O VetAI organiza dados e destaca contexto. Quem cuida, interpreta e decide continua sendo você." />
+                <div className="mt-8 space-y-4">
+                  {[
+                    { icon: FileText, title: 'Envie', text: 'Exames e documentos chegam ao prontuário.' },
+                    { icon: Sparkles, title: 'Revise', text: 'A IA estrutura leituras para sua avaliação.' },
+                    { icon: Stethoscope, title: 'Cuide', text: 'Registre a conduta e acompanhe a evolução.' },
+                  ].map((step, index) => (
+                    <div key={step.title} className="flex gap-4">
+                      <span className="font-data mt-0.5 shrink-0 text-sm font-semibold text-primary">0{index + 1}</span>
+                      <div>
+                        <h3 className="font-display flex items-center gap-2 text-xl font-bold tracking-[-0.05em]"><step.icon className="text-primary" size={18} />{step.title}</h3>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{step.text}</p>
+                      </div>
                     </div>
-                  </Reveal>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </Reveal>
+              <Reveal direction="up" delay={150}>
+                <Shot className="mx-auto w-full max-w-[520px]">
+                  <CopilotDemo />
+                </Shot>
+              </Reveal>
             </div>
           </div>
         </section>
@@ -315,14 +354,14 @@ export default function LandingPage() {
               {plans.map((plan, index) => (
                 <Reveal key={plan.id} direction="up" delay={index * 100}>
                   <article className={`relative flex h-full flex-col rounded-[24px] border p-7 ${plan.highlighted ? 'border-primary bg-primary text-primary-foreground shadow-[var(--shadow-brand)]' : 'border-border bg-card shadow-[var(--shadow-card)]'}`}>
-                    {plan.highlighted && <span className="absolute -top-3 left-6 rounded-full bg-[var(--brand-sun)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-accent-foreground">Mais escolhido</span>}
+                    {plan.highlighted && <span className="absolute -top-3 left-6 rounded-full bg-brand-sun px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-accent-foreground">Mais escolhido</span>}
                     <h3 className="font-display text-2xl font-bold tracking-[-0.05em]">{plan.name}</h3>
                     <p className={`mt-2 text-sm leading-6 ${plan.highlighted ? 'text-primary-foreground/75' : 'text-muted-foreground'}`}>{plan.description}</p>
                     <div className="mt-7"><span className="font-data text-3xl font-semibold tracking-[-0.08em]">{formatPrice(plan.monthlyPrice)}</span>{plan.billingMode === 'subscription' && <span className={`ml-1 text-sm ${plan.highlighted ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>/mês</span>}</div>
                     <ul className="mt-7 flex-1 space-y-3">
-                      <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-[var(--brand-sun)]" />Até {plan.userLimit} {plan.userLimit === 1 ? 'usuário' : 'usuários'}</li>
-                      <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-[var(--brand-sun)]" />{plan.aiCredits} créditos de IA por mês</li>
-                      {plan.features.map((feature) => <li key={feature.key} className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-[var(--brand-sun)]" />{feature.label}</li>)}
+                      <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-brand-sun" />Até {plan.userLimit} {plan.userLimit === 1 ? 'usuário' : 'usuários'}</li>
+                      <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-brand-sun" />{plan.aiCredits} créditos de IA por mês</li>
+                      {plan.features.map((feature) => <li key={feature.key} className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-brand-sun" />{feature.label}</li>)}
                     </ul>
                     <Button asChild variant={plan.highlighted ? 'secondary' : 'default'} className="mt-8 w-full"><Link href={`/register?plan_id=${plan.id}`}>Escolher plano <ChevronRight /></Link></Button>
                   </article>
@@ -339,7 +378,7 @@ export default function LandingPage() {
               {TESTIMONIALS.map((testimonial, index) => (
                 <Reveal key={testimonial.name} direction="up" delay={index * 100}>
                   <blockquote className="flex h-full flex-col rounded-[24px] border border-border bg-background p-7">
-                    <Quote className="text-[var(--brand-sun)]" size={28} />
+                    <Quote className="text-brand-sun" size={28} />
                     <p className="mt-5 flex-1 text-base leading-7 text-foreground">“{testimonial.quote}”</p>
                     <footer className="mt-8 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{testimonial.initials}</span><div><cite className="not-italic text-sm font-bold">{testimonial.name}</cite><p className="text-xs text-muted-foreground">{testimonial.role}</p></div></footer>
                   </blockquote>
@@ -354,7 +393,7 @@ export default function LandingPage() {
           <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
               <div><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold"><ShieldCheck size={14} /> Clínica, dados e cuidado no mesmo lugar</div><h2 className="font-display mt-6 max-w-2xl text-4xl font-bold leading-none tracking-[-0.07em] sm:text-5xl">Sua equipe mais presente em cada decisão clínica.</h2><p className="mt-5 max-w-xl text-lg leading-7 text-primary-foreground/75">Organize a rotina hoje e construa uma experiência de cuidado mais consistente amanhã.</p></div>
-              <Button asChild size="lg" className="h-12 bg-[var(--brand-sun)] px-7 text-base text-primary-foreground shadow-none hover:bg-[var(--brand-sun)]/90"><Link href="/register">Criar conta gratuita <ArrowRight /></Link></Button>
+              <Button asChild size="lg" className="h-12 bg-brand-sun px-7 text-base text-primary-foreground shadow-none hover:bg-brand-sun/90"><Link href="/register">Criar conta gratuita <ArrowRight /></Link></Button>
             </div>
           </div>
         </section>

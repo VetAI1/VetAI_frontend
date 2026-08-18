@@ -44,7 +44,7 @@ export function BrandLogo({
       </span>
       {!compact && (
         <span className={cn('font-display text-xl font-bold tracking-[-0.06em]', wordClass)}>
-          vet<span className={light ? 'text-[#f7be4c]' : 'text-primary'}>AI</span>
+          vet<span className={light ? 'text-brand-sun' : 'text-primary'}>AI</span>
         </span>
       )}
     </div>

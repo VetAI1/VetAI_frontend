@@ -38,13 +38,13 @@ export default function BillingSuccessPage() {
   }, []);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6 dark:bg-slate-950">
-      <section className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        {confirmed ? <CheckCircle2 className="mx-auto h-12 w-12 text-teal-600" /> : <Loader2 className="mx-auto h-12 w-12 animate-spin text-teal-600" />}
-        <h1 className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">
+    <main className="flex min-h-screen items-center justify-center bg-background p-6">
+      <section className="w-full max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+        {confirmed ? <CheckCircle2 className="mx-auto h-12 w-12 text-primary" /> : <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />}
+        <h1 className="mt-4 text-2xl font-bold text-foreground">
           {confirmed ? 'Pagamento confirmado' : 'Confirmando seu pagamento'}
         </h1>
-        <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+        <p className="mt-3 text-sm text-muted-foreground">
           {confirmed
             ? 'Sua assinatura está ativa e o acesso ao VetAI foi liberado.'
             : timedOut
@@ -52,7 +52,7 @@ export default function BillingSuccessPage() {
               : 'A confirmação pode levar alguns segundos. Não feche esta página.'}
         </p>
         {confirmed && (
-          <Button asChild className="mt-6 bg-teal-600 text-white hover:bg-teal-700">
+          <Button asChild className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90">
             <Link href="/analytics/dashboard">Entrar no VetAI</Link>
           </Button>
         )}

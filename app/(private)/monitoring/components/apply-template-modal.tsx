@@ -106,10 +106,10 @@ export function ApplyTemplateModal({
     >
       {loading ? (
         <div className="flex justify-center py-8">
-          <Loader2 size={24} className="animate-spin text-teal-600" />
+          <Loader2 size={24} className="animate-spin text-primary" />
         </div>
       ) : templates.length === 0 ? (
-        <p className="text-sm text-slate-500 dark:text-slate-400 py-6 text-center">
+        <p className="text-sm text-muted-foreground py-6 text-center">
           Nenhum modelo cadastrado ainda. Crie modelos na aba “Modelos de Prescrição”.
         </p>
       ) : (
@@ -136,8 +136,8 @@ export function ApplyTemplateModal({
                     key={index}
                     className={`p-3 rounded-lg border transition-colors ${
                       selection.checked
-                        ? 'border-teal-300 dark:border-teal-700 bg-teal-50/40 dark:bg-teal-900/10'
-                        : 'border-slate-200 dark:border-slate-700 opacity-60'
+                        ? 'border-primary/40 bg-primary/10'
+                        : 'border-border opacity-60'
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -153,11 +153,11 @@ export function ApplyTemplateModal({
                             ),
                           )
                         }
-                        className="mt-1 rounded border-slate-300 dark:border-slate-600 text-teal-600 focus:ring-teal-500"
+                        className="mt-1 rounded border-border text-primary focus:ring-primary"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          <p className="text-sm font-semibold text-foreground">
                             {item.name}
                           </p>
                           <span
@@ -166,7 +166,7 @@ export function ApplyTemplateModal({
                             {PRESCRIPTION_TYPE_MAP[item.type].label}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {FREQUENCY_LABELS[item.frequency]}
                           {item.frequency === 'RECURRING'
                             ? ` · a cada ${item.interval_hours}h por ${item.duration_days} dia(s)`
@@ -215,7 +215,7 @@ export function ApplyTemplateModal({
             </div>
           )}
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
@@ -226,7 +226,7 @@ export function ApplyTemplateModal({
               onClick={() => void handleSubmit()}
               loading={saving}
               disabled={!template}
-              className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Aplicar modelo
             </Button>

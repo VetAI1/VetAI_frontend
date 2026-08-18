@@ -14,7 +14,7 @@ export function DeleteBtn({ onDelete }: DeleteBtnProps) {
       variant="ghost"
       size="icon-sm"
       onClick={onDelete}
-      className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
+      className="text-muted-foreground/70 hover:text-danger hover:bg-danger-soft shrink-0"
     >
       <Trash2 size={14} />
     </Button>

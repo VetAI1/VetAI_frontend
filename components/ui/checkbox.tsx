@@ -34,22 +34,22 @@ export function Checkbox({
           checked={checked !== undefined ? (checked ?? false) : undefined}
           disabled={disabled}
           className={cn(
-            'peer h-4 w-4 appearance-none rounded border border-slate-300 bg-white transition-colors checked:border-indigo-600 checked:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:cursor-not-allowed dark:border-slate-600 dark:bg-slate-900',
+            'peer h-4 w-4 appearance-none rounded border border-input bg-card transition-colors checked:border-primary checked:bg-primary focus:outline-none focus:ring-2 focus:ring-ring/30 disabled:cursor-not-allowed',
             className,
           )}
           {...props}
         />
-        <Check className="pointer-events-none absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100" />
+        <Check className="pointer-events-none absolute h-3 w-3 text-primary-foreground opacity-0 peer-checked:opacity-100" />
       </span>
       {(label || description) && (
         <span>
           {label && (
-            <span className="block font-medium text-slate-700 dark:text-slate-200">
+            <span className="block font-medium text-foreground">
               {label}
             </span>
           )}
           {description && (
-            <span className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-xs text-muted-foreground">
               {description}
             </span>
           )}

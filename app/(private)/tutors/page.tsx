@@ -85,8 +85,8 @@ export default function TutorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-background w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Tutores" showStorage={false} />
 
         <SectionCard
@@ -104,7 +104,7 @@ export default function TutorsPage() {
                 setEditingTutor(undefined);
                 setShowModal(true);
               }}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              className="bg-primary h-10 text-primary-foreground hover:bg-primary/90"
             >
               <Plus size={18} /> Novo Tutor
             </Button>
@@ -130,9 +130,9 @@ export default function TutorsPage() {
                 <td colSpan={6} className="p-8 text-center">
                   <User
                     size={32}
-                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                    className="text-muted-foreground/50 mx-auto mb-2"
                   />
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {search
                       ? 'Nenhum tutor encontrado.'
                       : 'Nenhum tutor cadastrado ainda.'}
@@ -143,56 +143,56 @@ export default function TutorsPage() {
               tutors.map((tutor) => (
                 <tr
                   key={tutor.id}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                  className="hover:bg-secondary/60 transition-colors"
                 >
-                  <td className="p-4">
+                  <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                         <User
                           size={16}
-                          className="text-teal-600 dark:text-teal-400"
+                          className="text-primary"
                         />
                       </div>
-                      <p className="font-medium text-slate-900 dark:text-white">
+                      <p className="font-medium text-foreground">
                         {tutor.name}
                       </p>
                     </div>
                   </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
+                  <td className="p-4 text-muted-foreground">
                     {tutor.cpf ?? (
-                      <span className="text-slate-400 dark:text-slate-500">
+                      <span className="text-muted-foreground/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
+                  <td className="p-4 text-muted-foreground">
                     {tutor.phone ? (
                       <span className="flex items-center gap-1.5">
-                        <Phone size={13} className="text-slate-400" />
+                        <Phone size={13} className="text-muted-foreground/70" />
                         {formatPhone(tutor.phone)}
                       </span>
                     ) : (
-                      <span className="text-slate-400 dark:text-slate-500">
+                      <span className="text-muted-foreground/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
+                  <td className="p-4 text-muted-foreground">
                     {tutor.email ? (
                       <span className="flex items-center gap-1.5">
-                        <Mail size={13} className="text-slate-400" />
+                        <Mail size={13} className="text-muted-foreground/70" />
                         {tutor.email}
                       </span>
                     ) : (
-                      <span className="text-slate-400 dark:text-slate-500">
+                      <span className="text-muted-foreground/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
+                  <td className="p-4 text-muted-foreground">
                     {new Date(tutor.created_at).toLocaleDateString('pt-BR')}
                   </td>
-                  <td className="p-4">
+                  <td className="py-3 px-4">
                     <div className="flex items-center justify-end gap-1">
                       <Link href={`/tutors/detail?id=${tutor.id}`}>
                         <Button
@@ -200,7 +200,7 @@ export default function TutorsPage() {
                           size="icon-sm"
                           title="Ver detalhes"
                         >
-                          <Eye size={15} className="text-teal-600 dark:text-teal-400" />
+                          <Eye size={15} className="text-primary" />
                         </Button>
                       </Link>
                       <Button
@@ -211,7 +211,7 @@ export default function TutorsPage() {
                       >
                         <Pencil
                           size={15}
-                          className="text-slate-500 dark:text-slate-400"
+                          className="text-muted-foreground"
                         />
                       </Button>
                       <Button
@@ -224,10 +224,10 @@ export default function TutorsPage() {
                         {deletingId === tutor.id ? (
                           <Loader2
                             size={15}
-                            className="animate-spin text-red-500"
+                            className="animate-spin text-danger"
                           />
                         ) : (
-                          <Trash2 size={15} className="text-red-500" />
+                          <Trash2 size={15} className="text-danger" />
                         )}
                       </Button>
                     </div>
@@ -253,11 +253,11 @@ export default function TutorsPage() {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setConfirmDeleteTutor(null)}
           />
-          <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+          <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-foreground mb-2">
               Excluir tutor?
             </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               <strong>{confirmDeleteTutor.name}</strong> será removido
               permanentemente.
             </p>
@@ -274,7 +274,7 @@ export default function TutorsPage() {
                   void handleDelete(confirmDeleteTutor);
                 }}
                 disabled={!!deletingId}
-                className="bg-red-600 text-white hover:bg-red-700"
+                className="bg-destructive text-white hover:bg-destructive/90"
               >
                 {deletingId ? (
                   <Loader2 size={16} className="animate-spin" />

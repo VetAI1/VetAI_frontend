@@ -94,7 +94,7 @@ export default function BuyCreditsPage() {
   const availableCredits = aiCredits?.availableCredits ?? 0;
 
   return (
-    <div className="flex w-full flex-col gap-6 pb-12">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <Header
         title="Comprar Créditos de IA"
         showStorage={false}
@@ -114,28 +114,28 @@ export default function BuyCreditsPage() {
       />
 
       {/* BANNER SALDO ATUAL */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 rounded-xl border border-teal-200 bg-teal-50 shadow-sm dark:border-teal-900/50 dark:bg-teal-950/30 gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 rounded-xl border border-primary/40 bg-primary/10 shadow-sm gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-3.5 rounded-lg bg-teal-600 text-white">
+          <div className="p-3.5 rounded-lg bg-primary text-primary-foreground">
             <Zap className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">
+            <h2 className="text-base font-bold text-foreground">
               Seu Saldo Atual de Créditos
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-sm text-muted-foreground">
               {availableCredits === 0
                 ? 'Seus créditos esgotaram. Adquira um novo pacote para continuar gerando análises.'
                 : 'Créditos comprados acumulam com os créditos da sua renovação mensal.'}
             </p>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 border border-teal-200 dark:border-teal-900/50 px-5 py-2.5 rounded-lg text-center shadow-sm shrink-0">
-          <span className="text-xs uppercase tracking-wider text-teal-600 dark:text-teal-400 font-semibold block">
+        <div className="bg-card border border-primary/40 px-5 py-2.5 rounded-lg text-center shadow-sm shrink-0">
+          <span className="text-xs uppercase tracking-wider text-primary font-semibold block">
             Saldo Disponível
           </span>
-          <span className="text-2xl font-bold text-slate-900 dark:text-white">
-            {availableCredits.toLocaleString('pt-BR')} <span className="text-xs font-normal text-slate-500">créditos</span>
+          <span className="text-2xl font-bold text-foreground">
+            {availableCredits.toLocaleString('pt-BR')} <span className="text-xs font-normal text-muted-foreground">créditos</span>
           </span>
         </div>
       </div>
@@ -147,8 +147,8 @@ export default function BuyCreditsPage() {
       >
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
-            <p className="text-sm text-slate-500">Carregando pacotes de créditos...</p>
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Carregando pacotes de créditos...</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -161,44 +161,44 @@ export default function BuyCreditsPage() {
                     onClick={() => setSelectedPackageId(pkg.id)}
                     className={`relative flex flex-col justify-between p-6 rounded-xl border-2 cursor-pointer transition-colors ${
                       isSelected
-                        ? 'border-teal-600 bg-teal-50/40 dark:bg-teal-950/30 shadow-sm ring-2 ring-teal-500/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-700 bg-white dark:bg-slate-800'
+                        ? 'border-primary bg-primary/10 shadow-sm ring-2 ring-primary/20'
+                        : 'border-border hover:border-primary/40 bg-card'
                     }`}
                   >
                     {isSelected && (
-                      <div className="absolute top-4 right-4 p-1 rounded-full bg-teal-600 text-white">
+                      <div className="absolute top-4 right-4 p-1 rounded-full bg-primary text-primary-foreground">
                         <Check className="h-4 w-4" />
                       </div>
                     )}
 
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                        <span className="text-xs font-bold tracking-wider text-teal-700 dark:text-teal-300 uppercase">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <span className="text-xs font-bold tracking-wider text-primary uppercase">
                           {pkg.name}
                         </span>
                       </div>
 
                       <div>
-                        <div className="text-3xl font-bold text-slate-900 dark:text-white">
+                        <div className="text-3xl font-bold text-foreground">
                           {pkg.credits.toLocaleString('pt-BR')}{' '}
-                          <span className="text-sm font-normal text-slate-500">créditos</span>
+                          <span className="text-sm font-normal text-muted-foreground">créditos</span>
                         </div>
-                        <div className="text-xl font-bold text-teal-600 dark:text-teal-400 mt-1">
+                        <div className="text-xl font-bold text-primary mt-1">
                           {formatCurrency(pkg.price)}
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        <div className="text-xs text-muted-foreground mt-1">
                           {formatCreditUnitPrice(pkg)} por crédito
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
                       <span className="flex items-center gap-1.5 font-medium">
-                        <InfinityIcon className="h-4 w-4 text-slate-400" />
+                        <InfinityIcon className="h-4 w-4 text-muted-foreground/70" />
                         Sem prazo de validade
                       </span>
-                      <span className="font-semibold text-teal-600 dark:text-teal-400">
+                      <span className="font-semibold text-primary">
                         Acumulativo
                       </span>
                     </div>
@@ -209,18 +209,18 @@ export default function BuyCreditsPage() {
 
             {/* CARD DE RESUMO E REDIRECIONAMENTO */}
             {selectedPackage && (
-              <div className="flex flex-col sm:flex-row items-center justify-between p-6 rounded-xl border border-slate-200 bg-slate-50/50 dark:border-slate-600 dark:bg-slate-700/30 gap-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between p-6 rounded-xl border border-border bg-secondary gap-4">
                 <div className="space-y-1 text-center sm:text-left">
-                  <div className="text-sm text-slate-500 dark:text-slate-400">
+                  <div className="text-sm text-muted-foreground">
                     Pacote selecionado:{' '}
-                    <strong className="text-slate-900 dark:text-white">
+                    <strong className="text-foreground">
                       {selectedPackage.name}
                     </strong>
                   </div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                  <div className="text-2xl font-bold text-foreground">
                     +{selectedPackage.credits} Créditos por {formatCurrency(selectedPackage.price)}
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-muted-foreground">
                     Você será redirecionado para o ambiente seguro de pagamento (Cartão de Crédito ou Boleto).
                   </p>
                 </div>
@@ -229,7 +229,7 @@ export default function BuyCreditsPage() {
                   size="lg"
                   onClick={handleCheckout}
                   disabled={purchasing}
-                  className="bg-teal-600 hover:bg-teal-700 text-white px-8 shrink-0 w-full sm:w-auto"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 shrink-0 w-full sm:w-auto"
                 >
                   {purchasing ? (
                     <Loader2 className="h-5 w-5 animate-spin mr-2" />
@@ -245,8 +245,8 @@ export default function BuyCreditsPage() {
       </SectionCard>
 
       {/* TERMOS E REGRAS DE RETENÇÃO DE CRÉDITOS */}
-      <div className="p-5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-xs text-slate-600 dark:text-slate-400 space-y-2">
-        <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+      <div className="p-5 rounded-xl bg-card border border-border shadow-sm text-xs text-muted-foreground space-y-2">
+        <h4 className="font-bold text-foreground text-sm">
           ℹ️ Regras dos Pacotes de Créditos Comprados
         </h4>
         <ul className="list-disc pl-4 space-y-1">

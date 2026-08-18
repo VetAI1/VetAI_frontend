@@ -37,21 +37,21 @@ export function PreventionModal({
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-        <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-5 flex items-start justify-between gap-3 z-10">
+      <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+        <div className="sticky top-0 bg-card border-b border-border p-5 flex items-start justify-between gap-3 z-10">
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-700">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/40">
               <ShieldCheck
                 size={20}
-                className="text-teal-600 dark:text-teal-400"
+                className="text-primary"
               />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h2 className="text-lg font-bold text-foreground">
                 Análise de Prevenção
               </h2>
               {studyTitle && (
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-sm text-muted-foreground mt-0.5">
                   {studyTitle}
                 </p>
               )}
@@ -61,7 +61,7 @@ export function PreventionModal({
             variant="ghost"
             size="icon-sm"
             onClick={onClose}
-            className="shrink-0 text-slate-500"
+            className="shrink-0 text-muted-foreground"
           >
             <X size={18} />
           </Button>
@@ -70,8 +70,8 @@ export function PreventionModal({
         <div className="p-5 space-y-6">
           {prevention.alteredValues.map((altered, idx) => (
             <div key={idx}>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                <AlertTriangle size={15} className="text-red-500" />
+              <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                <AlertTriangle size={15} className="text-danger" />
                 {altered.name}
               </h3>
               {altered.problems.length > 0 && (
@@ -79,12 +79,12 @@ export function PreventionModal({
                   {altered.problems.map((problem, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-lg"
+                      className="flex items-start gap-2 p-2.5 bg-danger-soft border border-danger/30 rounded-lg"
                     >
-                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-danger text-white text-xs font-bold shrink-0 mt-0.5">
                         {i + 1}
                       </span>
-                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {problem}
                       </p>
                     </div>
@@ -96,13 +96,13 @@ export function PreventionModal({
                   {altered.recommendations.map((rec, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-2 p-2.5 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/40 rounded-lg"
+                      className="flex items-start gap-2 p-2.5 bg-primary/10 border border-primary/40 rounded-lg"
                     >
                       <CheckCircle2
                         size={15}
-                        className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5"
+                        className="text-primary shrink-0 mt-0.5"
                       />
-                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {rec}
                       </p>
                     </div>
@@ -113,21 +113,21 @@ export function PreventionModal({
           ))}
           {prevention.generalRecommendations.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                <Lightbulb size={16} className="text-teal-500" />
+              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                <Lightbulb size={16} className="text-primary" />
                 Recomendações Gerais
               </h3>
               <div className="space-y-2">
                 {prevention.generalRecommendations.map((rec, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-3 p-3 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/50 rounded-lg"
+                    className="flex items-start gap-3 p-3 bg-primary/10 border border-primary/40 rounded-lg"
                   >
                     <CheckCircle2
                       size={16}
-                      className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5"
+                      className="text-primary shrink-0 mt-0.5"
                     />
-                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {rec}
                     </p>
                   </div>

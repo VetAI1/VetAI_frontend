@@ -109,7 +109,7 @@ export function VitalSignsModal({
       maxWidth="2xl"
     >
       <div className="space-y-4">
-        <div className="flex items-start gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40 px-3 py-2.5 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-start gap-2 rounded-lg border border-border bg-secondary px-3 py-2.5 text-xs text-muted-foreground">
           <Clock size={14} className="mt-px shrink-0" />
           <span>
             A data, o horário e o veterinário responsável são registrados
@@ -168,7 +168,7 @@ export function VitalSignsModal({
 
         {parameters.length > 0 && (
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            <p className="text-sm font-semibold text-secondary-foreground">
               Parâmetros Clínicos
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -223,7 +223,7 @@ export function VitalSignsModal({
           <Button
             onClick={handleSubmit(onSubmit)}
             disabled={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800 min-w-[120px]"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[120px]"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : 'Registrar'}
           </Button>

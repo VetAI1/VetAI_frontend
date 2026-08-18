@@ -14,16 +14,16 @@ export function InfoCard({
   iconColor,
 }: InfoCardProps) {
   return (
-    <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+    <div className="flex flex-col gap-1.5 p-4 rounded-lg border border-border bg-muted/30">
       <div className="flex items-center gap-2">
         <Icon size={14} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
           {label}
         </span>
       </div>
-      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+      <p className="text-sm font-medium text-foreground">
         {value || (
-          <span className="text-slate-400 dark:text-slate-500 font-normal">
+          <span className="text-muted-foreground font-normal">
             —
           </span>
         )}

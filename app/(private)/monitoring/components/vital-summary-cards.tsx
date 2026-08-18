@@ -45,19 +45,19 @@ export function VitalSummaryCards({ specie, records }: VitalSummaryCardsProps) {
         return (
           <div
             key={def.key}
-            className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-4"
+            className="bg-card rounded-xl shadow-sm border border-border/70 p-4"
           >
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <p className="text-xs font-medium text-muted-foreground">
               {def.label}
             </p>
             <p className={`text-2xl font-bold mt-1 ${EVALUATION_TEXT_COLORS[evaluation]}`}>
               {latest ? latest.value : '—'}
               {latest && (
-                <span className="text-xs font-normal text-slate-400 ml-1">{def.unit}</span>
+                <span className="text-xs font-normal text-muted-foreground/70 ml-1">{def.unit}</span>
               )}
             </p>
             <div className="flex items-center justify-between mt-2">
-              <span className="text-[11px] text-slate-400 dark:text-slate-500">
+              <span className="text-[11px] text-muted-foreground/70">
                 {formatRange(range, def.unit)}
               </span>
               {latest && evaluation !== 'unknown' && (
@@ -67,12 +67,12 @@ export function VitalSummaryCards({ specie, records }: VitalSummaryCardsProps) {
               )}
             </div>
             {trend === 'worsening' && (
-              <span className="mt-1 inline-block text-[11px] font-semibold text-red-600 dark:text-red-400">
+              <span className="mt-1 inline-block text-[11px] font-semibold text-danger">
                 ↑ {TREND_LABELS.worsening}
               </span>
             )}
             {trend === 'improving' && (
-              <span className="mt-1 inline-block text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+              <span className="mt-1 inline-block text-[11px] font-semibold text-success">
                 ↓ {TREND_LABELS.improving}
               </span>
             )}

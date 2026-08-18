@@ -54,7 +54,7 @@ const items: Array<{
 ];
 
 const footerItemClassName =
-  'flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg w-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
+  'flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md w-full text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground';
 
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -66,12 +66,12 @@ export function AdminSidebar() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden print:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg"
+        className="md:hidden print:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-card border border-border shadow-lg"
       >
         {isOpen ? (
-          <X size={24} className="text-slate-900 dark:text-white" />
+          <X size={24} className="text-foreground" />
         ) : (
-          <Menu size={24} className="text-slate-900 dark:text-white" />
+          <Menu size={24} className="text-foreground" />
         )}
       </button>
 
@@ -83,16 +83,16 @@ export function AdminSidebar() {
       )}
 
       <aside
-        className={`fixed md:relative print:hidden z-40 flex h-full w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 transition-transform duration-300 ${
+        className={`fixed md:relative print:hidden z-40 flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
+        <div className="h-16 flex items-center justify-between px-6 border-b border-sidebar-border">
           <div className="flex items-center">
-            <ShieldCheck className="text-teal-600 mr-2" />
-            <span className="font-bold text-lg tracking-tight">VetAI</span>
+            <ShieldCheck className="text-primary mr-2" />
+            <span className="font-bold text-lg tracking-tight text-sidebar-foreground">VetAI</span>
           </div>
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300">
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
             ADMIN
           </span>
         </div>
@@ -104,17 +104,17 @@ export function AdminSidebar() {
               pathname === item.href || pathname.startsWith(`${item.href}/`);
             const isDisabled = item.permission ? !can(item.permission) : false;
 
-            const className = `w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+            const className = `w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors ${
               isDisabled
-                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-60'
+                ? 'text-muted-foreground/40 cursor-not-allowed opacity-60'
                 : isActive
-                  ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
+                  : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground'
             }`;
 
             const content = (
               <>
-                <Icon size={20} /> {item.label}
+                <Icon size={20} className={isActive ? 'text-primary' : ''} /> {item.label}
               </>
             );
 
@@ -143,7 +143,7 @@ export function AdminSidebar() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        <div className="p-4 border-t border-sidebar-border space-y-2">
           <button onClick={toggleTheme} className={footerItemClassName}>
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}

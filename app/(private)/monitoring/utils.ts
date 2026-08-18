@@ -22,25 +22,22 @@ export const STATUS_MAP: Record<
   },
   HOSPITALIZED: {
     label: 'Internado',
-    badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    badge: 'bg-info-soft text-info',
     dot: 'bg-blue-500',
   },
   DISCHARGED: {
     label: 'Alta',
-    badge:
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    badge: 'bg-success-soft text-success',
     dot: 'bg-green-500',
   },
   DECEASED: {
     label: 'Óbito',
-    badge:
-      'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+    badge: 'bg-muted text-secondary-foreground',
     dot: 'bg-slate-500',
   },
   CANCELLED: {
     label: 'Cancelada',
-    badge:
-      'bg-slate-100 text-slate-500 dark:bg-slate-700/60 dark:text-slate-400',
+    badge: 'bg-secondary text-muted-foreground',
     dot: 'bg-slate-400',
   },
 };
@@ -51,8 +48,7 @@ export const RISK_MAP: Record<
 > = {
   LOW: {
     label: 'Baixo risco',
-    badge:
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    badge: 'bg-success-soft text-success',
     dot: 'bg-green-500',
   },
   MEDIUM: {
@@ -63,7 +59,7 @@ export const RISK_MAP: Record<
   },
   HIGH: {
     label: 'Alto risco',
-    badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    badge: 'bg-danger-soft text-danger',
     dot: 'bg-red-500',
   },
 };
@@ -74,11 +70,11 @@ export const PRESCRIPTION_TYPE_MAP: Record<
 > = {
   MEDICATION: {
     label: 'Medicamento',
-    badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    badge: 'bg-info-soft text-info',
   },
   PROCEDURE: {
     label: 'Procedimento',
-    badge: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300',
+    badge: 'bg-primary/10 text-primary',
   },
   FLUID: {
     label: 'Fluidoterapia',
@@ -130,24 +126,22 @@ export const EXECUTION_STATUS_MAP: Record<
 > = {
   PENDING: {
     label: 'Programada',
-    badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-    chip: 'bg-blue-500 hover:bg-blue-600 text-white',
+    badge: 'bg-info-soft text-info',
+    chip: 'bg-info text-white hover:bg-info/90',
   },
   LATE: {
     label: 'Atrasada',
-    badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
-    chip: 'bg-red-500 hover:bg-red-600 text-white',
+    badge: 'bg-danger-soft text-danger',
+    chip: 'bg-destructive text-white hover:bg-destructive/90',
   },
   DONE: {
     label: 'Concluída',
-    badge:
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-    chip: 'bg-green-500 hover:bg-green-600 text-white',
+    badge: 'bg-success-soft text-success',
+    chip: 'bg-success text-white hover:bg-success/90',
   },
   CANCELLED: {
     label: 'Cancelada',
-    badge:
-      'bg-slate-100 text-slate-500 dark:bg-slate-700/60 dark:text-slate-400',
+    badge: 'bg-secondary text-muted-foreground',
     chip: 'bg-slate-300 dark:bg-slate-600 text-slate-600 dark:text-slate-300',
   },
 };

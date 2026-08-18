@@ -1,0 +1,182 @@
+'use client';
+
+import { BrainCircuit, FileText, Sparkles } from 'lucide-react';
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useReducedMotion,
+} from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
+
+import { cn } from '@/infra/utils';
+
+const FINDINGS = [
+  {
+    label: 'Leucocitose',
+    note: 'sugestivo de processo inflamatório ativo',
+    level: 'Moderado',
+  },
+  {
+    label: 'Plaquetas',
+    note: 'dentro da faixa de referência para a espécie',
+    level: 'Estável',
+  },
+  {
+    label: 'Creatinina',
+    note: 'valores normais, função renal preservada',
+    level: 'Ok',
+  },
+] as const;
+
+const LEVEL_TONE: Record<(typeof FINDINGS)[number]['level'], string> = {
+  Moderado: 'bg-brand-sun/20 text-brand-sun-strong',
+  Estável: 'bg-success/10 text-success',
+  Ok: 'bg-info/10 text-info',
+};
+
+export function CopilotDemo() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const reducedMotion = useReducedMotion();
+
+  const [typing, setTyping] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [visible, setVisible] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    if (reducedMotion) {
+      setTyping(false);
+      setAnalyzing(false);
+      setVisible(FINDINGS.length);
+      return;
+    }
+
+    const t1 = setTimeout(() => setTyping(true), 600);
+    const t2 = setTimeout(() => setTyping(false), 1600);
+    const t3 = setTimeout(() => setAnalyzing(true), 1800);
+    const t4 = setTimeout(() => setAnalyzing(false), 2800);
+    const reveals = FINDINGS.map((_, i) =>
+      setTimeout(() => setVisible(i + 1), 3000 + i * 400),
+    );
+    return () => {
+      [t1, t2, t3, t4, ...reveals].forEach(clearTimeout);
+    };
+  }, [inView, reducedMotion]);
+
+  const status = analyzing ? 'Analisando resultados' : 'Análise pronta';
+
+  return (
+    <div
+      ref={ref}
+      className="rounded-2xl border border-border bg-card p-4 sm:p-5"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <BrainCircuit size={18} />
+          </span>
+          <div>
+            <p className="text-sm font-bold text-foreground">Copilot VetAI</p>
+            <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <span
+                className={cn(
+                  'size-1.5 rounded-full',
+                  analyzing ? 'bg-brand-sun animate-pulse' : 'bg-success',
+                )}
+              />
+              {status}
+            </p>
+          </div>
+        </div>
+        <span className="font-data rounded-md bg-secondary px-2 py-1 text-xs font-semibold text-primary">
+          leitura #12
+        </span>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-3">
+        <div className="self-end rounded-2xl rounded-tr-sm bg-primary px-4 py-2.5 text-sm text-primary-foreground">
+          <p className="flex items-center gap-2">
+            <FileText size={14} />
+            Hemograma da Luna enviado para leitura.
+          </p>
+        </div>
+
+        <div className="flex gap-2.5">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-secondary text-primary">
+            <BrainCircuit size={15} />
+          </span>
+          <div className="min-w-0 flex-1">
+            {(typing || analyzing) && (
+              <div className="flex w-fit items-center gap-1 rounded-2xl rounded-tl-sm bg-secondary px-4 py-3">
+                {[0, 1, 2].map((dot) => (
+                  <span
+                    key={dot}
+                    className="typing-dot size-1.5 rounded-full bg-muted-foreground"
+                    style={{ animationDelay: `${dot * 120}ms` }}
+                  />
+                ))}
+              </div>
+            )}
+
+            <AnimatePresence>
+              {!typing && !analyzing && visible > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="space-y-2"
+                >
+                  <p className="w-fit rounded-2xl rounded-tl-sm bg-secondary px-4 py-2.5 text-sm text-foreground">
+                    Identifiquei 3 pontos que merecem a sua revisão:
+                  </p>
+                  {FINDINGS.slice(0, visible).map((finding) => (
+                    <motion.div
+                      key={finding.label}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.3,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background px-3.5 py-2.5"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground">
+                          {finding.label}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {finding.note}
+                        </p>
+                      </div>
+                      <span
+                        className={cn(
+                          'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider',
+                          LEVEL_TONE[finding.level],
+                        )}
+                      >
+                        {finding.level}
+                      </span>
+                    </motion.div>
+                  ))}
+                  {visible >= FINDINGS.length && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center gap-1.5 pt-1 text-xs font-semibold text-primary"
+                    >
+                      <Sparkles size={13} />
+                      A decisão clínica é sua.
+                    </motion.p>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

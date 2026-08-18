@@ -244,6 +244,57 @@ confirm({
 - An error thrown by `onConfirm` keeps the confirmation open. Handle user feedback, such as a toast, inside the callback.
 - Customize `icon`, button labels, outside-click behavior, and Escape behavior through the options object.
 
+### Design System & Styling Standards
+
+All screens **must** use semantic design tokens from `app/globals.css` (shadcn-style, backed by Tailwind's default palette: `teal`, `amber`, `stone`, `emerald`, `sky`, `red`). Do **NOT** use raw palette utilities (`slate-*`, `teal-*`, `amber-*`, `emerald-*`, `red-*`, `green-*`, `gray-*`, hex colors) in class strings — map them to tokens.
+
+#### Semantic tokens
+
+- **Surfaces**: `bg-background`, `bg-card`, `bg-popover`, `bg-secondary`, `bg-muted`, `bg-accent`
+- **Text**: `text-foreground`, `text-secondary-foreground`, `text-muted-foreground`, `text-primary`, `text-accent-foreground`
+- **Brand**: `text-primary` (teal), `bg-brand-sun` / `text-brand-sun` / `text-brand-sun-strong` (amber accent)
+- **Status**: `success` / `success-soft` (emerald), `warning` / `warning-soft` (amber), `info` / `info-soft` (sky), `danger` / `danger-soft` and `destructive` (red)
+- **Borders**: `border-border`, `border-input`
+- **Charts**: `--chart-1..5` (read via `constants/charts.ts` with hex fallback)
+
+#### Quick mapping (raw → token)
+
+| Raw | Token |
+|---|---|
+| `text-slate-900` / `text-gray-900` / `dark:text-white` | `text-foreground` |
+| `text-slate-600` / `text-gray-600` | `text-muted-foreground` |
+| `text-slate-400` | `text-muted-foreground/70` |
+| `text-teal-600` / `text-teal-700` | `text-primary` |
+| `bg-teal-600` / `bg-teal-700` (sólido) | `bg-primary` |
+| `bg-teal-50` / `bg-teal-100` / `dark:bg-teal-900/20` | `bg-primary/10` |
+| `text-amber-500` | `text-brand-sun` |
+| `text-amber-600` / `text-amber-700` / `text-amber-800` | `text-brand-sun-strong` |
+| `bg-amber-50` / `bg-amber-100` (aviso) | `bg-warning-soft` |
+| `text-red-600` / `text-red-500` | `text-danger` |
+| `bg-red-50` / `bg-red-100` | `bg-danger-soft` |
+| `text-emerald-600` / `text-green-600` | `text-success` |
+| `bg-emerald-50` / `bg-emerald-100` | `bg-success-soft` |
+| `text-blue-600` / `text-sky-600` | `text-info` |
+| `bg-blue-50` / `bg-blue-100` | `bg-info-soft` |
+| `bg-white` / `dark:bg-slate-800` / `dark:bg-slate-900` (superfície) | `bg-card` |
+| `border-slate-200` / `dark:border-slate-700` / `dark:border-slate-800` | `border-border` |
+| `hover:bg-slate-100` | `hover:bg-secondary` |
+| `bg-amber-600 hover:bg-amber-700 text-white` (botão) | `bg-warning text-white hover:bg-warning/90 dark:text-stone-950` |
+| `bg-red-600 hover:bg-red-700 text-white` (botão) | `bg-destructive text-white hover:bg-destructive/90` |
+
+Keep categorical colors (`indigo`, `violet`, `purple`, `rose`, `pink`, `orange`, `lime`, `cyan`, `fuchsia`) for multi-item color coding (monitoring parameters, chart series). Do NOT touch hex inside JS objects (chart.js, jsPDF, inline `style`). Tokens already switch light/dark — do NOT add redundant `dark:` variants once tokenized.
+
+#### Layout standards
+
+- **Page container** (root of every screen, private + admin): `mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8` inside a `min-h-screen bg-background w-full` wrapper. Intentional narrower layouts may keep `max-w-5xl`/`max-w-6xl` but must keep `px-4 sm:px-6 lg:px-8`.
+- **Page header**: prefer the `Header` component (`<Header title="..." showStorage={false} />`). Custom headers follow `mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between`, title `text-2xl sm:text-3xl font-bold tracking-tight text-foreground`, subtitle `text-sm text-muted-foreground`.
+- **Cards**: `rounded-lg border border-border bg-card p-5` (compact cards may use `p-4`). Modal panels: `rounded-xl`. Badges/pills: `rounded-full`. Buttons/inputs: `rounded-md`.
+- **Gaps**: card grids `gap-4`; row lists `gap-3`; section stacks `space-y-6`; form fields `space-y-4`.
+- **Table rows**: `px-4 py-3`, header `text-[11px] font-semibold uppercase tracking-wider text-muted-foreground` (handled by `DataTable`).
+- **Fonts**: `font-display` (Space Grotesk) only for hero/greeting/key numbers; `font-data` (IBM Plex Mono) for technical values (codes, prices, times).
+- **Motion**: durations 150/200/250/300ms by frequency, ease `--ease-brand`; always respect `prefers-reduced-motion`.
+- **Skeleton**: use `<Skeleton>` (`bg-muted`) for all async data loads; `Loader2` is reserved for button/input loading states.
+
 ### Workflow Rules
 
 - **Final Verification**: Always run `bun run format`, `bun run lint`, and `bun run build` at the end of any process to ensure code quality and build stability.

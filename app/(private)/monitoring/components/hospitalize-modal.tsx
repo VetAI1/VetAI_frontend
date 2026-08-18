@@ -445,7 +445,7 @@ export function HospitalizeModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {isEdit ? 'Salvar alterações' : 'Internar'}
           </Button>

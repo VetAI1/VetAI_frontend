@@ -150,7 +150,7 @@ export function AddPrescriptionModal({
               onClick={() =>
                 append({ drug: '', form: '', quantity: '', posology: '' })
               }
-              className="gap-1.5 text-xs text-teal-600 hover:bg-teal-50 hover:text-teal-700 dark:text-teal-400 dark:hover:bg-teal-900/20 dark:hover:text-teal-300"
+              className="gap-1.5 text-xs text-primary hover:bg-primary/10 hover:text-primary"
             >
               <Plus size={14} /> Adicionar medicamento
             </Button>
@@ -159,10 +159,10 @@ export function AddPrescriptionModal({
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30"
+              className="space-y-3 rounded-lg border border-border bg-secondary/50 p-4"
             >
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Medicamento {index + 1}
                 </span>
                 {fields.length > 1 && (
@@ -171,7 +171,7 @@ export function AddPrescriptionModal({
                     variant="ghost"
                     size="icon-sm"
                     onClick={() => remove(index)}
-                    className="text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                    className="text-muted-foreground/70 hover:bg-danger-soft hover:text-danger"
                   >
                     <X size={14} />
                   </Button>
@@ -262,20 +262,20 @@ export function AddPrescriptionModal({
               variant="ghost"
               size="sm"
               onClick={() => appendRecommendation({ text: '' })}
-              className="gap-1.5 text-xs text-teal-600 hover:bg-teal-50 hover:text-teal-700 dark:text-teal-400 dark:hover:bg-teal-900/20 dark:hover:text-teal-300"
+              className="gap-1.5 text-xs text-primary hover:bg-primary/10 hover:text-primary"
             >
               <Plus size={14} /> Adicionar recomendação
             </Button>
           </div>
 
           {recommendationFields.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-slate-300 px-3 py-4 text-center text-xs text-slate-400 dark:border-slate-600">
+            <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground/70">
               Cada recomendação vira um item na receita impressa.
             </p>
           ) : (
             recommendationFields.map((field, index) => (
               <div key={field.id} className="flex items-center gap-2">
-                <span className="text-slate-400 select-none">•</span>
+                <span className="text-muted-foreground/70 select-none">•</span>
                 <div className="flex-1">
                   <Controller
                     name={`recommendations.${index}.text`}
@@ -294,7 +294,7 @@ export function AddPrescriptionModal({
                   variant="ghost"
                   size="icon-sm"
                   onClick={() => removeRecommendation(index)}
-                  className="text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                  className="text-muted-foreground/70 hover:bg-danger-soft hover:text-danger"
                 >
                   <X size={14} />
                 </Button>
@@ -315,7 +315,7 @@ export function AddPrescriptionModal({
           <Button
             type="submit"
             disabled={saving}
-            className="bg-teal-600 text-white hover:bg-teal-700"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {saving ? (
               <Loader2 size={16} className="animate-spin" />

@@ -168,8 +168,8 @@ export default function AdminSubscriptionPage() {
       key: 'operation',
       header: 'Operação',
       render: (item) => (
-        <div className="flex items-center gap-2 font-medium text-slate-900 dark:text-white">
-          <Sparkles className="h-4 w-4 text-teal-500" />
+        <div className="flex items-center gap-2 font-medium text-foreground">
+          <Sparkles className="h-4 w-4 text-primary" />
           <span>
             {AI_OPERATION_LABELS[item.operation] ?? 'Processamento IA'}
           </span>
@@ -180,7 +180,7 @@ export default function AdminSubscriptionPage() {
       key: 'charged_credits',
       header: 'Créditos',
       render: (item) => (
-        <span className="font-semibold text-slate-800 dark:text-slate-200">
+        <span className="font-semibold text-foreground">
           {item.charged_credits || item.reserved_credits || 0}
         </span>
       ),
@@ -189,7 +189,7 @@ export default function AdminSubscriptionPage() {
       key: 'created_at',
       header: 'Data/Hora',
       render: (item) => (
-        <span className="text-slate-500 text-xs dark:text-slate-400">
+        <span className="text-xs text-muted-foreground">
           {formatDateTime(item.created_at)}
         </span>
       ),
@@ -225,7 +225,7 @@ export default function AdminSubscriptionPage() {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6 pb-12">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <Header
         title="Plano & Assinatura"
         showStorage={false}
@@ -248,7 +248,7 @@ export default function AdminSubscriptionPage() {
 
       {loading ? (
         <div className="space-y-6">
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
+          <div className="rounded-lg bg-card p-4 shadow sm:p-6 space-y-4">
             <Skeleton className="h-6 w-40" />
             <div className="grid gap-6 md:grid-cols-3 pt-2">
               <Skeleton className="h-28 w-full rounded-lg" />
@@ -257,11 +257,11 @@ export default function AdminSubscriptionPage() {
             </div>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
+            <div className="rounded-lg bg-card p-4 shadow sm:p-6 space-y-4">
               <Skeleton className="h-6 w-48" />
               <Skeleton className="h-16 w-full rounded-lg" />
             </div>
-            <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
+            <div className="rounded-lg bg-card p-4 shadow sm:p-6 space-y-4">
               <Skeleton className="h-6 w-48" />
               <Skeleton className="h-16 w-full rounded-lg" />
             </div>
@@ -271,17 +271,17 @@ export default function AdminSubscriptionPage() {
         <>
           {/* BANNER SE ESTIVER CANCELADA */}
           {subscription?.status === 'canceled' && (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-6 shadow-sm dark:border-red-900/50 dark:bg-red-950/30">
+            <div className="rounded-xl border border-danger/30 bg-danger-soft p-6 shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-red-100 p-2.5 text-red-600 dark:bg-red-900/40 dark:text-red-400">
+                  <div className="rounded-full bg-danger-soft p-2.5 text-danger">
                     <XCircle className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-red-900 dark:text-red-200">
+                    <h3 className="text-base font-bold text-danger">
                       Assinatura Cancelada
                     </h3>
-                    <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+                    <p className="mt-1 text-sm text-danger">
                       {subscription.canceledAt && (
                         <span>
                           Solicitação efetuada em{' '}
@@ -298,16 +298,16 @@ export default function AdminSubscriptionPage() {
 
           {/* BANNER SE ESTIVER TRIALING */}
           {subscription?.status === 'trialing' && (
-            <div className="rounded-xl border border-blue-200 bg-blue-50 p-6 shadow-sm dark:border-blue-900/50 dark:bg-blue-950/30">
+            <div className="rounded-xl border border-info/30 bg-info-soft p-6 shadow-sm">
               <div className="flex items-start gap-4">
-                <div className="rounded-full bg-blue-100 p-2.5 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
+                <div className="rounded-full bg-info-soft p-2.5 text-info">
                   <Info className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-blue-900 dark:text-blue-200">
+                  <h3 className="text-base font-bold text-info">
                     Período de Teste Gratuito (Trial)
                   </h3>
-                  <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                  <p className="mt-1 text-sm text-info">
                     Aproveite todos os recursos do plano. O período de teste encerra em{' '}
                     <strong>{formatDate(subscription.currentPeriodEnd || subscription.nextRenewalAt)}</strong>.
                   </p>
@@ -326,7 +326,7 @@ export default function AdminSubscriptionPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setIsCancelModalOpen(true)}
-                  className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/40"
+                  className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
                 >
                   Cancelar Plano
                 </Button>
@@ -334,44 +334,44 @@ export default function AdminSubscriptionPage() {
             }
           >
             <div className="grid gap-6 md:grid-cols-3">
-              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
-                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <Crown size={15} className="text-amber-500" /> Plano Atual
+              <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-secondary p-4">
+                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Crown size={15} className="text-brand-sun" /> Plano Atual
                 </span>
-                <span className="text-xl font-bold text-slate-900 dark:text-white">
+                <span className="text-xl font-bold text-foreground">
                   {currentPlan?.name || 'Plano Personalizado'}
                 </span>
-                <span className="text-sm text-slate-500 dark:text-slate-400">
+                <span className="text-sm text-muted-foreground">
                   {currentPlan?.basePrice || currentPlan?.monthlyPrice
                     ? `${formatCurrency(currentPlan.basePrice ?? currentPlan.monthlyPrice ?? 0)} / mês`
                     : 'Consulte suporte'}
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
-                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <CheckCircle2 size={15} className="text-teal-500" /> Status da Assinatura
+              <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-secondary p-4">
+                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <CheckCircle2 size={15} className="text-primary" /> Status da Assinatura
                 </span>
                 <div className="flex items-center gap-2 mt-1">
                   {getStatusBadge(subscription?.status)}
                 </div>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="text-xs text-muted-foreground">
                   {subscription?.status === 'canceled'
                     ? 'Acesso bloqueado até uma nova assinatura'
                     : 'Renovação automática ativada'}
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
-                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <Calendar size={15} className="text-blue-500" /> Data de Renovação / Vigência
+              <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-secondary p-4">
+                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Calendar size={15} className="text-info" /> Data de Renovação / Vigência
                 </span>
-                <span className="text-xl font-bold text-slate-900 dark:text-white">
+                <span className="text-xl font-bold text-foreground">
                   {formatDate(
                     subscription?.nextRenewalAt || subscription?.currentPeriodEnd,
                   )}
                 </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="text-xs text-muted-foreground">
                   Ciclo atual: {formatDate(subscription?.currentPeriodStart)} até{' '}
                   {formatDate(subscription?.currentPeriodEnd)}
                 </span>
@@ -389,32 +389,32 @@ export default function AdminSubscriptionPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-teal-500/10 p-3 text-teal-600 dark:text-teal-400">
+                    <div className="rounded-lg bg-primary/10 p-3 text-primary">
                       <Users size={22} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                      <p className="text-sm font-medium text-muted-foreground">
                         Assentos em Uso
                       </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {collaboratorsCount} <span className="text-sm font-normal text-slate-500">/ {totalSeats}</span>
+                      <p className="text-2xl font-bold text-foreground">
+                        {collaboratorsCount} <span className="text-sm font-normal text-muted-foreground">/ {totalSeats}</span>
                       </p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-teal-600 dark:text-teal-400">
+                  <span className="text-sm font-bold text-primary">
                     {seatsUsagePercent}%
                   </span>
                 </div>
 
                 <Progress value={seatsUsagePercent} className="h-3" />
 
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Plano Base: {userLimit} assentos</span>
                   <span>Adicionais: {additionalSeats} assentos</span>
                 </div>
 
                 {collaboratorsCount >= totalSeats && (
-                  <div className="flex items-center gap-2 rounded-lg bg-amber-50 p-2.5 text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+                  <div className="flex items-center gap-2 rounded-lg bg-warning-soft p-2.5 text-xs text-warning">
                     <AlertTriangle size={16} className="shrink-0" />
                     <span>
                       Você atingiu o limite de assentos contratados no seu plano.
@@ -433,7 +433,7 @@ export default function AdminSubscriptionPage() {
                   <Button
                     size="sm"
                     asChild
-                    className="bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-1.5"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5"
                   >
                     <Link href="/admin/subscription/buy-credits">
                       <Sparkles size={14} />
@@ -450,12 +450,12 @@ export default function AdminSubscriptionPage() {
                       <Bot size={22} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                      <p className="text-sm font-medium text-muted-foreground">
                         Créditos Consumidos
                       </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                      <p className="text-2xl font-bold text-foreground">
                         {usedCredits.toLocaleString('pt-BR')}{' '}
-                        <span className="text-sm font-normal text-slate-500">
+                        <span className="text-sm font-normal text-muted-foreground">
                           / {totalCredits.toLocaleString('pt-BR')}
                         </span>
                       </p>
@@ -468,7 +468,7 @@ export default function AdminSubscriptionPage() {
 
                 <Progress value={creditsUsagePercent} className="h-3" />
 
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Disponíveis: {availableCredits.toLocaleString('pt-BR')} créditos</span>
                   <span>Reservados: {(aiCredits?.reservedCredits ?? 0).toLocaleString('pt-BR')}</span>
                 </div>
@@ -482,7 +482,7 @@ export default function AdminSubscriptionPage() {
             subtitle="Histórico das últimas operações e diagnósticos processados"
           >
             {aiUsageList.length === 0 ? (
-              <div className="py-12 text-center text-sm text-slate-500 dark:text-slate-400">
+              <div className="py-12 text-center text-sm text-muted-foreground">
                 Nenhum uso recente de Inteligência Artificial registrado neste período.
               </div>
             ) : (

@@ -92,12 +92,12 @@ export function ExecuteModal({
   return (
     <Modal title="Registrar Execução" onClose={onClose} maxWidth="md">
       {info && (
-        <div className="mb-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-700">
+        <div className="mb-4 p-3 rounded-lg bg-secondary border border-border">
           <div className="flex items-center justify-between gap-2">
-            <p className="font-semibold text-slate-900 dark:text-white text-sm">
+            <p className="font-semibold text-foreground text-sm">
               {info.name}
               {info.dose ? (
-                <span className="font-normal text-slate-500 dark:text-slate-400"> · {info.dose}</span>
+                <span className="font-normal text-muted-foreground"> · {info.dose}</span>
               ) : null}
             </p>
             <span
@@ -106,7 +106,7 @@ export function ExecuteModal({
               {PRESCRIPTION_TYPE_MAP[info.type].label}
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {info.patient ? `Paciente: ${info.patient}` : ''}
             {info.scheduled ? ` · Programado para ${info.scheduled}` : ''}
           </p>
@@ -173,7 +173,7 @@ export function ExecuteModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             Concluir execução
           </Button>

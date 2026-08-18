@@ -123,7 +123,7 @@ export default function AdminCollaborators() {
       key: 'name',
       header: 'Nome',
       render: (c) => (
-        <span className="font-medium text-slate-900 dark:text-white">
+        <span className="font-medium text-foreground">
           {c.name ?? 'Convite pendente'}
         </span>
       ),
@@ -131,7 +131,7 @@ export default function AdminCollaborators() {
     {
       key: 'email',
       header: 'E-mail',
-      render: (c) => <span className="text-sm text-slate-500">{c.email}</span>,
+      render: (c) => <span className="text-sm text-muted-foreground">{c.email}</span>,
     },
     {
       key: 'status',
@@ -160,14 +160,14 @@ export default function AdminCollaborators() {
           );
         }
         return (
-          <span className="text-sm text-slate-500">{c.role_name ?? '-'}</span>
+          <span className="text-sm text-muted-foreground">{c.role_name ?? '-'}</span>
         );
       },
     },
   ];
 
   return (
-    <div className="flex w-full flex-col gap-6 pb-12">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <Header
         title="Colaboradores"
         showStorage={false}
@@ -175,7 +175,7 @@ export default function AdminCollaborators() {
           canEdit ? (
             <Button
               onClick={() => setIsInviteOpen(true)}
-              className="bg-teal-600 text-white hover:bg-teal-700"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <UserPlus className="h-4 w-4" /> Convidar colaborador
             </Button>
@@ -233,7 +233,7 @@ export default function AdminCollaborators() {
               <Button
                 onClick={invite}
                 disabled={saving || !email.trim() || !roleId}
-                className="bg-teal-600 text-white hover:bg-teal-700"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {saving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -255,7 +255,7 @@ export default function AdminCollaborators() {
           onClose={() => setUserLimitError(null)}
         >
           <div className="space-y-5">
-            <p className="text-sm text-slate-600 dark:text-slate-300">
+            <p className="text-sm text-muted-foreground">
               Contrate mais um usuário por{' '}
               {formatPrice(userLimitError.pricePerUser)}/mês. O valor será
               adicionado à sua assinatura Stripe.
@@ -271,7 +271,7 @@ export default function AdminCollaborators() {
               <Button
                 onClick={purchaseSeat}
                 loading={saving}
-                className="bg-teal-600 text-white hover:bg-teal-700"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 Contratar usuário
               </Button>

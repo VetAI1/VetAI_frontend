@@ -37,11 +37,9 @@ export function DiseaseDetailModal({
   };
 
   const severityBg = {
-    red: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
-    yellow:
-      'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800',
-    green:
-      'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
+    red: 'bg-danger-soft border-danger/30',
+    yellow: 'bg-warning-soft border-warning/30',
+    green: 'bg-success-soft border-success/30',
   };
 
   const probability =
@@ -55,30 +53,30 @@ export function DiseaseDetailModal({
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-        <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-5 flex items-start justify-between gap-3 z-10">
+      <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+        <div className="sticky top-0 bg-card border-b border-border p-5 flex items-start justify-between gap-3 z-10">
           <div className="flex items-start gap-3">
             <div className={`p-2 rounded-lg ${severityBg[disease.severity]}`}>
               <AlertCircle
                 size={20}
                 className={
                   disease.severity === 'red'
-                    ? 'text-red-600 dark:text-red-400'
+                    ? 'text-danger'
                     : disease.severity === 'yellow'
-                      ? 'text-yellow-600 dark:text-yellow-400'
-                      : 'text-green-600 dark:text-green-400'
+                      ? 'text-warning'
+                      : 'text-success'
                 }
               />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h2 className="text-lg font-bold text-foreground">
                 {disease.name}
               </h2>
               <div className="flex items-center gap-2 mt-1">
                 <Badge color={disease.severity}>
                   {severityLabels[disease.severity]}
                 </Badge>
-                <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                <span className="text-sm font-semibold text-muted-foreground">
                   {probability}% probabilidade
                 </span>
               </div>
@@ -88,7 +86,7 @@ export function DiseaseDetailModal({
             variant="ghost"
             size="icon-sm"
             onClick={onClose}
-            className="text-slate-500"
+            className="text-muted-foreground"
           >
             <X size={18} />
           </Button>
@@ -96,18 +94,18 @@ export function DiseaseDetailModal({
 
         <div className="p-5 space-y-5">
           <div>
-            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+            <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
               <span>Probabilidade</span>
               <span>{probability}%</span>
             </div>
-            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+            <div className="w-full bg-muted rounded-full h-2.5">
               <div
                 className={`h-2.5 rounded-full transition-all duration-700 ${
                   disease.severity === 'red'
-                    ? 'bg-red-500'
+                    ? 'bg-danger'
                     : disease.severity === 'yellow'
-                      ? 'bg-yellow-500'
-                      : 'bg-green-500'
+                      ? 'bg-warning'
+                      : 'bg-success'
                 }`}
                 style={{ width: `${probability}%` }}
               />
@@ -116,11 +114,11 @@ export function DiseaseDetailModal({
 
           {disease.reasoning && (
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                <Stethoscope size={16} className="text-teal-600" />
+              <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                <Stethoscope size={16} className="text-primary" />
                 Raciocínio Clínico
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3">
+              <p className="text-sm text-muted-foreground leading-relaxed bg-muted rounded-lg p-3">
                 {disease.reasoning}
               </p>
             </div>
@@ -128,20 +126,20 @@ export function DiseaseDetailModal({
 
           {treatments.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                <Pill size={16} className="text-teal-600" />
+              <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                <Pill size={16} className="text-primary" />
                 Tratamentos e Medicamentos Sugeridos
               </h3>
               <div className="space-y-2">
                 {treatments.map((treatment, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-2 p-3 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg"
+                    className="flex items-start gap-2 p-3 bg-primary/10 border border-primary/40 rounded-lg"
                   >
-                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-teal-600 text-white text-xs font-bold shrink-0 mt-0.5">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
                       {i + 1}
                     </span>
-                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <p className="text-sm text-muted-foreground">
                       {treatment}
                     </p>
                   </div>
@@ -151,7 +149,7 @@ export function DiseaseDetailModal({
           )}
 
           {treatments.length === 0 && (
-            <div className="text-center py-4 text-slate-500 dark:text-slate-400">
+            <div className="text-center py-4 text-muted-foreground">
               <Pill size={24} className="mx-auto mb-2 opacity-50" />
               <p className="text-sm">
                 Nenhum tratamento sugerido ainda para esta condição.

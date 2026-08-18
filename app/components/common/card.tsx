@@ -3,12 +3,19 @@ interface CardProps {
   className?: string;
   style?: React.CSSProperties;
   onClick?: () => void;
+  shadow?: boolean;
 }
 
-export function Card({ children, className = '', style, onClick }: CardProps) {
+export function Card({
+  children,
+  className = '',
+  style,
+  onClick,
+  shadow = true,
+}: CardProps) {
   return (
     <div
-      className={`rounded-2xl border border-border bg-card shadow-[var(--shadow-card)] ${className}`}
+      className={`rounded-lg border border-border bg-card ${shadow ? 'shadow-[var(--shadow-card)]' : ''} ${className}`}
       style={style}
       onClick={onClick}
     >

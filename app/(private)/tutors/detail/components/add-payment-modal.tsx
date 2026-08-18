@@ -28,7 +28,7 @@ interface AddPaymentModalProps {
 }
 
 const inputCls =
-  'w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500';
+  'w-full rounded-lg border border-border bg-card dark:bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary';
 
 const STATUS_OPTIONS: { value: PaymentStatus; label: string }[] = [
   { value: 'PENDING', label: 'Pendente' },
@@ -202,14 +202,14 @@ export function AddPaymentModal({
           </div>
 
           {showCatalog && (
-            <div className="mb-3 border border-slate-200 dark:border-slate-600 rounded-lg overflow-hidden">
-              <div className="p-2 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800">
+            <div className="mb-3 border border-border rounded-lg overflow-hidden">
+              <div className="p-2 border-b border-border bg-secondary">
                 <input
                   type="text"
                   value={catalogSearch}
                   onChange={(e) => setCatalogSearch(e.target.value)}
                   placeholder="Buscar produto ou serviço..."
-                  className="w-full px-3 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-1.5 text-sm rounded border border-border bg-card dark:bg-secondary text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   autoFocus
                 />
               </div>
@@ -218,11 +218,11 @@ export function AddPaymentModal({
                   <div className="flex items-center justify-center py-6">
                     <Loader2
                       size={16}
-                      className="animate-spin text-slate-400"
+                      className="animate-spin text-muted-foreground/70"
                     />
                   </div>
                 ) : filteredCatalog.length === 0 ? (
-                  <p className="text-sm text-slate-400 text-center py-4">
+                  <p className="text-sm text-muted-foreground/70 text-center py-4">
                     {catalogItems.length === 0
                       ? 'Nenhum item no catálogo.'
                       : 'Nenhum resultado.'}
@@ -233,17 +233,17 @@ export function AddPaymentModal({
                       key={item.id}
                       type="button"
                       onClick={() => addFromCatalog(item)}
-                      className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors text-left border-b border-slate-100 dark:border-slate-700 last:border-0"
+                      className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-primary/10 transition-colors text-left border-b border-border/70 last:border-0"
                     >
                       <div>
-                        <span className="font-medium text-slate-900 dark:text-white">
+                        <span className="font-medium text-foreground">
                           {item.name}
                         </span>
-                        <span className="ml-2 text-xs text-slate-400">
+                        <span className="ml-2 text-xs text-muted-foreground/70">
                           {CATALOG_CATEGORY_LABELS[item.category]}
                         </span>
                       </div>
-                      <span className="text-teal-600 dark:text-teal-400 font-medium shrink-0 ml-3">
+                      <span className="text-primary font-medium shrink-0 ml-3">
                         {fmtCurrency(item.price)}
                       </span>
                     </button>
@@ -254,7 +254,7 @@ export function AddPaymentModal({
           )}
 
           {fields.length === 0 ? (
-            <div className="border border-dashed border-slate-300 dark:border-slate-600 rounded-lg py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+            <div className="border border-dashed border-border rounded-lg py-6 text-center text-sm text-muted-foreground/70">
               Adicione itens do catálogo ou crie avulsos
             </div>
           ) : (
@@ -288,16 +288,16 @@ export function AddPaymentModal({
                   <button
                     type="button"
                     onClick={() => remove(idx)}
-                    className="text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center"
+                    className="text-muted-foreground/70 hover:text-danger transition-colors flex items-center justify-center"
                   >
                     <X size={16} />
                   </button>
                 </div>
               ))}
               <div className="flex justify-end pt-1">
-                <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                <span className="text-sm font-semibold text-foreground">
                   Total:{' '}
-                  <span className="text-teal-600 dark:text-teal-400">
+                  <span className="text-primary">
                     {fmtCurrency(total)}
                   </span>
                 </span>
@@ -305,7 +305,7 @@ export function AddPaymentModal({
             </div>
           )}
           {errors.items?.message && (
-            <p className="mt-1 text-xs text-red-500">{errors.items.message}</p>
+            <p className="mt-1 text-xs text-danger">{errors.items.message}</p>
           )}
         </div>
 
@@ -368,7 +368,7 @@ export function AddPaymentModal({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {isSubmitting ? (
               <Loader2 size={16} className="animate-spin" />

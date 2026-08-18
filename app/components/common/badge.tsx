@@ -1,20 +1,35 @@
+type BadgeColor =
+  | 'red'
+  | 'green'
+  | 'yellow'
+  | 'blue'
+  | 'neutral'
+  | 'danger'
+  | 'success'
+  | 'warning'
+  | 'info';
+
 interface BadgeProps {
   children: React.ReactNode;
-  color?: 'red' | 'green' | 'yellow' | 'blue';
+  color?: BadgeColor;
 }
 
-export const Badge = ({ children, color = 'red' }: BadgeProps) => {
-  const colors = {
-    red: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
-    green:
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-    yellow:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    blue: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-  };
+const COLORS: Record<BadgeColor, string> = {
+  red: 'bg-danger-soft text-danger',
+  green: 'bg-success-soft text-success',
+  yellow: 'bg-warning-soft text-warning',
+  blue: 'bg-info-soft text-info',
+  neutral: 'bg-muted text-muted-foreground',
+  danger: 'bg-danger-soft text-danger',
+  success: 'bg-success-soft text-success',
+  warning: 'bg-warning-soft text-warning',
+  info: 'bg-info-soft text-info',
+};
+
+export const Badge = ({ children, color = 'danger' }: BadgeProps) => {
   return (
     <span
-      className={`px-2 py-1 rounded-full text-xs font-semibold ${colors[color] || colors.red}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${COLORS[color]}`}
     >
       {children}
     </span>

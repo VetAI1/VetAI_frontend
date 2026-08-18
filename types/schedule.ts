@@ -19,21 +19,21 @@ export const EVENT_TYPE_MAP: Record<
 > = {
   consultation: {
     label: 'Consulta',
-    color: 'text-blue-700 dark:text-blue-300',
-    bg: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800',
-    dot: 'bg-blue-500',
+    color: 'text-info',
+    bg: 'bg-info-soft border-info/30',
+    dot: 'bg-info',
   },
   surgery: {
     label: 'Cirurgia',
-    color: 'text-red-700 dark:text-red-300',
-    bg: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800',
-    dot: 'bg-red-500',
+    color: 'text-danger',
+    bg: 'bg-danger-soft border-danger/30',
+    dot: 'bg-danger',
   },
   vaccine: {
     label: 'Vacina',
-    color: 'text-green-700 dark:text-green-300',
-    bg: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800',
-    dot: 'bg-green-500',
+    color: 'text-success',
+    bg: 'bg-success-soft border-success/30',
+    dot: 'bg-success',
   },
   exam: {
     label: 'Exame',
@@ -43,8 +43,8 @@ export const EVENT_TYPE_MAP: Record<
   },
   other: {
     label: 'Outro',
-    color: 'text-slate-700 dark:text-slate-300',
-    bg: 'bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600',
-    dot: 'bg-slate-500',
+    color: 'text-secondary-foreground',
+    bg: 'bg-secondary border-border',
+    dot: 'bg-muted-foreground/60',
   },
 };

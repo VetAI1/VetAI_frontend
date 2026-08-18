@@ -41,22 +41,22 @@ export default function Monitoring() {
   const [tab, setTab] = useState<MonitoringTab>('hospitalized');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-background w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Internação" showStorage={false} />
 
-        <div className="border-b border-slate-200 dark:border-slate-700 mb-6 -mt-2 overflow-x-auto overflow-y-hidden scrollbar-thin">
-          <nav className="flex gap-1 min-w-max">
+        <div className="mb-6 rounded-lg border border-border bg-card p-2">
+          <nav className="flex gap-1.5 overflow-x-auto scrollbar-thin">
             {TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => setTab(key)}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap',
+                  'flex shrink-0 items-center gap-2 rounded-md px-3.5 py-2 text-sm font-semibold whitespace-nowrap transition-colors',
                   tab === key
-                    ? 'border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400'
-                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600',
+                    ? 'bg-primary text-primary-foreground shadow-[var(--shadow-brand)]'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
                 )}
               >
                 <Icon size={16} />

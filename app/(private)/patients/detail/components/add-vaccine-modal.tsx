@@ -195,7 +195,7 @@ export function AddVaccineModal({
         />
 
         {loadingPrevDose && (
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Loader2 size={12} className="animate-spin" /> Buscando dose
             anterior...
           </div>
@@ -269,11 +269,11 @@ export function AddVaccineModal({
         </div>
 
         {selectedVaccine?.revaccination_period_days ? (
-          <div className="rounded-lg border border-teal-200 bg-teal-50 p-3 dark:border-teal-700 dark:bg-teal-900/20">
-            <p className="mb-0.5 text-xs font-medium text-teal-700 dark:text-teal-400">
+          <div className="rounded-lg border border-primary/40 bg-primary/10 p-3">
+            <p className="mb-0.5 text-xs font-medium text-primary">
               Próxima Revacinação (calculada automaticamente)
             </p>
-            <p className="text-sm font-semibold text-teal-900 dark:text-teal-300">
+            <p className="text-sm font-semibold text-primary">
               {calcRevaccinationDate(
                 date,
                 selectedVaccine.revaccination_period_days,
@@ -286,14 +286,14 @@ export function AddVaccineModal({
                 ).toLocaleDateString('pt-BR')
                 : '—'}
             </p>
-            <p className="mt-0.5 text-xs text-teal-600 dark:text-teal-500">
+            <p className="mt-0.5 text-xs text-primary">
               Baseado no período de {selectedVaccine.revaccination_period_days}{' '}
               dias da vacina
             </p>
           </div>
         ) : selectedVaccine ? (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-700/50">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="rounded-lg border border-border bg-secondary p-3">
+            <p className="text-xs text-muted-foreground">
               Esta vacina não possui período de revacinação definido no
               catálogo.
             </p>
@@ -340,7 +340,7 @@ export function AddVaccineModal({
           <Button
             type="submit"
             disabled={saving}
-            className="bg-teal-600 text-white hover:bg-teal-700"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : 'Salvar'}
           </Button>

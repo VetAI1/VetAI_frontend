@@ -53,10 +53,10 @@ export default function PatientsPage() {
           href={`/patients/detail?id=${patient.id}`}
           className="flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
-            <PawPrint size={18} className="text-teal-600 dark:text-teal-400" />
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <PawPrint size={18} className="text-primary" />
           </div>
-          <p className="font-medium text-slate-900 dark:text-white">
+          <p className="font-medium text-foreground">
             {patient.name}
           </p>
         </Link>
@@ -66,7 +66,7 @@ export default function PatientsPage() {
       key: 'specie',
       header: 'Espécie',
       render: (patient) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {SPECIE_LABELS[patient.specie] ?? patient.specie}
         </span>
       ),
@@ -75,7 +75,7 @@ export default function PatientsPage() {
       key: 'breed',
       header: 'Raça',
       render: (patient) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {patient.breed ?? '-'}
         </span>
       ),
@@ -84,7 +84,7 @@ export default function PatientsPage() {
       key: 'created_at',
       header: 'Cadastrado em',
       render: (patient) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {new Date(patient.created_at).toLocaleDateString('pt-BR')}
         </span>
       ),
@@ -97,7 +97,7 @@ export default function PatientsPage() {
       render: (patient) => (
         <Link href={`/patients/detail?id=${patient.id}`}>
           <ChevronRight
-            className="inline text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+            className="inline text-muted-foreground/50 hover:text-primary transition-colors"
             size={20}
           />
         </Link>
@@ -106,8 +106,8 @@ export default function PatientsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-background w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Pacientes" showStorage={false} />
 
         <SectionCard
@@ -122,7 +122,7 @@ export default function PatientsPage() {
           headerAction={
             <Button
               onClick={() => setShowCreateModal(true)}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              className="bg-primary h-10 text-primary-foreground hover:bg-primary/90"
             >
               <Plus size={18} /> Novo Paciente
             </Button>
@@ -140,9 +140,9 @@ export default function PatientsPage() {
               <div className="p-8 text-center">
                 <PawPrint
                   size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                  className="text-muted-foreground/50 mx-auto mb-2"
                 />
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {search
                     ? 'Nenhum paciente encontrado.'
                     : 'Nenhum paciente cadastrado ainda.'}

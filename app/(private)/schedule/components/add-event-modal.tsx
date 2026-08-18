@@ -344,7 +344,7 @@ export function AddEventModal({
           </Button>
           <Button
             type="submit"
-            className="border-teal-600 bg-teal-600 text-white hover:bg-teal-700"
+            className="border-primary bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {isEditing ? 'Salvar alterações' : 'Salvar evento'}
           </Button>

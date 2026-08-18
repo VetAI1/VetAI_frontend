@@ -1,40 +1,73 @@
 'use client';
 
-import {
-  BookOpen,
-  CalendarDays,
-  CreditCard,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  MessageCircleQuestionMark,
-  Microscope,
-  Moon,
-  PawPrint,
-  Pill,
-  Settings,
-  ShieldCheck,
-  SquareActivity,
-  Sun,
-  Syringe,
-  Users,
-  X,
-} from 'lucide-react';
+import { LogOut, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
 
+import { NAV_ITEMS, type NavItem } from './navigation';
 import { NotificationBell } from './notification-bell';
 
 import { BrandLogo } from '@/app/components/brand/brand-logo';
 import { useTheme } from '@/contexts/theme-context';
 import { useAuth } from '@/infra/auth-context';
-import type { Permission } from '@/types/permissions';
+import { cn } from '@/infra/utils';
+
+function NavLink({
+  item,
+  isActive,
+  isDisabled,
+}: {
+  item: NavItem;
+  isActive: boolean;
+  isDisabled: boolean;
+}) {
+  const Icon = item.icon;
+
+  const className = cn(
+    'group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+    isDisabled
+      ? 'cursor-not-allowed text-muted-foreground/40'
+      : isActive
+        ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
+        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
+  );
+
+  const content = (
+    <>
+      <Icon
+        size={18}
+        className={cn(
+          'shrink-0 transition-colors',
+          isActive && 'text-primary',
+        )}
+      />
+      <span className="truncate">{item.label}</span>
+      {item.badge && (
+        <span className="ml-auto rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+          {item.badge}
+        </span>
+      )}
+    </>
+  );
+
+  if (isDisabled) {
+    return (
+      <span key={item.href} className={className} aria-disabled="true">
+        {content}
+      </span>
+    );
+  }
+
+  return (
+    <Link key={item.href} href={item.href} className={className}>
+      {content}
+    </Link>
+  );
+}
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { logout, can } = useAuth();
 
@@ -43,164 +76,43 @@ export function Sidebar() {
     router.push('/login');
   }
 
-  const menuItems: Array<{
-    href: string;
-    icon: typeof LayoutDashboard;
-    label: string;
-    permission?: Permission;
-  }> = [
-    { href: '/analytics/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    {
-      href: '/exams',
-      icon: Microscope,
-      label: 'Exames',
-      permission: 'exams:view',
-    },
-    {
-      href: '/patients',
-      icon: PawPrint,
-      label: 'Pacientes',
-      permission: 'patients:view',
-    },
-    {
-      href: '/tutors',
-      icon: Users,
-      label: 'Tutores',
-      permission: 'tutors:view',
-    },
-    {
-      href: '/vaccines',
-      icon: Syringe,
-      label: 'Vacinas',
-      permission: 'vaccines:view',
-    },
-    { href: '/medicines', icon: Pill, label: 'Medicações' },
-    {
-      href: '/schedule',
-      icon: CalendarDays,
-      label: 'Agendamentos',
-      permission: 'schedule:view',
-    },
-    { href: '/payments', icon: CreditCard, label: 'Pagamentos' },
-    { href: '/catalog', icon: BookOpen, label: 'Catálogo' },
-    {
-      href: '/monitoring',
-      icon: SquareActivity,
-      label: 'Internação',
-      permission: 'monitoring:view',
-    },
-    {
-      href: '/consultation',
-      icon: MessageCircleQuestionMark,
-      label: 'Consulta',
-      permission: 'consultation:view',
-    },
-    {
-      href: '/settings',
-      icon: Settings,
-      label: 'Configurações',
-      permission: 'settings:view',
-    },
-    { href: '/admin/dashboard', icon: ShieldCheck, label: 'Administrativo' },
-  ];
-
   return (
-    <>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden print:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg"
-      >
-        {isOpen ? (
-          <X size={24} className="text-slate-900 dark:text-white" />
-        ) : (
-          <Menu size={24} className="text-slate-900 dark:text-white" />
-        )}
-      </button>
+    <aside className="hidden md:flex h-full w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar print:hidden">
+      <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-5">
+        <Link href="/analytics/dashboard" aria-label="VetAI - início">
+          <BrandLogo />
+        </Link>
+        <NotificationBell />
+      </div>
 
-      {isOpen && (
-        <div
-          onClick={() => setIsOpen(false)}
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
-        />
-      )}
-
-      <aside
-        className={`fixed md:relative print:hidden w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 h-full z-40 transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        } md:flex`}
-      >
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center">
-            <BrandLogo />
-          </div>
-          <NotificationBell />
-        </div>
-        <nav className="flex-1 p-4 space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const isDisabled = item.permission ? !can(item.permission) : false;
-
-            const className = `w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-              isDisabled
-                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-60'
-                : isActive
-                  ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`;
-
-            const content = (
-              <>
-                <Icon size={20} /> {item.label}
-                {item.label === 'Consulta' && (
-                  <span className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300">
-                    BETA
-                  </span>
-                )}
-              </>
-            );
-
-            if (isDisabled) {
-              return (
-                <span
-                  key={item.href}
-                  className={className}
-                  aria-disabled="true"
-                >
-                  {content}
-                </span>
-              );
+      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            isActive={
+              pathname === item.href || pathname.startsWith(`${item.href}/`)
             }
+            isDisabled={item.permission ? !can(item.permission) : false}
+          />
+        ))}
+      </nav>
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className={className}
-              >
-                {content}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
-          <button
-            onClick={toggleTheme}
-            className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg w-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg w-full text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-          >
-            <LogOut size={18} /> Sair
-          </button>
-        </div>
-      </aside>
-    </>
+      <div className="space-y-1 border-t border-sidebar-border p-3">
+        <button
+          onClick={toggleTheme}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+        </button>
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+        >
+          <LogOut size={18} /> Sair
+        </button>
+      </div>
+    </aside>
   );
 }

@@ -36,10 +36,10 @@ export function TodayEventsList({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white capitalize">
+          <h2 className="text-base font-semibold text-foreground capitalize">
             {dateFormatted}
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {loading ? (
               <Skeleton className="h-3 w-16" />
             ) : sorted.length === 0 ? (
@@ -51,7 +51,7 @@ export function TodayEventsList({
         </div>
         <button
           onClick={onAddClick}
-          className="flex items-center gap-1.5 text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary transition-colors"
         >
           <Plus size={14} /> Adicionar
         </button>
@@ -67,14 +67,14 @@ export function TodayEventsList({
         <div className="flex flex-col items-center justify-center flex-1 py-10 text-center">
           <CalendarX
             size={36}
-            className="text-slate-300 dark:text-slate-600 mb-3"
+            className="text-muted-foreground/50 mb-3"
           />
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-muted-foreground">
             Sem eventos para este dia.
           </p>
           <button
             onClick={onAddClick}
-            className="mt-3 text-sm text-teal-600 dark:text-teal-400 hover:underline font-medium"
+            className="mt-3 text-sm text-primary hover:underline font-medium"
           >
             Agendar evento
           </button>
@@ -110,12 +110,12 @@ export function TodayEventsList({
                 {(ev.patientName ?? ev.tutorName) && (
                   <div className="flex flex-col gap-0.5 mt-1.5 pl-4">
                     {ev.patientName && (
-                      <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <PawPrint size={11} /> {ev.patientName}
                       </div>
                     )}
                     {ev.tutorName && (
-                      <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <User size={11} /> {ev.tutorName}
                       </div>
                     )}

@@ -128,11 +128,11 @@ export default function CatalogPage() {
       header: 'Nome',
       render: (item) => (
         <div>
-          <p className="font-medium text-slate-900 dark:text-white">
+          <p className="font-medium text-foreground">
             {item.name}
           </p>
           {item.description && (
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate max-w-xs">
+            <p className="text-xs text-muted-foreground/70 mt-0.5 truncate max-w-xs">
               {item.description}
             </p>
           )}
@@ -159,7 +159,7 @@ export default function CatalogPage() {
       header: 'Preço',
       width: '130px',
       render: (item) => (
-        <span className="text-slate-700 dark:text-slate-300 font-medium">
+        <span className="text-secondary-foreground font-medium">
           {fmtCurrency(item.price)}
         </span>
       ),
@@ -170,11 +170,11 @@ export default function CatalogPage() {
       width: '110px',
       render: (item) =>
         item.active ? (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-soft text-success">
             Ativo
           </span>
         ) : (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-muted-foreground">
             Inativo
           </span>
         ),
@@ -192,7 +192,7 @@ export default function CatalogPage() {
             onClick={() => openEdit(item)}
             title="Editar"
           >
-            <Pencil size={15} className="text-slate-500 dark:text-slate-400" />
+            <Pencil size={15} className="text-muted-foreground" />
           </Button>
           <Button
             variant="ghost"
@@ -200,7 +200,7 @@ export default function CatalogPage() {
             onClick={() => handleDelete(item)}
             title="Excluir"
           >
-            <Trash2 size={15} className="text-red-500" />
+            <Trash2 size={15} className="text-danger" />
           </Button>
         </div>
       ),
@@ -208,8 +208,8 @@ export default function CatalogPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-background w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Catálogo" showStorage={false} />
 
         <SectionCard
@@ -225,7 +225,7 @@ export default function CatalogPage() {
                 setEditingItem(undefined);
                 setShowModal(true);
               }}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-10"
             >
               <Plus size={18} /> Novo item
             </Button>
@@ -264,9 +264,9 @@ export default function CatalogPage() {
               <div className="p-8 text-center">
                 <BookOpen
                   size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                  className="text-muted-foreground/50 mx-auto mb-2"
                 />
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {filters.category || filters.active !== undefined
                     ? 'Nenhum item encontrado para os filtros selecionados.'
                     : 'Nenhum item no catálogo ainda.'}
@@ -293,7 +293,7 @@ export default function CatalogPage() {
                   onClick={() => setPage(n)}
                   className={
                     n === page
-                      ? 'bg-teal-600 text-white hover:bg-teal-700 border-teal-600'
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary'
                       : ''
                   }
                 >

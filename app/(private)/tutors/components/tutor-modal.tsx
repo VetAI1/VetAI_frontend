@@ -85,13 +85,13 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700">
+      <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between p-5 border-b border-border">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-foreground">
               {isEdit ? 'Editar Tutor' : 'Novo Tutor'}
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {isEdit ? 'Atualize os dados do tutor' : 'Cadastre um novo tutor'}
             </p>
           </div>
@@ -99,7 +99,7 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
             variant="ghost"
             size="icon-sm"
             onClick={onClose}
-            className="text-slate-500"
+            className="text-muted-foreground"
           >
             <X size={18} />
           </Button>
@@ -188,14 +188,14 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
           />
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-border">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
             disabled={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800 min-w-[100px]"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[100px]"
           >
             {saving ? (
               <Loader2 size={16} className="animate-spin" />

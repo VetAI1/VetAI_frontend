@@ -1,7 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -38,17 +38,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-background">
       <AuthPanel
         title="Bem-vindo de volta"
-        description="Acesse sua conta e continue cuidando dos seus pacientes com o poder da inteligncia artificial."
+        description="Acesse sua conta e continue cuidando dos seus pacientes com o poder da inteligência artificial."
       />
 
-      <div className="flex flex-1 items-center justify-center bg-background p-6 sm:p-8">
-        <div className="w-full max-w-md">
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden p-6 sm:p-8">
+        <div
+          aria-hidden="true"
+          className="absolute -top-32 right-0 size-96 rounded-full bg-primary/5 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute -bottom-32 left-0 size-80 rounded-full bg-brand-sun/10 blur-3xl"
+        />
+
+        <div className="relative w-full max-w-md">
           <div className="mb-10 lg:hidden"><BrandLogo /></div>
 
-          <span className="inline-flex rounded-full bg-secondary px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-secondary-foreground">Acesso seguro</span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-secondary-foreground">
+            <ShieldCheck size={13} className="text-primary" />
+            Acesso seguro
+          </span>
           <h1 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-foreground">
             Entrar na sua conta
           </h1>
@@ -115,6 +127,11 @@ export default function LoginPage() {
               Entrar
             </Button>
           </form>
+
+          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Sparkles size={13} className="text-brand-sun" />
+            Ambiente seguro · LGPD · Suporte dedicado
+          </div>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Não tem uma conta?{' '}

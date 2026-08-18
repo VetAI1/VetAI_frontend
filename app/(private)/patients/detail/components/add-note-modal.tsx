@@ -84,7 +84,7 @@ export function AddNoteModal({
           <Button
             type="submit"
             disabled={saving}
-            className="bg-teal-600 text-white hover:bg-teal-700"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : 'Salvar'}
           </Button>

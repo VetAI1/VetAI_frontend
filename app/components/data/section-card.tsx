@@ -19,22 +19,20 @@ export function SectionCard({
 }: SectionCardProps) {
   return (
     <div
-      className={`bg-white dark:bg-slate-800 rounded-lg shadow p-4 sm:p-6 ${className}`}
+      className={`rounded-lg border border-border bg-card p-4 sm:p-5 ${className}`}
     >
       <div
         className={`mb-4 ${headerAction ? 'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0' : ''}`}
       >
-        <div>
-          <div className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-            {title}
-          </div>
+        <div className="min-w-0">
+          <div className="text-base font-semibold text-foreground">{title}</div>
           {subtitle && (
-            <div className="text-sm text-gray-500 dark:text-slate-400">
+            <div className="mt-0.5 text-sm text-muted-foreground">
               {subtitle}
             </div>
           )}
         </div>
-        {headerAction && <div className="w-full sm:w-auto">{headerAction}</div>}
+        {headerAction && <div className="w-full sm:w-auto shrink-0">{headerAction}</div>}
       </div>
       <div
         className={`flex flex-col flex-1 min-h-0 ${clipContent ? 'overflow-hidden' : ''}`}

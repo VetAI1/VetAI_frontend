@@ -171,22 +171,22 @@ export function HospitalizedTab() {
     <div>
       <SummaryCards summary={summary} loading={summaryLoading} />
 
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-4 mb-6">
+      <div className="bg-card rounded-lg shadow p-4 mb-6">
         <div className="flex flex-col lg:flex-row gap-3 lg:items-end">
           <div className="flex-1 min-w-0">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-sm font-medium text-secondary-foreground mb-1.5">
               Buscar paciente
             </label>
             <div className="relative">
               <Search
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70"
               />
               <input
                 type="text"
                 placeholder="Nome do paciente..."
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-card text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
@@ -241,7 +241,7 @@ export function HospitalizedTab() {
           </div>
           <Button
             onClick={() => setShowHospitalize(true)}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 shrink-0"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
           >
             <Plus size={16} />
             Internar paciente
@@ -251,15 +251,15 @@ export function HospitalizedTab() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-teal-600" />
+          <Loader2 size={32} className="animate-spin text-primary" />
         </div>
       ) : isEmpty ? (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-12 text-center">
-          <PawPrint size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-          <p className="text-slate-500 dark:text-slate-400 font-medium">
+        <div className="bg-card rounded-lg shadow p-12 text-center">
+          <PawPrint size={48} className="mx-auto text-muted-foreground/50 mb-4" />
+          <p className="text-muted-foreground font-medium">
             Nenhum animal internado no momento
           </p>
-          <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
+          <p className="text-sm text-muted-foreground/70 mt-1">
             Clique em “Internar paciente” para registrar uma nova internação.
           </p>
         </div>
@@ -272,10 +272,10 @@ export function HospitalizedTab() {
                   <span
                     className={`w-2.5 h-2.5 rounded-full ${STATUS_MAP[group.status].dot}`}
                   />
-                  <h2 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">
+                  <h2 className="text-sm font-bold uppercase tracking-wide text-secondary-foreground">
                     {GROUP_LABELS[group.status]}
                   </h2>
-                  <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
+                  <span className="text-xs font-semibold text-muted-foreground/70">
                     ({group.items.length})
                   </span>
                 </div>
@@ -290,7 +290,7 @@ export function HospitalizedTab() {
                           router.push(`/monitoring/detail?id=${hospitalization.id}`)
                         }
                         title={risk.label}
-                        className="relative overflow-hidden text-left bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all p-4 pl-6"
+                        className="relative overflow-hidden text-left bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all p-4 pl-6"
                       >
                         <span
                           aria-hidden="true"
@@ -298,14 +298,14 @@ export function HospitalizedTab() {
                         />
                         <div className="flex items-start justify-between gap-2 mb-3">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 shrink-0">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
                               <Stethoscope size={22} />
                             </div>
                             <div className="min-w-0">
-                              <p className="font-semibold text-slate-900 dark:text-white truncate">
+                              <p className="font-semibold text-foreground truncate">
                                 {hospitalization.patient?.name}
                               </p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                              <p className="text-xs text-muted-foreground truncate">
                                 {hospitalization.patient?.breed || '—'}
                               </p>
                             </div>
@@ -313,7 +313,7 @@ export function HospitalizedTab() {
                           {(hospitalization.patient?.restrictions?.length ?? 0) > 0 && (
                             <span
                               title={`Restrições: ${hospitalization.patient.restrictions?.join(', ')}`}
-                              className="text-amber-500 shrink-0"
+                              className="text-warning shrink-0"
                             >
                               <AlertTriangle size={18} />
                             </span>
@@ -329,18 +329,18 @@ export function HospitalizedTab() {
                             </span>
                           )}
                           {cadenceFor(hospitalization)?.overdue && (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-danger-soft text-danger">
                         Aferição atrasada
                             </span>
                           )}
                         </div>
 
-                        <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                        <div className="space-y-1.5 text-xs text-muted-foreground">
                           <p
                             className="flex items-center gap-1.5"
                             title="Veterinário de plantão"
                           >
-                            <Stethoscope size={13} className="text-slate-400 shrink-0" />
+                            <Stethoscope size={13} className="text-muted-foreground/70 shrink-0" />
                             <span className="truncate">
                               {hospitalization.on_duty_veterinarian?.name ??
                                 hospitalization.veterinarian?.name ??
@@ -348,11 +348,11 @@ export function HospitalizedTab() {
                             </span>
                           </p>
                           <p className="flex items-center gap-1.5">
-                            <BedDouble size={13} className="text-slate-400 shrink-0" />
+                            <BedDouble size={13} className="text-muted-foreground/70 shrink-0" />
                             {hospitalization.box?.name ?? 'Sem box'}
                           </p>
                           <p className="flex items-center gap-1.5">
-                            <CalendarClock size={13} className="text-slate-400 shrink-0" />
+                            <CalendarClock size={13} className="text-muted-foreground/70 shrink-0" />
                             {daysSince(hospitalization.admitted_at)}{' '}
                             {daysSince(hospitalization.admitted_at) === 1 ? 'dia' : 'dias'} internado
                             {hospitalization.expected_discharge_at

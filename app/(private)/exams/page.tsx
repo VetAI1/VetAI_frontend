@@ -52,7 +52,7 @@ export default function ExamsPage() {
       key: 'title',
       header: 'Título',
       render: (study) => (
-        <span className="text-slate-900 dark:text-white font-medium">
+        <span className="text-foreground font-medium">
           {study.title ?? 'Sem título'}
         </span>
       ),
@@ -61,7 +61,7 @@ export default function ExamsPage() {
       key: 'patient',
       header: 'Paciente',
       render: (study) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {study.patient?.name ?? '-'}
         </span>
       ),
@@ -81,7 +81,7 @@ export default function ExamsPage() {
       key: 'date',
       header: 'Data',
       render: (study) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-muted-foreground">
           {study.examDate
             ? new Date(study.examDate).toLocaleDateString('pt-BR')
             : new Date(study.created_at).toLocaleDateString('pt-BR')}
@@ -96,7 +96,7 @@ export default function ExamsPage() {
       render: (study) => (
         <Link href={`/exams/detail?id=${study.id}`}>
           <Button variant="ghost" size="icon-sm" title="Ver detalhes">
-            <Eye size={16} className="text-slate-600 dark:text-slate-300" />
+            <Eye size={16} className="text-muted-foreground" />
           </Button>
         </Link>
       ),
@@ -104,8 +104,8 @@ export default function ExamsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-background w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Exames" showStorage={false} />
 
         <SectionCard
@@ -120,7 +120,7 @@ export default function ExamsPage() {
           headerAction={
             <Button
               onClick={() => setShowUploadModal(true)}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-10"
             >
               <UploadIcon size={18} /> Enviar Exame
             </Button>
@@ -138,9 +138,9 @@ export default function ExamsPage() {
               <div className="p-8 text-center">
                 <Microscope
                   size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                  className="text-muted-foreground/50 mx-auto mb-2"
                 />
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {search
                     ? 'Nenhum exame encontrado.'
                     : 'Nenhum exame cadastrado ainda.'}

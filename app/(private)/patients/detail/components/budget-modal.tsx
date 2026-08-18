@@ -131,17 +131,17 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
   if (preview) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/70 backdrop-blur-sm">
-        <div className="flex items-center justify-between gap-3 bg-teal-700 px-4 py-3 text-white">
+        <div className="flex items-center justify-between gap-3 bg-primary px-4 py-3 text-primary-foreground">
           <div className="min-w-0">
             <p className="text-sm font-semibold truncate">Orçamento</p>
-            <p className="text-xs text-teal-100 truncate">{patient.name}</p>
+            <p className="text-xs text-primary-foreground/90 truncate">{patient.name}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setPreview(null)}
-              className="text-teal-100 hover:text-white hover:bg-teal-600"
+              className="text-primary-foreground/90 hover:text-primary-foreground hover:bg-primary"
             >
               Editar itens
             </Button>
@@ -149,7 +149,7 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
               type="button"
               variant="ghost"
               onClick={preview.save}
-              className="text-teal-100 hover:text-white hover:bg-teal-600"
+              className="text-primary-foreground/90 hover:text-primary-foreground hover:bg-primary"
             >
               <Download size={16} />
               Baixar PDF
@@ -159,7 +159,7 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="text-teal-100 hover:text-white hover:bg-teal-600"
+              className="text-primary-foreground/90 hover:text-primary-foreground hover:bg-primary"
               title="Fechar"
             >
               <X size={18} />
@@ -191,26 +191,26 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
             placeholder="Digite para encontrar um serviço ou produto"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            endAdornment={<Search size={16} className="text-slate-400" />}
+            endAdornment={<Search size={16} className="text-muted-foreground/70" />}
           />
           {filteredCatalog.length > 0 && (
-            <div className="mt-2 max-h-44 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-700/60">
+            <div className="mt-2 max-h-44 overflow-y-auto rounded-lg border border-border divide-y divide-border">
               {filteredCatalog.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => addFromCatalog(item)}
-                  className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left hover:bg-teal-50 dark:hover:bg-teal-900/20"
+                  className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left hover:bg-primary/10"
                 >
                   <span className="min-w-0">
-                    <span className="block truncate text-sm text-slate-800 dark:text-slate-100">
+                    <span className="block truncate text-sm text-foreground">
                       {item.name}
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-muted-foreground/70">
                       {CATALOG_CATEGORY_LABELS[item.category]}
                     </span>
                   </span>
-                  <span className="shrink-0 text-sm font-semibold text-teal-600 dark:text-teal-400">
+                  <span className="shrink-0 text-sm font-semibold text-primary">
                     {money(item.price)}
                   </span>
                 </button>
@@ -221,7 +221,7 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            <p className="text-sm font-semibold text-secondary-foreground">
               Itens do orçamento ({items.length})
             </p>
             <Button
@@ -241,7 +241,7 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
           </div>
 
           {items.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-slate-300 dark:border-slate-600 px-3 py-6 text-center text-sm text-slate-400">
+            <p className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground/70">
               Nenhum item adicionado ainda.
             </p>
           ) : (
@@ -249,7 +249,7 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
               {items.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-end gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-2"
+                  className="flex items-end gap-2 rounded-lg border border-border p-2"
                 >
                   <div className="flex-1 min-w-0">
                     <InputWithLabel
@@ -296,7 +296,7 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
                     onClick={() =>
                       setItems((prev) => prev.filter((_, i) => i !== index))
                     }
-                    className="text-red-500 hover:text-red-600 shrink-0"
+                    className="text-danger hover:text-danger shrink-0"
                     title="Remover"
                   >
                     <Trash2 size={16} />
@@ -307,11 +307,11 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
           )}
         </div>
 
-        <div className="flex items-center justify-between rounded-lg bg-teal-50 dark:bg-teal-900/20 px-3 py-2.5">
-          <span className="text-sm font-semibold text-teal-800 dark:text-teal-200">
+        <div className="flex items-center justify-between rounded-lg bg-primary/10 px-3 py-2.5">
+          <span className="text-sm font-semibold text-primary">
             Total
           </span>
-          <span className="text-lg font-bold text-teal-700 dark:text-teal-300">
+          <span className="text-lg font-bold text-primary">
             {money(total)}
           </span>
         </div>
@@ -343,7 +343,7 @@ export function BudgetModal({ patient, tutor, onClose }: BudgetModalProps) {
             type="button"
             onClick={() => void generate()}
             loading={generating}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             Gerar orçamento
           </Button>

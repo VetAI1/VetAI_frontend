@@ -163,7 +163,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
       <Header
         title="Perfil"
         showStorage={false}
@@ -171,7 +171,7 @@ export default function Profile() {
           <Button
             onClick={handleSave}
             loading={saving}
-            className="bg-teal-600 text-white hover:bg-teal-700"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Save size={18} /> Salvar alterações
           </Button>
@@ -295,7 +295,7 @@ export default function Profile() {
             />
           </div>
           {cepLoading && (
-            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-3 text-sm text-muted-foreground">
               Buscando endereço...
             </p>
           )}

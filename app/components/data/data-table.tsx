@@ -4,8 +4,6 @@ import { Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
-import { Card } from '../common/card';
-
 import { Skeleton } from '@/components/ui/skeleton';
 
 export interface DataTableColumn<T> {
@@ -35,6 +33,7 @@ interface DataTableProps<T> {
   tableClassName?: string;
   fillHeight?: boolean;
   maxBodyHeight?: number;
+  responsive?: boolean;
 }
 
 export function DataTable<T>({
@@ -56,6 +55,7 @@ export function DataTable<T>({
   tableClassName,
   fillHeight = false,
   maxBodyHeight,
+  responsive = true,
 }: DataTableProps<T>) {
   const [searchValue, setSearchValue] = useState('');
   const tableHeaders = columns?.map((column) => column.header) ?? headers ?? [];
@@ -63,117 +63,172 @@ export function DataTable<T>({
   const stretchEmptyState =
     fillHeight && !loading && columns !== undefined && data?.length === 0;
 
+  const useColumnsMode = columns !== undefined && data !== undefined;
+  const showCards = responsive && useColumnsMode && columns.length > 0;
+
   const handleSearch = (value: string) => {
     setSearchValue(value);
     onSearch?.(value);
   };
 
+  const renderTable = (
+    <div
+      className="overflow-x-auto overflow-y-auto flex-1"
+      style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}
+    >
+      <table
+        className={`w-full text-left text-sm${stretchEmptyState ? ' h-full' : ''}${tableClassName ? ` ${tableClassName}` : ''}`}
+      >
+        <thead className="border-b border-border bg-muted/40 text-muted-foreground">
+          <tr>
+            {tableHeaders.map((header, index) => {
+              const column = columns?.[index];
+              const align = column?.align;
+
+              return (
+                <th
+                  key={index}
+                  className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-wider ${centerHeaders || align === 'center' ? 'text-center' : ''} ${align === 'right' || (!centerHeaders && !align && index === tableHeaders.length - 1) ? 'text-right' : ''}`}
+                  style={
+                    column?.width || columnWidths?.[index]
+                      ? { width: column?.width ?? columnWidths?.[index] }
+                      : undefined
+                  }
+                >
+                  {header}
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody className="[&>tr:not(:last-child)]:border-b [&>tr:not(:last-child)]:border-border/60">
+          {loading ? (
+            Array.from({ length: skeletonRows }).map((_, rIdx) => (
+              <tr key={`skel-row-${rIdx}`}>
+                {tableHeaders.length > 0 ? (
+                  tableHeaders.map((_, cIdx) => (
+                    <td key={`skel-cell-${cIdx}`} className="p-4">
+                      <Skeleton className="h-5 w-full" />
+                    </td>
+                  ))
+                ) : (
+                  <td className="p-4">
+                    <Skeleton className="h-5 w-full" />
+                  </td>
+                )}
+              </tr>
+            ))
+          ) : useColumnsMode ? (
+            data.length > 0 ? (
+              data.map((row, rowIndex) => (
+                <tr
+                  key={getRowKey?.(row, rowIndex) ?? rowIndex}
+                  className="transition-colors hover:bg-muted/40"
+                >
+                  {columns.map((column) => (
+                    <td
+                      key={column.key}
+                      className={`px-4 py-3.5 ${column.align === 'center' ? 'text-center' : ''} ${column.align === 'right' ? 'text-right' : ''}`}
+                    >
+                      {column.render?.(row, rowIndex) ??
+                        String(
+                          (row as Record<string, unknown>)[column.key] ?? '',
+                        )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={colSpan}
+                  className="p-8 text-center text-sm text-muted-foreground"
+                >
+                  {emptyState}
+                </td>
+              </tr>
+            )
+          ) : (
+            children
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderMobileCards = showCards && (
+    <div className="flex flex-col gap-3 md:hidden">
+      {loading ? (
+        Array.from({ length: skeletonRows }).map((_, rIdx) => (
+          <div
+            key={`skel-card-${rIdx}`}
+            className="rounded-lg border border-border bg-card p-4"
+          >
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ))
+      ) : data.length > 0 ? (
+        data.map((row, rowIndex) => (
+          <div
+            key={getRowKey?.(row, rowIndex) ?? rowIndex}
+            className="rounded-lg border border-border bg-card p-4"
+          >
+            <div className="flex flex-col gap-2.5">
+              {columns.map((column) => (
+                <div
+                  key={column.key}
+                  className="flex items-start justify-between gap-3"
+                >
+                  <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {column.header}
+                  </span>
+                  <span className="text-right text-sm">
+                    {column.render?.(row, rowIndex) ??
+                      String(
+                        (row as Record<string, unknown>)[column.key] ?? '',
+                      )}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center text-sm text-muted-foreground">
+          {emptyState}
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <Card
-      className={`overflow-hidden flex flex-col min-h-0${fillHeight ? ' flex-1' : ''}${className ? ` ${className}` : ''}`}
+    <div
+      className={`flex flex-col min-h-0${fillHeight ? ' flex-1' : ''}${className ? ` ${className}` : ''}`}
     >
       {(showSearch || actions) && (
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0">
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           {actions && <div>{actions}</div>}
           {showSearch && (
-            <div className="relative w-85">
+            <div className="relative w-full sm:w-80">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
-                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70"
+                size={16}
               />
               <input
                 type="text"
                 value={searchValue}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
+                aria-label={searchPlaceholder}
+                className="w-full rounded-md border border-input bg-card py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors hover:border-primary/35 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
               />
             </div>
           )}
         </div>
       )}
-      <div
-        className="overflow-x-auto overflow-y-auto flex-1"
-        style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}
-      >
-        <table
-          className={`w-full text-left text-sm${stretchEmptyState ? ' h-full' : ''}${tableClassName ? ` ${tableClassName}` : ''}`}
-        >
-          <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 sticky top-0 z-10">
-            <tr>
-              {tableHeaders.map((header, index) => {
-                const column = columns?.[index];
-                const align = column?.align;
 
-                return (
-                  <th
-                    key={index}
-                    className={`p-4 font-medium ${centerHeaders || align === 'center' ? 'text-center' : ''} ${align === 'right' || (!centerHeaders && !align && index === tableHeaders.length - 1) ? 'text-right' : ''}`}
-                    style={
-                      column?.width || columnWidths?.[index]
-                        ? { width: column?.width ?? columnWidths?.[index] }
-                        : undefined
-                    }
-                  >
-                    {header}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-700 [&>tr:last-child]:border-b [&>tr:last-child]:border-slate-200 dark:[&>tr:last-child]:border-slate-700">
-            {loading ? (
-              Array.from({ length: skeletonRows }).map((_, rIdx) => (
-                <tr key={`skel-row-${rIdx}`}>
-                  {tableHeaders.length > 0 ? (
-                    tableHeaders.map((_, cIdx) => (
-                      <td key={`skel-cell-${cIdx}`} className="p-4">
-                        <Skeleton className="h-5 w-full dark:bg-slate-700" />
-                      </td>
-                    ))
-                  ) : (
-                    <td className="p-4">
-                      <Skeleton className="h-5 w-full dark:bg-slate-700" />
-                    </td>
-                  )}
-                </tr>
-              ))
-            ) : columns && data ? (
-              data.length > 0 ? (
-                data.map((row, rowIndex) => (
-                  <tr
-                    key={getRowKey?.(row, rowIndex) ?? rowIndex}
-                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                  >
-                    {columns.map((column) => (
-                      <td
-                        key={column.key}
-                        className={`p-4 ${column.align === 'center' ? 'text-center' : ''} ${column.align === 'right' ? 'text-right' : ''}`}
-                      >
-                        {column.render?.(row, rowIndex) ??
-                          String(
-                            (row as Record<string, unknown>)[column.key] ?? '',
-                          )}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={colSpan}
-                    className="p-8 text-center text-sm text-slate-500 dark:text-slate-400"
-                  >
-                    {emptyState}
-                  </td>
-                </tr>
-              )
-            ) : (
-              children
-            )}
-          </tbody>
-        </table>
-      </div>
-    </Card>
+      <div className={showCards ? 'hidden md:block' : 'block'}>{renderTable}</div>
+      {renderMobileCards}
+    </div>
   );
 }

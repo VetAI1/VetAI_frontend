@@ -10,6 +10,7 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -304,25 +305,29 @@ function RegisterForm() {
           <div className="mb-10 lg:hidden"><BrandLogo /></div>
 
           {!isInvite && (
-            <div className="mb-8 flex items-center gap-2">
-              {[1, 2, 3].map((number) => (
-                <div
-                  key={number}
-                  className="flex flex-1 items-center gap-2 last:flex-none"
-                >
+            <ol className="mb-8 flex items-center gap-3">
+              {[
+                { label: 'Clínica e acesso', done: step > 1, active: step === 1 },
+                { label: 'Plano', done: step > 2, active: step === 2 },
+                { label: 'Pagamento', done: false, active: step === 3 },
+              ].map((item, index) => (
+                <li key={item.label} className="flex flex-1 items-center gap-3 last:flex-none">
                   <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${step >= number ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
+                    className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-bold transition-colors ${item.done || item.active ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}
                   >
-                    {number}
+                    {item.done ? (
+                      <Check size={13} />
+                    ) : (
+                      <span className="font-data">{index + 1}</span>
+                    )}
+                    <span className="hidden sm:inline">{item.label}</span>
                   </div>
-                  {number < 3 && (
-                    <div
-                      className={`h-px flex-1 ${step > number ? 'bg-primary' : 'bg-border'}`}
-                    />
+                  {index < 2 && (
+                    <div className={`h-px flex-1 ${item.done ? 'bg-primary' : 'bg-border'}`} />
                   )}
-                </div>
+                </li>
               ))}
-            </div>
+            </ol>
           )}
 
           <form
@@ -330,7 +335,13 @@ function RegisterForm() {
             className="space-y-6"
           >
             {step === 1 && (
-              <>
+              <motion.div
+                key="step-1"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-6"
+              >
                 <div>
                   <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
                     {isInvite ? 'Criar sua conta' : 'Dados da clínica e acesso'}
@@ -386,7 +397,7 @@ function RegisterForm() {
                           type="checkbox"
                           id="isUserResponsible"
                           {...registerField('isUserResponsible')}
-                          className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                          className="size-4 rounded border-input accent-primary"
                         />
                         <label
                           htmlFor="isUserResponsible"
@@ -589,11 +600,17 @@ function RegisterForm() {
                   </div>
                   <PasswordStrength password={password} />
                 </section>
-              </>
+              </motion.div>
             )}
 
             {!isInvite && step === 2 && (
-              <>
+              <motion.div
+                key="step-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-6"
+              >
                 <div>
                   <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
                     Escolha seu plano
@@ -653,15 +670,21 @@ function RegisterForm() {
                   </div>
                 )}
                 {errors.planId?.message && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {errors.planId.message}
                   </p>
                 )}
-              </>
+              </motion.div>
             )}
 
             {!isInvite && step === 3 && selectedPlan && (
-              <>
+              <motion.div
+                key="step-3"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-6"
+              >
                 <div>
                   <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
                     Revise e prossiga para o pagamento
@@ -715,7 +738,7 @@ function RegisterForm() {
                   pagamento é processado de forma segura pela Stripe. O VetAI
                   não armazena os dados do seu cartão.
                 </div>
-              </>
+              </motion.div>
             )}
 
             <div className="flex justify-between gap-3 pt-2">
