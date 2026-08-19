@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, Moon, Sun } from 'lucide-react';
+import { LogOut, Moon, Sun, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -25,6 +25,7 @@ interface SidebarProps {
   header?: ReactNode;
   homeHref?: string;
   items?: NavItem[];
+  onClose?: () => void;
   onNavigate?: () => void;
   renderFooter?: (classes: SidebarFooterClasses) => ReactNode;
   variant?: SidebarVariant;
@@ -128,6 +129,7 @@ export function Sidebar({
   header,
   homeHref = '/analytics/dashboard',
   items = NAV_ITEMS,
+  onClose,
   onNavigate,
   renderFooter,
   variant = 'default',
@@ -170,10 +172,31 @@ export function Sidebar({
       >
         {header ?? (
           <>
-            <Link href={homeHref} aria-label="VetAI - início">
+            <Link
+              href={homeHref}
+              aria-label="VetAI - início"
+              {...(onNavigate ? { onClick: onNavigate } : {})}
+            >
               <BrandLogo />
             </Link>
-            <NotificationBell />
+            <div className="flex items-center gap-1.5">
+              <NotificationBell />
+              {onClose && (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Fechar navegação"
+                  className={cn(
+                    'grid size-8 place-items-center rounded-md text-stone-500 dark:text-stone-400 transition-colors hover:text-stone-900 dark:hover:text-stone-100 md:hidden',
+                    variant === 'admin'
+                      ? 'hover:bg-teal-100/60 dark:hover:bg-teal-900/60'
+                      : 'hover:bg-stone-100 dark:hover:bg-stone-800',
+                  )}
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
           </>
         )}
       </div>
@@ -202,12 +225,22 @@ export function Sidebar({
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
             </button>
-            <button
-              onClick={handleLogout}
-              className={footerClasses.destructiveItem}
-            >
-              <LogOut size={18} /> Sair
-            </button>
+            {variant === 'admin' ? (
+              <Link
+                href="/analytics/dashboard"
+                className={footerClasses.destructiveItem}
+                {...(onNavigate ? { onClick: onNavigate } : {})}
+              >
+                <LogOut size={18} /> Sair
+              </Link>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className={footerClasses.destructiveItem}
+              >
+                <LogOut size={18} /> Sair
+              </button>
+            )}
           </>
         )}
       </div>

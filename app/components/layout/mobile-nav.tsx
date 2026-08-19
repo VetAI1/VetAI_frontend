@@ -5,18 +5,40 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { MOBILE_ESSENTIALS, NAV_ITEMS } from './navigation';
+import {
+  ADMIN_MOBILE_ESSENTIALS,
+  ADMIN_NAV_ITEMS,
+  MOBILE_ESSENTIALS,
+  NAV_ITEMS,
+  type NavItem,
+} from './navigation';
 
 import { useTheme } from '@/contexts/theme-context';
 import { useAuth } from '@/infra/auth-context';
 import { cn } from '@/infra/utils';
 
-export function MobileNav() {
+interface MobileNavProps {
+  essentials?: NavItem[];
+  items?: NavItem[];
+  variant?: 'default' | 'admin';
+}
+
+export function MobileNav({
+  essentials,
+  items,
+  variant = 'default',
+}: MobileNavProps = {}) {
   const pathname = usePathname();
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { logout, can } = useAuth();
+
+  const currentItems =
+    items ?? (variant === 'admin' ? ADMIN_NAV_ITEMS : NAV_ITEMS);
+  const currentEssentials =
+    essentials ??
+    (variant === 'admin' ? ADMIN_MOBILE_ESSENTIALS : MOBILE_ESSENTIALS);
 
   async function handleLogout() {
     setSheetOpen(false);
@@ -24,7 +46,7 @@ export function MobileNav() {
     router.push('/login');
   }
 
-  const essentials = MOBILE_ESSENTIALS.filter(
+  const activeEssentials = currentEssentials.filter(
     (item) => !item.permission || can(item.permission),
   );
 
@@ -37,7 +59,7 @@ export function MobileNav() {
         aria-label="Navegação principal"
         className="fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t border-stone-200 dark:border-stone-800 bg-white/95 dark:bg-stone-900/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
       >
-        {essentials.map((item) => {
+        {activeEssentials.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
           return (
@@ -46,7 +68,7 @@ export function MobileNav() {
               href={item.href}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'flex min-w-0 flex-1 flex-col items-center gap-1 px-2 py-2.5 text-[11px] font-medium transition-colors',
+                'flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] sm:text-[11px] font-medium transition-colors',
                 active
                   ? 'text-teal-800 dark:text-teal-500'
                   : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100',
@@ -54,24 +76,29 @@ export function MobileNav() {
             >
               <span
                 className={cn(
-                  'grid h-8 w-14 place-items-center rounded-full transition-colors',
+                  'grid h-8 w-12 sm:w-14 place-items-center rounded-full transition-colors',
                   active && 'bg-teal-800/10 dark:bg-teal-500/10',
                 )}
               >
                 <Icon size={20} />
               </span>
-              <span className="truncate">{item.label}</span>
+              <span className="w-full truncate px-0.5 text-center text-[10px] sm:text-[11px] leading-tight">
+                {item.shortLabel ?? item.label}
+              </span>
             </Link>
           );
         })}
         <button
+          type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex min-w-0 flex-1 flex-col items-center gap-1 px-2 py-2.5 text-[11px] font-medium text-stone-500 dark:text-stone-400 transition-colors hover:text-stone-900 dark:hover:text-stone-100"
+          className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] sm:text-[11px] font-medium text-stone-500 dark:text-stone-400 transition-colors hover:text-stone-900 dark:hover:text-stone-100"
         >
-          <span className="grid h-8 w-14 place-items-center rounded-full">
+          <span className="grid h-8 w-12 sm:w-14 place-items-center rounded-full">
             <MoreHorizontal size={20} />
           </span>
-          <span>Mais</span>
+          <span className="w-full truncate px-0.5 text-center text-[10px] sm:text-[11px] leading-tight">
+            Mais
+          </span>
         </button>
       </nav>
 
@@ -91,7 +118,7 @@ export function MobileNav() {
           >
             <div className="sticky top-0 flex items-center justify-between border-b border-stone-200 dark:border-stone-800 bg-white/95 dark:bg-stone-900/95 px-4 py-3 backdrop-blur-xl">
               <span className="text-sm font-bold text-stone-900 dark:text-stone-100">
-                Navegação
+                {variant === 'admin' ? 'Administração' : 'Navegação'}
               </span>
               <button
                 onClick={() => setSheetOpen(false)}
@@ -103,36 +130,36 @@ export function MobileNav() {
             </div>
 
             <div className="space-y-1 p-3">
-              {NAV_ITEMS.filter(
-                (item) => !item.permission || can(item.permission),
-              ).map((item) => {
-                const Icon = item.icon;
-                const active = isActive(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setSheetOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                      active
-                        ? 'bg-teal-50 dark:bg-teal-900 font-semibold text-teal-800 dark:text-teal-300'
-                        : 'text-stone-900/80 dark:text-stone-100/80 hover:bg-stone-100 dark:hover:bg-stone-800',
-                    )}
-                  >
-                    <Icon
-                      size={18}
-                      className={cn(active && 'text-teal-800 dark:text-teal-500')}
-                    />
-                    <span className="truncate">{item.label}</span>
-                    {item.badge && (
-                      <span className="ml-auto rounded-full bg-teal-800/10 dark:bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-800 dark:text-teal-500">
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
+              {currentItems
+                .filter((item) => !item.permission || can(item.permission))
+                .map((item) => {
+                  const Icon = item.icon;
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSheetOpen(false)}
+                      className={cn(
+                        'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+                        active
+                          ? 'bg-teal-50 dark:bg-teal-900 font-semibold text-teal-800 dark:text-teal-300'
+                          : 'text-stone-900/80 dark:text-stone-100/80 hover:bg-stone-100 dark:hover:bg-stone-800',
+                      )}
+                    >
+                      <Icon
+                        size={18}
+                        className={cn(active && 'text-teal-800 dark:text-teal-500')}
+                      />
+                      <span className="truncate">{item.label}</span>
+                      {item.badge && (
+                        <span className="ml-auto rounded-full bg-teal-800/10 dark:bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-800 dark:text-teal-500">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
             </div>
 
             <div className="space-y-1 border-t border-stone-200 dark:border-stone-800 p-3">
@@ -143,14 +170,24 @@ export function MobileNav() {
                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                 {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
               </button>
-              <button
-                onClick={() => {
-                  void handleLogout();
-                }}
-                className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-500 transition-colors hover:bg-red-600/10 dark:hover:bg-red-500/10"
-              >
-                <LogOut size={18} /> Sair
-              </button>
+              {variant === 'admin' ? (
+                <Link
+                  href="/analytics/dashboard"
+                  onClick={() => setSheetOpen(false)}
+                  className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-stone-900/80 dark:text-stone-100/80 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
+                >
+                  <LogOut size={18} /> Sair
+                </Link>
+              ) : (
+                <button
+                  onClick={() => {
+                    void handleLogout();
+                  }}
+                  className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-500 transition-colors hover:bg-red-600/10 dark:hover:bg-red-500/10"
+                >
+                  <LogOut size={18} /> Sair
+                </button>
+              )}
             </div>
           </div>
         </div>
