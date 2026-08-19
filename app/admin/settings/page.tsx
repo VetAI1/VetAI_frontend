@@ -139,7 +139,7 @@ export default function SettingsPage() {
 
       {canEdit && (
         <div className="flex justify-end">
-          <Button type="submit" loading={isSubmitting} className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button type="submit" loading={isSubmitting} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90">
             <Save size={16} />Salvar alterações
           </Button>
         </div>

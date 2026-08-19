@@ -15,15 +15,15 @@ interface BadgeProps {
 }
 
 const COLORS: Record<BadgeColor, string> = {
-  red: 'bg-danger-soft text-danger',
-  green: 'bg-success-soft text-success',
-  yellow: 'bg-warning-soft text-warning',
-  blue: 'bg-info-soft text-info',
-  neutral: 'bg-muted text-muted-foreground',
-  danger: 'bg-danger-soft text-danger',
-  success: 'bg-success-soft text-success',
-  warning: 'bg-warning-soft text-warning',
-  info: 'bg-info-soft text-info',
+  red: 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500',
+  green: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
+  yellow: 'bg-amber-50 dark:bg-amber-900 text-amber-600 dark:text-amber-400',
+  blue: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
+  neutral: 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400',
+  danger: 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500',
+  success: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
+  warning: 'bg-amber-50 dark:bg-amber-900 text-amber-600 dark:text-amber-400',
+  info: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
 };
 
 export const Badge = ({ children, color = 'danger' }: BadgeProps) => {

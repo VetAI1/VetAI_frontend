@@ -55,7 +55,7 @@ export function InfiniteScroll({
       {children}
       {hasMore && (
         <div ref={sentinelRef} className="flex min-h-10 items-center justify-center">
-          {loading && <Loader2 size={16} className="animate-spin text-muted-foreground" />}
+          {loading && <Loader2 size={16} className="animate-spin text-stone-500 dark:text-stone-400" />}
         </div>
       )}
     </div>

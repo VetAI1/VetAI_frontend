@@ -32,31 +32,31 @@ interface SidebarProps {
 
 const sidebarStyles = {
   default: {
-    background: 'border-sidebar-border bg-sidebar',
+    background: 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900',
     active:
-      'bg-sidebar-accent font-semibold text-sidebar-accent-foreground',
-    disabled: 'cursor-not-allowed text-muted-foreground/40',
-    iconActive: 'text-primary',
+      'bg-teal-50 dark:bg-teal-900 font-semibold text-teal-800 dark:text-teal-300',
+    disabled: 'cursor-not-allowed text-stone-500/40 dark:text-stone-400/40',
+    iconActive: 'text-teal-800 dark:text-teal-500',
     inactive:
-      'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
+      'text-stone-900/70 dark:text-stone-100/70 hover:bg-teal-50/60 dark:hover:bg-teal-900/60 hover:text-stone-900 dark:hover:text-stone-100',
     footerItem:
-      'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
-    footerDestructive: 'text-destructive hover:bg-destructive/10',
-    headerBorder: 'border-sidebar-border',
+      'text-stone-900/70 dark:text-stone-100/70 hover:bg-teal-50/60 dark:hover:bg-teal-900/60 hover:text-stone-900 dark:hover:text-stone-100',
+    footerDestructive: 'text-red-600 dark:text-red-500 hover:bg-red-600/10 dark:hover:bg-red-500/10',
+    headerBorder: 'border-stone-200 dark:border-stone-800',
   },
   admin: {
-    background: 'border-admin-sidebar-border bg-admin-sidebar',
+    background: 'border-teal-100 dark:border-teal-900 bg-teal-50 dark:bg-teal-950',
     active:
-      'bg-admin-sidebar-accent font-semibold text-admin-sidebar-accent-foreground',
-    disabled: 'cursor-not-allowed text-admin-sidebar-foreground/40',
-    iconActive: 'text-admin-sidebar-primary',
+      'bg-teal-100 dark:bg-teal-900 font-semibold text-teal-900 dark:text-teal-100',
+    disabled: 'cursor-not-allowed text-stone-900/40 dark:text-stone-100/40',
+    iconActive: 'text-teal-800 dark:text-teal-300',
     inactive:
-      'text-admin-sidebar-foreground/75 hover:bg-admin-sidebar-accent/60 hover:text-admin-sidebar-foreground',
+      'text-stone-900/75 dark:text-stone-100/75 hover:bg-teal-100/60 dark:hover:bg-teal-900/60 hover:text-stone-900 dark:hover:text-stone-100',
     footerItem:
-      'text-admin-sidebar-foreground/75 hover:bg-admin-sidebar-accent/60 hover:text-admin-sidebar-foreground',
+      'text-stone-900/75 dark:text-stone-100/75 hover:bg-teal-100/60 dark:hover:bg-teal-900/60 hover:text-stone-900 dark:hover:text-stone-100',
     footerDestructive:
-      'text-admin-sidebar-foreground/75 hover:bg-admin-sidebar-accent/60 hover:text-admin-sidebar-foreground',
-    headerBorder: 'border-admin-sidebar-border',
+      'text-stone-900/75 dark:text-stone-100/75 hover:bg-teal-100/60 dark:hover:bg-teal-900/60 hover:text-stone-900 dark:hover:text-stone-100',
+    headerBorder: 'border-teal-100 dark:border-teal-900',
   },
 } as const;
 
@@ -96,7 +96,7 @@ function NavLink({
       />
       <span className="truncate">{item.label}</span>
       {item.badge && (
-        <span className="ml-auto rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+        <span className="ml-auto rounded-full bg-teal-800/10 dark:bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-800 dark:text-teal-500">
           {item.badge}
         </span>
       )}

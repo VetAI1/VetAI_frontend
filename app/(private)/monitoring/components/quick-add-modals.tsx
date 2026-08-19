@@ -68,14 +68,14 @@ export function QuickAddChooserModal({
             key={kind}
             type="button"
             onClick={() => onChoose(kind)}
-            className="w-full flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary hover:bg-primary/10 transition-colors text-left"
+            className="w-full flex items-center gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-teal-800 dark:hover:border-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-colors text-left"
           >
-            <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+            <div className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
               <Icon size={18} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">{label}</p>
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{label}</p>
+              <p className="text-xs text-stone-500 dark:text-stone-400">{description}</p>
             </div>
           </button>
         ))}
@@ -98,7 +98,7 @@ function recordDate(recordedAt?: string): string {
 
 function RecordTimeHint({ recordedAt }: { recordedAt?: string }) {
   return (
-    <div className="flex items-start gap-2 rounded-lg border border-border bg-secondary px-3 py-2.5 text-xs text-muted-foreground">
+    <div className="flex items-start gap-2 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 px-3 py-2.5 text-xs text-stone-500 dark:text-stone-400">
       <Clock size={14} className="mt-px shrink-0" />
       <span>
         {recordedAt
@@ -189,7 +189,7 @@ export function OccurrenceModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Salvar
           </Button>
@@ -309,7 +309,7 @@ export function WeightModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Salvar
           </Button>
@@ -378,7 +378,7 @@ export function ParametersModal({
       <form onSubmit={handleSubmit} className="space-y-4">
         <RecordTimeHint {...(recordedAt ? { recordedAt } : {})} />
         {loading ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">
+          <p className="text-sm text-stone-500 dark:text-stone-400 py-4 text-center">
             Carregando parâmetros...
           </p>
         ) : (
@@ -404,7 +404,7 @@ export function ParametersModal({
           </div>
         )}
 
-        {error && <p className="text-sm text-danger">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-500">{error}</p>}
 
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
@@ -413,7 +413,7 @@ export function ParametersModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Salvar
           </Button>

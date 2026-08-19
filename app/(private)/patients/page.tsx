@@ -67,10 +67,10 @@ export default function PatientsPage() {
           href={`/patients/detail?id=${patient.id}`}
           className="flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <PawPrint size={18} className="text-primary" />
+          <div className="w-10 h-10 rounded-full bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
+            <PawPrint size={18} className="text-teal-800 dark:text-teal-500" />
           </div>
-          <p className="font-medium text-foreground">
+          <p className="font-medium text-stone-900 dark:text-stone-100">
             {patient.name}
           </p>
         </Link>
@@ -80,7 +80,7 @@ export default function PatientsPage() {
       key: 'specie',
       header: 'Espécie',
       render: (patient) => (
-        <span className="text-muted-foreground">
+        <span className="text-stone-500 dark:text-stone-400">
           {SPECIE_LABELS[patient.specie] ?? patient.specie}
         </span>
       ),
@@ -89,7 +89,7 @@ export default function PatientsPage() {
       key: 'breed',
       header: 'Raça',
       render: (patient) => (
-        <span className="text-muted-foreground">
+        <span className="text-stone-500 dark:text-stone-400">
           {patient.breed ?? '-'}
         </span>
       ),
@@ -98,7 +98,7 @@ export default function PatientsPage() {
       key: 'created_at',
       header: 'Cadastrado em',
       render: (patient) => (
-        <span className="text-muted-foreground">
+        <span className="text-stone-500 dark:text-stone-400">
           {new Date(patient.created_at).toLocaleDateString('pt-BR')}
         </span>
       ),
@@ -111,7 +111,7 @@ export default function PatientsPage() {
       render: (patient) => (
         <Link href={`/patients/detail?id=${patient.id}`}>
           <ChevronRight
-            className="inline text-muted-foreground/50 hover:text-primary transition-colors"
+            className="inline text-stone-500/50 dark:text-stone-400/50 hover:text-teal-800 dark:hover:text-teal-500 transition-colors"
             size={20}
           />
         </Link>
@@ -120,7 +120,7 @@ export default function PatientsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Pacientes" showStorage={false} />
 
@@ -136,7 +136,7 @@ export default function PatientsPage() {
           headerAction={
             <Button
               onClick={openCreateModal}
-              className="bg-primary h-10 text-primary-foreground hover:bg-primary/90"
+              className="bg-teal-800 dark:bg-teal-500 h-10 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={18} /> Novo Paciente
             </Button>

@@ -15,13 +15,13 @@ function MutationFeedback({ message }: { message: string }) {
         duration: reducedMotion ? 0 : 0.2,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="flex items-center gap-3 rounded-lg border border-success/20 bg-card px-4 py-3 shadow-[var(--shadow-card)]"
+      className="flex items-center gap-3 rounded-lg border border-emerald-700/20 dark:border-emerald-500/20 bg-white dark:bg-stone-900 px-4 py-3 shadow-[var(--shadow-card)]"
       role="status"
     >
-      <span className="grid size-7 place-items-center rounded-full bg-success-soft text-success">
+      <span className="grid size-7 place-items-center rounded-full bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500">
         <Check size={15} strokeWidth={3} />
       </span>
-      <p className="text-sm font-semibold text-foreground">{message}</p>
+      <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{message}</p>
     </motion.div>
   );
 }

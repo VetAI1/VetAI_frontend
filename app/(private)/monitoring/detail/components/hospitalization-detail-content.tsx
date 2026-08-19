@@ -204,7 +204,7 @@ function CloseActionModal({
     <Modal title={info.title} onClose={onClose} maxWidth="md">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {action === 'discharge' && (
-          <div className="flex items-start gap-2 rounded-lg border border-border bg-secondary px-3 py-2.5 text-xs text-muted-foreground">
+          <div className="flex items-start gap-2 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 px-3 py-2.5 text-xs text-stone-500 dark:text-stone-400">
             <Clock size={14} className="mt-px shrink-0" />
             <span>
               A data e o horário da alta são registrados automaticamente no
@@ -291,8 +291,8 @@ function CloseActionModal({
             loading={saving}
             className={
               action === 'discharge'
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'bg-destructive text-white hover:bg-destructive/90'
+                ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90'
+                : 'bg-red-600 dark:bg-red-500 text-white hover:bg-red-600/90 dark:hover:bg-red-500/90'
             }
           >
             {info.confirm}
@@ -360,7 +360,7 @@ function MoveBoxModal({
           <Button
             onClick={() => void handleSave()}
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Mover
           </Button>
@@ -449,7 +449,7 @@ function RescheduleModal({
           <Button
             onClick={() => void handleSave()}
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Reprogramar
           </Button>
@@ -596,7 +596,7 @@ export function HospitalizationDetailContent() {
         items.push({
           ...base,
           icon: Scale,
-          iconClass: 'text-info bg-info-soft',
+          iconClass: 'text-sky-700 dark:text-sky-500 bg-sky-50 dark:bg-sky-900',
           title: `Peso registrado: ${data.value ?? '—'} ${(data.unit ?? 'KG').toLowerCase()}`,
           ...(event.description ? { description: event.description } : {}),
         });
@@ -620,7 +620,7 @@ export function HospitalizationDetailContent() {
         items.push({
           ...base,
           icon: MessageSquarePlus,
-          iconClass: 'text-brand-sun bg-brand-sun/10',
+          iconClass: 'text-amber-500 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-400/10',
           title: event.title ?? 'Ocorrência',
           ...(event.description ? { description: event.description } : {}),
         });
@@ -628,7 +628,7 @@ export function HospitalizationDetailContent() {
         items.push({
           ...base,
           icon: event.type === 'BOX_CHANGE' ? ArrowRightLeft : CalendarClock,
-          iconClass: 'text-muted-foreground bg-secondary',
+          iconClass: 'text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800',
           title: event.title ?? EVENT_TYPE_LABELS[event.type],
           ...(event.description ? { description: event.description } : {}),
         });
@@ -641,7 +641,7 @@ export function HospitalizationDetailContent() {
         key: `execution-${execution.id}`,
         date: execution.executed_at,
         icon: CheckCircle2,
-        iconClass: 'text-success bg-success-soft',
+        iconClass: 'text-emerald-700 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-900',
         title: `Executado: ${execution.prescription?.name ?? ''}${
           doseLabel(execution.prescription) ? ` (${doseLabel(execution.prescription)})` : ''
         }`,
@@ -655,7 +655,7 @@ export function HospitalizationDetailContent() {
         key: `vital-${vital.id}`,
         date: vital.measured_at,
         icon: Activity,
-        iconClass: 'text-primary bg-primary/10',
+        iconClass: 'text-teal-800 dark:text-teal-500 bg-teal-800/10 dark:bg-teal-500/10',
         title: 'Realizou uma nova aferição',
         ...(vital.notes ? { description: vital.notes } : {}),
         ...(vital.recorded_by?.name ? { user: vital.recorded_by.name } : {}),
@@ -667,7 +667,7 @@ export function HospitalizationDetailContent() {
 
   if (!id) {
     return (
-      <div className="text-center py-20 text-muted-foreground">
+      <div className="text-center py-20 text-stone-500 dark:text-stone-400">
         Internação não encontrada.
       </div>
     );
@@ -676,7 +676,7 @@ export function HospitalizationDetailContent() {
   if (loading || !hospitalization) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 size={32} className="animate-spin text-primary" />
+        <Loader2 size={32} className="animate-spin text-teal-800 dark:text-teal-500" />
       </div>
     );
   }
@@ -766,25 +766,25 @@ export function HospitalizationDetailContent() {
 
   return (
     <div className="space-y-6 pb-10">
-      <div className="bg-card rounded-xl border border-border shadow-sm p-5">
+      <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm p-5">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div className="flex items-start gap-4 min-w-0">
             <button
               type="button"
               onClick={() => router.push('/monitoring')}
-              className="p-2 rounded-lg hover:bg-secondary text-muted-foreground shrink-0 mt-1"
+              className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 shrink-0 mt-1"
               title="Voltar"
             >
               <ArrowLeft size={18} />
             </button>
-            <div className="p-3 rounded-xl bg-primary/10 text-primary shrink-0">
+            <div className="p-3 rounded-xl bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
               <Stethoscope size={28} />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href={`/patients/detail?id=${hospitalization.patient?.id}`}
-                  className="text-xl font-bold text-foreground hover:text-primary"
+                  className="text-xl font-bold text-stone-900 dark:text-stone-100 hover:text-teal-800 dark:hover:text-teal-500"
                 >
                   {hospitalization.patient?.name}
                 </Link>
@@ -795,12 +795,12 @@ export function HospitalizationDetailContent() {
                   {risk.label}
                 </span>
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-muted-foreground">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-stone-500 dark:text-stone-400">
                 <span
                   className="flex items-center gap-1.5"
                   title="Veterinário responsável — quem deu entrada"
                 >
-                  <Stethoscope size={14} className="text-muted-foreground/70" />
+                  <Stethoscope size={14} className="text-stone-500/70 dark:text-stone-400/70" />
                   <span className="font-semibold">Resp.</span>{' '}
                   {hospitalization.veterinarian?.name ?? '—'}
                 </span>
@@ -809,32 +809,32 @@ export function HospitalizationDetailContent() {
                     className="flex items-center gap-1.5"
                     title="Veterinário de plantão — quem acompanha o paciente agora"
                   >
-                    <UserCheck size={14} className="text-muted-foreground/70" />
+                    <UserCheck size={14} className="text-stone-500/70 dark:text-stone-400/70" />
                     <span className="font-semibold">Plantão</span>{' '}
                     {onDutyVet.name}
                   </span>
                 )}
                 <span className="flex items-center gap-1.5">
-                  <BedDouble size={14} className="text-muted-foreground/70" />
+                  <BedDouble size={14} className="text-stone-500/70 dark:text-stone-400/70" />
                   {hospitalization.box?.name ?? 'Sem box'}
                 </span>
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-stone-500 dark:text-stone-400">
                 <span className="flex items-center gap-1.5">
-                  <CalendarClock size={14} className="text-muted-foreground/70" />
+                  <CalendarClock size={14} className="text-stone-500/70 dark:text-stone-400/70" />
                   Entrada {fmtDateTime(hospitalization.admitted_at)} (
                   {daysSince(hospitalization.admitted_at)} dia
                   {daysSince(hospitalization.admitted_at) === 1 ? '' : 's'})
                 </span>
                 {hospitalization.expected_discharge_at && isActive && (
                   <span className="flex items-center gap-1.5">
-                    <MoveRight size={14} className="text-muted-foreground/70" />
+                    <MoveRight size={14} className="text-stone-500/70 dark:text-stone-400/70" />
                     Alta prevista {fmtDate(hospitalization.expected_discharge_at)}
                   </span>
                 )}
                 {hospitalization.discharged_at && (
                   <span className="flex items-center gap-1.5">
-                    <MoveRight size={14} className="text-muted-foreground/70" />
+                    <MoveRight size={14} className="text-stone-500/70 dark:text-stone-400/70" />
                     Saída {fmtDateTime(hospitalization.discharged_at)}
                     {hospitalization.discharge_reason
                       ? ` · ${DISCHARGE_REASON_LABELS[hospitalization.discharge_reason]}`
@@ -843,15 +843,15 @@ export function HospitalizationDetailContent() {
                 )}
               </div>
               {restrictions.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-border/70">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 mb-1.5">
+                <div className="mt-3 pt-3 border-t border-stone-200/70 dark:border-stone-800/70">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500/70 dark:text-stone-400/70 mb-1.5">
                     Restrições
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {restrictions.map((restriction) => (
                       <span
                         key={restriction}
-                        className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-brand-sun/10 text-brand-sun-strong"
+                        className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 dark:bg-amber-400/10 text-amber-700 dark:text-amber-300"
                       >
                         {capitalize(restriction)}
                       </span>
@@ -860,18 +860,18 @@ export function HospitalizationDetailContent() {
                 </div>
               )}
               {tutor && (
-                <div className="mt-3 pt-3 border-t border-border/70">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 mb-1.5">
+                <div className="mt-3 pt-3 border-t border-stone-200/70 dark:border-stone-800/70">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500/70 dark:text-stone-400/70 mb-1.5">
                     Tutor
                   </p>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone-500 dark:text-stone-400">
                     <span className="flex items-center gap-1.5">
-                      <User size={14} className="text-muted-foreground/70 shrink-0" />
+                      <User size={14} className="text-stone-500/70 dark:text-stone-400/70 shrink-0" />
                       {tutor.name}
                     </span>
                     {tutor.phone && (
                       <span className="flex items-center gap-1.5">
-                        <Phone size={14} className="text-muted-foreground/70 shrink-0" />
+                        <Phone size={14} className="text-stone-500/70 dark:text-stone-400/70 shrink-0" />
                         {formatPhone(tutor.phone)}
                         <a
                           href={buildWhatsAppLink(
@@ -883,7 +883,7 @@ export function HospitalizationDetailContent() {
                           target="_blank"
                           rel="noopener noreferrer"
                           title={`Conversar com ${tutor.name} no WhatsApp`}
-                          className="text-success"
+                          className="text-emerald-700 dark:text-emerald-500"
                         >
                           <WhatsAppIcon />
                         </a>
@@ -891,7 +891,7 @@ export function HospitalizationDetailContent() {
                     )}
                     {tutor.address && (
                       <span className="flex items-center gap-1.5">
-                        <MapPin size={14} className="text-muted-foreground/70 shrink-0" />
+                        <MapPin size={14} className="text-stone-500/70 dark:text-stone-400/70 shrink-0" />
                         {tutor.address}
                       </span>
                     )}
@@ -915,7 +915,7 @@ export function HospitalizationDetailContent() {
                 <Button
                   size="sm"
                   onClick={() => setCloseAction('discharge')}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
                 >
                   <FileDown size={14} />
                   Registrar alta
@@ -924,7 +924,7 @@ export function HospitalizationDetailContent() {
                   variant="outline"
                   size="sm"
                   onClick={() => setCloseAction('decease')}
-                  className="text-muted-foreground"
+                  className="text-stone-500 dark:text-stone-400"
                 >
                   <Skull size={14} />
                   Óbito
@@ -933,7 +933,7 @@ export function HospitalizationDetailContent() {
                   variant="outline"
                   size="sm"
                   onClick={() => setCloseAction('cancel')}
-                  className="text-danger border-danger/30 hover:bg-danger-soft"
+                  className="text-red-600 dark:text-red-500 border-red-600/30 dark:border-red-500/30 hover:bg-red-50 dark:hover:bg-red-900"
                 >
                   Cancelar
                 </Button>
@@ -951,20 +951,20 @@ export function HospitalizationDetailContent() {
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-border/70">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 mb-2">
+        <div className="mt-4 pt-4 border-t border-stone-200/70 dark:border-stone-800/70">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500/70 dark:text-stone-400/70 mb-2">
             Informações do paciente
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {patientFacts.map((fact) => (
               <div
                 key={fact.label}
-                className="rounded-lg bg-secondary border border-border/70 px-3 py-2"
+                className="rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200/70 dark:border-stone-800/70 px-3 py-2"
               >
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-stone-500/70 dark:text-stone-400/70">
                   {fact.label}
                 </p>
-                <p className="text-sm font-semibold text-foreground truncate">
+                <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">
                   {fact.value}
                 </p>
               </div>
@@ -978,56 +978,56 @@ export function HospitalizationDetailContent() {
           hospitalization.accessories ||
           hospitalization.observations ||
           hospitalization.discharge_notes) && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3 mt-4 pt-4 border-t border-border/70 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3 mt-4 pt-4 border-t border-stone-200/70 dark:border-stone-800/70 text-sm">
             {hospitalization.complaint && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wide">Queixa</p>
-                <p className="text-secondary-foreground">{hospitalization.complaint}</p>
+                <p className="text-xs font-semibold text-stone-500/70 dark:text-stone-400/70 uppercase tracking-wide">Queixa</p>
+                <p className="text-stone-800 dark:text-stone-100">{hospitalization.complaint}</p>
               </div>
             )}
             {hospitalization.diagnosis && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wide">Diagnóstico</p>
-                <p className="text-secondary-foreground">{hospitalization.diagnosis}</p>
+                <p className="text-xs font-semibold text-stone-500/70 dark:text-stone-400/70 uppercase tracking-wide">Diagnóstico</p>
+                <p className="text-stone-800 dark:text-stone-100">{hospitalization.diagnosis}</p>
               </div>
             )}
             {hospitalization.prognosis && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wide">Prognóstico</p>
-                <p className="text-secondary-foreground">{hospitalization.prognosis}</p>
+                <p className="text-xs font-semibold text-stone-500/70 dark:text-stone-400/70 uppercase tracking-wide">Prognóstico</p>
+                <p className="text-stone-800 dark:text-stone-100">{hospitalization.prognosis}</p>
               </div>
             )}
             {hospitalization.accessories && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wide">Acessórios</p>
-                <p className="text-secondary-foreground">{hospitalization.accessories}</p>
+                <p className="text-xs font-semibold text-stone-500/70 dark:text-stone-400/70 uppercase tracking-wide">Acessórios</p>
+                <p className="text-stone-800 dark:text-stone-100">{hospitalization.accessories}</p>
               </div>
             )}
             {hospitalization.observations && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wide">Observações</p>
-                <p className="text-secondary-foreground">{hospitalization.observations}</p>
+                <p className="text-xs font-semibold text-stone-500/70 dark:text-stone-400/70 uppercase tracking-wide">Observações</p>
+                <p className="text-stone-800 dark:text-stone-100">{hospitalization.observations}</p>
               </div>
             )}
             {hospitalization.discharge_notes && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wide">Notas do encerramento</p>
-                <p className="text-secondary-foreground">{hospitalization.discharge_notes}</p>
+                <p className="text-xs font-semibold text-stone-500/70 dark:text-stone-400/70 uppercase tracking-wide">Notas do encerramento</p>
+                <p className="text-stone-800 dark:text-stone-100">{hospitalization.discharge_notes}</p>
               </div>
             )}
           </div>
         )}
       </div>
 
-      <div className="border-b border-border overflow-x-auto overflow-y-hidden scrollbar-thin">
+      <div className="border-b border-stone-200 dark:border-stone-800 overflow-x-auto overflow-y-hidden scrollbar-thin">
         <nav className="flex gap-1 min-w-max">
           <button
             type="button"
             onClick={() => setDetailTab('care')}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
               detailTab === 'care'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/30'
+                ? 'border-teal-800 dark:border-teal-500 text-teal-800 dark:text-teal-500'
+                : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:border-teal-800/30 dark:hover:border-teal-500/30'
             }`}
           >
             <Activity size={16} />
@@ -1038,8 +1038,8 @@ export function HospitalizationDetailContent() {
             onClick={() => setDetailTab('history')}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
               detailTab === 'history'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/30'
+                ? 'border-teal-800 dark:border-teal-500 text-teal-800 dark:text-teal-500'
+                : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:border-teal-800/30 dark:hover:border-teal-500/30'
             }`}
           >
             <History size={16} />
@@ -1064,7 +1064,7 @@ export function HospitalizationDetailContent() {
                 <Button
                   size="sm"
                   onClick={() => setShowVitalsModal(true)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
                 >
                   <Plus size={14} />
               Aferição
@@ -1074,7 +1074,7 @@ export function HospitalizationDetailContent() {
           >
             {vitalsLoading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="animate-spin text-primary" size={24} />
+                <Loader2 className="animate-spin text-teal-800 dark:text-teal-500" size={24} />
               </div>
             ) : (
               <div className="space-y-4">
@@ -1115,7 +1115,7 @@ export function HospitalizationDetailContent() {
                   <Button
                     size="sm"
                     onClick={() => setShowPrescription(true)}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
                   >
                     <Plus size={14} />
                 Prescrição
@@ -1126,12 +1126,12 @@ export function HospitalizationDetailContent() {
           >
             {prescriptionsLoading ? (
               <div className="flex justify-center py-8">
-                <Loader2 size={24} className="animate-spin text-primary" />
+                <Loader2 size={24} className="animate-spin text-teal-800 dark:text-teal-500" />
               </div>
             ) : prescriptions.length === 0 ? (
               <div className="text-center py-8">
-                <Pill size={40} className="mx-auto text-muted-foreground/50 mb-2" />
-                <p className="text-muted-foreground text-sm">
+                <Pill size={40} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-2" />
+                <p className="text-stone-500 dark:text-stone-400 text-sm">
               Nenhuma prescrição registrada
                 </p>
               </div>
@@ -1143,26 +1143,26 @@ export function HospitalizationDetailContent() {
                   return (
                     <div
                       key={prescription.id}
-                      className={`p-3 rounded-lg border border-border ${
+                      className={`p-3 rounded-lg border border-stone-200 dark:border-stone-800 ${
                         prescription.status === 'STOPPED' ? 'opacity-60' : ''
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3 flex-wrap">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-semibold text-foreground">
+                            <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
                               {prescription.name}
                             </p>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${typeInfo.badge}`}>
                               {typeInfo.label}
                             </span>
                             {prescription.status === 'STOPPED' && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-secondary text-muted-foreground">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
                             Interrompida
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-0.5">
+                          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                             {FREQUENCY_LABELS[prescription.frequency]}
                             {prescription.frequency === 'RECURRING'
                               ? ` · a cada ${prescription.interval_hours}h por ${prescription.duration_days} dia(s)`
@@ -1173,8 +1173,8 @@ export function HospitalizationDetailContent() {
                               : ''}
                           </p>
                           {stats && stats.total > 0 && (
-                            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                              <CheckCircle2 size={12} className="text-success" />
+                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 flex items-center gap-1">
+                              <CheckCircle2 size={12} className="text-emerald-700 dark:text-emerald-500" />
                               {stats.done}/{stats.total} execuções concluídas
                               {stats.nextPending
                                 ? ` · próxima ${fmtDateTime(stats.nextPending)}`
@@ -1182,7 +1182,7 @@ export function HospitalizationDetailContent() {
                             </p>
                           )}
                           {prescription.notes && (
-                            <p className="text-xs text-muted-foreground/70 italic mt-0.5">
+                            <p className="text-xs text-stone-500/70 dark:text-stone-400/70 italic mt-0.5">
                               {prescription.notes}
                             </p>
                           )}
@@ -1195,7 +1195,7 @@ export function HospitalizationDetailContent() {
                                 size="sm"
                                 onClick={() => setExecutingSOS(prescription)}
                                 disabled={hospitalization.status === 'TRIAGE'}
-                                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
                                 title={
                                   hospitalization.status === 'TRIAGE'
                                     ? 'Disponível quando o paciente estiver Internado'
@@ -1221,7 +1221,7 @@ export function HospitalizationDetailContent() {
                                   size="icon-sm"
                                   onClick={() => setStopping(prescription)}
                                   title="Interromper"
-                                  className="text-warning"
+                                  className="text-amber-600 dark:text-amber-400"
                                 >
                                   <OctagonPause size={14} />
                                 </Button>
@@ -1232,7 +1232,7 @@ export function HospitalizationDetailContent() {
                               size="icon-sm"
                               onClick={() => setDeletingPrescription(prescription)}
                               title="Excluir (apenas se nunca executada)"
-                              className="text-danger"
+                              className="text-red-600 dark:text-red-500"
                             >
                               <Trash2 size={14} />
                             </Button>
@@ -1269,12 +1269,12 @@ export function HospitalizationDetailContent() {
         >
           {timelineLoading ? (
             <div className="flex justify-center py-8">
-              <Loader2 size={24} className="animate-spin text-primary" />
+              <Loader2 size={24} className="animate-spin text-teal-800 dark:text-teal-500" />
             </div>
           ) : timelineItems.length === 0 ? (
             <div className="text-center py-8">
-              <CalendarClock size={40} className="mx-auto text-muted-foreground/50 mb-2" />
-              <p className="text-muted-foreground text-sm">
+              <CalendarClock size={40} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-2" />
+              <p className="text-stone-500 dark:text-stone-400 text-sm">
               Nenhum registro ainda
               </p>
             </div>
@@ -1285,10 +1285,10 @@ export function HospitalizationDetailContent() {
                 return (
                   <div key={item.key} className="flex gap-3">
                     <div className="w-20 shrink-0 text-right pt-1">
-                      <p className="text-xs font-semibold text-secondary-foreground tabular-nums">
+                      <p className="text-xs font-semibold text-stone-800 dark:text-stone-100 tabular-nums">
                         {fmtDate(item.date)}
                       </p>
-                      <p className="text-[11px] text-muted-foreground/70 tabular-nums">
+                      <p className="text-[11px] text-stone-500/70 dark:text-stone-400/70 tabular-nums">
                         {fmtTime(item.date)}
                       </p>
                     </div>
@@ -1299,7 +1299,7 @@ export function HospitalizationDetailContent() {
                         <Icon size={14} />
                       </span>
                       {index < timelineItems.length - 1 && (
-                        <span className="w-px flex-1 bg-muted" />
+                        <span className="w-px flex-1 bg-stone-100 dark:bg-stone-800" />
                       )}
                     </div>
                     <div
@@ -1307,16 +1307,16 @@ export function HospitalizationDetailContent() {
                         index < timelineItems.length - 1 ? 'pb-7' : ''
                       }`}
                     >
-                      <p className="text-sm font-medium text-foreground">
+                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
                         {item.title}
                       </p>
                       {item.description && (
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                           {item.description}
                         </p>
                       )}
                       {item.user && (
-                        <p className="text-[11px] text-muted-foreground/70 mt-0.5">
+                        <p className="text-[11px] text-stone-500/70 dark:text-stone-400/70 mt-0.5">
                           {item.user}
                         </p>
                       )}

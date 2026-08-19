@@ -41,12 +41,12 @@ export function AdminSidebar() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed left-4 top-4 z-50 rounded-lg border border-border bg-card p-2 shadow-lg print:hidden md:hidden"
+        className="fixed left-4 top-4 z-50 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-2 shadow-lg print:hidden md:hidden"
       >
         {isOpen ? (
-          <X size={24} className="text-foreground" />
+          <X size={24} className="text-stone-900 dark:text-stone-100" />
         ) : (
-          <Menu size={24} className="text-foreground" />
+          <Menu size={24} className="text-stone-900 dark:text-stone-100" />
         )}
       </button>
 

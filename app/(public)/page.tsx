@@ -96,15 +96,15 @@ function SectionHeading({
 }) {
   return (
     <div className="max-w-2xl">
-      <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-secondary-foreground">
-        <span className="size-1.5 rounded-full bg-brand-sun" />
+      <span className="inline-flex items-center gap-2 rounded-full bg-stone-100 dark:bg-stone-800 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-stone-800 dark:text-stone-100">
+        <span className="size-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
         {eyebrow}
       </span>
-      <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-foreground sm:text-4xl md:text-5xl">
+      <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100 sm:text-4xl md:text-5xl">
         {title}
       </h2>
       {description && (
-        <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
+        <p className="mt-5 max-w-xl text-base leading-7 text-stone-500 dark:text-stone-400 md:text-lg">
           {description}
         </p>
       )}
@@ -125,20 +125,20 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-border/80 bg-background/85 backdrop-blur-xl">
+    <div className="min-h-screen overflow-x-hidden bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 text-stone-900 dark:text-stone-100">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-stone-200/80 dark:border-stone-800/80 bg-[oklch(0.985_0.01_95)]/85 dark:bg-stone-950/85 backdrop-blur-xl">
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8">
           <Link href="/" aria-label="VetAI - início">
             <BrandLogo />
           </Link>
           <div className="hidden items-center gap-7 lg:flex">
-            <a className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary" href="#produto">
+            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#produto">
               Produto
             </a>
-            <a className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary" href="#planos">
+            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#planos">
               Planos
             </a>
-            <a className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary" href="#relatos">
+            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#relatos">
               Relatos
             </a>
           </div>
@@ -156,25 +156,25 @@ export default function LandingPage() {
       <main>
         <section className="relative isolate pt-32 pb-16 sm:pt-40 md:pb-24">
           <div className="surface-pattern absolute inset-x-0 top-0 -z-10 h-[540px] opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-          <div className="absolute -z-10 right-[7%] top-32 hidden size-40 rounded-full border border-primary/15 bg-secondary/50 md:block" />
-          <div className="absolute -z-10 left-[8%] top-64 hidden size-12 rounded-full bg-brand-sun/65 md:block" />
+          <div className="absolute -z-10 right-[7%] top-32 hidden size-40 rounded-full border border-teal-800/15 dark:border-teal-500/15 bg-stone-100/50 dark:bg-stone-800/50 md:block" />
+          <div className="absolute -z-10 left-[8%] top-64 hidden size-12 rounded-full bg-amber-500/65 dark:bg-amber-400/65 md:block" />
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid items-center gap-14 lg:grid-cols-[1.02fr_0.98fr]">
               <div className="max-w-2xl">
                 <Reveal direction="up">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card px-3 py-1.5 text-xs font-bold text-primary shadow-sm">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-teal-800/15 dark:border-teal-500/15 bg-white dark:bg-stone-900 px-3 py-1.5 text-xs font-bold text-teal-800 dark:text-teal-500 shadow-sm">
                     <PawPrint size={14} />
                     Tecnologia que acompanha o cuidado
                   </div>
                 </Reveal>
                 <Reveal direction="up" delay={60}>
-                  <h1 className="font-display mt-6 text-5xl font-bold leading-[0.98] tracking-[-0.075em] text-foreground sm:text-6xl lg:text-7xl">
+                  <h1 className="font-display mt-6 text-5xl font-bold leading-[0.98] tracking-[-0.075em] text-stone-900 dark:text-stone-100 sm:text-6xl lg:text-7xl">
                     Gestão clínica que{' '}
-                    <span className="text-primary">cuida do seu tempo.</span>
+                    <span className="text-teal-800 dark:text-teal-500">cuida do seu tempo.</span>
                   </h1>
                 </Reveal>
                 <Reveal direction="up" delay={120}>
-                  <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground md:text-xl">
+                  <p className="mt-6 max-w-xl text-lg leading-8 text-stone-500 dark:text-stone-400 md:text-xl">
                     Prontuário, exames e acompanhamento inteligente para a sua equipe ter mais clareza e cada paciente receber mais atenção.
                   </p>
                 </Reveal>
@@ -189,10 +189,10 @@ export default function LandingPage() {
                   </div>
                 </Reveal>
                 <Reveal direction="up" delay={240}>
-                  <div className="mt-10 flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="mt-10 flex items-center gap-3 text-sm text-stone-500 dark:text-stone-400">
                     <div className="flex -space-x-2">
                       {['AP', 'CM', 'MC'].map((initials, index) => (
-                        <span key={initials} className={`grid size-8 place-items-center rounded-full border-2 border-background text-[10px] font-bold text-primary-foreground ${index === 1 ? 'bg-brand-sun text-accent-foreground' : 'bg-primary'}`}>
+                        <span key={initials} className={`grid size-8 place-items-center rounded-full border-2 border-stone-50 dark:border-stone-950 text-[10px] font-bold text-white dark:text-stone-950 ${index === 1 ? 'bg-amber-500 dark:bg-amber-400 text-amber-900 dark:text-amber-100' : 'bg-teal-800 dark:bg-teal-500'}`}>
                           {initials}
                         </span>
                       ))}
@@ -207,50 +207,50 @@ export default function LandingPage() {
                   className="mx-auto w-full max-w-[560px]"
                   floating={
                     <>
-                      <div className="absolute -right-5 top-12 hidden rounded-2xl border border-border bg-card p-3 shadow-[var(--shadow-card)] lg:block">
+                      <div className="absolute -right-5 top-12 hidden rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3 shadow-[var(--shadow-card)] lg:block">
                         <div className="flex items-center gap-2">
-                          <span className="grid size-8 place-items-center rounded-xl bg-brand-sun text-accent-foreground"><HeartPulse size={16} /></span>
-                          <div><p className="text-[10px] font-semibold text-muted-foreground">Acompanhamento</p><p className="text-xs font-bold text-foreground">Sinais estáveis</p></div>
+                          <span className="grid size-8 place-items-center rounded-xl bg-amber-500 dark:bg-amber-400 text-amber-900 dark:text-amber-100"><HeartPulse size={16} /></span>
+                          <div><p className="text-[10px] font-semibold text-stone-500 dark:text-stone-400">Acompanhamento</p><p className="text-xs font-bold text-stone-900 dark:text-stone-100">Sinais estáveis</p></div>
                         </div>
                       </div>
-                      <div className="absolute -bottom-5 -left-7 hidden rounded-2xl border border-border bg-card px-3 py-2.5 shadow-[var(--shadow-card)] lg:flex lg:items-center lg:gap-2">
-                        <span className="grid size-7 place-items-center rounded-full bg-secondary text-primary"><PawPrint size={14} /></span>
-                        <span className="text-xs font-bold text-foreground">Luna · retorno em dia</span>
+                      <div className="absolute -bottom-5 -left-7 hidden rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3 py-2.5 shadow-[var(--shadow-card)] lg:flex lg:items-center lg:gap-2">
+                        <span className="grid size-7 place-items-center rounded-full bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500"><PawPrint size={14} /></span>
+                        <span className="text-xs font-bold text-stone-900 dark:text-stone-100">Luna · retorno em dia</span>
                       </div>
                     </>
                   }
                 >
                   <ProductFrame badge="Hoje">
                     <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
-                      <div className="rounded-2xl bg-secondary/60 p-4">
+                      <div className="rounded-2xl bg-stone-100/60 dark:bg-stone-800/60 p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-semibold text-muted-foreground">Paciente em acompanhamento</p>
+                            <p className="text-xs font-semibold text-stone-500 dark:text-stone-400">Paciente em acompanhamento</p>
                             <p className="font-display mt-1 text-xl font-bold tracking-[-0.05em]">Luna</p>
                           </div>
-                          <div className="grid size-10 place-items-center rounded-2xl bg-brand-sun text-accent-foreground"><PawPrint size={19} /></div>
+                          <div className="grid size-10 place-items-center rounded-2xl bg-amber-500 dark:bg-amber-400 text-amber-900 dark:text-amber-100"><PawPrint size={19} /></div>
                         </div>
                         <div className="mt-5 flex items-end gap-1.5" aria-label="Evolução estável">
                           {[31, 42, 37, 54, 49, 65, 73].map((height, index) => (
-                            <span key={index} className="w-full rounded-full bg-primary/20" style={{ height: `${height / 2}px` }}>
-                              <span className="block h-[52%] rounded-full bg-primary" />
+                            <span key={index} className="w-full rounded-full bg-teal-800/20 dark:bg-teal-500/20" style={{ height: `${height / 2}px` }}>
+                              <span className="block h-[52%] rounded-full bg-teal-800 dark:bg-teal-500" />
                             </span>
                           ))}
                         </div>
-                        <p className="mt-3 text-xs font-semibold text-primary">Sinais estáveis nas últimas 24h</p>
+                        <p className="mt-3 text-xs font-semibold text-teal-800 dark:text-teal-500">Sinais estáveis nas últimas 24h</p>
                       </div>
-                      <div className="rounded-2xl border border-border p-4">
-                        <p className="text-xs font-semibold text-muted-foreground">Próximo atendimento</p>
-                        <p className="font-data mt-3 text-2xl font-semibold text-foreground">14:30</p>
-                        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground"><CalendarDays size={14} /> Retorno clínico</div>
+                      <div className="rounded-2xl border border-stone-200 dark:border-stone-800 p-4">
+                        <p className="text-xs font-semibold text-stone-500 dark:text-stone-400">Próximo atendimento</p>
+                        <p className="font-data mt-3 text-2xl font-semibold text-stone-900 dark:text-stone-100">14:30</p>
+                        <div className="mt-3 flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400"><CalendarDays size={14} /> Retorno clínico</div>
                       </div>
                     </div>
-                    <div className="mt-3 rounded-2xl border border-border p-4">
+                    <div className="mt-3 rounded-2xl border border-stone-200 dark:border-stone-800 p-4">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2"><span className="grid size-8 place-items-center rounded-xl bg-secondary text-primary"><BrainCircuit size={16} /></span><p className="text-sm font-bold">Leitura assistida por IA</p></div>
-                        <span className="font-data text-xs font-semibold text-primary">98%</span>
+                        <div className="flex items-center gap-2"><span className="grid size-8 place-items-center rounded-xl bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500"><BrainCircuit size={16} /></span><p className="text-sm font-bold">Leitura assistida por IA</p></div>
+                        <span className="font-data text-xs font-semibold text-teal-800 dark:text-teal-500">98%</span>
                       </div>
-                      <p className="mt-3 text-xs leading-5 text-muted-foreground">Resultados organizados, contexto do paciente e observações prontas para a sua revisão.</p>
+                      <p className="mt-3 text-xs leading-5 text-stone-500 dark:text-stone-400">Resultados organizados, contexto do paciente e observações prontas para a sua revisão.</p>
                     </div>
                   </ProductFrame>
                 </Shot>
@@ -259,7 +259,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="border-y border-border bg-card">
+        <section className="border-y border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
           <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y divide-border sm:grid-cols-4 sm:divide-y-0 px-5 sm:px-8">
             {[
               { value: 2500, suffix: '+', label: 'veterinários ativos' },
@@ -269,8 +269,8 @@ export default function LandingPage() {
             ].map((stat, index) => (
               <Reveal key={stat.label} direction="up" delay={index * 60}>
                 <div className="px-4 py-7 text-center sm:px-7">
-                  <p className="font-data text-2xl font-semibold tracking-[-0.07em] text-primary sm:text-3xl"><Counter target={stat.value} suffix={stat.suffix} /></p>
-                  <p className="mt-1 text-xs font-semibold text-muted-foreground">{stat.label}</p>
+                  <p className="font-data text-2xl font-semibold tracking-[-0.07em] text-teal-800 dark:text-teal-500 sm:text-3xl"><Counter target={stat.value} suffix={stat.suffix} /></p>
+                  <p className="mt-1 text-xs font-semibold text-stone-500 dark:text-stone-400">{stat.label}</p>
                 </div>
               </Reveal>
             ))}
@@ -282,11 +282,11 @@ export default function LandingPage() {
           <div className="mt-14 grid gap-5 lg:grid-cols-3">
             {FEATURES.map((feature, index) => (
               <Reveal key={feature.title} direction="up" delay={index * 80}>
-                <article className="group h-full rounded-[24px] border border-border bg-card p-7 shadow-[var(--shadow-card)] transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-primary/25">
-                  <div className={`grid size-12 place-items-center rounded-2xl ${index === 1 ? 'bg-brand-sun text-accent-foreground' : 'bg-secondary text-primary'}`}><feature.icon size={23} /></div>
-                  <p className="mt-7 text-xs font-bold uppercase tracking-[0.12em] text-primary">{feature.eyebrow}</p>
-                  <h3 className="font-display mt-3 text-2xl font-bold tracking-[-0.05em] text-foreground">{feature.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{feature.description}</p>
+                <article className="group h-full rounded-[24px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-7 shadow-[var(--shadow-card)] transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-teal-800/25 dark:hover:border-teal-500/25">
+                  <div className={`grid size-12 place-items-center rounded-2xl ${index === 1 ? 'bg-amber-500 dark:bg-amber-400 text-amber-900 dark:text-amber-100' : 'bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500'}`}><feature.icon size={23} /></div>
+                  <p className="mt-7 text-xs font-bold uppercase tracking-[0.12em] text-teal-800 dark:text-teal-500">{feature.eyebrow}</p>
+                  <h3 className="font-display mt-3 text-2xl font-bold tracking-[-0.05em] text-stone-900 dark:text-stone-100">{feature.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-stone-500 dark:text-stone-400">{feature.description}</p>
                 </article>
               </Reveal>
             ))}
@@ -295,15 +295,15 @@ export default function LandingPage() {
           <Reveal direction="up" delay={120}>
             <Shot tilt="right" className="mx-auto mt-16 max-w-4xl">
               <ProductFrame title="Prontuário vivo" badge="Paciente">
-                <div className="flex items-center justify-between border-b border-border pb-4">
+                <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
                   <div className="flex items-center gap-3">
-                    <span className="grid size-10 place-items-center rounded-full bg-primary/10 text-primary"><PawPrint size={18} /></span>
+                    <span className="grid size-10 place-items-center rounded-full bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500"><PawPrint size={18} /></span>
                     <div>
                       <p className="font-display text-lg font-bold tracking-[-0.03em]">Luna · SRD</p>
-                      <p className="text-xs text-muted-foreground">CRMV-SP 0000 · Feminino · 3 anos · 4,2 kg</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400">CRMV-SP 0000 · Feminino · 3 anos · 4,2 kg</p>
                     </div>
                   </div>
-                  <span className="font-data text-xs text-muted-foreground">atualizado há 2h</span>
+                  <span className="font-data text-xs text-stone-500 dark:text-stone-400">atualizado há 2h</span>
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   {[
@@ -311,9 +311,9 @@ export default function LandingPage() {
                     { label: 'Vacinas em dia', value: 'Sim' },
                     { label: 'Próxima dose', value: '20/09' },
                   ].map((item) => (
-                    <div key={item.label} className="rounded-xl bg-secondary/60 p-3">
-                      <p className="text-[11px] font-semibold text-muted-foreground">{item.label}</p>
-                      <p className="font-data mt-1 text-sm font-semibold text-foreground">{item.value}</p>
+                    <div key={item.label} className="rounded-xl bg-stone-100/60 dark:bg-stone-800/60 p-3">
+                      <p className="text-[11px] font-semibold text-stone-500 dark:text-stone-400">{item.label}</p>
+                      <p className="font-data mt-1 text-sm font-semibold text-stone-900 dark:text-stone-100">{item.value}</p>
                     </div>
                   ))}
                 </div>
@@ -322,7 +322,7 @@ export default function LandingPage() {
           </Reveal>
         </section>
 
-        <section className="border-y border-border bg-secondary/35 py-24 md:py-32">
+        <section className="border-y border-stone-200 dark:border-stone-800 bg-stone-100/35 dark:bg-stone-800/35 py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
               <Reveal direction="up">
@@ -334,10 +334,10 @@ export default function LandingPage() {
                     { icon: Stethoscope, title: 'Cuide', text: 'Registre a conduta e acompanhe a evolução.' },
                   ].map((step, index) => (
                     <div key={step.title} className="flex gap-4">
-                      <span className="font-data mt-0.5 shrink-0 text-sm font-semibold text-primary">0{index + 1}</span>
+                      <span className="font-data mt-0.5 shrink-0 text-sm font-semibold text-teal-800 dark:text-teal-500">0{index + 1}</span>
                       <div>
-                        <h3 className="font-display flex items-center gap-2 text-xl font-bold tracking-[-0.05em]"><step.icon className="text-primary" size={18} />{step.title}</h3>
-                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{step.text}</p>
+                        <h3 className="font-display flex items-center gap-2 text-xl font-bold tracking-[-0.05em]"><step.icon className="text-teal-800 dark:text-teal-500" size={18} />{step.title}</h3>
+                        <p className="mt-1 text-sm leading-6 text-stone-500 dark:text-stone-400">{step.text}</p>
                       </div>
                     </div>
                   ))}
@@ -357,7 +357,7 @@ export default function LandingPage() {
           {plansLoading ? (
             <div className="mt-14 grid gap-5 md:grid-cols-3">
               {[0, 1, 2].map((index) => (
-                <div key={index} className="rounded-[24px] border border-border bg-card p-7">
+                <div key={index} className="rounded-[24px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-7">
                   <Skeleton className="h-7 w-2/5" />
                   <Skeleton className="mt-4 h-4 w-full" />
                   <Skeleton className="mt-2 h-4 w-4/5" />
@@ -370,34 +370,34 @@ export default function LandingPage() {
             <div className="mt-14 grid gap-5 md:grid-cols-3">
               {plans.map((plan, index) => (
                 <Reveal key={plan.id} direction="up" delay={index * 80}>
-                  <article className={`relative flex h-full flex-col rounded-[24px] border p-7 ${plan.highlighted ? 'border-primary bg-primary text-primary-foreground shadow-[var(--shadow-brand)]' : 'border-border bg-card shadow-[var(--shadow-card)]'}`}>
-                    {plan.highlighted && <span className="absolute -top-3 left-6 rounded-full bg-brand-sun px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-accent-foreground">Mais escolhido</span>}
+                  <article className={`relative flex h-full flex-col rounded-[24px] border p-7 ${plan.highlighted ? 'border-teal-800 dark:border-teal-500 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 shadow-[var(--shadow-brand)]' : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-[var(--shadow-card)]'}`}>
+                    {plan.highlighted && <span className="absolute -top-3 left-6 rounded-full bg-amber-500 dark:bg-amber-400 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-100">Mais escolhido</span>}
                     <h3 className="font-display text-2xl font-bold tracking-[-0.05em]">{plan.name}</h3>
-                    <p className={`mt-2 text-sm leading-6 ${plan.highlighted ? 'text-primary-foreground/75' : 'text-muted-foreground'}`}>{plan.description}</p>
-                    <div className="mt-7"><span className="font-data text-3xl font-semibold tracking-[-0.08em]">{formatPrice(plan.monthlyPrice)}</span>{plan.billingMode === 'subscription' && <span className={`ml-1 text-sm ${plan.highlighted ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>/mês</span>}</div>
+                    <p className={`mt-2 text-sm leading-6 ${plan.highlighted ? 'text-white/75 dark:text-stone-950/75' : 'text-stone-500 dark:text-stone-400'}`}>{plan.description}</p>
+                    <div className="mt-7"><span className="font-data text-3xl font-semibold tracking-[-0.08em]">{formatPrice(plan.monthlyPrice)}</span>{plan.billingMode === 'subscription' && <span className={`ml-1 text-sm ${plan.highlighted ? 'text-white/70 dark:text-stone-950/70' : 'text-stone-500 dark:text-stone-400'}`}>/mês</span>}</div>
                     <ul className="mt-7 flex-1 space-y-3">
-                      <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-brand-sun" />Até {plan.userLimit} {plan.userLimit === 1 ? 'usuário' : 'usuários'}</li>
-                      <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-brand-sun" />{plan.aiCredits} créditos de IA por mês</li>
-                      {plan.features.map((feature) => <li key={feature.key} className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-brand-sun" />{feature.label}</li>)}
+                      <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400" />Até {plan.userLimit} {plan.userLimit === 1 ? 'usuário' : 'usuários'}</li>
+                      <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400" />{plan.aiCredits} créditos de IA por mês</li>
+                      {plan.features.map((feature) => <li key={feature.key} className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400" />{feature.label}</li>)}
                     </ul>
                     <Button asChild variant={plan.highlighted ? 'secondary' : 'default'} className="mt-8 w-full"><Link href={`/register?plan_id=${plan.id}`}>Escolher plano <ChevronRight /></Link></Button>
                   </article>
                 </Reveal>
               ))}
             </div>
-          ) : <div className="mt-12 rounded-2xl border border-dashed border-border bg-secondary/40 p-8 text-center text-sm text-muted-foreground">Os planos estarão disponíveis em instantes.</div>}
+          ) : <div className="mt-12 rounded-2xl border border-dashed border-stone-200 dark:border-stone-800 bg-stone-100/40 dark:bg-stone-800/40 p-8 text-center text-sm text-stone-500 dark:text-stone-400">Os planos estarão disponíveis em instantes.</div>}
         </section>
 
-        <section id="relatos" className="border-y border-border bg-card py-24 md:py-32">
+        <section id="relatos" className="border-y border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <Reveal direction="up"><SectionHeading eyebrow="Quem usa, sente" title="Mais presença para o que importa." /></Reveal>
             <div className="mt-14 grid gap-5 md:grid-cols-3">
               {TESTIMONIALS.map((testimonial, index) => (
                 <Reveal key={testimonial.name} direction="up" delay={index * 80}>
-                  <blockquote className="flex h-full flex-col rounded-[24px] border border-border bg-background p-7">
-                    <Quote className="text-brand-sun" size={28} />
-                    <p className="mt-5 flex-1 text-base leading-7 text-foreground">“{testimonial.quote}”</p>
-                    <footer className="mt-8 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{testimonial.initials}</span><div><cite className="not-italic text-sm font-bold">{testimonial.name}</cite><p className="text-xs text-muted-foreground">{testimonial.role}</p></div></footer>
+                  <blockquote className="flex h-full flex-col rounded-[24px] border border-stone-200 dark:border-stone-800 bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 p-7">
+                    <Quote className="text-amber-500 dark:text-amber-400" size={28} />
+                    <p className="mt-5 flex-1 text-base leading-7 text-stone-900 dark:text-stone-100">“{testimonial.quote}”</p>
+                    <footer className="mt-8 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-teal-800 dark:bg-teal-500 text-xs font-bold text-white dark:text-stone-950">{testimonial.initials}</span><div><cite className="not-italic text-sm font-bold">{testimonial.name}</cite><p className="text-xs text-stone-500 dark:text-stone-400">{testimonial.role}</p></div></footer>
                   </blockquote>
                 </Reveal>
               ))}
@@ -405,19 +405,19 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-primary py-24 text-primary-foreground md:py-28">
+        <section className="relative overflow-hidden bg-teal-800 dark:bg-teal-500 py-24 text-white dark:text-stone-950 md:py-28">
           <div className="absolute inset-0 opacity-15 [background-image:radial-gradient(currentColor_1px,transparent_1px)] [background-size:18px_18px]" />
           <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
-              <Reveal direction="up"><div><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold"><ShieldCheck size={14} /> Clínica, dados e cuidado no mesmo lugar</div><h2 className="font-display mt-6 max-w-2xl text-4xl font-bold leading-none tracking-[-0.07em] sm:text-5xl">Sua equipe mais presente em cada decisão clínica.</h2><p className="mt-5 max-w-xl text-lg leading-7 text-primary-foreground/75">Organize a rotina hoje e construa uma experiência de cuidado mais consistente amanhã.</p></div></Reveal>
-              <Reveal direction="up" delay={100}><Button asChild size="lg" className="h-12 bg-brand-sun-strong px-7 text-base text-primary-foreground shadow-none hover:bg-brand-sun-strong/90"><Link href="/register">Criar conta gratuita <ArrowRight /></Link></Button></Reveal>
+              <Reveal direction="up"><div><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold"><ShieldCheck size={14} /> Clínica, dados e cuidado no mesmo lugar</div><h2 className="font-display mt-6 max-w-2xl text-4xl font-bold leading-none tracking-[-0.07em] sm:text-5xl">Sua equipe mais presente em cada decisão clínica.</h2><p className="mt-5 max-w-xl text-lg leading-7 text-white/75 dark:text-stone-950/75">Organize a rotina hoje e construa uma experiência de cuidado mais consistente amanhã.</p></div></Reveal>
+              <Reveal direction="up" delay={100}><Button asChild size="lg" className="h-12 bg-amber-700 dark:bg-amber-300 px-7 text-base text-white dark:text-stone-950 shadow-none hover:bg-amber-700/90 dark:hover:bg-amber-300/90"><Link href="/register">Criar conta gratuita <ArrowRight /></Link></Button></Reveal>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="bg-background py-10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 sm:flex-row sm:items-center sm:justify-between sm:px-8"><BrandLogo /><p className="text-xs text-muted-foreground">© 2026 VetAI. Tecnologia que acompanha o cuidado.</p><div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground"><ChartNoAxesCombined size={14} className="text-primary" /> Gestão veterinária inteligente</div></div>
+      <footer className="bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 py-10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 sm:flex-row sm:items-center sm:justify-between sm:px-8"><BrandLogo /><p className="text-xs text-stone-500 dark:text-stone-400">© 2026 VetAI. Tecnologia que acompanha o cuidado.</p><div className="flex items-center gap-2 text-xs font-semibold text-stone-500 dark:text-stone-400"><ChartNoAxesCombined size={14} className="text-teal-800 dark:text-teal-500" /> Gestão veterinária inteligente</div></div>
       </footer>
     </div>
   );

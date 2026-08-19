@@ -89,29 +89,29 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
     <Modal title={medicine.name} maxWidth="2xl" onClose={onClose}>
       <div className="flex flex-col gap-0 -mx-5 -mt-5">
         {/* Classification + active ingredients header */}
-        <div className="flex flex-wrap items-center gap-2 px-5 pt-4 pb-3 border-b border-border/70">
+        <div className="flex flex-wrap items-center gap-2 px-5 pt-4 pb-3 border-b border-stone-200/70 dark:border-stone-800/70">
           {medicine.classification && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/40">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 border border-teal-800/40 dark:border-teal-500/40">
               {medicine.classification}
             </span>
           )}
           {medicine.activeIngredients && (
-            <span className="text-xs text-muted-foreground/70">
+            <span className="text-xs text-stone-500/70 dark:text-stone-400/70">
               {medicine.activeIngredients}
             </span>
           )}
         </div>
 
         {/* Tabs */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 px-4 py-2 border-b border-border bg-secondary">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 px-4 py-2 border-b border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800">
           {TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`py-2 px-2 rounded-lg text-xs font-medium transition-all text-center leading-snug ${
                 activeTab === tab.key
-                  ? 'bg-card text-primary shadow-sm ring-1 ring-border'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/60 dark:hover:bg-slate-700/40'
+                  ? 'bg-white dark:bg-stone-900 text-teal-800 dark:text-teal-500 shadow-sm ring-1 ring-stone-200 dark:ring-stone-700'
+                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-white/60 dark:hover:bg-slate-700/40'
               }`}
             >
               {tab.label}
@@ -129,43 +129,43 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 icon={BookOpen}
                 label="Indicações"
                 value={medicine.fullIndications}
-                iconColor="text-primary"
-                borderColor="border-primary/40"
-                bgColor="bg-primary/10"
+                iconColor="text-teal-800 dark:text-teal-500"
+                borderColor="border-teal-800/40 dark:border-teal-500/40"
+                bgColor="bg-teal-800/10 dark:bg-teal-500/10"
               />
 
               <ListSection
                 icon={AlertTriangle}
                 label="Contraindicações e Precauções"
                 items={medicine.contraindicationsPrecautions ?? []}
-                iconColor="text-danger"
-                bgColor="border-danger/30 bg-danger-soft"
+                iconColor="text-red-600 dark:text-red-500"
+                bgColor="border-red-600/30 dark:border-red-500/30 bg-red-50 dark:bg-red-900"
               />
 
               <ListSection
                 icon={Zap}
                 label="Efeitos Adversos"
                 items={medicine.adverseEffects ?? []}
-                iconColor="text-muted-foreground/70"
-                bgColor="border-border bg-secondary"
+                iconColor="text-stone-500/70 dark:text-stone-400/70"
+                bgColor="border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800"
               />
 
               <TextBlock
                 icon={ShieldAlert}
                 label="Superdosagem"
                 value={medicine.overdose}
-                iconColor="text-muted-foreground/70"
-                borderColor="border-border"
-                bgColor="bg-secondary"
+                iconColor="text-stone-500/70 dark:text-stone-400/70"
+                borderColor="border-stone-200 dark:border-stone-800"
+                bgColor="bg-stone-100 dark:bg-stone-800"
               />
 
               <TextBlock
                 icon={Info}
                 label="Reprodução, Gestação e Lactação"
                 value={medicine.reproductionPregnancyLactation}
-                iconColor="text-muted-foreground/70"
-                borderColor="border-border"
-                bgColor="bg-secondary"
+                iconColor="text-stone-500/70 dark:text-stone-400/70"
+                borderColor="border-stone-200 dark:border-stone-800"
+                bgColor="bg-stone-100 dark:bg-stone-800"
               />
 
               {!medicine.fullIndications &&
@@ -173,9 +173,9 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 !medicine.adverseEffects?.length &&
                 !medicine.overdose &&
                 !medicine.reproductionPregnancyLactation && (
-                <div className="rounded-xl border border-dashed border-border p-6 text-center">
-                  <AlertTriangle size={24} className="mx-auto text-muted-foreground/50 mb-2" />
-                  <p className="text-sm text-muted-foreground/70">
+                <div className="rounded-xl border border-dashed border-stone-200 dark:border-stone-800 p-6 text-center">
+                  <AlertTriangle size={24} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-2" />
+                  <p className="text-sm text-stone-500/70 dark:text-stone-400/70">
                       Nenhuma informação disponível.
                   </p>
                 </div>
@@ -190,8 +190,8 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               {(medicine.administrationRoutes?.length ?? 0) > 0 && (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <Route size={14} className="text-success" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                    <Route size={14} className="text-emerald-700 dark:text-emerald-500" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500/70 dark:text-stone-400/70">
                       Vias de Administração
                     </span>
                   </div>
@@ -199,7 +199,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                     {medicine.administrationRoutes!.map((r) => (
                       <span
                         key={r}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-soft text-success border border-success/30"
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500 border border-emerald-700/30 dark:border-emerald-500/30"
                       >
                         {r}
                       </span>
@@ -214,7 +214,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   icon={Clock}
                   label="Frequência de Uso"
                   value={medicine.usageFrequency}
-                  iconColor="text-info"
+                  iconColor="text-sky-700 dark:text-sky-500"
                 />
                 <InfoCard
                   icon={Clock}
@@ -229,7 +229,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Pill size={14} className="text-violet-500" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500/70 dark:text-stone-400/70">
                       Doses de Referência
                     </span>
                   </div>
@@ -241,33 +241,33 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                           key={key}
                           className="flex flex-col gap-1 p-3 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-900/20"
                         >
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500/70 dark:text-stone-400/70">
                             {label}
                           </span>
                           {entry?.dose ? (
                             <>
-                              <p className="text-sm font-semibold text-secondary-foreground">
+                              <p className="text-sm font-semibold text-stone-800 dark:text-stone-100">
                                 {entry.dose}
                               </p>
                               {entry.unit && (
-                                <p className="text-xs text-muted-foreground/70">{entry.unit}</p>
+                                <p className="text-xs text-stone-500/70 dark:text-stone-400/70">{entry.unit}</p>
                               )}
                             </>
                           ) : (
-                            <span className="text-xs text-muted-foreground/70">—</span>
+                            <span className="text-xs text-stone-500/70 dark:text-stone-400/70">—</span>
                           )}
                         </div>
                       );
                     })}
                     {medicine.referenceDose.general && (
-                      <div className="col-span-2 sm:col-span-4 flex flex-col gap-1 p-3 rounded-xl border border-border bg-secondary">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                      <div className="col-span-2 sm:col-span-4 flex flex-col gap-1 p-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500/70 dark:text-stone-400/70">
                           Geral (todas as espécies)
                         </span>
-                        <p className="text-sm font-semibold text-secondary-foreground">
+                        <p className="text-sm font-semibold text-stone-800 dark:text-stone-100">
                           {medicine.referenceDose.general.dose}
                           {medicine.referenceDose.general.unit && (
-                            <span className="text-xs font-normal text-muted-foreground/70 ml-1.5">
+                            <span className="text-xs font-normal text-stone-500/70 dark:text-stone-400/70 ml-1.5">
                               {medicine.referenceDose.general.unit}
                             </span>
                           )}
@@ -283,31 +283,31 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 icon={Info}
                 label="Observações de Dosagem"
                 value={medicine.dosageNotes}
-                iconColor="text-info"
-                borderColor="border-info/30"
-                bgColor="bg-info-soft"
+                iconColor="text-sky-700 dark:text-sky-500"
+                borderColor="border-sky-700/30 dark:border-sky-500/30"
+                bgColor="bg-sky-50 dark:bg-sky-900"
               />
 
               {/* Dose calculator */}
-              <div className="rounded-xl border border-border overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 bg-secondary border-b border-border">
-                  <Calculator size={14} className="text-primary" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 bg-stone-100 dark:bg-stone-800 border-b border-stone-200 dark:border-stone-800">
+                  <Calculator size={14} className="text-teal-800 dark:text-teal-500" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
                     Calculadora de Dose
                   </span>
                 </div>
                 <div className="p-4 space-y-4">
                   <div>
-                    <p className="text-xs font-semibold text-muted-foreground mb-2">Espécie</p>
-                    <div className="flex rounded-lg border border-border overflow-hidden w-fit">
+                    <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 mb-2">Espécie</p>
+                    <div className="flex rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden w-fit">
                       {SPECIES_OPTIONS.map((opt) => (
                         <button
                           key={opt.key}
                           onClick={() => setCalcSpecies(opt.key)}
                           className={`px-4 py-2 text-sm font-medium transition-colors ${
                             calcSpecies === opt.key
-                              ? 'bg-primary text-white'
-                              : 'bg-card text-muted-foreground hover:bg-secondary/60'
+                              ? 'bg-teal-800 dark:bg-teal-500 text-white'
+                              : 'bg-white dark:bg-stone-900 text-stone-500 dark:text-stone-400 hover:bg-stone-100/60 dark:hover:bg-stone-800/60'
                           }`}
                         >
                           {opt.label}
@@ -318,7 +318,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
 
                   <div className="flex items-end gap-3">
                     <div className="flex-1 max-w-[180px]">
-                      <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
+                      <label className="text-xs font-semibold text-stone-500 dark:text-stone-400 mb-1.5 block">
                         Peso do animal
                       </label>
                       <div className="relative">
@@ -329,9 +329,9 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                           placeholder="Ex: 12"
                           value={weight}
                           onChange={(e) => setWeight(e.target.value)}
-                          className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary pr-10"
+                          className="w-full rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3 py-2 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-500/70 dark:placeholder:text-stone-400/70 focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-500 pr-10"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground/70 font-medium">
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-500/70 dark:text-stone-400/70 font-medium">
                           kg
                         </span>
                       </div>
@@ -341,13 +341,13 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   {weight && weightKg > 0 && (
                     <>
                       {calculatedResult ? (
-                        <div className="rounded-lg bg-primary/10 border border-primary/40 px-4 py-3 flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                        <div className="rounded-lg bg-teal-800/10 dark:bg-teal-500/10 border border-teal-800/40 dark:border-teal-500/40 px-4 py-3 flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-teal-800 dark:bg-teal-500 shrink-0" />
                           <div>
-                            <p className="text-[11px] font-bold uppercase tracking-wider text-primary mb-0.5">
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-teal-800 dark:text-teal-500 mb-0.5">
                               Dose calculada para {weightKg} kg
                             </p>
-                            <p className="text-base font-bold text-primary">
+                            <p className="text-base font-bold text-teal-800 dark:text-teal-500">
                               {calculatedResult.isRange
                                 ? `${formatDose(calculatedResult.min)} – ${formatDose(calculatedResult.max)}`
                                 : formatDose(calculatedResult.min)}
@@ -355,8 +355,8 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                           </div>
                         </div>
                       ) : (
-                        <div className="rounded-lg bg-warning-soft border border-warning/40 px-4 py-3">
-                          <p className="text-xs text-warning">
+                        <div className="rounded-lg bg-amber-50 dark:bg-amber-900 border border-amber-600/40 dark:border-amber-400/40 px-4 py-3">
+                          <p className="text-xs text-amber-600 dark:text-amber-400">
                             {activeEntry
                               ? 'Dose disponível mas não calculável automaticamente. Consulte a bula.'
                               : 'Dose não informada para esta espécie. Consulte a bula.'}
@@ -374,10 +374,10 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
           {activeTab === 'apresentacoes' && (
             <>
               {(medicine.presentationsConcentrations?.length ?? 0) > 0 ? (
-                <div className="rounded-xl border border-border p-4">
+                <div className="rounded-xl border border-stone-200 dark:border-stone-800 p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Layers size={15} className="text-primary" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    <Layers size={15} className="text-teal-800 dark:text-teal-500" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
                       Apresentações e Concentrações
                     </span>
                   </div>
@@ -385,18 +385,18 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                     {medicine.presentationsConcentrations!.map((item, i) => (
                       <li
                         key={i}
-                        className="flex items-start gap-2.5 text-sm text-secondary-foreground"
+                        className="flex items-start gap-2.5 text-sm text-stone-800 dark:text-stone-100"
                       >
-                        <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                        <span className="mt-2 w-1.5 h-1.5 rounded-full bg-teal-800 dark:bg-teal-500 shrink-0" />
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
               ) : (
-                <div className="rounded-xl border border-dashed border-border p-6 text-center">
-                  <FlaskConical size={24} className="mx-auto text-muted-foreground/50 mb-2" />
-                  <p className="text-sm text-muted-foreground/70">
+                <div className="rounded-xl border border-dashed border-stone-200 dark:border-stone-800 p-6 text-center">
+                  <FlaskConical size={24} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-2" />
+                  <p className="text-sm text-stone-500/70 dark:text-stone-400/70">
                     Nenhuma apresentação disponível.
                   </p>
                 </div>
@@ -407,7 +407,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   icon={Thermometer}
                   label="Armazenamento"
                   value={medicine.storage}
-                  iconColor="text-info"
+                  iconColor="text-sky-700 dark:text-sky-500"
                 />
                 <InfoCard
                   icon={Stethoscope}
@@ -421,9 +421,9 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 icon={MessageSquare}
                 label="Informações ao Cliente"
                 value={medicine.clientInformation}
-                iconColor="text-muted-foreground/70"
-                borderColor="border-border"
-                bgColor="bg-secondary"
+                iconColor="text-stone-500/70 dark:text-stone-400/70"
+                borderColor="border-stone-200 dark:border-stone-800"
+                bgColor="bg-stone-100 dark:bg-stone-800"
               />
             </>
           )}
@@ -436,7 +436,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                   icon={Pill}
                   label="Princípios Ativos"
                   value={medicine.activeIngredients}
-                  iconColor="text-primary"
+                  iconColor="text-teal-800 dark:text-teal-500"
                 />
                 <InfoCard
                   icon={Archive}
@@ -449,8 +449,8 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               {(medicine.recommendedSpecies?.length ?? 0) > 0 && (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <User size={14} className="text-muted-foreground/70" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                    <User size={14} className="text-stone-500/70 dark:text-stone-400/70" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500/70 dark:text-stone-400/70">
                       Espécies Recomendadas
                     </span>
                   </div>
@@ -458,7 +458,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                     {medicine.recommendedSpecies!.map((s) => (
                       <span
                         key={s}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border"
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-800"
                       >
                         {s}
                       </span>
@@ -470,9 +470,9 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
               {!medicine.activeIngredients &&
                 !medicine.classification &&
                 !medicine.recommendedSpecies?.length && (
-                <div className="rounded-xl border border-dashed border-border p-6 text-center">
-                  <FlaskConical size={24} className="mx-auto text-muted-foreground/50 mb-2" />
-                  <p className="text-sm text-muted-foreground/70">
+                <div className="rounded-xl border border-dashed border-stone-200 dark:border-stone-800 p-6 text-center">
+                  <FlaskConical size={24} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-2" />
+                  <p className="text-sm text-stone-500/70 dark:text-stone-400/70">
                       Nenhuma informação disponível.
                   </p>
                 </div>

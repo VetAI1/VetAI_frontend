@@ -214,7 +214,7 @@ export function TutorDetailContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen w-full bg-background">
+      <div className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
         <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           <Header title="Detalhes do tutor" showStorage={false} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -233,7 +233,7 @@ export function TutorDetailContent() {
     pets.find((p) => p.id === patientId)?.name ?? '—';
 
   return (
-    <div className="min-h-screen w-full bg-background">
+    <div className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
       <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
         <Header
           title={tutor.name}
@@ -255,7 +255,7 @@ export function TutorDetailContent() {
         <div className="flex items-center gap-4">
           <Link
             href="/tutors"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-stone-500 dark:text-stone-400 hover:text-teal-800 dark:hover:text-teal-500 transition-colors"
           >
             <ArrowLeft size={16} />
           Voltar para tutores
@@ -265,8 +265,8 @@ export function TutorDetailContent() {
         {/* Info cards */}
         <SectionCard title="Informações de contato" subtitle="Dados cadastrados do tutor">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <InfoItem icon={<User size={16} className="text-primary" />} iconBg="bg-primary/10" label="CPF" value={fmtCpf(tutor.cpf)} />
-            <InfoItem icon={<Phone size={16} className="text-info" />} iconBg="bg-info-soft" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
+            <InfoItem icon={<User size={16} className="text-teal-800 dark:text-teal-500" />} iconBg="bg-teal-800/10 dark:bg-teal-500/10" label="CPF" value={fmtCpf(tutor.cpf)} />
+            <InfoItem icon={<Phone size={16} className="text-sky-700 dark:text-sky-500" />} iconBg="bg-sky-50 dark:bg-sky-900" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
             <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? '—'} />
             <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="Endereço" value={tutor.address ?? '—'} />
           </div>
@@ -291,14 +291,14 @@ export function TutorDetailContent() {
                 <Link
                   key={pet.id}
                   href={`/patients/detail?id=${pet.id}`}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/10 transition-all group"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-teal-800/40 dark:hover:border-teal-500/40 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all group"
                 >
-                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <PawPrint size={16} className="text-primary" />
+                  <div className="w-9 h-9 rounded-full bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
+                    <PawPrint size={16} className="text-teal-800 dark:text-teal-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">{pet.name}</p>
-                    <p className="text-xs text-muted-foreground">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
+                    <p className="font-medium text-stone-900 dark:text-stone-100 text-sm truncate group-hover:text-teal-800 dark:group-hover:text-teal-500 transition-colors">{pet.name}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
                   </div>
                 </Link>
               ))}
@@ -314,7 +314,7 @@ export function TutorDetailContent() {
             <Button
               size="sm"
               onClick={() => setShowAddAppointment(true)}
-              className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+              className="gap-1.5 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={14} />
             Novo agendamento
@@ -344,7 +344,7 @@ export function TutorDetailContent() {
 
           {pastAppointments.length > 0 && (
             <details className="mt-4">
-              <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground select-none flex items-center gap-1.5 mb-2">
+              <summary className="cursor-pointer text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 select-none flex items-center gap-1.5 mb-2">
                 <History size={14} />
                 {pastAppointments.length} atividade{pastAppointments.length !== 1 ? 's' : ''} passada{pastAppointments.length !== 1 ? 's' : ''}
               </summary>
@@ -371,7 +371,7 @@ export function TutorDetailContent() {
             <Button
               size="sm"
               onClick={() => setShowAddPayment(true)}
-              className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+              className="gap-1.5 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={14} />
             Registrar cobrança
@@ -524,8 +524,8 @@ function InfoItem({
         {icon}
       </div>
       <div className="min-w-0 pl-2">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm font-medium text-foreground truncate">
+        <p className="text-xs text-stone-500 dark:text-stone-400">{label}</p>
+        <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
           {value}
         </p>
       </div>
@@ -548,12 +548,12 @@ function AppointmentRow({
   const statusColors = APPOINTMENT_STATUS_COLORS[appointment.status];
   return (
     <div
-      className={`flex items-center gap-3 p-3 rounded-lg border border-border ${muted ? 'opacity-60' : ''}`}
+      className={`flex items-center gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800 ${muted ? 'opacity-60' : ''}`}
     >
       <div className={`w-2 h-2 rounded-full shrink-0 ${typeColors.dot}`} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-foreground truncate">
+          <span className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
             {appointment.title}
           </span>
           <span
@@ -567,7 +567,7 @@ function AppointmentRow({
             {APPOINTMENT_STATUS_LABELS[appointment.status]}
           </span>
         </div>
-        <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
+        <div className="flex items-center gap-3 mt-0.5 text-xs text-stone-500 dark:text-stone-400">
           <span className="flex items-center gap-1">
             <Calendar size={11} />
             {fmtDate(appointment.date)} às {appointment.start_time}
@@ -582,7 +582,7 @@ function AppointmentRow({
       </div>
       <button
         onClick={onDelete}
-        className="text-muted-foreground/70 hover:text-danger transition-colors p-1 shrink-0"
+        className="text-stone-500/70 dark:text-stone-400/70 hover:text-red-600 dark:hover:text-red-500 transition-colors p-1 shrink-0"
         aria-label="Excluir agendamento"
       >
         <Trash2 size={14} />
@@ -617,12 +617,12 @@ function PaymentRow({
 
   return (
     <div
-      className={`p-3 rounded-lg border ${isOverdue ? 'border-danger/30 bg-danger-soft/50' : 'border-border'}`}
+      className={`p-3 rounded-lg border ${isOverdue ? 'border-red-600/30 dark:border-red-500/30 bg-red-50/50 dark:bg-red-900/50' : 'border-stone-200 dark:border-stone-800'}`}
     >
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-foreground">
+            <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">
               {fmtCurrency(payment.amount)}
             </span>
             <span
@@ -631,15 +631,15 @@ function PaymentRow({
               {PAYMENT_STATUS_LABELS[payment.status]}
             </span>
             {isOverdue && (
-              <span className="text-xs text-danger font-medium">
+              <span className="text-xs text-red-600 dark:text-red-500 font-medium">
                 Vencido
               </span>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5 truncate">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 truncate">
             {itemsSummary}
           </p>
-          <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground/70 flex-wrap">
+          <div className="flex items-center gap-3 mt-0.5 text-xs text-stone-500/70 dark:text-stone-400/70 flex-wrap">
             <span className="flex items-center gap-1">
               <Calendar size={11} />
               Vence: {fmtDate(payment.due_date)}
@@ -657,7 +657,7 @@ function PaymentRow({
           {payment.status === 'PENDING' && onMarkPaid && (
             <button
               onClick={onMarkPaid}
-              className="text-muted-foreground/70 hover:text-success transition-colors p-1"
+              className="text-stone-500/70 dark:text-stone-400/70 hover:text-emerald-700 dark:hover:text-emerald-500 transition-colors p-1"
               aria-label="Marcar como pago"
             >
               <CheckCircle2 size={16} />
@@ -666,7 +666,7 @@ function PaymentRow({
           {onDelete && (
             <button
               onClick={onDelete}
-              className="text-muted-foreground/70 hover:text-danger transition-colors p-1"
+              className="text-stone-500/70 dark:text-stone-400/70 hover:text-red-600 dark:hover:text-red-500 transition-colors p-1"
               aria-label="Excluir cobrança"
             >
               <Trash2 size={14} />
@@ -676,14 +676,14 @@ function PaymentRow({
       </div>
       {payment.items.length > 1 && (
         <details className="mt-2">
-          <summary className="text-xs text-muted-foreground/70 cursor-pointer hover:text-muted-foreground select-none">
+          <summary className="text-xs text-stone-500/70 dark:text-stone-400/70 cursor-pointer hover:text-stone-500 dark:hover:text-stone-400 select-none">
             Ver {payment.items.length} itens
           </summary>
-          <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-border">
+          <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-stone-200 dark:border-stone-800">
             {payment.items.map((item, i) => (
               <div
                 key={i}
-                className="flex justify-between text-xs text-muted-foreground"
+                className="flex justify-between text-xs text-stone-500 dark:text-stone-400"
               >
                 <span>
                   {item.quantity > 1 ? `${item.quantity}× ` : ''}

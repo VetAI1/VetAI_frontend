@@ -164,7 +164,7 @@ export function AddAppointmentModal({
           error={errors.description?.message}
         />
 
-        {generalError && <p className="text-sm text-danger">{generalError}</p>}
+        {generalError && <p className="text-sm text-red-600 dark:text-red-500">{generalError}</p>}
 
         <div className="flex justify-end gap-2 pt-1">
           <Button
@@ -178,7 +178,7 @@ export function AddAppointmentModal({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             {isSubmitting ? (
               <Loader2 size={16} className="animate-spin" />

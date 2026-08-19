@@ -76,13 +76,13 @@ export function DataTable<T>({
 
   const renderTable = (
     <div
-      className="flex-1 overflow-x-auto overflow-y-auto rounded-lg border border-border bg-card"
+      className="flex-1 overflow-x-auto overflow-y-auto rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900"
       style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}
     >
       <table
         className={`w-full text-left text-sm${stretchEmptyState ? ' h-full' : ''}${tableClassName ? ` ${tableClassName}` : ''}`}
       >
-        <thead className="border-b border-border bg-secondary/70 text-muted-foreground">
+        <thead className="border-b border-stone-200 dark:border-stone-800 bg-stone-100/70 dark:bg-stone-800/70 text-stone-500 dark:text-stone-400">
           <tr>
             {tableHeaders.map((header, index) => {
               const column = columns?.[index];
@@ -104,7 +104,7 @@ export function DataTable<T>({
             })}
           </tr>
         </thead>
-        <tbody className="[&>tr:not(:last-child)]:border-b [&>tr:not(:last-child)]:border-border/60">
+        <tbody className="[&>tr:not(:last-child)]:border-b [&>tr:not(:last-child)]:border-stone-200/60 dark:border-stone-800/60">
           {loading ? (
             Array.from({ length: skeletonRows }).map((_, rIdx) => (
               <tr key={`skel-row-${rIdx}`}>
@@ -126,7 +126,7 @@ export function DataTable<T>({
               data.map((row, rowIndex) => (
                 <tr
                   key={getRowKey?.(row, rowIndex) ?? rowIndex}
-                  className="transition-colors hover:bg-muted/40"
+                  className="transition-colors hover:bg-stone-100/40 dark:hover:bg-stone-800/40"
                 >
                   {columns.map((column) => (
                     <td
@@ -165,7 +165,7 @@ export function DataTable<T>({
         Array.from({ length: skeletonRows }).map((_, rIdx) => (
           <div
             key={`skel-card-${rIdx}`}
-            className="rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]"
+            className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-[var(--shadow-card)]"
           >
             <Skeleton className="h-4 w-1/2" />
           </div>
@@ -174,7 +174,7 @@ export function DataTable<T>({
         data.map((row, rowIndex) => (
           <div
             key={getRowKey?.(row, rowIndex) ?? rowIndex}
-            className="rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]"
+            className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-[var(--shadow-card)]"
           >
             <div className="flex flex-col gap-2.5">
               {columns.map((column) => (
@@ -182,7 +182,7 @@ export function DataTable<T>({
                   key={column.key}
                   className="flex items-start justify-between gap-3"
                 >
-                  <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
                     {column.header}
                   </span>
                   <span className="text-right text-sm">
@@ -214,7 +214,7 @@ export function DataTable<T>({
           {showSearch && (
             <div className="relative w-full sm:w-80">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500/70 dark:text-stone-400/70"
                 size={16}
               />
               <input
@@ -223,7 +223,7 @@ export function DataTable<T>({
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder={searchPlaceholder}
                 aria-label={searchPlaceholder}
-                className="w-full rounded-md border border-input bg-card py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors hover:border-primary/35 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
+                className="w-full rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 py-2 pl-9 pr-3 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-500 dark:placeholder:text-stone-400 transition-colors hover:border-teal-800/35 dark:hover:border-teal-500/35 focus:border-teal-800 dark:focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-600/30 dark:focus:ring-teal-500/30"
               />
             </div>
           )}

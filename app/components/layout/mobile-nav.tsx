@@ -35,7 +35,7 @@ export function MobileNav() {
     <>
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t border-stone-200 dark:border-stone-800 bg-white/95 dark:bg-stone-900/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
       >
         {essentials.map((item) => {
           const Icon = item.icon;
@@ -48,14 +48,14 @@ export function MobileNav() {
               className={cn(
                 'flex min-w-0 flex-1 flex-col items-center gap-1 px-2 py-2.5 text-[11px] font-medium transition-colors',
                 active
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground',
+                  ? 'text-teal-800 dark:text-teal-500'
+                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100',
               )}
             >
               <span
                 className={cn(
                   'grid h-8 w-14 place-items-center rounded-full transition-colors',
-                  active && 'bg-primary/10',
+                  active && 'bg-teal-800/10 dark:bg-teal-500/10',
                 )}
               >
                 <Icon size={20} />
@@ -66,7 +66,7 @@ export function MobileNav() {
         })}
         <button
           onClick={() => setSheetOpen(true)}
-          className="flex min-w-0 flex-1 flex-col items-center gap-1 px-2 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className="flex min-w-0 flex-1 flex-col items-center gap-1 px-2 py-2.5 text-[11px] font-medium text-stone-500 dark:text-stone-400 transition-colors hover:text-stone-900 dark:hover:text-stone-100"
         >
           <span className="grid h-8 w-14 place-items-center rounded-full">
             <MoreHorizontal size={20} />
@@ -87,16 +87,16 @@ export function MobileNav() {
             role="dialog"
             aria-modal="true"
             aria-label="Todas as páginas"
-            className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-card pb-[env(safe-area-inset-bottom)] shadow-[var(--shadow-card)] animate-in slide-in-from-bottom-6 duration-300"
+            className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white dark:bg-stone-900 pb-[env(safe-area-inset-bottom)] shadow-[var(--shadow-card)] animate-in slide-in-from-bottom-6 duration-300"
           >
-            <div className="sticky top-0 flex items-center justify-between border-b border-border bg-card/95 px-4 py-3 backdrop-blur-xl">
-              <span className="text-sm font-bold text-foreground">
+            <div className="sticky top-0 flex items-center justify-between border-b border-stone-200 dark:border-stone-800 bg-white/95 dark:bg-stone-900/95 px-4 py-3 backdrop-blur-xl">
+              <span className="text-sm font-bold text-stone-900 dark:text-stone-100">
                 Navegação
               </span>
               <button
                 onClick={() => setSheetOpen(false)}
                 aria-label="Fechar"
-                className="grid size-8 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="grid size-8 place-items-center rounded-md text-stone-500 dark:text-stone-400 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-900 dark:hover:text-stone-100"
               >
                 <X size={18} />
               </button>
@@ -116,17 +116,17 @@ export function MobileNav() {
                     className={cn(
                       'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                       active
-                        ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
-                        : 'text-foreground/80 hover:bg-muted',
+                        ? 'bg-teal-50 dark:bg-teal-900 font-semibold text-teal-800 dark:text-teal-300'
+                        : 'text-stone-900/80 dark:text-stone-100/80 hover:bg-stone-100 dark:hover:bg-stone-800',
                     )}
                   >
                     <Icon
                       size={18}
-                      className={cn(active && 'text-primary')}
+                      className={cn(active && 'text-teal-800 dark:text-teal-500')}
                     />
                     <span className="truncate">{item.label}</span>
                     {item.badge && (
-                      <span className="ml-auto rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                      <span className="ml-auto rounded-full bg-teal-800/10 dark:bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-800 dark:text-teal-500">
                         {item.badge}
                       </span>
                     )}
@@ -135,10 +135,10 @@ export function MobileNav() {
               })}
             </div>
 
-            <div className="space-y-1 border-t border-border p-3">
+            <div className="space-y-1 border-t border-stone-200 dark:border-stone-800 p-3">
               <button
                 onClick={toggleTheme}
-                className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted"
+                className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-stone-900/80 dark:text-stone-100/80 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
               >
                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                 {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
@@ -147,7 +147,7 @@ export function MobileNav() {
                 onClick={() => {
                   void handleLogout();
                 }}
-                className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+                className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-500 transition-colors hover:bg-red-600/10 dark:hover:bg-red-500/10"
               >
                 <LogOut size={18} /> Sair
               </button>

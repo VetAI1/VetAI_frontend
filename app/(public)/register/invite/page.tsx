@@ -81,10 +81,10 @@ function InviteRegistrationForm() {
     >
       <form onSubmit={handleSubmit(submit)} className="space-y-6">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
+          <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100">
                 Criar sua conta
           </h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-stone-500 dark:text-stone-400">
                 Preencha seus dados para aceitar o convite.
           </p>
         </div>
@@ -126,7 +126,7 @@ function InviteRegistrationForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-muted-foreground transition-colors hover:text-primary"
+                className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -158,7 +158,7 @@ function InviteRegistrationForm() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="text-muted-foreground transition-colors hover:text-primary"
+                className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
               >
                 {showConfirmPassword ? (
                   <EyeOff size={18} />
@@ -179,11 +179,11 @@ function InviteRegistrationForm() {
           </Button>
         </div>
       </form>
-      <p className="mt-8 text-center text-sm text-muted-foreground">
+      <p className="mt-8 text-center text-sm text-stone-500 dark:text-stone-400">
             Já tem uma conta?{' '}
         <Link
           href="/login"
-          className="font-bold text-primary hover:underline"
+          className="font-bold text-teal-800 dark:text-teal-500 hover:underline"
         >
               Entrar
         </Link>
@@ -195,7 +195,7 @@ function InviteRegistrationForm() {
 export default function InviteRegistrationPage() {
   return (
     <Suspense
-      fallback={<div className="min-h-screen bg-background" />}
+      fallback={<div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950" />}
     >
       <InviteRegistrationForm />
     </Suspense>

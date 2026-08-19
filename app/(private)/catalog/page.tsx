@@ -129,11 +129,11 @@ export default function CatalogPage() {
       header: 'Nome',
       render: (item) => (
         <div>
-          <p className="font-medium text-foreground">
+          <p className="font-medium text-stone-900 dark:text-stone-100">
             {item.name}
           </p>
           {item.description && (
-            <p className="text-xs text-muted-foreground/70 mt-0.5 truncate max-w-xs">
+            <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5 truncate max-w-xs">
               {item.description}
             </p>
           )}
@@ -160,7 +160,7 @@ export default function CatalogPage() {
       header: 'Preço',
       width: '130px',
       render: (item) => (
-        <span className="text-secondary-foreground font-medium">
+        <span className="text-stone-800 dark:text-stone-100 font-medium">
           {fmtCurrency(item.price)}
         </span>
       ),
@@ -171,11 +171,11 @@ export default function CatalogPage() {
       width: '110px',
       render: (item) =>
         item.active ? (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-soft text-success">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500">
             Ativo
           </span>
         ) : (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-muted-foreground">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
             Inativo
           </span>
         ),
@@ -193,7 +193,7 @@ export default function CatalogPage() {
             onClick={() => openEdit(item)}
             title="Editar"
           >
-            <Pencil size={15} className="text-muted-foreground" />
+            <Pencil size={15} className="text-stone-500 dark:text-stone-400" />
           </Button>
           <Button
             variant="ghost"
@@ -201,7 +201,7 @@ export default function CatalogPage() {
             onClick={() => handleDelete(item)}
             title="Excluir"
           >
-            <Trash2 size={15} className="text-danger" />
+            <Trash2 size={15} className="text-red-600 dark:text-red-500" />
           </Button>
         </div>
       ),
@@ -209,7 +209,7 @@ export default function CatalogPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Catálogo" showStorage={false} />
 
@@ -226,7 +226,7 @@ export default function CatalogPage() {
                 setEditingItem(undefined);
                 setShowModal(true);
               }}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 h-10"
+              className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-10"
             >
               <Plus size={18} /> Novo item
             </Button>
@@ -288,7 +288,7 @@ export default function CatalogPage() {
                   onClick={() => setPage(n)}
                   className={
                     n === page
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary'
+                      ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 border-teal-800 dark:border-teal-500'
                       : ''
                   }
                 >

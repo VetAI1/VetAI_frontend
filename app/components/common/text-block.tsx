@@ -22,11 +22,11 @@ export function TextBlock({
     <div className={`rounded-xl border p-4 ${borderColor} ${bgColor}`}>
       <div className="flex items-center gap-2 mb-2">
         <Icon size={14} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
           {label}
         </span>
       </div>
-      <p className="text-sm text-foreground/80 leading-relaxed">
+      <p className="text-sm text-stone-900/80 dark:text-stone-100/80 leading-relaxed">
         {value}
       </p>
     </div>

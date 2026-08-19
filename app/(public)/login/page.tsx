@@ -44,14 +44,14 @@ export default function LoginPage() {
       description="Acesse sua conta e continue cuidando dos seus pacientes com o poder da inteligência artificial."
     >
       <div>
-        <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-primary">
-          <ShieldCheck size={13} className="text-primary" />
+        <span className="inline-flex items-center gap-2 rounded-full border border-teal-800/15 dark:border-teal-500/15 bg-teal-800/10 dark:bg-teal-500/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-teal-800 dark:text-teal-500">
+          <ShieldCheck size={13} className="text-teal-800 dark:text-teal-500" />
           Acesso seguro
         </span>
-        <h1 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-foreground sm:text-5xl">
+        <h1 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100 sm:text-5xl">
           Entrar na sua conta
         </h1>
-        <p className="mb-8 mt-2 text-muted-foreground">
+        <p className="mb-8 mt-2 text-stone-500 dark:text-stone-400">
           Digite suas credenciais para acessar o painel.
         </p>
 
@@ -71,12 +71,12 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-semibold text-foreground">
+              <Label className="text-sm font-semibold text-stone-900 dark:text-stone-100">
                 Senha
               </Label>
               <Link
                 href="/forgot-password"
-                className="text-xs font-bold text-primary hover:underline"
+                className="text-xs font-bold text-teal-800 dark:text-teal-500 hover:underline"
               >
                 Esqueceu a senha?
               </Link>
@@ -94,7 +94,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-muted-foreground transition-colors hover:text-primary"
+                  className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
                 >
                   {showPassword ? (
                     <EyeOff size={18} />
@@ -111,16 +111,16 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-          <Sparkles size={13} className="text-brand-sun" />
+        <div className="mt-6 flex items-center justify-center gap-2 text-xs text-stone-500 dark:text-stone-400">
+          <Sparkles size={13} className="text-amber-500 dark:text-amber-400" />
           Acesse a rotina da sua clínica em um só lugar
         </div>
 
-        <p className="mt-8 text-center text-sm text-muted-foreground">
+        <p className="mt-8 text-center text-sm text-stone-500 dark:text-stone-400">
           Não tem uma conta?{' '}
           <Link
             href="/register"
-            className="font-bold text-primary hover:underline"
+            className="font-bold text-teal-800 dark:text-teal-500 hover:underline"
           >
             Criar conta
           </Link>

@@ -43,7 +43,7 @@ export default function RoleDetail() {
         showStorage={false}
       />
       {loading ? (
-        <div className="flex justify-center py-20 text-muted-foreground">
+        <div className="flex justify-center py-20 text-stone-500 dark:text-stone-400">
           <Loader2 className="animate-spin" />
         </div>
       ) : (

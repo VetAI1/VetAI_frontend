@@ -172,17 +172,17 @@ function TemplateFormModal({
 
         {items.length > 0 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-secondary-foreground">
+            <p className="text-sm font-medium text-stone-800 dark:text-stone-100">
               Itens do modelo ({items.length})
             </p>
             {items.map((item, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-border"
+                className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-stone-200 dark:border-stone-800"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-medium text-foreground">
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
                       {item.name}
                     </p>
                     <span
@@ -191,7 +191,7 @@ function TemplateFormModal({
                       {PRESCRIPTION_TYPE_MAP[item.type].label}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-stone-500 dark:text-stone-400">
                     {FREQUENCY_LABELS[item.frequency]}
                     {item.frequency === 'RECURRING'
                       ? ` · a cada ${item.interval_hours}h por ${item.duration_days} dia(s)`
@@ -206,7 +206,7 @@ function TemplateFormModal({
                   onClick={() =>
                     setItems((prev) => prev.filter((_, i) => i !== index))
                   }
-                  className="text-danger shrink-0"
+                  className="text-red-600 dark:text-red-500 shrink-0"
                 >
                   <X size={14} />
                 </Button>
@@ -215,8 +215,8 @@ function TemplateFormModal({
           </div>
         )}
 
-        <div className="p-3 rounded-lg bg-secondary border border-dashed border-border space-y-3">
-          <p className="text-sm font-medium text-secondary-foreground">
+        <div className="p-3 rounded-lg bg-stone-100 dark:bg-stone-800 border border-dashed border-stone-200 dark:border-stone-800 space-y-3">
+          <p className="text-sm font-medium text-stone-800 dark:text-stone-100">
             Adicionar item
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -312,14 +312,14 @@ function TemplateFormModal({
               </>
             )}
           </div>
-          {itemError && <p className="text-sm text-danger">{itemError}</p>}
+          {itemError && <p className="text-sm text-red-600 dark:text-red-500">{itemError}</p>}
           <Button type="button" variant="outline" size="sm" onClick={addItem}>
             <Plus size={14} />
             Adicionar item
           </Button>
         </div>
 
-        {error && <p className="text-sm text-danger">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-500">{error}</p>}
 
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
@@ -328,7 +328,7 @@ function TemplateFormModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Salvar modelo
           </Button>
@@ -383,7 +383,7 @@ export function TemplatesTab() {
       headerAction={
         <Button
           onClick={() => setShowForm(true)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
         >
           <Plus size={16} />
           Novo modelo
@@ -392,13 +392,13 @@ export function TemplatesTab() {
     >
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-primary" />
+          <Loader2 size={28} className="animate-spin text-teal-800 dark:text-teal-500" />
         </div>
       ) : templates.length === 0 ? (
         <div className="text-center py-12">
-          <ClipboardList size={48} className="mx-auto text-muted-foreground/50 mb-3" />
-          <p className="text-muted-foreground">Nenhum modelo cadastrado</p>
-          <p className="text-sm text-muted-foreground/70 mt-1">
+          <ClipboardList size={48} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-3" />
+          <p className="text-stone-500 dark:text-stone-400">Nenhum modelo cadastrado</p>
+          <p className="text-sm text-stone-500/70 dark:text-stone-400/70 mt-1">
             Crie modelos para quadros comuns, como pós-operatório ou gastroenterite.
           </p>
         </div>
@@ -411,24 +411,24 @@ export function TemplatesTab() {
             return (
               <div
                 key={template.id}
-                className="flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all"
+                className="flex flex-col rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-teal-800/50 dark:hover:border-teal-500/50 hover:shadow-md transition-all"
               >
                 <div className="flex items-start gap-3 p-4 pb-3">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+                  <div className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
                     <ClipboardList size={18} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <p className="font-semibold text-foreground truncate">
+                      <p className="font-semibold text-stone-900 dark:text-stone-100 truncate">
                         {template.name}
                       </p>
-                      <span className="shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-muted text-secondary-foreground">
+                      <span className="shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100">
                         {template.items.length}{' '}
                         {template.items.length === 1 ? 'item' : 'itens'}
                       </span>
                     </div>
                     {template.description && (
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">
+                      <p className="text-xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
                         {template.description}
                       </p>
                     )}
@@ -447,7 +447,7 @@ export function TemplatesTab() {
                       size="icon-sm"
                       onClick={() => setDeleting(template)}
                       title="Excluir"
-                      className="text-danger"
+                      className="text-red-600 dark:text-red-500"
                     >
                       <Trash2 size={14} />
                     </Button>
@@ -468,7 +468,7 @@ export function TemplatesTab() {
                     return (
                       <div
                         key={index}
-                        className="rounded-lg bg-secondary px-2.5 py-2"
+                        className="rounded-lg bg-stone-100 dark:bg-stone-800 px-2.5 py-2"
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           <span
@@ -476,18 +476,18 @@ export function TemplatesTab() {
                           >
                             {PRESCRIPTION_TYPE_MAP[item.type].label}
                           </span>
-                          <p className="text-xs font-medium text-foreground truncate">
+                          <p className="text-xs font-medium text-stone-900 dark:text-stone-100 truncate">
                             {item.name}
                           </p>
                         </div>
-                        <p className="mt-1 text-[11px] text-muted-foreground truncate">
+                        <p className="mt-1 text-[11px] text-stone-500 dark:text-stone-400 truncate">
                           {details}
                         </p>
                       </div>
                     );
                   })}
                   {hiddenCount > 0 && (
-                    <p className="pl-1 text-[11px] text-muted-foreground/70">
+                    <p className="pl-1 text-[11px] text-stone-500/70 dark:text-stone-400/70">
                       + {hiddenCount}{' '}
                       {hiddenCount === 1 ? 'outro item' : 'outros itens'}
                     </p>

@@ -96,13 +96,13 @@ export function UploadExamModal({
   };
 
   return (
-    <div className="flex max-h-[calc(100dvh-2rem)] w-[min(calc(100vw-2rem),32rem)] flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-card)]">
-      <div className="flex shrink-0 items-center justify-between border-b border-border p-5">
+    <div className="flex max-h-[calc(100dvh-2rem)] w-[min(calc(100vw-2rem),32rem)] flex-col overflow-hidden rounded-xl bg-white dark:bg-stone-900 shadow-[var(--shadow-card)]">
+      <div className="flex shrink-0 items-center justify-between border-b border-stone-200 dark:border-stone-800 p-5">
         <div>
-          <h2 className="text-lg font-bold text-foreground">
+          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
               Enviar Exame
           </h2>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               Faça o upload do PDF do exame para análise automática
           </p>
         </div>
@@ -110,7 +110,7 @@ export function UploadExamModal({
           variant="ghost"
           size="icon-sm"
           onClick={onClose}
-          className="text-muted-foreground"
+          className="text-stone-500 dark:text-stone-400"
         >
           <X size={18} />
         </Button>
@@ -158,11 +158,11 @@ export function UploadExamModal({
 
         {preselectedPatient && (
           <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">
+            <label className="mb-2 block text-sm font-medium text-stone-900 dark:text-stone-100">
                 Paciente
             </label>
-            <div className="rounded-lg border border-primary/40 bg-primary/10 p-3">
-              <span className="text-sm font-medium text-primary">
+            <div className="rounded-lg border border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10 p-3">
+              <span className="text-sm font-medium text-teal-800 dark:text-teal-500">
                 {preselectedPatient.name}
               </span>
             </div>
@@ -202,14 +202,14 @@ export function UploadExamModal({
         />
       </div>
 
-      <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border p-4">
+      <div className="flex shrink-0 items-center justify-end gap-3 border-t border-stone-200 dark:border-stone-800 p-4">
         <Button variant="outline" onClick={onClose} disabled={uploading}>
             Cancelar
         </Button>
         <Button
           onClick={handleSubmit(onSubmit)}
           loading={uploading}
-          className="min-w-[120px] bg-primary text-primary-foreground hover:bg-primary/90"
+          className="min-w-[120px] bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
         >
           {uploading ? (
             <>Enviando...</>

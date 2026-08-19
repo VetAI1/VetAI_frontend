@@ -71,7 +71,7 @@ function Dropdown({
         e.preventDefault();
         e.stopPropagation();
       }}
-      className="animate-in overflow-hidden rounded-xl border border-border bg-popover py-1.5 text-popover-foreground shadow-[var(--shadow-card)] fade-in-0 zoom-in-95 duration-150"
+      className="animate-in overflow-hidden rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 py-1.5 text-stone-900 dark:text-stone-100 shadow-[var(--shadow-card)] fade-in-0 zoom-in-95 duration-150"
     >
       <div className="overflow-y-auto" style={{ maxHeight: MAX_HEIGHT }}>
         {options.map((opt) => {
@@ -87,13 +87,13 @@ function Dropdown({
               className={cn(
                 'w-full flex items-center justify-between gap-2 px-3 py-2 text-sm text-left transition-colors',
                 isSelected
-                  ? 'bg-secondary text-secondary-foreground font-semibold'
-                  : 'text-foreground hover:bg-muted',
+                  ? 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100 font-semibold'
+                  : 'text-stone-900 dark:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800',
               )}
             >
               <span>{opt.label}</span>
               {isSelected && (
-                <Check size={14} className="shrink-0 text-primary" />
+                <Check size={14} className="shrink-0 text-teal-800 dark:text-teal-500" />
               )}
             </button>
           );
@@ -171,10 +171,10 @@ function SelectInputInner({
       {label && (
         <label
           htmlFor={inputId}
-          className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-foreground"
+          className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-stone-900 dark:text-stone-100"
         >
           {label}
-          {required && <span className="ml-0.5 text-destructive">*</span>}
+          {required && <span className="ml-0.5 text-red-600 dark:text-red-500">*</span>}
         </label>
       )}
 
@@ -193,12 +193,12 @@ function SelectInputInner({
           }
         }}
         className={cn(
-          'flex w-full cursor-pointer select-none items-center justify-between gap-2 rounded-xl border border-input bg-card text-foreground transition-colors duration-200 hover:border-primary/35',
+          'flex w-full cursor-pointer select-none items-center justify-between gap-2 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 transition-colors duration-200 hover:border-teal-800/35 dark:hover:border-teal-500/35',
           compact ? 'px-2 py-1 text-xs' : 'px-3 py-2.5 text-sm',
           open
-            ? 'border-primary ring-2 ring-ring/30'
+            ? 'border-teal-800 dark:border-teal-500 ring-2 ring-teal-600/30 dark:ring-teal-500/30'
             : error
-              ? 'border-destructive bg-destructive/5'
+              ? 'border-red-600 dark:border-red-500 bg-red-600/5 dark:bg-red-500/5'
               : '',
           disabled && 'opacity-60 cursor-not-allowed pointer-events-none',
           className,
@@ -206,7 +206,7 @@ function SelectInputInner({
       >
         <span
           className={cn(
-            selectedLabel ? 'text-foreground' : 'text-muted-foreground',
+            selectedLabel ? 'text-stone-900 dark:text-stone-100' : 'text-stone-500 dark:text-stone-400',
           )}
         >
           {selectedLabel ?? placeholder}
@@ -214,14 +214,14 @@ function SelectInputInner({
         <ChevronDown
           size={compact ? 13 : 15}
           className={cn(
-            'shrink-0 text-muted-foreground transition-transform duration-150',
-            open && 'rotate-180 text-primary',
+            'shrink-0 text-stone-500 dark:text-stone-400 transition-transform duration-150',
+            open && 'rotate-180 text-teal-800 dark:text-teal-500',
           )}
         />
       </div>
 
       {error && (
-        <p className="mt-1.5 text-xs font-medium text-destructive">{error}</p>
+        <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-500">{error}</p>
       )}
 
       {mounted &&

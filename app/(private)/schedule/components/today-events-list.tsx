@@ -37,10 +37,10 @@ export function TodayEventsList({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-base font-semibold text-foreground capitalize">
+          <h2 className="text-base font-semibold text-stone-900 dark:text-stone-100 capitalize">
             {dateFormatted}
           </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
             {loading ? (
               <Skeleton className="h-3 w-16" />
             ) : sorted.length === 0 ? (
@@ -52,7 +52,7 @@ export function TodayEventsList({
         </div>
         <button
           onClick={onAddClick}
-          className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary transition-colors"
+          className="flex items-center gap-1.5 text-xs font-medium text-teal-800 dark:text-teal-500 hover:text-teal-800 dark:hover:text-teal-500 transition-colors"
         >
           <Plus size={14} /> Adicionar
         </button>
@@ -71,7 +71,7 @@ export function TodayEventsList({
           action={
             <button
               onClick={onAddClick}
-              className="text-sm font-medium text-primary hover:underline"
+              className="text-sm font-medium text-teal-800 dark:text-teal-500 hover:underline"
             >
               Agendar evento
             </button>
@@ -108,12 +108,12 @@ export function TodayEventsList({
                 {(ev.patientName ?? ev.tutorName) && (
                   <div className="flex flex-col gap-0.5 mt-1.5 pl-4">
                     {ev.patientName && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
                         <PawPrint size={11} /> {ev.patientName}
                       </div>
                     )}
                     {ev.tutorName && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
                         <User size={11} /> {ev.tutorName}
                       </div>
                     )}

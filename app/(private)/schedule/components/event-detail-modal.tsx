@@ -35,8 +35,8 @@ export function EventDetailModal({
   }
 
   const rowCls = 'flex items-start gap-3 text-sm';
-  const labelCls = 'text-muted-foreground min-w-[80px]';
-  const valueCls = 'text-foreground font-medium';
+  const labelCls = 'text-stone-500 dark:text-stone-400 min-w-[80px]';
+  const valueCls = 'text-stone-900 dark:text-stone-100 font-medium';
 
   const dateFormatted = new Date(`${event.date}T00:00:00`).toLocaleDateString(
     'pt-BR',
@@ -62,7 +62,7 @@ export function EventDetailModal({
           <div className={rowCls}>
             <CalendarDays
               size={16}
-              className="text-muted-foreground/70 mt-0.5 shrink-0"
+              className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0"
             />
             <div>
               <span className={labelCls}>Data</span>
@@ -71,7 +71,7 @@ export function EventDetailModal({
           </div>
 
           <div className={rowCls}>
-            <Clock size={16} className="text-muted-foreground/70 mt-0.5 shrink-0" />
+            <Clock size={16} className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0" />
             <div>
               <span className={labelCls}>Horário</span>
               <p className={valueCls}>
@@ -83,7 +83,7 @@ export function EventDetailModal({
 
           {event.patientName && (
             <div className={rowCls}>
-              <PawPrint size={16} className="text-muted-foreground/70 mt-0.5 shrink-0" />
+              <PawPrint size={16} className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0" />
               <div>
                 <span className={labelCls}>Paciente</span>
                 <p className={valueCls}>{event.patientName}</p>
@@ -93,7 +93,7 @@ export function EventDetailModal({
 
           {event.tutorName && (
             <div className={rowCls}>
-              <User size={16} className="text-muted-foreground/70 mt-0.5 shrink-0" />
+              <User size={16} className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0" />
               <div>
                 <span className={labelCls}>Tutor</span>
                 <p className={valueCls}>{event.tutorName}</p>
@@ -102,19 +102,19 @@ export function EventDetailModal({
           )}
 
           {event.description && (
-            <div className="bg-secondary rounded-lg p-3 text-sm text-secondary-foreground border border-border/70">
+            <div className="bg-stone-100 dark:bg-stone-800 rounded-lg p-3 text-sm text-stone-800 dark:text-stone-100 border border-stone-200/70 dark:border-stone-800/70">
               {event.description}
             </div>
           )}
         </div>
 
-        <div className="flex justify-between items-center pt-2 border-t border-border/70">
+        <div className="flex justify-between items-center pt-2 border-t border-stone-200/70 dark:border-stone-800/70">
           <Button
             variant="ghost"
             onClick={() => {
               void handleDelete();
             }}
-            className="gap-1.5 text-danger hover:text-danger hover:bg-danger-soft"
+            className="gap-1.5 text-red-600 dark:text-red-500 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
           >
             <Trash2 size={15} /> Excluir
           </Button>
@@ -127,7 +127,7 @@ export function EventDetailModal({
                 onEdit(event);
                 onClose();
               }}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground border-primary gap-1.5"
+              className="bg-teal-800 dark:bg-teal-500 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 text-white dark:text-stone-950 border-teal-800 dark:border-teal-500 gap-1.5"
             >
               <Pencil size={14} /> Editar
             </Button>

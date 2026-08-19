@@ -123,15 +123,15 @@ export function Autocomplete<TItem extends { id: string }>({
     >
       <div ref={containerRef} className="relative">
         <div
-          className={`flex min-h-11 w-full items-center gap-2 rounded-xl border bg-card px-3 py-1.5 transition-colors duration-200 hover:border-primary/35 ${error ? 'border-destructive bg-destructive/5 focus-within:border-destructive focus-within:ring-2 focus-within:ring-destructive/20' : 'border-input focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/30'}`}
+          className={`flex min-h-11 w-full items-center gap-2 rounded-xl border bg-white dark:bg-stone-900 px-3 py-1.5 transition-colors duration-200 hover:border-teal-800/35 dark:hover:border-teal-500/35 ${error ? 'border-red-600 dark:border-red-500 bg-red-600/5 dark:bg-red-500/5 focus-within:border-red-600 dark:focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-600/20 dark:focus-within:ring-red-500/20' : 'border-stone-300 dark:border-stone-700 focus-within:border-teal-800 dark:focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-600/30 dark:focus-within:ring-teal-500/30'}`}
         >
-          <Search size={16} className="shrink-0 text-muted-foreground" />
+          <Search size={16} className="shrink-0 text-stone-500 dark:text-stone-400" />
           {hasSelection && (
             <div className="flex flex-wrap items-center gap-1.5">
               {selected.map((option) => (
                 <span
                   key={option.id}
-                  className="inline-flex h-7 max-w-48 items-center gap-1 rounded-lg bg-secondary px-2 text-xs font-semibold text-secondary-foreground"
+                  className="inline-flex h-7 max-w-48 items-center gap-1 rounded-lg bg-stone-100 dark:bg-stone-800 px-2 text-xs font-semibold text-stone-800 dark:text-stone-100"
                   title={option.description}
                 >
                   <span className="truncate">{option.label}</span>
@@ -142,7 +142,7 @@ export function Autocomplete<TItem extends { id: string }>({
                       if (multiple) onRemove?.(option);
                       else onClear?.();
                     }}
-                    className="shrink-0 text-primary transition-colors hover:text-primary/70"
+                    className="shrink-0 text-teal-800 dark:text-teal-500 transition-colors hover:text-teal-800/70 dark:hover:text-teal-500/70"
                   >
                     <X size={13} />
                   </button>
@@ -157,7 +157,7 @@ export function Autocomplete<TItem extends { id: string }>({
               value={search ?? ''}
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={() => onOpenChange(true)}
-              className="min-w-32 flex-1 bg-transparent py-1 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              className="min-w-32 flex-1 bg-transparent py-1 text-sm text-stone-900 dark:text-stone-100 outline-none placeholder:text-stone-500 dark:placeholder:text-stone-400"
             />
           )}
         </div>
@@ -180,17 +180,17 @@ export function Autocomplete<TItem extends { id: string }>({
               }}
             >
               <InfiniteScroll
-                className="max-h-48 overflow-y-auto rounded-xl border border-border bg-popover shadow-[var(--shadow-card)]"
+                className="max-h-48 overflow-y-auto rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-[var(--shadow-card)]"
                 hasMore={hasMorePage}
                 loading={loadingMore}
                 onLoadMore={() => onLoadNextPage?.()}
               >
                 {loading ? (
                   <div className="flex items-center justify-center p-4">
-                    <Loader2 size={16} className="animate-spin text-primary" />
+                    <Loader2 size={16} className="animate-spin text-teal-800 dark:text-teal-500" />
                   </div>
                 ) : items.length === 0 ? (
-                  <p className="p-3 text-center text-sm text-muted-foreground">
+                  <p className="p-3 text-center text-sm text-stone-500 dark:text-stone-400">
                     {emptyMessage}
                   </p>
                 ) : (
@@ -207,17 +207,17 @@ export function Autocomplete<TItem extends { id: string }>({
                           onSearchChange('');
                           if (!multiple) onOpenChange(false);
                         }}
-                        className="h-auto w-full justify-between rounded-none border-b border-border px-3 py-2.5 text-sm text-foreground last:border-0 hover:bg-muted disabled:opacity-100"
+                        className="h-auto w-full justify-between rounded-none border-b border-stone-200 dark:border-stone-800 px-3 py-2.5 text-sm text-stone-900 dark:text-stone-100 last:border-0 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-100"
                       >
                         <div className="text-left">
                           <p className="font-medium">{getOptionLabel(item)}</p>
                           {getOptionDescription?.(item) && (
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs text-stone-500 dark:text-stone-400">
                               {getOptionDescription(item)}
                             </p>
                           )}
                         </div>
-                        {isSelected && <Check size={16} className="shrink-0 text-primary" />}
+                        {isSelected && <Check size={16} className="shrink-0 text-teal-800 dark:text-teal-500" />}
                       </Button>
                     );
                   })

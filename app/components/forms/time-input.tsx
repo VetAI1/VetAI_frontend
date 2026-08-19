@@ -113,10 +113,10 @@ function TimeInputInner({
       {label && (
         <label
           htmlFor={inputId}
-          className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-foreground"
+          className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-stone-900 dark:text-stone-100"
         >
           {label}
-          {required && <span className="ml-0.5 text-destructive">*</span>}
+          {required && <span className="ml-0.5 text-red-600 dark:text-red-500">*</span>}
         </label>
       )}
       <div className="relative">
@@ -131,9 +131,9 @@ function TimeInputInner({
           maxLength={5}
           disabled={disabled}
           className={cn(
-            'w-full rounded-md border border-input bg-card px-3 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-200 hover:border-primary/35 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30',
+            'w-full rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 pr-10 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-500 dark:placeholder:text-stone-400 transition-colors duration-200 hover:border-teal-800/35 dark:hover:border-teal-500/35 focus:border-teal-800 dark:focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-600/30 dark:focus:ring-teal-500/30',
             error
-              ? 'border-destructive bg-destructive/5 focus:border-destructive focus:ring-destructive/20'
+              ? 'border-red-600 dark:border-red-500 bg-red-600/5 dark:bg-red-500/5 focus:border-red-600 dark:focus:border-red-500 focus:ring-red-600/20 dark:focus:ring-red-500/20'
               : '',
             disabled && 'opacity-60 cursor-not-allowed',
             className,
@@ -145,14 +145,14 @@ function TimeInputInner({
           onClick={setNow}
           disabled={disabled}
           title="Usar o horário atual"
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-primary disabled:cursor-not-allowed"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500 disabled:cursor-not-allowed"
         >
           <Clock size={15} />
         </button>
       </div>
 
       {error && (
-        <p className="mt-1.5 text-xs font-medium text-destructive">{error}</p>
+        <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-500">{error}</p>
       )}
     </div>
   );

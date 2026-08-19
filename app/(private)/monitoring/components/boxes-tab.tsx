@@ -91,7 +91,7 @@ function BoxFormModal({ box, onClose, onSuccess }: BoxFormModalProps) {
           <Button
             type="submit"
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Salvar
           </Button>
@@ -141,7 +141,7 @@ export function BoxesTab() {
       headerAction={
         <Button
           onClick={() => setShowForm(true)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
         >
           <Plus size={16} />
           Novo box
@@ -150,12 +150,12 @@ export function BoxesTab() {
     >
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-primary" />
+          <Loader2 size={28} className="animate-spin text-teal-800 dark:text-teal-500" />
         </div>
       ) : boxes.length === 0 ? (
         <div className="text-center py-12">
-          <BedDouble size={48} className="mx-auto text-muted-foreground/50 mb-3" />
-          <p className="text-muted-foreground">Nenhum box cadastrado</p>
+          <BedDouble size={48} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-3" />
+          <p className="text-stone-500 dark:text-stone-400">Nenhum box cadastrado</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -164,8 +164,8 @@ export function BoxesTab() {
               key={box.id}
               className={`p-4 rounded-xl border transition-colors ${
                 box.occupied
-                  ? 'border-danger/30 bg-danger-soft'
-                  : 'border-success/30 bg-success-soft'
+                  ? 'border-red-600/30 dark:border-red-500/30 bg-red-50 dark:bg-red-900'
+                  : 'border-emerald-700/30 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-900'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
@@ -173,10 +173,10 @@ export function BoxesTab() {
                   <BedDouble
                     size={18}
                     className={
-                      'text-foreground'
+                      'text-stone-900 dark:text-stone-100'
                     }
                   />
-                  <p className="font-semibold text-foreground truncate">
+                  <p className="font-semibold text-stone-900 dark:text-stone-100 truncate">
                     {box.name}
                   </p>
                 </div>
@@ -195,22 +195,22 @@ export function BoxesTab() {
                     onClick={() => setDeleting(box)}
                     disabled={box.occupied}
                     title={box.occupied ? 'Box ocupado' : 'Excluir'}
-                    className="text-danger"
+                    className="text-red-600 dark:text-red-500"
                   >
                     <Trash2 size={14} />
                   </Button>
                 </div>
               </div>
               {box.description && (
-                <p className="text-xs text-muted-foreground mt-1 truncate">
+                <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 truncate">
                   {box.description}
                 </p>
               )}
               <p
                 className={`text-xs font-medium mt-2 ${
                   box.occupied
-                    ? 'text-danger'
-                    : 'text-success'
+                    ? 'text-red-600 dark:text-red-500'
+                    : 'text-emerald-700 dark:text-emerald-500'
                 }`}
               >
                 {box.occupied

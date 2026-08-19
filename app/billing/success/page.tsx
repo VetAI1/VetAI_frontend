@@ -39,26 +39,26 @@ export default function BillingSuccessPage() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full bg-background">
+    <main className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
       <section className="mx-auto flex min-h-screen w-full max-w-7xl items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
         <div
-          className="w-full max-w-lg rounded-lg border border-border bg-card p-5 text-center sm:p-6"
+          className="w-full max-w-lg rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 text-center sm:p-6"
           aria-live="polite"
         >
           {confirmed ? (
-            <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
+            <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-700 dark:text-emerald-500" />
           ) : timedOut ? (
-            <AlertTriangle className="mx-auto h-12 w-12 text-warning" />
+            <AlertTriangle className="mx-auto h-12 w-12 text-amber-600 dark:text-amber-400" />
           ) : (
             <div aria-busy="true">
               <span className="sr-only">Confirmando seu pagamento</span>
               <Skeleton className="mx-auto size-12 rounded-full" />
             </div>
           )}
-          <h1 className="mt-4 text-2xl font-bold text-foreground">
+          <h1 className="mt-4 text-2xl font-bold text-stone-900 dark:text-stone-100">
             {confirmed ? 'Pagamento confirmado' : 'Confirmando seu pagamento'}
           </h1>
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
             {confirmed
               ? 'Sua assinatura está ativa e o acesso ao VetAI foi liberado.'
               : timedOut

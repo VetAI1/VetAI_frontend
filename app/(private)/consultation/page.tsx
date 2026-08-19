@@ -206,21 +206,21 @@ export default function Consultation() {
 
   const getSeverityColor = (severity: 'red' | 'yellow' | 'green') => {
     const colors = {
-      red: 'text-danger',
-      yellow: 'text-warning',
-      green: 'text-success',
+      red: 'text-red-600 dark:text-red-500',
+      yellow: 'text-amber-600 dark:text-amber-400',
+      green: 'text-emerald-700 dark:text-emerald-500',
     };
     return colors[severity];
   };
 
   if (isCheckingInProgress) {
     return (
-      <div className="min-h-screen bg-background w-full">
+      <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <Header title="Consulta" showStorage={false} />
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 size={32} className="animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">
+            <Loader2 size={32} className="animate-spin text-teal-800 dark:text-teal-500 mb-4" />
+            <p className="text-stone-500 dark:text-stone-400">
               Verificando consultas...
             </p>
           </div>
@@ -231,7 +231,7 @@ export default function Consultation() {
 
   if (!consultationId) {
     return (
-      <div className="min-h-screen bg-background w-full">
+      <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <Header title="Consulta" showStorage={false} />
           <EmptyState
@@ -244,7 +244,7 @@ export default function Consultation() {
                 <Button
                   onClick={handleNewConsultation}
                   disabled={isCreating}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 h-11"
+                  className="bg-teal-800 dark:bg-teal-500 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 text-white dark:text-stone-950 px-6 h-11"
                 >
                   {isCreating ? (
                     <>
@@ -272,22 +272,22 @@ export default function Consultation() {
   }
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Consulta" showStorage={false} />
 
         {isFinished && summary && (
-          <div className="mb-4 p-4 rounded-lg bg-primary/10 border border-primary/40">
+          <div className="mb-4 p-4 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 border border-teal-800/40 dark:border-teal-500/40">
             <div className="flex items-start gap-3">
               <CheckCircle
                 size={20}
-                className="text-primary mt-0.5"
+                className="text-teal-800 dark:text-teal-500 mt-0.5"
               />
               <div className="flex-1">
-                <h3 className="font-semibold text-primary mb-1">
+                <h3 className="font-semibold text-teal-800 dark:text-teal-500 mb-1">
                   Consulta finalizada
                 </h3>
-                <p className="text-sm text-primary">
+                <p className="text-sm text-teal-800 dark:text-teal-500">
                   {summary}
                 </p>
               </div>
@@ -295,7 +295,7 @@ export default function Consultation() {
             <div className="mt-4 flex gap-2">
               <Button
                 onClick={handleNewConsultation}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="bg-teal-800 dark:bg-teal-500 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 text-white dark:text-stone-950"
                 size="sm"
               >
                 <Plus size={16} /> Nova consulta
@@ -324,7 +324,7 @@ export default function Consultation() {
                       size="sm"
                       onClick={handleFinishClick}
                       disabled={isLoading || isFinishing || messages.length < 3}
-                      className="text-warning border-warning/40 hover:bg-warning-soft"
+                      className="text-amber-600 dark:text-amber-400 border-amber-600/40 dark:border-amber-400/40 hover:bg-amber-50 dark:hover:bg-amber-900"
                     >
                       {isFinishing ? (
                         <>
@@ -346,7 +346,7 @@ export default function Consultation() {
 
                 <div
                   ref={messagesContainerRef}
-                  className="flex-1 overflow-y-auto space-y-4 mb-4 p-4 bg-secondary rounded-lg scrollbar-thin"
+                  className="flex-1 overflow-y-auto space-y-4 mb-4 p-4 bg-stone-100 dark:bg-stone-800 rounded-lg scrollbar-thin"
                 >
                   {messages.map((message) => (
                     <div
@@ -356,8 +356,8 @@ export default function Consultation() {
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                           message.role === 'user'
-                            ? 'bg-primary self-start'
-                            : 'bg-secondary'
+                            ? 'bg-teal-800 dark:bg-teal-500 self-start'
+                            : 'bg-stone-100 dark:bg-stone-800'
                         }`}
                         style={
                           message.role === 'user'
@@ -381,25 +381,25 @@ export default function Consultation() {
                           >
                             <button
                               onClick={() => handleCopyMessage(message.content)}
-                              className="p-1 rounded hover:bg-muted transition-colors"
+                              className="p-1 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                               title="Copiar mensagem"
                             >
                               <Copy
                                 size={12}
-                                className="text-muted-foreground"
+                                className="text-stone-500 dark:text-stone-400"
                               />
                             </button>
                             <button
                               onClick={() =>
                                 handleResendMessage(message.content)
                               }
-                              className="p-1 rounded hover:bg-muted transition-colors"
+                              className="p-1 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                               title="Reenviar mensagem"
                               disabled={isLoading}
                             >
                               <RotateCcw
                                 size={12}
-                                className="text-muted-foreground"
+                                className="text-stone-500 dark:text-stone-400"
                               />
                             </button>
                           </div>
@@ -407,8 +407,8 @@ export default function Consultation() {
                         <div
                           className={`inline-block p-3 rounded-lg ${
                             message.role === 'user'
-                              ? 'bg-primary text-white'
-                              : 'bg-card text-foreground border border-border'
+                              ? 'bg-teal-800 dark:bg-teal-500 text-white'
+                              : 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-stone-800'
                           }`}
                         >
                           {message.role === 'assistant' && message.isTyping ? (
@@ -427,7 +427,7 @@ export default function Consultation() {
                             )}
                         </div>
                         <p
-                          className={`text-xs text-muted-foreground mt-1 px-1 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
+                          className={`text-xs text-stone-500 dark:text-stone-400 mt-1 px-1 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
                         >
                           {message.timestamp.toLocaleTimeString('pt-BR', {
                             hour: '2-digit',
@@ -440,7 +440,7 @@ export default function Consultation() {
                 </div>
 
                 {!isFinished && !isFinishing && (
-                  <div className="border-t border-border pt-4 mt-4">
+                  <div className="border-t border-stone-200 dark:border-stone-800 pt-4 mt-4">
                     <div className="flex items-center gap-2">
                       <Input
                         placeholder="Digite sua mensagem..."
@@ -458,7 +458,7 @@ export default function Consultation() {
                       <Button
                         onClick={handleSendMessage}
                         disabled={isLoading || !inputMessage.trim()}
-                        className="w-9 h-9 bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-9 h-9 bg-teal-800 dark:bg-teal-500 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 text-white dark:text-stone-950 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Send size={17} />
                       </Button>
@@ -493,10 +493,10 @@ export default function Consultation() {
                     return (
                       <div
                         key={`${disease.name}-${index}`}
-                        className={`p-3 border rounded-lg transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-right cursor-pointer hover:bg-secondary/60 ${
+                        className={`p-3 border rounded-lg transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-right cursor-pointer hover:bg-stone-100/60 dark:hover:bg-stone-800/60 ${
                           isMarked
-                            ? 'border-primary/40 bg-primary/10 ring-1 ring-primary/30'
-                            : 'border-border'
+                            ? 'border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10 ring-1 ring-teal-600/30 dark:ring-teal-500/30'
+                            : 'border-stone-200 dark:border-stone-800'
                         }`}
                         style={{ animationDelay: `${index * 50}ms` }}
                         onClick={() => openDiseaseDetail(disease)}
@@ -507,7 +507,7 @@ export default function Consultation() {
                               size={16}
                               className={`mt-0.5 shrink-0 ${getSeverityColor(disease.severity)}`}
                             />
-                            <h4 className="text-sm font-semibold text-foreground truncate">
+                            <h4 className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">
                               {disease.name}
                             </h4>
                           </div>
@@ -520,7 +520,7 @@ export default function Consultation() {
                                     isMarked ? null : index,
                                   );
                                 }}
-                                className={`p-1 rounded transition-colors ${isMarked ? 'text-primary' : 'text-muted-foreground/70 hover:text-primary'}`}
+                                className={`p-1 rounded transition-colors ${isMarked ? 'text-teal-800 dark:text-teal-500' : 'text-stone-500/70 dark:text-stone-400/70 hover:text-teal-800 dark:hover:text-teal-500'}`}
                                 title={
                                   isMarked
                                     ? 'Desmarcar como mais provável'
@@ -537,24 +537,24 @@ export default function Consultation() {
                           </div>
                         </div>
                         {disease.reasoning && (
-                          <p className="text-xs text-muted-foreground mb-2 ml-6 line-clamp-2">
+                          <p className="text-xs text-stone-500 dark:text-stone-400 mb-2 ml-6 line-clamp-2">
                             {disease.reasoning}
                           </p>
                         )}
-                        <div className="w-full bg-muted rounded-full h-2">
+                        <div className="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all duration-500 ${
                               disease.severity === 'red'
-                                ? 'bg-danger'
+                                ? 'bg-red-600 dark:bg-red-500'
                                 : disease.severity === 'yellow'
                                   ? 'bg-yellow-500'
-                                  : 'bg-success'
+                                  : 'bg-emerald-700 dark:bg-emerald-500'
                             }`}
                             style={{ width: `${prob}%` }}
                           />
                         </div>
                         {isMarked && (
-                          <div className="mt-2 flex items-center gap-1 text-xs text-primary font-medium">
+                          <div className="mt-2 flex items-center gap-1 text-xs text-teal-800 dark:text-teal-500 font-medium">
                             <Star size={10} fill="currentColor" /> Marcada como
                             mais provável
                           </div>
@@ -575,10 +575,10 @@ export default function Consultation() {
                   {suggestedTreatments.map((treatment, index) => (
                     <div
                       key={index}
-                      className="p-3 border border-border rounded-lg animate-in fade-in slide-in-from-right"
+                      className="p-3 border border-stone-200 dark:border-stone-800 rounded-lg animate-in fade-in slide-in-from-right"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <p className="text-sm text-secondary-foreground">
+                      <p className="text-sm text-stone-800 dark:text-stone-100">
                         {treatment}
                       </p>
                     </div>
@@ -602,15 +602,15 @@ export default function Consultation() {
                   suggestedInfo.map((info, index) => (
                     <div
                       key={index}
-                      className="p-3 border border-border rounded-lg bg-secondary animate-in fade-in slide-in-from-right"
+                      className="p-3 border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-100 dark:bg-stone-800 animate-in fade-in slide-in-from-right"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <div className="flex items-start gap-2">
                         <Info
                           size={14}
-                          className="text-primary mt-0.5 shrink-0"
+                          className="text-teal-800 dark:text-teal-500 mt-0.5 shrink-0"
                         />
-                        <p className="text-sm text-secondary-foreground">
+                        <p className="text-sm text-stone-800 dark:text-stone-100">
                           {info}
                         </p>
                       </div>

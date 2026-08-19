@@ -76,13 +76,13 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
   };
 
   return (
-    <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-xl bg-card shadow-2xl">
-      <div className="flex shrink-0 items-center justify-between border-b border-border p-5">
+    <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-xl bg-white dark:bg-stone-900 shadow-2xl">
+      <div className="flex shrink-0 items-center justify-between border-b border-stone-200 dark:border-stone-800 p-5">
         <div>
-          <h2 className="text-lg font-bold text-foreground">
+          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
             {isEdit ? 'Editar Tutor' : 'Novo Tutor'}
           </h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
             {isEdit ? 'Atualize os dados do tutor' : 'Cadastre um novo tutor'}
           </p>
         </div>
@@ -90,7 +90,7 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
           variant="ghost"
           size="icon-sm"
           onClick={onClose}
-          className="text-muted-foreground"
+          className="text-stone-500 dark:text-stone-400"
         >
           <X size={18} />
         </Button>
@@ -179,14 +179,14 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
         />
       </div>
 
-      <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border px-5 py-4">
+      <div className="flex shrink-0 items-center justify-end gap-3 border-t border-stone-200 dark:border-stone-800 px-5 py-4">
         <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
         </Button>
         <Button
           onClick={handleSubmit(onSubmit)}
           loading={saving}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[100px]"
+          className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 min-w-[100px]"
         >
           {isEdit ? 'Salvar' : 'Cadastrar'}
         </Button>

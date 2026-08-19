@@ -153,46 +153,46 @@ export default function SchedulePage() {
       : formatWeekRange(weekStart);
 
   return (
-    <main className="min-h-screen w-full bg-background">
+    <main className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Agendamentos" showStorage={false} />
 
         <div className="flex flex-col gap-4 xl:flex-row">
-          <div className="flex-1 rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
+          <div className="flex-1 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-sm sm:p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-1">
                 <button
                   onClick={prevPeriod}
-                  className="rounded-md p-2 transition-colors hover:bg-secondary"
+                  className="rounded-md p-2 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
                 >
                   <ChevronLeft
                     size={18}
-                    className="text-muted-foreground"
+                    className="text-stone-500 dark:text-stone-400"
                   />
                 </button>
 
-                <h2 className="min-w-40 text-center text-base font-bold text-foreground">
+                <h2 className="min-w-40 text-center text-base font-bold text-stone-900 dark:text-stone-100">
                   {periodLabel}
                 </h2>
 
                 <button
                   onClick={nextPeriod}
-                  className="rounded-md p-2 transition-colors hover:bg-secondary"
+                  className="rounded-md p-2 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
                 >
                   <ChevronRight
                     size={18}
-                    className="text-muted-foreground"
+                    className="text-stone-500 dark:text-stone-400"
                   />
                 </button>
               </div>
 
-              <div className="flex shrink-0 items-center overflow-hidden rounded-lg border border-border">
+              <div className="flex shrink-0 items-center overflow-hidden rounded-lg border border-stone-200 dark:border-stone-800">
                 <button
                   onClick={() => handleSwitchView('month')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${
                     viewMode === 'month'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-secondary/60'
+                      ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950'
+                      : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100/60 dark:hover:bg-stone-800/60'
                   }`}
                 >
                   <LayoutGrid size={13} />
@@ -200,10 +200,10 @@ export default function SchedulePage() {
                 </button>
                 <button
                   onClick={() => handleSwitchView('week')}
-                  className={`flex items-center gap-1.5 border-l border-border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  className={`flex items-center gap-1.5 border-l border-stone-200 dark:border-stone-800 px-3 py-1.5 text-xs font-semibold transition-colors ${
                     viewMode === 'week'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-secondary/60'
+                      ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950'
+                      : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100/60 dark:hover:bg-stone-800/60'
                   }`}
                 >
                   <CalendarDays size={13} />
@@ -237,14 +237,14 @@ export default function SchedulePage() {
               <Button
                 disabled={loadingEvents}
                 onClick={() => handleAddClick(selectedDate)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
               >
                 <Plus size={16} /> Novo evento
               </Button>
             </div>
           </div>
 
-          <div className="w-full rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6 xl:sticky xl:top-6 xl:h-fit xl:w-80">
+          <div className="w-full rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-sm sm:p-6 xl:sticky xl:top-6 xl:h-fit xl:w-80">
             <TodayEventsList
               date={selectedDate}
               events={selectedEvents}

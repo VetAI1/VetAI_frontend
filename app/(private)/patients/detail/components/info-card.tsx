@@ -8,24 +8,24 @@ import { Card } from '@/app/components/common/card';
 // paciente vivo, sem chip e sem sexo informado fica quase todo neutro.
 const TONES = {
   accent: {
-    badge: 'bg-primary/10',
-    icon: 'text-primary',
+    badge: 'bg-teal-800/10 dark:bg-teal-500/10',
+    icon: 'text-teal-800 dark:text-teal-500',
   },
   neutral: {
-    badge: 'bg-secondary',
-    icon: 'text-muted-foreground',
+    badge: 'bg-stone-100 dark:bg-stone-800',
+    icon: 'text-stone-500 dark:text-stone-400',
   },
   positive: {
-    badge: 'bg-success-soft',
-    icon: 'text-success',
+    badge: 'bg-emerald-50 dark:bg-emerald-900',
+    icon: 'text-emerald-700 dark:text-emerald-500',
   },
   danger: {
-    badge: 'bg-danger-soft',
-    icon: 'text-danger',
+    badge: 'bg-red-50 dark:bg-red-900',
+    icon: 'text-red-600 dark:text-red-500',
   },
   male: {
-    badge: 'bg-info-soft',
-    icon: 'text-info',
+    badge: 'bg-sky-50 dark:bg-sky-900',
+    icon: 'text-sky-700 dark:text-sky-500',
   },
   female: {
     badge: 'bg-pink-50 dark:bg-pink-950/50',
@@ -64,11 +64,11 @@ export function InfoCard({
         <Icon size={16} className={icon} />
       </div>
       <div className="min-w-0 pl-2">
-        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-xs text-stone-500 dark:text-stone-400">{label}</p>
         {value}
         {sub && (
           <div
-            className={`text-xs text-muted-foreground${typeof sub === 'string' ? ' truncate' : ''}`}
+            className={`text-xs text-stone-500 dark:text-stone-400${typeof sub === 'string' ? ' truncate' : ''}`}
           >
             {sub}
           </div>

@@ -98,7 +98,7 @@ export default function TutorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Tutores" showStorage={false} />
 
@@ -116,7 +116,7 @@ export default function TutorsPage() {
               onClick={() => {
                 openTutorModal();
               }}
-              className="bg-primary h-10 text-primary-foreground hover:bg-primary/90"
+              className="bg-teal-800 dark:bg-teal-500 h-10 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={18} /> Novo Tutor
             </Button>
@@ -154,53 +154,53 @@ export default function TutorsPage() {
               tutors.map((tutor) => (
                 <tr
                   key={tutor.id}
-                  className="hover:bg-secondary/60 transition-colors"
+                  className="hover:bg-stone-100/60 dark:hover:bg-stone-800/60 transition-colors"
                 >
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
                         <User
                           size={16}
-                          className="text-primary"
+                          className="text-teal-800 dark:text-teal-500"
                         />
                       </div>
-                      <p className="font-medium text-foreground">
+                      <p className="font-medium text-stone-900 dark:text-stone-100">
                         {tutor.name}
                       </p>
                     </div>
                   </td>
-                  <td className="p-4 text-muted-foreground">
+                  <td className="p-4 text-stone-500 dark:text-stone-400">
                     {tutor.cpf ?? (
-                      <span className="text-muted-foreground/70">
+                      <span className="text-stone-500/70 dark:text-stone-400/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-muted-foreground">
+                  <td className="p-4 text-stone-500 dark:text-stone-400">
                     {tutor.phone ? (
                       <span className="flex items-center gap-1.5">
-                        <Phone size={13} className="text-muted-foreground/70" />
+                        <Phone size={13} className="text-stone-500/70 dark:text-stone-400/70" />
                         {formatPhone(tutor.phone)}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground/70">
+                      <span className="text-stone-500/70 dark:text-stone-400/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-muted-foreground">
+                  <td className="p-4 text-stone-500 dark:text-stone-400">
                     {tutor.email ? (
                       <span className="flex items-center gap-1.5">
-                        <Mail size={13} className="text-muted-foreground/70" />
+                        <Mail size={13} className="text-stone-500/70 dark:text-stone-400/70" />
                         {tutor.email}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground/70">
+                      <span className="text-stone-500/70 dark:text-stone-400/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-muted-foreground">
+                  <td className="p-4 text-stone-500 dark:text-stone-400">
                     {new Date(tutor.created_at).toLocaleDateString('pt-BR')}
                   </td>
                   <td className="py-3 px-4">
@@ -211,7 +211,7 @@ export default function TutorsPage() {
                           size="icon-sm"
                           title="Ver detalhes"
                         >
-                          <Eye size={15} className="text-primary" />
+                          <Eye size={15} className="text-teal-800 dark:text-teal-500" />
                         </Button>
                       </Link>
                       <Button
@@ -222,7 +222,7 @@ export default function TutorsPage() {
                       >
                         <Pencil
                           size={15}
-                          className="text-muted-foreground"
+                          className="text-stone-500 dark:text-stone-400"
                         />
                       </Button>
                       <Button
@@ -235,10 +235,10 @@ export default function TutorsPage() {
                         {deletingId === tutor.id ? (
                           <Loader2
                             size={15}
-                            className="animate-spin text-danger"
+                            className="animate-spin text-red-600 dark:text-red-500"
                           />
                         ) : (
-                          <Trash2 size={15} className="text-danger" />
+                          <Trash2 size={15} className="text-red-600 dark:text-red-500" />
                         )}
                       </Button>
                     </div>

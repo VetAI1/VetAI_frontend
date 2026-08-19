@@ -315,7 +315,7 @@ export function PatientDetailContent() {
       {/* Info cards skeleton */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-2 p-3 rounded-xl border border-border">
+          <div key={i} className="flex flex-col gap-2 p-3 rounded-xl border border-stone-200 dark:border-stone-800">
             <Skeleton className="w-7 h-7 rounded-lg" />
             <Skeleton className="h-3 w-16" />
             <Skeleton className="h-4 w-24" />
@@ -325,7 +325,7 @@ export function PatientDetailContent() {
       </div>
       {/* Sections skeleton */}
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-xl border border-border p-5 flex flex-col gap-3">
+        <div key={i} className="rounded-xl border border-stone-200 dark:border-stone-800 p-5 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1.5">
               <Skeleton className="h-4 w-32" />
@@ -352,8 +352,8 @@ export function PatientDetailContent() {
 
   if (!patient) return (
     <div className="text-center py-20">
-      <PawPrint size={48} className="text-muted-foreground/50 mx-auto mb-4" />
-      <p className="text-muted-foreground">Paciente não encontrado.</p>
+      <PawPrint size={48} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-4" />
+      <p className="text-stone-500 dark:text-stone-400">Paciente não encontrado.</p>
       <Link href="/patients" className="mt-4 inline-block">
         <Button variant="outline">Voltar</Button>
       </Link>
@@ -373,8 +373,8 @@ export function PatientDetailContent() {
           <Button variant="ghost" size="icon"><ArrowLeft size={20} /></Button>
         </Link>
         <div className="flex-1">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{patient.name}</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-100 sm:text-3xl">{patient.name}</h2>
+          <p className="text-sm text-stone-500 dark:text-stone-400">
             {SPECIE_LABELS[patient.specie] ?? patient.specie}{patient.breed && ` · ${patient.breed}`}
           </p>
         </div>
@@ -384,26 +384,26 @@ export function PatientDetailContent() {
             Orçamento
           </Button>
           <Button variant="outline" size="icon" onClick={() => setShowEditModal(true)} title="Editar"><Pencil size={16} /></Button>
-          <Button variant="outline" size="icon" onClick={() => setShowDeleteConfirm(true)} title="Excluir" className="text-danger hover:bg-danger-soft border-danger/30">
+          <Button variant="outline" size="icon" onClick={() => setShowDeleteConfirm(true)} title="Excluir" className="text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900 border-red-600/30 dark:border-red-500/30">
             <Trash2 size={16} />
           </Button>
         </div>
       </div>
 
       {patient.restrictions && patient.restrictions.length > 0 && (
-        <div className="mb-6 flex items-start gap-3 rounded-xl border border-l-4 border-danger/30 border-l-danger bg-danger-soft/70 px-4 py-3">
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-l-4 border-red-600/30 dark:border-red-500/30 border-l-danger bg-red-50/70 dark:bg-red-900/70 px-4 py-3">
           <AlertTriangle
             size={18}
-            className="mt-px shrink-0 text-danger"
+            className="mt-px shrink-0 text-red-600 dark:text-red-500"
           />
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1.5">
-            <span className="text-sm font-semibold text-danger">
+            <span className="text-sm font-semibold text-red-600 dark:text-red-500">
               Restrições
             </span>
             {patient.restrictions.map((restriction) => (
               <span
                 key={restriction}
-                className="rounded-md border border-danger/30 bg-card px-2 py-0.5 text-xs font-medium text-danger"
+                className="rounded-md border border-red-600/30 dark:border-red-500/30 bg-white dark:bg-stone-900 px-2 py-0.5 text-xs font-medium text-red-600 dark:text-red-500"
               >
                 {capitalize(restriction)}
               </span>
@@ -416,7 +416,7 @@ export function PatientDetailContent() {
         <InfoCard
           icon={PawPrint}
           label="Espécie / Raça"
-          value={<p className="text-sm font-semibold text-foreground truncate">{SPECIE_LABELS[patient.specie] ?? patient.specie}</p>}
+          value={<p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">{SPECIE_LABELS[patient.specie] ?? patient.specie}</p>}
           sub={patient.breed}
         />
         <InfoCard
@@ -425,8 +425,8 @@ export function PatientDetailContent() {
           label="Nascimento"
           value={
             birthDateObj
-              ? <p className="text-sm font-semibold text-foreground">{birthDateObj.toLocaleDateString('pt-BR')}</p>
-              : <p className="text-sm text-muted-foreground/70">Não informado</p>
+              ? <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{birthDateObj.toLocaleDateString('pt-BR')}</p>
+              : <p className="text-sm text-stone-500/70 dark:text-stone-400/70">Não informado</p>
           }
           sub={birthDateObj ? calcAge(birthDateObj) : undefined}
         />
@@ -440,21 +440,21 @@ export function PatientDetailContent() {
                 : 'neutral'
           }
           label="Sexo"
-          value={<p className="text-sm font-semibold text-foreground">{patient.sex === 'MALE' ? 'Macho' : patient.sex === 'FEMALE' ? 'Fêmea' : 'Não informado'}</p>}
+          value={<p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{patient.sex === 'MALE' ? 'Macho' : patient.sex === 'FEMALE' ? 'Fêmea' : 'Não informado'}</p>}
           sub={patient.castration_date ? `Castrado em ${fmtDate(patient.castration_date)}` : 'Não castrado'}
         />
         <InfoCard
           icon={Cpu}
           tone={patient.microchip ? 'positive' : 'neutral'}
           label="Microchip"
-          value={<p className="text-sm font-semibold text-foreground">{patient.microchip ? 'Sim' : 'N/A'}</p>}
+          value={<p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{patient.microchip ? 'Sim' : 'N/A'}</p>}
           sub={patient.microchip ?? 'Não cadastrado'}
         />
         <InfoCard
           icon={Skull}
           tone={patient.death_date ? 'danger' : 'neutral'}
           label="Falecimento"
-          value={<p className="text-sm font-semibold text-foreground">{patient.death_date ? 'Sim' : 'N/A'}</p>}
+          value={<p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{patient.death_date ? 'Sim' : 'N/A'}</p>}
           sub={patient.death_date ? fmtDate(patient.death_date) : undefined}
         />
         <InfoCard
@@ -464,8 +464,8 @@ export function PatientDetailContent() {
           className="lg:col-span-2"
           value={
             tutor
-              ? <p className="text-sm font-semibold text-foreground truncate">{tutor.name}</p>
-              : <p className="text-sm text-muted-foreground/70">Não informado</p>
+              ? <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">{tutor.name}</p>
+              : <p className="text-sm text-stone-500/70 dark:text-stone-400/70">Não informado</p>
           }
           sub={
             tutor?.phone || tutor?.address ? (
@@ -479,7 +479,7 @@ export function PatientDetailContent() {
                         target="_blank"
                         rel="noopener noreferrer"
                         title={`Conversar com ${tutor.name} no WhatsApp`}
-                        className="shrink-0 text-success hover:text-success"
+                        className="shrink-0 text-emerald-700 dark:text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-500"
                       >
                         <WhatsAppIcon size={14} />
                       </a>
@@ -502,8 +502,8 @@ export function PatientDetailContent() {
       >
         {upcomingEvents.length === 0 ? (
           <div className="py-6 text-center">
-            <CalendarClock size={32} className="text-muted-foreground/50 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">Nenhuma atividade agendada.</p>
+            <CalendarClock size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+            <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma atividade agendada.</p>
           </div>
         ) : (
           <div className="divide-y divide-border">
@@ -517,8 +517,8 @@ export function PatientDetailContent() {
                 <div key={ev.id} className="flex items-center gap-3 py-3 px-1">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${typeStyle.dot}`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{ev.title}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{ev.title}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
                       {dateLabel} · {ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}
                     </p>
                   </div>
@@ -534,7 +534,7 @@ export function PatientDetailContent() {
 
       <SectionCard title="Exames" subtitle="Exames vinculados a este paciente" className="mb-6"
         headerAction={
-          <Button onClick={() => setShowUploadModal(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+          <Button onClick={() => setShowUploadModal(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
             <Plus size={16} /> Adicionar Exame
           </Button>
         }
@@ -554,20 +554,20 @@ export function PatientDetailContent() {
           </div>
         ) : exams.length === 0 ? (
           <div className="py-8 text-center">
-            <Microscope size={32} className="text-muted-foreground/50 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">Nenhum exame encontrado.</p>
+            <Microscope size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+            <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum exame encontrado.</p>
           </div>
         ) : (
           <div className="divide-y divide-border">
             {exams.map((exam) => (
               <div key={exam.id} className="flex items-center justify-between py-3 px-1 gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-info-soft flex items-center justify-center shrink-0">
-                    <Microscope size={15} className="text-info" />
+                  <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                    <Microscope size={15} className="text-sky-700 dark:text-sky-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{exam.title ?? 'Exame'}</p>
-                    <p className="text-xs text-muted-foreground">{exam.examDate ? fmtDate(exam.examDate) : fmtDate(exam.created_at)}</p>
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{exam.title ?? 'Exame'}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">{exam.examDate ? fmtDate(exam.examDate) : fmtDate(exam.created_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -581,7 +581,7 @@ export function PatientDetailContent() {
               </div>
             ))}
             <div className="pt-3 pb-1 text-center">
-              <Link href="/exams" className="text-xs text-primary hover:underline underline-offset-2">Ver todos os exames →</Link>
+              <Link href="/exams" className="text-xs text-teal-800 dark:text-teal-500 hover:underline underline-offset-2">Ver todos os exames →</Link>
             </div>
           </div>
         )}
@@ -590,7 +590,7 @@ export function PatientDetailContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <SectionCard title="Histórico de Pesos" subtitle="Acompanhe a evolução do peso"
           headerAction={
-            <Button onClick={() => setShowAddWeight(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+            <Button onClick={() => setShowAddWeight(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Registrar Peso
             </Button>
           }
@@ -610,8 +610,8 @@ export function PatientDetailContent() {
             </div>
           ) : weightRecords.length === 0 ? (
             <div className="py-8 text-center">
-              <Scale size={32} className="text-muted-foreground/50 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Nenhum registro de peso.</p>
+              <Scale size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum registro de peso.</p>
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -620,13 +620,13 @@ export function PatientDetailContent() {
                 return (
                   <div key={rec.id} className="flex items-center justify-between py-3 px-1 gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                        <Scale size={15} className="text-primary" />
+                      <div className="w-8 h-8 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
+                        <Scale size={15} className="text-teal-800 dark:text-teal-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-foreground">{meta.value} {meta.unit === 'KG' ? 'kg' : 'g'}</p>
-                        <p className="text-xs text-muted-foreground">{fmtDate(rec.date)}{byAuthor(rec)}</p>
-                        {rec.notes && <p className="text-xs text-muted-foreground/70 mt-0.5">{rec.notes}</p>}
+                        <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{meta.value} {meta.unit === 'KG' ? 'kg' : 'g'}</p>
+                        <p className="text-xs text-stone-500 dark:text-stone-400">{fmtDate(rec.date)}{byAuthor(rec)}</p>
+                        {rec.notes && <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5">{rec.notes}</p>}
                       </div>
                     </div>
                     <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchWeights) })} />
@@ -639,7 +639,7 @@ export function PatientDetailContent() {
 
         <SectionCard title="Registros Clínicos" subtitle="Mais recentes no topo"
           headerAction={
-            <Button onClick={() => setShowAddClinicalNote(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+            <Button onClick={() => setShowAddClinicalNote(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Novo Registro
             </Button>
           }
@@ -647,7 +647,7 @@ export function PatientDetailContent() {
           {clinicalLoading ? (
             <div className="flex flex-col gap-3 py-2">
               {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="p-4 rounded-xl border border-border flex flex-col gap-2">
+                <div key={i} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-4 w-36" />
                     <Skeleton className="h-3 w-20 ml-auto" />
@@ -659,8 +659,8 @@ export function PatientDetailContent() {
             </div>
           ) : clinicalNotes.length === 0 ? (
             <div className="py-8 text-center">
-              <FileText size={32} className="text-muted-foreground/50 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Nenhum registro clínico.</p>
+              <FileText size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum registro clínico.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -671,10 +671,10 @@ export function PatientDetailContent() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-semibold text-foreground truncate">{meta.title}</p>
-                          <span className="text-xs text-muted-foreground/70 shrink-0">{fmtDate(rec.date)}{byAuthor(rec)}</span>
+                          <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">{meta.title}</p>
+                          <span className="text-xs text-stone-500/70 dark:text-stone-400/70 shrink-0">{fmtDate(rec.date)}{byAuthor(rec)}</span>
                         </div>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{meta.description}</p>
+                        <p className="text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap">{meta.description}</p>
                       </div>
                       <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchClinicalNotes) })} />
                     </div>
@@ -689,7 +689,7 @@ export function PatientDetailContent() {
       <div className="space-y-4 mb-6">
         <SectionCard title="Vacinas" subtitle="Histórico de vacinação"
           headerAction={
-            <Button onClick={() => setShowAddVaccine(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+            <Button onClick={() => setShowAddVaccine(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Registrar Vacina
             </Button>
           }
@@ -697,7 +697,7 @@ export function PatientDetailContent() {
           {vaccinesLoading ? (
             <div className="flex flex-col gap-2 py-2">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3 py-2 border-b border-border/70 last:border-0">
+                <div key={i} className="flex items-center gap-3 py-2 border-b border-stone-200/70 dark:border-stone-800/70 last:border-0">
                   <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
                   <div className="flex flex-col gap-1.5 flex-1">
                     <Skeleton className="h-3.5 w-36" />
@@ -710,16 +710,16 @@ export function PatientDetailContent() {
             </div>
           ) : vaccines.length === 0 ? (
             <div className="py-8 text-center">
-              <Syringe size={32} className="text-muted-foreground/50 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Nenhuma vacina registrada.</p>
+              <Syringe size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma vacina registrada.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border">
+                  <tr className="border-b border-stone-200 dark:border-stone-800">
                     {['Vacina', 'Data', 'Dose', 'Lote', 'Próx. Revacinação', 'Dose Anterior', 'Aplicado por', ''].map((h) => (
-                      <th key={h} className="text-left py-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
+                      <th key={h} className="text-left py-2 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -727,28 +727,28 @@ export function PatientDetailContent() {
                   {vaccines.map((rec) => {
                     const meta = rec.metadata as VaccineMetadata;
                     return (
-                      <tr key={rec.id} className="hover:bg-secondary/60 transition-colors">
+                      <tr key={rec.id} className="hover:bg-stone-100/60 dark:hover:bg-stone-800/60 transition-colors">
                         <td className="py-3 px-3">
                           <div className="flex items-center gap-2">
-                            <ShieldCheck size={14} className="text-success shrink-0" />
+                            <ShieldCheck size={14} className="text-emerald-700 dark:text-emerald-500 shrink-0" />
                             <div>
-                              <p className="font-medium text-foreground">{meta.vaccine_name}</p>
-                              <p className="text-xs font-mono text-muted-foreground/70">{meta.vaccine_code}</p>
+                              <p className="font-medium text-stone-900 dark:text-stone-100">{meta.vaccine_name}</p>
+                              <p className="text-xs font-mono text-stone-500/70 dark:text-stone-400/70">{meta.vaccine_code}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-3 text-muted-foreground whitespace-nowrap">{fmtDate(rec.date)}<span className="block text-[11px] text-muted-foreground/70">{rec.recorded_by?.name ?? '—'}</span></td>
+                        <td className="py-3 px-3 text-stone-500 dark:text-stone-400 whitespace-nowrap">{fmtDate(rec.date)}<span className="block text-[11px] text-stone-500/70 dark:text-stone-400/70">{rec.recorded_by?.name ?? '—'}</span></td>
                         <td className="py-3 px-3">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-info-soft text-info">{meta.dose_number}</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500">{meta.dose_number}</span>
                         </td>
-                        <td className="py-3 px-3 text-xs font-mono text-muted-foreground">{meta.batch ?? '—'}</td>
-                        <td className="py-3 px-3 text-xs text-muted-foreground whitespace-nowrap">
+                        <td className="py-3 px-3 text-xs font-mono text-stone-500 dark:text-stone-400">{meta.batch ?? '—'}</td>
+                        <td className="py-3 px-3 text-xs text-stone-500 dark:text-stone-400 whitespace-nowrap">
                           {meta.revaccination_date ? fmtDate(meta.revaccination_date) : '—'}
                         </td>
-                        <td className="py-3 px-12 text-xs text-muted-foreground whitespace-nowrap">
+                        <td className="py-3 px-12 text-xs text-stone-500 dark:text-stone-400 whitespace-nowrap">
                           {meta.previous_dose_date ? fmtDate(meta.previous_dose_date) : '—'}
                         </td>
-                        <td className="py-3 px-3 text-xs text-muted-foreground">{meta.applied_by ?? '—'}</td>
+                        <td className="py-3 px-3 text-xs text-stone-500 dark:text-stone-400">{meta.applied_by ?? '—'}</td>
                         <td className="py-3 text-end px-3"><DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchVaccines) })} /></td>
                       </tr>
                     );
@@ -761,7 +761,7 @@ export function PatientDetailContent() {
 
         <SectionCard title="Receituário" subtitle="Receitas e prescrições"
           headerAction={
-            <Button onClick={() => setShowAddPrescription(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+            <Button onClick={() => setShowAddPrescription(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Nova Receita
             </Button>
           }
@@ -769,12 +769,12 @@ export function PatientDetailContent() {
           {prescriptionsLoading ? (
             <div className="flex flex-col gap-3 py-2">
               {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="p-4 rounded-xl border border-border flex flex-col gap-2">
+                <div key={i} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 flex flex-col gap-2">
                   <div className="flex items-center gap-2 mb-1">
                     <Skeleton className="h-4 w-20" />
                     <Skeleton className="h-3 w-24 ml-auto" />
                   </div>
-                  <div className="pl-3 border-l-2 border-border flex flex-col gap-1.5">
+                  <div className="pl-3 border-l-2 border-stone-200 dark:border-stone-800 flex flex-col gap-1.5">
                     <Skeleton className="h-3.5 w-40" />
                     <Skeleton className="h-3 w-56" />
                   </div>
@@ -783,8 +783,8 @@ export function PatientDetailContent() {
             </div>
           ) : prescriptions.length === 0 ? (
             <div className="py-8 text-center">
-              <ClipboardList size={32} className="text-muted-foreground/50 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Nenhuma receita registrada.</p>
+              <ClipboardList size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma receita registrada.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -798,29 +798,29 @@ export function PatientDetailContent() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <ClipboardList size={15} className="text-primary shrink-0" />
-                          <span className="text-sm font-semibold text-foreground">
+                          <ClipboardList size={15} className="text-teal-800 dark:text-teal-500 shrink-0" />
+                          <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">
                             {meta.include_date ? fmtDate(rec.date) : 'Receita'}
                           </span>
                           {!meta.include_date && (
-                            <span className="text-xs text-muted-foreground/70">{fmtDate(rec.date)}{byAuthor(rec)}</span>
+                            <span className="text-xs text-stone-500/70 dark:text-stone-400/70">{fmtDate(rec.date)}{byAuthor(rec)}</span>
                           )}
                         </div>
                         <div className="space-y-2">
                           {(meta.medications ?? []).map((med, i) => (
-                            <div key={i} className="pl-3 border-l-2 border-primary/40">
-                              <p className="text-sm font-medium text-foreground">
-                                <Pill size={12} className="inline mr-1.5 text-primary" />
+                            <div key={i} className="pl-3 border-l-2 border-teal-800/40 dark:border-teal-500/40">
+                              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                                <Pill size={12} className="inline mr-1.5 text-teal-800 dark:text-teal-500" />
                                 {med.drug}
-                                {med.form && <span className="text-muted-foreground font-normal"> · {med.form}</span>}
-                                {med.quantity && <span className="text-muted-foreground font-normal"> · {med.quantity}</span>}
+                                {med.form && <span className="text-stone-500 dark:text-stone-400 font-normal"> · {med.form}</span>}
+                                {med.quantity && <span className="text-stone-500 dark:text-stone-400 font-normal"> · {med.quantity}</span>}
                               </p>
                               {med.usage && (
-                                <span className="inline-block text-[10px] font-medium text-primary bg-primary/10 rounded px-1.5 py-0.5 mt-0.5">
+                                <span className="inline-block text-[10px] font-medium text-teal-800 dark:text-teal-500 bg-teal-800/10 dark:bg-teal-500/10 rounded px-1.5 py-0.5 mt-0.5">
                                   {med.usage}
                                 </span>
                               )}
-                              <p className="text-xs text-muted-foreground mt-0.5">{med.posology}</p>
+                              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{med.posology}</p>
                             </div>
                           ))}
                         </div>
@@ -848,7 +848,7 @@ export function PatientDetailContent() {
                               });
                             });
                           }}
-                          className="text-muted-foreground/70 hover:text-primary hover:bg-primary/10"
+                          className="text-stone-500/70 dark:text-stone-400/70 hover:text-teal-800 dark:hover:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10"
                         >
                           <FileText size={14} />
                         </Button>
@@ -866,7 +866,7 @@ export function PatientDetailContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionCard title="Notas e Observações" subtitle="Observações gerais sobre o paciente"
           headerAction={
-            <Button onClick={() => setShowAddNote(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+            <Button onClick={() => setShowAddNote(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Nova Nota
             </Button>
           }
@@ -886,8 +886,8 @@ export function PatientDetailContent() {
             </div>
           ) : notes.length === 0 ? (
             <div className="py-8 text-center">
-              <StickyNote size={32} className="text-muted-foreground/50 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Nenhuma nota registrada.</p>
+              <StickyNote size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma nota registrada.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -898,8 +898,8 @@ export function PatientDetailContent() {
                     <div className="flex items-start gap-3">
                       <StickyNote size={16} className="text-yellow-500 shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-secondary-foreground whitespace-pre-wrap">{meta.text}</p>
-                        <p className="text-xs text-muted-foreground/70 mt-1">{fmtDateTime(rec.created_at)}{byAuthor(rec)}</p>
+                        <p className="text-sm text-stone-800 dark:text-stone-100 whitespace-pre-wrap">{meta.text}</p>
+                        <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-1">{fmtDateTime(rec.created_at)}{byAuthor(rec)}</p>
                       </div>
                       <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchNotes) })} />
                     </div>
@@ -914,7 +914,7 @@ export function PatientDetailContent() {
           headerAction={
             <>
               <input ref={fileInputRef} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleUploadDocument(f); e.target.value = ''; }} />
-              <Button onClick={() => fileInputRef.current?.click()} disabled={uploadingDoc} className="bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+              <Button onClick={() => fileInputRef.current?.click()} disabled={uploadingDoc} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
                 {uploadingDoc ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                 Enviar Documento
               </Button>
@@ -937,24 +937,24 @@ export function PatientDetailContent() {
             </div>
           ) : documents.length === 0 ? (
             <div
-              className="py-10 border-2 border-dashed border-border rounded-lg text-center cursor-pointer hover:border-primary/40 transition-colors"
+              className="py-10 border-2 border-dashed border-stone-200 dark:border-stone-800 rounded-lg text-center cursor-pointer hover:border-teal-800/40 dark:hover:border-teal-500/40 transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
-              <Upload size={32} className="text-muted-foreground/50 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Clique para enviar um documento</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">PDF, imagens, etc.</p>
+              <Upload size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Clique para enviar um documento</p>
+              <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-1">PDF, imagens, etc.</p>
             </div>
           ) : (
             <div className="divide-y divide-border">
               {documents.map((doc) => (
                 <div key={doc.id} className="flex items-center justify-between py-3 px-1 gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                      <FileText size={15} className="text-muted-foreground" />
+                    <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0">
+                      <FileText size={15} className="text-stone-500 dark:text-stone-400" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{doc.fileName}</p>
-                      <p className="text-xs text-muted-foreground">{fmtDate(doc.created_at)}</p>
+                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{doc.fileName}</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400">{fmtDate(doc.created_at)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -963,7 +963,7 @@ export function PatientDetailContent() {
                       size="icon-sm"
                       onClick={() => { void handleViewDocument(doc); }}
                       disabled={loadingDocId === doc.id}
-                      className="text-muted-foreground/70 hover:text-primary hover:bg-primary/10"
+                      className="text-stone-500/70 dark:text-stone-400/70 hover:text-teal-800 dark:hover:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10"
                       title={doc.mimeType.startsWith('image/') || doc.mimeType.includes('pdf') ? 'Visualizar' : 'Baixar'}
                     >
                       {loadingDocId === doc.id
@@ -976,7 +976,7 @@ export function PatientDetailContent() {
                       variant="ghost"
                       size="icon-sm"
                       onClick={() => setDeleteConfirm({ onConfirm: () => handleDeleteDocument(doc.id) })}
-                      className="text-muted-foreground/70 hover:text-danger hover:bg-danger-soft"
+                      className="text-stone-500/70 dark:text-stone-400/70 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
                     >
                       <Trash2 size={14} />
                     </Button>
@@ -990,18 +990,18 @@ export function PatientDetailContent() {
 
       {viewingDoc && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black/80">
-          <div className="flex items-center justify-between px-4 py-3 bg-primary shrink-0">
-            <p className="text-primary-foreground font-medium text-sm truncate">{viewingDoc.fileName}</p>
+          <div className="flex items-center justify-between px-4 py-3 bg-teal-800 dark:bg-teal-500 shrink-0">
+            <p className="text-white dark:text-stone-950 font-medium text-sm truncate">{viewingDoc.fileName}</p>
             <div className="flex items-center gap-1 shrink-0">
               <a
                 href={viewingDoc.url}
                 download={viewingDoc.fileName}
                 title="Baixar"
-                className="inline-flex items-center justify-center rounded-md h-7 w-7 text-primary-foreground/90 hover:text-primary-foreground hover:bg-primary transition-colors"
+                className="inline-flex items-center justify-center rounded-md h-7 w-7 text-white/90 dark:text-stone-950/90 hover:text-white dark:hover:text-stone-950 hover:bg-teal-800 dark:hover:bg-teal-500 transition-colors"
               >
                 <Download size={16} />
               </a>
-              <Button variant="ghost" size="icon-sm" onClick={closeDocViewer} className="text-primary-foreground/90 hover:text-primary-foreground hover:bg-primary">
+              <Button variant="ghost" size="icon-sm" onClick={closeDocViewer} className="text-white/90 dark:text-stone-950/90 hover:text-white dark:hover:text-stone-950 hover:bg-teal-800 dark:hover:bg-teal-500">
                 <X size={18} />
               </Button>
             </div>

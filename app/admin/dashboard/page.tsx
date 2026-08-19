@@ -98,12 +98,12 @@ export default function AdminDashboard() {
             data?.collaborators_activity.map((item) => (
               <tr
                 key={item.id}
-                className="border-t border-border"
+                className="border-t border-stone-200 dark:border-stone-800"
               >
-                <td className="px-4 py-3 font-medium text-foreground">
+                <td className="px-4 py-3 font-medium text-stone-900 dark:text-stone-100">
                   {item.name}
                 </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">
+                <td className="px-4 py-3 text-sm text-stone-500 dark:text-stone-400">
                   {item.email}
                 </td>
                 <td className="px-4 py-3 text-sm">{item.patients}</td>

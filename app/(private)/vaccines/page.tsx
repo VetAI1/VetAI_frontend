@@ -60,10 +60,10 @@ export default function VaccinesPage() {
       header: 'Nome',
       render: (vaccine) => (
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-success-soft">
-            <Syringe size={15} className="text-success" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-emerald-50 dark:bg-emerald-900">
+            <Syringe size={15} className="text-emerald-700 dark:text-emerald-500" />
           </div>
-          <span className="text-sm font-medium text-foreground">
+          <span className="text-sm font-medium text-stone-900 dark:text-stone-100">
             {vaccine.name}
           </span>
         </div>
@@ -73,7 +73,7 @@ export default function VaccinesPage() {
       key: 'code',
       header: 'Código',
       render: (vaccine) => (
-        <span className="font-data inline-flex items-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
+        <span className="font-data inline-flex items-center rounded-md bg-stone-100 dark:bg-stone-800 px-2 py-0.5 text-xs font-medium text-stone-500 dark:text-stone-400">
           {vaccine.code}
         </span>
       ),
@@ -83,18 +83,18 @@ export default function VaccinesPage() {
       header: 'Período de Revacinação',
       render: (vaccine) =>
         vaccine.revaccination_period_days ? (
-          <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+          <span className="inline-flex items-center rounded-full bg-teal-800/10 dark:bg-teal-500/10 px-2.5 py-0.5 text-xs font-medium text-teal-800 dark:text-teal-500">
             {fmtPeriod(vaccine.revaccination_period_days)}
           </span>
         ) : (
-          <span className="text-xs text-muted-foreground/70">—</span>
+          <span className="text-xs text-stone-500/70 dark:text-stone-400/70">—</span>
         ),
     },
     {
       key: 'created_at',
       header: 'Criado em',
       render: (vaccine) => (
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-stone-500 dark:text-stone-400">
           {fmtDate(vaccine.created_at)}
         </span>
       ),
@@ -115,7 +115,7 @@ export default function VaccinesPage() {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="text-danger hover:text-danger hover:bg-danger-soft"
+            className="text-red-600 dark:text-red-500 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
             onClick={() => setDeleteVaccine(vaccine)}
           >
             <Trash2 size={15} />
@@ -128,7 +128,7 @@ export default function VaccinesPage() {
   const totalPages = meta?.total_pages ?? 1;
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Catálogo de Vacinas" showStorage={false} />
 
@@ -140,7 +140,7 @@ export default function VaccinesPage() {
           headerAction={
             <Button
               onClick={() => setShowCreateModal(true)}
-              className="bg-primary h-10 text-primary-foreground hover:bg-primary/90"
+              className="bg-teal-800 dark:bg-teal-500 h-10 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={18} /> Nova Vacina
             </Button>

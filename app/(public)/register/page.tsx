@@ -309,7 +309,7 @@ function RegisterForm() {
           ].map((item, index) => (
             <li key={item.label} className="flex flex-1 items-center gap-3 last:flex-none">
               <div
-                className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-bold transition-colors ${item.done || item.active ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
+                className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-bold transition-colors ${item.done || item.active ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950' : 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100'}`}
               >
                 {item.done ? (
                   <Check size={13} />
@@ -319,7 +319,7 @@ function RegisterForm() {
                 <span className="hidden sm:inline">{item.label}</span>
               </div>
               {index < 2 && (
-                <div className={`h-px flex-1 ${item.done ? 'bg-primary' : 'bg-border'}`} />
+                <div className={`h-px flex-1 ${item.done ? 'bg-teal-800 dark:bg-teal-500' : 'bg-stone-200 dark:bg-stone-800'}`} />
               )}
             </li>
           ))}
@@ -339,10 +339,10 @@ function RegisterForm() {
             className="space-y-6"
           >
             <div>
-              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
+              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100">
                 {isInvite ? 'Criar sua conta' : 'Dados da clínica e acesso'}
               </h1>
-              <p className="mt-2 text-muted-foreground">
+              <p className="mt-2 text-stone-500 dark:text-stone-400">
                 {isInvite
                   ? 'Preencha seus dados para aceitar o convite.'
                   : 'Estas informações identificam sua clínica e seu responsável.'}
@@ -393,11 +393,11 @@ function RegisterForm() {
                       type="checkbox"
                       id="isUserResponsible"
                       {...registerField('isUserResponsible')}
-                      className="size-4 rounded border-input accent-primary"
+                      className="size-4 rounded border-stone-300 dark:border-stone-700 accent-primary"
                     />
                     <label
                       htmlFor="isUserResponsible"
-                      className="cursor-pointer select-none text-sm font-semibold text-foreground"
+                      className="cursor-pointer select-none text-sm font-semibold text-stone-900 dark:text-stone-100"
                     >
                           Eu sou o responsável
                     </label>
@@ -421,8 +421,8 @@ function RegisterForm() {
                     </>
                   )}
                 </div>
-                <div className="border-t border-border pt-6">
-                  <h2 className="mb-4 text-base font-semibold text-foreground">
+                <div className="border-t border-stone-200 dark:border-stone-800 pt-6">
+                  <h2 className="mb-4 text-base font-semibold text-stone-900 dark:text-stone-100">
                         Endereço da clínica
                   </h2>
                   <div className="grid gap-5 sm:grid-cols-3">
@@ -487,7 +487,7 @@ function RegisterForm() {
                   </div>
                   {(cepLookupLoading || cepLookupError) && (
                     <p
-                      className={`mt-3 text-sm ${cepLookupError ? 'text-destructive' : 'text-muted-foreground'}`}
+                      className={`mt-3 text-sm ${cepLookupError ? 'text-red-600 dark:text-red-500' : 'text-stone-500 dark:text-stone-400'}`}
                     >
                       {cepLookupError ?? 'Buscando endereço...'}
                     </p>
@@ -496,8 +496,8 @@ function RegisterForm() {
               </section>
             )}
 
-            <section className="border-t border-border pt-6">
-              <h2 className="mb-4 text-base font-semibold text-foreground">
+            <section className="border-t border-stone-200 dark:border-stone-800 pt-6">
+              <h2 className="mb-4 text-base font-semibold text-stone-900 dark:text-stone-100">
                     Dados de acesso
               </h2>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -559,7 +559,7 @@ function RegisterForm() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="text-muted-foreground transition-colors hover:text-primary"
+                      className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
                     >
                       {showPassword ? (
                         <EyeOff size={18} />
@@ -583,7 +583,7 @@ function RegisterForm() {
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      className="text-muted-foreground transition-colors hover:text-primary"
+                      className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
                     >
                       {showConfirmPassword ? (
                         <EyeOff size={18} />
@@ -608,16 +608,16 @@ function RegisterForm() {
             className="space-y-6"
           >
             <div>
-              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
+              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100">
                     Escolha seu plano
               </h1>
-              <p className="mt-2 text-muted-foreground">
+              <p className="mt-2 text-stone-500 dark:text-stone-400">
                     Todos os limites e recursos abaixo são definidos pelo seu
                     plano.
               </p>
             </div>
             {plansLoading ? (
-              <p className="text-sm text-muted-foreground">Carregando planos...</p>
+              <p className="text-sm text-stone-500 dark:text-stone-400">Carregando planos...</p>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
                 {plans.map((plan) => (
@@ -625,26 +625,26 @@ function RegisterForm() {
                     key={plan.id}
                     type="button"
                     onClick={() => setValue('planId', plan.id)}
-                    className={`rounded-2xl border p-5 text-left transition-colors ${planId === plan.id ? 'border-primary bg-secondary ring-1 ring-primary/25' : 'border-border bg-card hover:border-primary/30'}`}
+                    className={`rounded-2xl border p-5 text-left transition-colors ${planId === plan.id ? 'border-teal-800 dark:border-teal-500 bg-stone-100 dark:bg-stone-800 ring-1 ring-teal-600/25 dark:ring-teal-500/25' : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-teal-800/30 dark:hover:border-teal-500/30'}`}
                   >
                     <div className="flex justify-between gap-4">
                       <div>
-                        <h2 className="font-semibold text-foreground">
+                        <h2 className="font-semibold text-stone-900 dark:text-stone-100">
                           {plan.name}
                         </h2>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
                           {plan.description}
                         </p>
                       </div>
                       {planId === plan.id && (
-                        <Check className="text-primary" />
+                        <Check className="text-teal-800 dark:text-teal-500" />
                       )}
                     </div>
-                    <p className="font-data mt-4 text-2xl font-semibold text-primary">
+                    <p className="font-data mt-4 text-2xl font-semibold text-teal-800 dark:text-teal-500">
                       {formatPrice(plan.monthlyPrice)}
                       <span className="text-sm font-normal">/mês</span>
                     </p>
-                    <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                    <ul className="mt-4 space-y-2 text-sm text-stone-500 dark:text-stone-400">
                       <li className="flex gap-2">
                         <Users size={16} />
                             Até {plan.userLimit}{' '}
@@ -656,7 +656,7 @@ function RegisterForm() {
                       </li>
                       {plan.features.map((feature) => (
                         <li key={feature.key} className="flex gap-2">
-                          <Check size={16} className="text-primary" />
+                          <Check size={16} className="text-teal-800 dark:text-teal-500" />
                           {feature.label}
                         </li>
                       ))}
@@ -666,7 +666,7 @@ function RegisterForm() {
               </div>
             )}
             {errors.planId?.message && (
-              <p className="text-xs text-destructive">
+              <p className="text-xs text-red-600 dark:text-red-500">
                 {errors.planId.message}
               </p>
             )}
@@ -682,55 +682,55 @@ function RegisterForm() {
             className="space-y-6"
           >
             <div>
-              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-foreground">
+              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100">
                     Revise e prossiga para o pagamento
               </h1>
-              <p className="mt-2 text-muted-foreground">
+              <p className="mt-2 text-stone-500 dark:text-stone-400">
                     Você será direcionado ao ambiente seguro da Stripe para
                     inserir os dados do cartão.
               </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl border border-border bg-card p-5">
-                <h2 className="font-semibold text-foreground">
+              <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+                <h2 className="font-semibold text-stone-900 dark:text-stone-100">
                       Clínica
                 </h2>
-                <p className="mt-3 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
                   {data.hospitalName}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-stone-500 dark:text-stone-400">
                   {data.cnpj}
                 </p>
                 {data.hospitalPhone && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-stone-500 dark:text-stone-400">
                     {data.hospitalPhone}
                   </p>
                 )}
-                <p className="mt-3 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
                   {data.address?.street}, {data.address?.number} -{' '}
                   {data.address?.city}/{data.address?.state}
                 </p>
               </div>
-              <div className="rounded-2xl border border-primary/25 bg-secondary p-5">
-                <h2 className="font-semibold text-foreground">
+              <div className="rounded-2xl border border-teal-800/25 dark:border-teal-500/25 bg-stone-100 dark:bg-stone-800 p-5">
+                <h2 className="font-semibold text-stone-900 dark:text-stone-100">
                   {selectedPlan.name}
                 </h2>
-                <p className="font-data mt-2 text-2xl font-semibold text-primary">
+                <p className="font-data mt-2 text-2xl font-semibold text-teal-800 dark:text-teal-500">
                   {formatPrice(selectedPlan.monthlyPrice)}
                   <span className="text-sm font-normal">/mês</span>
                 </p>
-                <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+                <p className="mt-3 flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
                   <Users size={16} />
                       Até {selectedPlan.userLimit} usuários
                 </p>
-                <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <p className="mt-2 flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
                   <Sparkles size={16} />
                   {selectedPlan.aiCredits} créditos de IA/mês
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 rounded-2xl bg-secondary p-4 text-sm text-secondary-foreground">
-              <ShieldCheck className="shrink-0 text-primary" size={20} />O
+            <div className="flex items-center gap-3 rounded-2xl bg-stone-100 dark:bg-stone-800 p-4 text-sm text-stone-800 dark:text-stone-100">
+              <ShieldCheck className="shrink-0 text-teal-800 dark:text-teal-500" size={20} />O
                   pagamento é processado de forma segura pela Stripe. O VetAI
                   não armazena os dados do seu cartão.
             </div>
@@ -780,11 +780,11 @@ function RegisterForm() {
         </div>
       </form>
 
-      <p className="mt-8 text-center text-sm text-muted-foreground">
+      <p className="mt-8 text-center text-sm text-stone-500 dark:text-stone-400">
             Já tem uma conta?{' '}
         <Link
           href="/login"
-          className="font-bold text-primary hover:underline"
+          className="font-bold text-teal-800 dark:text-teal-500 hover:underline"
         >
               Entrar
         </Link>
@@ -797,8 +797,8 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-background">
-          <p className="text-muted-foreground">Carregando...</p>
+        <div className="flex min-h-screen items-center justify-center bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
+          <p className="text-stone-500 dark:text-stone-400">Carregando...</p>
         </div>
       }
     >

@@ -125,17 +125,17 @@ export function VaccineFormModal({
               />
             )}
           />
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
             Usado para calcular automaticamente a próxima revacinação ao
             registrar uma dose.
           </p>
         </div>
 
         {isEdit && (
-          <div className="p-3 bg-secondary rounded-lg">
-            <p className="text-xs text-muted-foreground">
+          <div className="p-3 bg-stone-100 dark:bg-stone-800 rounded-lg">
+            <p className="text-xs text-stone-500 dark:text-stone-400">
               Código:{' '}
-              <span className="font-mono font-medium text-secondary-foreground">
+              <span className="font-mono font-medium text-stone-800 dark:text-stone-100">
                 {vaccine.code}
               </span>
             </p>
@@ -153,7 +153,7 @@ export function VaccineFormModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             {isEdit ? 'Salvar' : 'Criar Vacina'}
           </Button>

@@ -66,7 +66,7 @@ export default function ExamsPage() {
       key: 'title',
       header: 'Título',
       render: (study) => (
-        <span className="text-foreground font-medium">
+        <span className="text-stone-900 dark:text-stone-100 font-medium">
           {study.title ?? 'Sem título'}
         </span>
       ),
@@ -75,7 +75,7 @@ export default function ExamsPage() {
       key: 'patient',
       header: 'Paciente',
       render: (study) => (
-        <span className="text-muted-foreground">
+        <span className="text-stone-500 dark:text-stone-400">
           {study.patient?.name ?? '-'}
         </span>
       ),
@@ -95,7 +95,7 @@ export default function ExamsPage() {
       key: 'date',
       header: 'Data',
       render: (study) => (
-        <span className="text-muted-foreground">
+        <span className="text-stone-500 dark:text-stone-400">
           {study.examDate
             ? new Date(study.examDate).toLocaleDateString('pt-BR')
             : new Date(study.created_at).toLocaleDateString('pt-BR')}
@@ -110,7 +110,7 @@ export default function ExamsPage() {
       render: (study) => (
         <Link href={`/exams/detail?id=${study.id}`}>
           <Button variant="ghost" size="icon-sm" title="Ver detalhes">
-            <Eye size={16} className="text-muted-foreground" />
+            <Eye size={16} className="text-stone-500 dark:text-stone-400" />
           </Button>
         </Link>
       ),
@@ -118,7 +118,7 @@ export default function ExamsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Exames" showStorage={false} />
 
@@ -134,7 +134,7 @@ export default function ExamsPage() {
           headerAction={
             <Button
               onClick={openUploadModal}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 h-10"
+              className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-10"
             >
               <UploadIcon size={18} /> Enviar Exame
             </Button>

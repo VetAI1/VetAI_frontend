@@ -15,7 +15,7 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className={`rounded-lg border border-border bg-card ${shadow ? 'shadow-[var(--shadow-card)]' : ''} ${className}`}
+      className={`rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 ${shadow ? 'shadow-[var(--shadow-card)]' : ''} ${className}`}
       style={style}
       onClick={onClick}
     >

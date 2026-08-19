@@ -100,12 +100,12 @@ export function NotificationBell() {
       <button
         ref={buttonRef}
         onClick={() => setOpen((o) => !o)}
-        className="relative flex items-center justify-center w-9 h-9 rounded-md text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground transition-colors"
+        className="relative flex items-center justify-center w-9 h-9 rounded-md text-stone-500 dark:text-stone-400 hover:bg-teal-50/60 dark:hover:bg-teal-900/60 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
         aria-label="Notificações"
       >
         <Bell size={18} />
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-white text-[10px] font-bold flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-red-600 dark:bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -114,16 +114,16 @@ export function NotificationBell() {
       {open && (
         <div
           ref={panelRef}
-          className="absolute left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-popover shadow-[var(--shadow-card)] z-50 overflow-hidden animate-in fade-in-0 slide-in-from-left-2 duration-150"
+          className="absolute left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-[var(--shadow-card)] z-50 overflow-hidden animate-in fade-in-0 slide-in-from-left-2 duration-150"
         >
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <span className="text-sm font-semibold text-foreground">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">
               Notificações
             </span>
             {unread > 0 && (
               <button
                 onClick={handleMarkAll}
-                className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80"
+                className="flex items-center gap-1 text-xs font-medium text-teal-800 dark:text-teal-500 hover:text-teal-800/80 dark:hover:text-teal-500/80"
               >
                 <CheckCheck size={14} /> Marcar todas
               </button>
@@ -133,10 +133,10 @@ export function NotificationBell() {
           <div className="max-h-96 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 size={20} className="animate-spin text-muted-foreground" />
+                <Loader2 size={20} className="animate-spin text-stone-500 dark:text-stone-400" />
               </div>
             ) : items.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
+              <p className="text-sm text-stone-500 dark:text-stone-400 text-center py-8">
                 Nenhuma notificação
               </p>
             ) : (
@@ -144,22 +144,22 @@ export function NotificationBell() {
                 <button
                   key={notification.id}
                   onClick={() => handleOpen(notification)}
-                  className={`w-full text-left px-4 py-3 border-b border-border last:border-0 hover:bg-muted/60 transition-colors ${
-                    notification.read ? '' : 'bg-primary/[0.04]'
+                  className={`w-full text-left px-4 py-3 border-b border-stone-200 dark:border-stone-800 last:border-0 hover:bg-stone-100/60 dark:hover:bg-stone-800/60 transition-colors ${
+                    notification.read ? '' : 'bg-teal-800 dark:bg-teal-500/[0.04]'
                   }`}
                 >
                   <div className="flex items-start gap-2">
                     {!notification.read && (
-                      <span className="mt-1.5 w-2 h-2 rounded-full bg-primary shrink-0" />
+                      <span className="mt-1.5 w-2 h-2 rounded-full bg-teal-800 dark:bg-teal-500 shrink-0" />
                     )}
                     <div className={notification.read ? 'pl-4' : ''}>
-                      <p className="text-sm font-medium text-foreground">
+                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
                         {notification.title}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-stone-500 dark:text-stone-400">
                         {notification.message}
                       </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                      <p className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">
                         {timeAgo(notification.created_at)}
                       </p>
                     </div>

@@ -247,43 +247,24 @@ confirm({
 
 ### Design System & Styling Standards
 
-All screens **must** use semantic design tokens from `app/globals.css` (shadcn-style, backed by Tailwind's default palette: `teal`, `amber`, `stone`, `emerald`, `sky`, `red`). Do **NOT** use raw palette utilities (`slate-*`, `teal-*`, `amber-*`, `emerald-*`, `red-*`, `green-*`, `gray-*`, hex colors) in class strings — map them to tokens.
+Use Tailwind's default color utilities directly in class strings. Keep CSS variables in `app/globals.css` only for design-specific values such as fonts, shadows, easing, radii and chart colors. Prefer explicit `dark:` variants when a component has a different dark-mode surface, text or border.
 
-#### Semantic tokens
+#### Color hierarchy
 
-- **Surfaces**: `bg-background`, `bg-card`, `bg-popover`, `bg-secondary`, `bg-muted`, `bg-accent`
-- **Text**: `text-foreground`, `text-secondary-foreground`, `text-muted-foreground`, `text-primary`, `text-accent-foreground`
-- **Brand**: `text-primary` (teal), `bg-brand-sun` / `text-brand-sun` / `text-brand-sun-strong` (amber accent)
-- **Status**: `success` / `success-soft` (emerald), `warning` / `warning-soft` (amber), `info` / `info-soft` (sky), `danger` / `danger-soft` and `destructive` (red)
-- **Borders**: `border-border`, `border-input`
-- **Charts**: `--chart-1..5` (read via `constants/charts.ts` with hex fallback)
+Use `gray` as the neutral scale:
 
-#### Quick mapping (raw → token)
+- `gray-900`: primary text and headings
+- `gray-700` / `gray-600`: secondary content and labels
+- `gray-500`: metadata, placeholders and icons
+- `gray-400`: disabled content and dark-mode metadata
+- `gray-300` / `gray-200`: inputs, dividers and borders
+- `gray-100` / `gray-50` / `white`: light surfaces
+- `gray-950` / `gray-900` / `gray-800` / `gray-700`: dark surfaces and controls
+- `gray-100` / `gray-400`: readable dark-mode text
 
-| Raw | Token |
-|---|---|
-| `text-slate-900` / `text-gray-900` / `dark:text-white` | `text-foreground` |
-| `text-slate-600` / `text-gray-600` | `text-muted-foreground` |
-| `text-slate-400` | `text-muted-foreground/70` |
-| `text-teal-600` / `text-teal-700` | `text-primary` |
-| `bg-teal-600` / `bg-teal-700` (sólido) | `bg-primary` |
-| `bg-teal-50` / `bg-teal-100` / `dark:bg-teal-900/20` | `bg-primary/10` |
-| `text-amber-500` | `text-brand-sun` |
-| `text-amber-600` / `text-amber-700` / `text-amber-800` | `text-brand-sun-strong` |
-| `bg-amber-50` / `bg-amber-100` (aviso) | `bg-warning-soft` |
-| `text-red-600` / `text-red-500` | `text-danger` |
-| `bg-red-50` / `bg-red-100` | `bg-danger-soft` |
-| `text-emerald-600` / `text-green-600` | `text-success` |
-| `bg-emerald-50` / `bg-emerald-100` | `bg-success-soft` |
-| `text-blue-600` / `text-sky-600` | `text-info` |
-| `bg-blue-50` / `bg-blue-100` | `bg-info-soft` |
-| `bg-white` / `dark:bg-slate-800` / `dark:bg-slate-900` (superfície) | `bg-card` |
-| `border-slate-200` / `dark:border-slate-700` / `dark:border-slate-800` | `border-border` |
-| `hover:bg-slate-100` | `hover:bg-secondary` |
-| `bg-amber-600 hover:bg-amber-700 text-white` (botão) | `bg-warning text-white hover:bg-warning/90 dark:text-stone-950` |
-| `bg-red-600 hover:bg-red-700 text-white` (botão) | `bg-destructive text-white hover:bg-destructive/90` |
+Use `teal` for primary actions and brand UI, `amber` for accents and warnings, `emerald` for success, `sky` for information, and `red` for errors or destructive actions. Use categorical colors (`indigo`, `violet`, `purple`, `rose`, `pink`, `orange`, `lime`, `cyan`, `fuchsia`) only for multi-item coding such as monitoring parameters and chart series. Do not change hex values inside chart, PDF or inline-style objects.
 
-Keep categorical colors (`indigo`, `violet`, `purple`, `rose`, `pink`, `orange`, `lime`, `cyan`, `fuchsia`) for multi-item color coding (monitoring parameters, chart series). Do NOT touch hex inside JS objects (chart.js, jsPDF, inline `style`). Tokens already switch light/dark — do NOT add redundant `dark:` variants once tokenized.
+When using a solid light color, pair it with a readable dark-mode value, for example `bg-gray-50 dark:bg-gray-950` or `text-gray-900 dark:text-gray-100`. Prefer the closest Tailwind shade over creating a new token.
 
 #### Layout standards
 

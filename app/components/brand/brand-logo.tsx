@@ -13,8 +13,8 @@ export function BrandLogo({
 }: BrandLogoProps) {
   const markClass = light
     ? 'bg-white/15 text-white ring-1 ring-white/20'
-    : 'bg-primary text-primary-foreground';
-  const wordClass = light ? 'text-white' : 'text-foreground';
+    : 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950';
+  const wordClass = light ? 'text-white' : 'text-stone-900 dark:text-stone-100';
 
   return (
     <div className={cn('inline-flex items-center gap-2.5', className)}>
@@ -44,7 +44,7 @@ export function BrandLogo({
       </span>
       {!compact && (
         <span className={cn('font-display text-xl font-bold tracking-[-0.06em]', wordClass)}>
-          vet<span className={light ? 'text-brand-sun' : 'text-primary'}>AI</span>
+          vet<span className={light ? 'text-amber-500 dark:text-amber-400' : 'text-teal-800 dark:text-teal-500'}>AI</span>
         </span>
       )}
     </div>

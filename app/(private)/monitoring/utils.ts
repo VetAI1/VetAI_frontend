@@ -22,22 +22,22 @@ export const STATUS_MAP: Record<
   },
   HOSPITALIZED: {
     label: 'Internado',
-    badge: 'bg-info-soft text-info',
+    badge: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
     dot: 'bg-blue-500',
   },
   DISCHARGED: {
     label: 'Alta',
-    badge: 'bg-success-soft text-success',
+    badge: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
     dot: 'bg-green-500',
   },
   DECEASED: {
     label: 'Óbito',
-    badge: 'bg-muted text-secondary-foreground',
+    badge: 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100',
     dot: 'bg-slate-500',
   },
   CANCELLED: {
     label: 'Cancelada',
-    badge: 'bg-secondary text-muted-foreground',
+    badge: 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400',
     dot: 'bg-slate-400',
   },
 };
@@ -48,7 +48,7 @@ export const RISK_MAP: Record<
 > = {
   LOW: {
     label: 'Baixo risco',
-    badge: 'bg-success-soft text-success',
+    badge: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
     dot: 'bg-green-500',
   },
   MEDIUM: {
@@ -59,7 +59,7 @@ export const RISK_MAP: Record<
   },
   HIGH: {
     label: 'Alto risco',
-    badge: 'bg-danger-soft text-danger',
+    badge: 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500',
     dot: 'bg-red-500',
   },
 };
@@ -70,11 +70,11 @@ export const PRESCRIPTION_TYPE_MAP: Record<
 > = {
   MEDICATION: {
     label: 'Medicamento',
-    badge: 'bg-info-soft text-info',
+    badge: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
   },
   PROCEDURE: {
     label: 'Procedimento',
-    badge: 'bg-primary/10 text-primary',
+    badge: 'bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500',
   },
   FLUID: {
     label: 'Fluidoterapia',
@@ -126,22 +126,22 @@ export const EXECUTION_STATUS_MAP: Record<
 > = {
   PENDING: {
     label: 'Programada',
-    badge: 'bg-info-soft text-info',
-    chip: 'bg-info text-white hover:bg-info/90',
+    badge: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
+    chip: 'bg-sky-700 dark:bg-sky-500 text-white hover:bg-sky-700/90 dark:hover:bg-sky-500/90',
   },
   LATE: {
     label: 'Atrasada',
-    badge: 'bg-danger-soft text-danger',
-    chip: 'bg-destructive text-white hover:bg-destructive/90',
+    badge: 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500',
+    chip: 'bg-red-600 dark:bg-red-500 text-white hover:bg-red-600/90 dark:hover:bg-red-500/90',
   },
   DONE: {
     label: 'Concluída',
-    badge: 'bg-success-soft text-success',
-    chip: 'bg-success text-white hover:bg-success/90',
+    badge: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
+    chip: 'bg-emerald-700 dark:bg-emerald-500 text-white hover:bg-emerald-700/90 dark:hover:bg-emerald-500/90',
   },
   CANCELLED: {
     label: 'Cancelada',
-    badge: 'bg-secondary text-muted-foreground',
+    badge: 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400',
     chip: 'bg-slate-300 dark:bg-slate-600 text-slate-600 dark:text-slate-300',
   },
 };

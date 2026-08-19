@@ -32,10 +32,10 @@ export function FileDropzone({
       <div
         className={`relative cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors duration-200 ${
           isDragging
-            ? 'border-primary bg-secondary'
+            ? 'border-teal-800 dark:border-teal-500 bg-stone-100 dark:bg-stone-800'
             : file
-              ? 'border-primary/50 bg-secondary/60'
-              : 'border-input bg-card hover:border-primary/50 hover:bg-muted/60'
+              ? 'border-teal-800/50 dark:border-teal-500/50 bg-stone-100/60 dark:bg-stone-800/60'
+              : 'border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-teal-800/50 dark:hover:border-teal-500/50 hover:bg-stone-100/60 dark:hover:bg-stone-800/60'
         }`}
         onClick={() => inputRef.current?.click()}
         onDragOver={(event) => {
@@ -61,13 +61,13 @@ export function FileDropzone({
           <div className="flex items-center justify-center gap-3">
             <FileText
               size={24}
-              className="shrink-0 text-primary"
+              className="shrink-0 text-teal-800 dark:text-teal-500"
             />
             <div className="min-w-0 text-left">
-              <p className="truncate text-sm font-semibold text-secondary-foreground">
+              <p className="truncate text-sm font-semibold text-stone-800 dark:text-stone-100">
                 {file.name}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-stone-500 dark:text-stone-400">
                 {(file.size / 1024 / 1024).toFixed(2)} MB · Clique para trocar
               </p>
             </div>
@@ -76,13 +76,13 @@ export function FileDropzone({
           <>
             <Upload
               size={24}
-              className="mx-auto mb-2 text-muted-foreground"
+              className="mx-auto mb-2 text-stone-500 dark:text-stone-400"
             />
-            <p className="text-sm font-semibold text-foreground">
+            <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
               Arraste o arquivo aqui ou clique para selecionar
             </p>
             {helperText && (
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
                 {helperText}
               </p>
             )}

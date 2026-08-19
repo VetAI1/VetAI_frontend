@@ -23,21 +23,21 @@ export function PreventionModal({
   onClose,
 }: PreventionModalProps) {
   return (
-    <div className="w-full max-w-lg max-h-[85vh] overflow-hidden rounded-xl bg-card shadow-2xl flex flex-col">
-      <div className="bg-card border-b border-border p-5 flex items-start justify-between gap-3 shrink-0">
+    <div className="w-full max-w-lg max-h-[85vh] overflow-hidden rounded-xl bg-white dark:bg-stone-900 shadow-2xl flex flex-col">
+      <div className="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 p-5 flex items-start justify-between gap-3 shrink-0">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-primary/10 border border-primary/40">
+          <div className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 border border-teal-800/40 dark:border-teal-500/40">
             <ShieldCheck
               size={20}
-              className="text-primary"
+              className="text-teal-800 dark:text-teal-500"
             />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-foreground">
+            <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
                 Análise de Prevenção
             </h2>
             {studyTitle && (
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
                 {studyTitle}
               </p>
             )}
@@ -47,7 +47,7 @@ export function PreventionModal({
           variant="ghost"
           size="icon-sm"
           onClick={onClose}
-          className="shrink-0 text-muted-foreground"
+          className="shrink-0 text-stone-500 dark:text-stone-400"
         >
           <X size={18} />
         </Button>
@@ -56,8 +56,8 @@ export function PreventionModal({
       <div className="overflow-y-auto flex-1 p-5 space-y-6">
         {prevention.alteredValues.map((altered, idx) => (
           <div key={idx}>
-            <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-              <AlertTriangle size={15} className="text-danger" />
+            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 mb-2 flex items-center gap-2">
+              <AlertTriangle size={15} className="text-red-600 dark:text-red-500" />
               {altered.name}
             </h3>
             {altered.problems.length > 0 && (
@@ -65,12 +65,12 @@ export function PreventionModal({
                 {altered.problems.map((problem, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-2 p-2.5 bg-danger-soft border border-danger/30 rounded-lg"
+                    className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-900 border border-red-600/30 dark:border-red-500/30 rounded-lg"
                   >
-                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-danger text-white text-xs font-bold shrink-0 mt-0.5">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-600 dark:bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">
                       {i + 1}
                     </span>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
                       {problem}
                     </p>
                   </div>
@@ -82,13 +82,13 @@ export function PreventionModal({
                 {altered.recommendations.map((rec, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-2 p-2.5 bg-primary/10 border border-primary/40 rounded-lg"
+                    className="flex items-start gap-2 p-2.5 bg-teal-800/10 dark:bg-teal-500/10 border border-teal-800/40 dark:border-teal-500/40 rounded-lg"
                   >
                     <CheckCircle2
                       size={15}
-                      className="text-primary shrink-0 mt-0.5"
+                      className="text-teal-800 dark:text-teal-500 shrink-0 mt-0.5"
                     />
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
                       {rec}
                     </p>
                   </div>
@@ -99,21 +99,21 @@ export function PreventionModal({
         ))}
         {prevention.generalRecommendations.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-              <Lightbulb size={16} className="text-primary" />
+            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 mb-3 flex items-center gap-2">
+              <Lightbulb size={16} className="text-teal-800 dark:text-teal-500" />
                 Recomendações Gerais
             </h3>
             <div className="space-y-2">
               {prevention.generalRecommendations.map((rec, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-3 p-3 bg-primary/10 border border-primary/40 rounded-lg"
+                  className="flex items-start gap-3 p-3 bg-teal-800/10 dark:bg-teal-500/10 border border-teal-800/40 dark:border-teal-500/40 rounded-lg"
                 >
                   <CheckCircle2
                     size={16}
-                    className="text-primary shrink-0 mt-0.5"
+                    className="text-teal-800 dark:text-teal-500 shrink-0 mt-0.5"
                   />
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
                     {rec}
                   </p>
                 </div>

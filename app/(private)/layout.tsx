@@ -11,9 +11,9 @@ export default function PrivateLayout({
   return (
     <AuthGuard>
       <TooltipProvider>
-        <div className="flex h-screen overflow-hidden bg-background">
+        <div className="flex h-screen overflow-hidden bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
           <Sidebar />
-          <main className="flex-1 overflow-y-auto bg-background pb-24 md:pb-0">
+          <main className="flex-1 overflow-y-auto bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 pb-24 md:pb-0">
             {children}
           </main>
         </div>

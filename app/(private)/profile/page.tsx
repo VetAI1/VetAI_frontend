@@ -171,7 +171,7 @@ export default function Profile() {
           <Button
             onClick={handleSave}
             loading={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             <Save size={18} /> Salvar alterações
           </Button>
@@ -295,7 +295,7 @@ export default function Profile() {
             />
           </div>
           {cepLoading && (
-            <p className="mt-3 text-sm text-muted-foreground">
+            <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
               Buscando endereço...
             </p>
           )}

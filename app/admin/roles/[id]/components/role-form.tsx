@@ -192,10 +192,10 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
           {PERMISSION_CATEGORIES.map((category) => (
             <div
               key={category.key}
-              className="rounded-lg border border-border bg-secondary p-4"
+              className="rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 p-4"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-semibold text-stone-900 dark:text-stone-100">
                   {category.label}
                 </h3>
                 <Button
@@ -247,7 +247,7 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
         ) : (
           <div className="space-y-4">
             <div className="relative max-w-xl">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500/70 dark:text-stone-400/70" />
               <Input
                 value={collaboratorSearch}
                 onChange={(event) => {
@@ -260,9 +260,9 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
                 className="pl-9"
               />
               {showCollaboratorOptions && !readonly && (
-                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-48 overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
+                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-48 overflow-y-auto rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-lg">
                   {collaboratorOptions.length === 0 ? (
-                    <p className="p-3 text-center text-sm text-muted-foreground">
+                    <p className="p-3 text-center text-sm text-stone-500 dark:text-stone-400">
                       Nenhum colaborador encontrado.
                     </p>
                   ) : (
@@ -271,12 +271,12 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
                         key={collaborator.id}
                         type="button"
                         onClick={() => addCollaborator(collaborator.id)}
-                        className="flex w-full flex-col border-b border-border/70 px-3 py-3 text-left last:border-0 hover:bg-secondary/60"
+                        className="flex w-full flex-col border-b border-stone-200/70 dark:border-stone-800/70 px-3 py-3 text-left last:border-0 hover:bg-stone-100/60 dark:hover:bg-stone-800/60"
                       >
-                        <span className="text-sm font-medium text-foreground">
+                        <span className="text-sm font-medium text-stone-900 dark:text-stone-100">
                           {collaborator.name}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-stone-500 dark:text-stone-400">
                           {collaborator.email}
                         </span>
                       </button>
@@ -288,21 +288,21 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
 
             <div className="flex flex-wrap gap-2">
               {selectedCollaborators.length === 0 ? (
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-stone-500 dark:text-stone-400">
                   Nenhum colaborador adicionado.
                 </span>
               ) : (
                 selectedCollaborators.map((collaborator) => (
                   <span
                     key={collaborator.id}
-                    className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm text-primary"
+                    className="inline-flex items-center gap-2 rounded-full border border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10 px-3 py-1.5 text-sm text-teal-800 dark:text-teal-500"
                   >
                     {collaborator.name ?? collaborator.email}
                     {!readonly && (
                       <button
                         type="button"
                         onClick={() => removeCollaborator(collaborator.id)}
-                        className="rounded-full hover:bg-primary/10"
+                        className="rounded-full hover:bg-teal-800/10 dark:hover:bg-teal-500/10"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -319,7 +319,7 @@ export function RoleForm({ role, mode, onSaved }: RoleFormProps) {
         <Button
           onClick={submit}
           disabled={readonly || saving || !name.trim()}
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
         >
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin" />

@@ -10,7 +10,7 @@ interface SummaryCardsProps {
 }
 
 const ICON_CLASS =
-  'text-primary bg-primary/10';
+  'text-teal-800 dark:text-teal-500 bg-teal-800/10 dark:bg-teal-500/10';
 
 const CARDS = [
   {
@@ -41,20 +41,20 @@ export function SummaryCards({ summary, loading = false }: SummaryCardsProps) {
       {CARDS.map(({ key, label, icon: Icon }) => (
         <div
           key={key}
-          className="bg-card rounded-xl border border-border shadow-sm p-4 flex items-center gap-3"
+          className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm p-4 flex items-center gap-3"
         >
           <div className={`p-2.5 rounded-lg shrink-0 ${ICON_CLASS}`}>
             <Icon size={20} />
           </div>
           <div className="min-w-0">
             {loading ? (
-              <div className="h-7 w-10 bg-muted rounded animate-pulse" />
+              <div className="h-7 w-10 bg-stone-100 dark:bg-stone-800 rounded animate-pulse" />
             ) : (
-              <p className="text-2xl font-bold text-foreground leading-tight">
+              <p className="text-2xl font-bold text-stone-900 dark:text-stone-100 leading-tight">
                 {summary?.[key] ?? 0}
               </p>
             )}
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
               {label}
             </p>
           </div>

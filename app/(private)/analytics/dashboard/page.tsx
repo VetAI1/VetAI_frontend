@@ -94,11 +94,11 @@ export default function Dashboard() {
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 md:text-4xl">
             {greeting()}
             {firstName ? `, ${firstName}` : ''}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
             {todayLabel()} — acompanhe o resumo da clínica
           </p>
         </div>
@@ -201,18 +201,18 @@ export default function Dashboard() {
                             >
                               {event.title}
                             </span>
-                            <span className="shrink-0 font-data text-xs text-muted-foreground">
+                            <span className="shrink-0 font-data text-xs text-stone-500 dark:text-stone-400">
                               {event.startTime}
                               {event.endTime ? ` – ${event.endTime}` : ''}
                             </span>
                           </div>
                           {event.patientName && (
-                            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                            <p className="mt-0.5 truncate text-xs text-stone-500 dark:text-stone-400">
                               {event.patientName}
                             </p>
                           )}
                           {event.description && (
-                            <p className="mt-0.5 truncate text-xs text-muted-foreground/80">
+                            <p className="mt-0.5 truncate text-xs text-stone-500/80 dark:text-stone-400/80">
                               {event.description}
                             </p>
                           )}
@@ -283,17 +283,17 @@ export default function Dashboard() {
                 return (
                   <tr
                     key={study.id}
-                    className="hover:bg-muted/40 transition-colors"
+                    className="hover:bg-stone-100/40 dark:hover:bg-stone-800/40 transition-colors"
                   >
-                    <td className="p-4 text-muted-foreground text-sm">
+                    <td className="p-4 text-stone-500 dark:text-stone-400 text-sm">
                       {fmtDate(study.examDate ?? study.created_at)}
                     </td>
                     <td className="p-4">
-                      <span className="font-medium text-foreground text-sm">
+                      <span className="font-medium text-stone-900 dark:text-stone-100 text-sm">
                         {study.patient?.name ?? '-'}
                       </span>
                     </td>
-                    <td className="p-4 text-muted-foreground text-sm">
+                    <td className="p-4 text-stone-500 dark:text-stone-400 text-sm">
                       {study.title ?? 'Sem título'}
                     </td>
                     <td className="p-4">
@@ -306,7 +306,7 @@ export default function Dashboard() {
                         onClick={() =>
                           router.push(`/exams/detail?id=${study.id}`)
                         }
-                        className="text-primary h-auto p-0"
+                        className="text-teal-800 dark:text-teal-500 h-auto p-0"
                       >
                         Abrir
                       </Button>
@@ -347,21 +347,21 @@ export default function Dashboard() {
                   <Card key={patient.id} className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                        <div className="grid size-10 shrink-0 place-items-center rounded-full bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500">
                           <PawPrint size={18} />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-foreground text-sm">
+                          <h3 className="font-semibold text-stone-900 dark:text-stone-100 text-sm">
                             {patient.name}
                           </h3>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-stone-500 dark:text-stone-400">
                             {SPECIE_LABELS[
                               patient.specie as keyof typeof SPECIE_LABELS
                             ] ?? patient.specie}
                           </p>
                         </div>
                       </div>
-                      <span className="font-data text-xs text-muted-foreground">
+                      <span className="font-data text-xs text-stone-500 dark:text-stone-400">
                         {fmtDate(patient.created_at)}
                       </span>
                     </div>

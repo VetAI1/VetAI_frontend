@@ -164,11 +164,11 @@ export default function PaymentsPage() {
           : '—';
         return (
           <div>
-            <p className="font-medium text-foreground">
+            <p className="font-medium text-stone-900 dark:text-stone-100">
               {itemsSummary}
             </p>
             {p.notes && (
-              <p className="text-xs text-muted-foreground/70 mt-0.5 truncate max-w-xs">
+              <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5 truncate max-w-xs">
                 {p.notes}
               </p>
             )}
@@ -181,7 +181,7 @@ export default function PaymentsPage() {
       header: 'Valor',
       width: '120px',
       render: (p) => (
-        <span className="text-secondary-foreground font-medium">
+        <span className="text-stone-800 dark:text-stone-100 font-medium">
           {fmtAmount(p.amount)}
         </span>
       ),
@@ -193,8 +193,8 @@ export default function PaymentsPage() {
       render: (p) => {
         const statusKey = (p.status?.toUpperCase() as PaymentStatus) ?? 'PENDING';
         const colors = PAYMENT_STATUS_COLORS[statusKey] ?? {
-          bg: 'bg-secondary',
-          text: 'text-secondary-foreground',
+          bg: 'bg-stone-100 dark:bg-stone-800',
+          text: 'text-stone-800 dark:text-stone-100',
         };
         const label = PAYMENT_STATUS_LABELS[statusKey] ?? p.status ?? 'Pendente';
         return (
@@ -211,7 +211,7 @@ export default function PaymentsPage() {
       header: 'Vencimento',
       width: '120px',
       render: (p) => (
-        <span className="text-muted-foreground text-sm">
+        <span className="text-stone-500 dark:text-stone-400 text-sm">
           {fmtDate(p.due_date)}
         </span>
       ),
@@ -221,11 +221,11 @@ export default function PaymentsPage() {
       header: 'Pago em',
       width: '120px',
       render: (p) => (
-        <span className="text-muted-foreground text-sm">
+        <span className="text-stone-500 dark:text-stone-400 text-sm">
           {p.paid_at ? (
             fmtDate(p.paid_at)
           ) : (
-            <span className="text-muted-foreground/70">—</span>
+            <span className="text-stone-500/70 dark:text-stone-400/70">—</span>
           )}
         </span>
       ),
@@ -243,7 +243,7 @@ export default function PaymentsPage() {
             onClick={() => openEdit(p)}
             title="Editar"
           >
-            <Pencil size={15} className="text-muted-foreground" />
+            <Pencil size={15} className="text-stone-500 dark:text-stone-400" />
           </Button>
           <Button
             variant="ghost"
@@ -251,7 +251,7 @@ export default function PaymentsPage() {
             onClick={() => handleDelete(p)}
             title="Excluir"
           >
-            <Trash2 size={15} className="text-danger" />
+            <Trash2 size={15} className="text-red-600 dark:text-red-500" />
           </Button>
         </div>
       ),
@@ -259,7 +259,7 @@ export default function PaymentsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Pagamentos" showStorage={false} />
 
@@ -276,7 +276,7 @@ export default function PaymentsPage() {
                 setEditingPayment(undefined);
                 setShowModal(true);
               }}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 h-10"
+              className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-10"
             >
               <Plus size={18} /> Nova Cobrança
             </Button>
@@ -355,7 +355,7 @@ export default function PaymentsPage() {
                   onClick={() => setPage(n)}
                   className={
                     n === page
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary'
+                      ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 border-teal-800 dark:border-teal-500'
                       : ''
                   }
                 >

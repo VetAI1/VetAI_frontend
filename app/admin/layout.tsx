@@ -18,9 +18,9 @@ export default function AdminLayout({
   return (
     <AuthGuard>
       <TooltipProvider>
-        <div className="flex h-screen overflow-hidden bg-background">
+        <div className="flex h-screen overflow-hidden bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
           <AdminSidebar />
-          <main className="flex-1 overflow-y-auto bg-background p-6">
+          <main className="flex-1 overflow-y-auto bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 p-6">
             {children}
           </main>
         </div>

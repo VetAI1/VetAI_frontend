@@ -163,8 +163,8 @@ export function CatalogItemModal({
             role="switch"
             aria-checked={active}
             onClick={() => setValue('active', !active)}
-            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-              active ? 'bg-primary' : 'bg-muted'
+            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-500 focus:ring-offset-2 ${
+              active ? 'bg-teal-800 dark:bg-teal-500' : 'bg-stone-100 dark:bg-stone-800'
             }`}
           >
             <span
@@ -173,7 +173,7 @@ export function CatalogItemModal({
               }`}
             />
           </button>
-          <span className="text-sm text-secondary-foreground">
+          <span className="text-sm text-stone-800 dark:text-stone-100">
             {active
               ? 'Ativo — aparece na seleção de cobranças'
               : 'Inativo — não aparece na seleção'}
@@ -192,7 +192,7 @@ export function CatalogItemModal({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground border-primary"
+            className="bg-teal-800 dark:bg-teal-500 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 text-white dark:text-stone-950 border-teal-800 dark:border-teal-500"
           >
             {isSubmitting ? (
               <Loader2 size={16} className="animate-spin" />

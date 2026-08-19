@@ -41,18 +41,18 @@ export function Modal({
       />
       <div
         className={cn(
-          'relative bg-card rounded-xl shadow-[var(--shadow-card)] w-full animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col',
+          'relative bg-white dark:bg-stone-900 rounded-xl shadow-[var(--shadow-card)] w-full animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col',
           MAX_WIDTH_MAP[maxWidth],
           className,
         )}
       >
-        <div className="flex items-start justify-between p-5 border-b border-border shrink-0">
+        <div className="flex items-start justify-between p-5 border-b border-stone-200 dark:border-stone-800 shrink-0">
           <div>
-            <h3 className="text-lg font-bold text-foreground">
+            <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
               {title}
             </h3>
             {description && (
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
                 {description}
               </p>
             )}
@@ -62,7 +62,7 @@ export function Modal({
             size="icon-sm"
             onClick={onClose}
             aria-label="Fechar"
-            className="ml-4 shrink-0 text-muted-foreground"
+            className="ml-4 shrink-0 text-stone-500 dark:text-stone-400"
           >
             <X size={18} />
           </Button>
@@ -70,7 +70,7 @@ export function Modal({
 
         <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
         {footer && (
-          <div className="shrink-0 border-t border-border p-4">{footer}</div>
+          <div className="shrink-0 border-t border-stone-200 dark:border-stone-800 p-4">{footer}</div>
         )}
       </div>
     </div>

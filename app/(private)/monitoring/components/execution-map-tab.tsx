@@ -108,7 +108,7 @@ export function ExecutionMapTab() {
 
   return (
     <div>
-      <div className="bg-card rounded-lg shadow p-4 mb-4 flex flex-col sm:flex-row sm:items-end gap-3 sm:justify-between">
+      <div className="bg-white dark:bg-stone-900 rounded-lg shadow p-4 mb-4 flex flex-col sm:flex-row sm:items-end gap-3 sm:justify-between">
         <div className="flex items-end gap-2">
           <div className="w-44">
             <DateInput label="Dia" value={date} onChange={setDate} />
@@ -119,7 +119,7 @@ export function ExecutionMapTab() {
             </Button>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-stone-500 dark:text-stone-400">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-full bg-blue-500" /> Programada
           </span>
@@ -134,34 +134,34 @@ export function ExecutionMapTab() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-primary" />
+          <Loader2 size={32} className="animate-spin text-teal-800 dark:text-teal-500" />
         </div>
       ) : hospitalizations.length === 0 ? (
-        <div className="bg-card rounded-lg shadow p-12 text-center">
-          <ClipboardCheck size={48} className="mx-auto text-muted-foreground/50 mb-4" />
-          <p className="text-muted-foreground font-medium">
+        <div className="bg-white dark:bg-stone-900 rounded-lg shadow p-12 text-center">
+          <ClipboardCheck size={48} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-4" />
+          <p className="text-stone-500 dark:text-stone-400 font-medium">
             Nenhum animal internado
           </p>
-          <p className="text-sm text-muted-foreground/70 mt-1">
+          <p className="text-sm text-stone-500/70 dark:text-stone-400/70 mt-1">
             O mapa de execução mostra a programação de cada paciente internado.
           </p>
         </div>
       ) : (
-        <div className="bg-card rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-stone-900 rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto overflow-y-hidden scrollbar-thin">
             <table className="border-collapse w-max min-w-full">
               <thead>
                 <tr>
-                  <th className="sticky left-0 z-10 bg-secondary text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide border-b border-r border-border min-w-44">
+                  <th className="sticky left-0 z-10 bg-stone-100 dark:bg-stone-800 text-left px-4 py-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wide border-b border-r border-stone-200 dark:border-stone-800 min-w-44">
                     Paciente
                   </th>
                   {HOURS.map((hour) => (
                     <th
                       key={hour}
                       className={cn(
-                        'px-1.5 py-3 text-center text-[11px] font-semibold text-muted-foreground border-b border-border min-w-12',
+                        'px-1.5 py-3 text-center text-[11px] font-semibold text-stone-500 dark:text-stone-400 border-b border-stone-200 dark:border-stone-800 min-w-12',
                         isToday && hour === currentHour &&
-                          'bg-muted text-foreground',
+                          'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100',
                       )}
                     >
                       {String(hour).padStart(2, '0')}h
@@ -172,14 +172,14 @@ export function ExecutionMapTab() {
               <tbody>
                 {hospitalizations.map((hospitalization) => (
                   <tr key={hospitalization.id} className="group">
-                    <td className="sticky left-0 z-10 bg-card group-hover:bg-secondary px-4 py-2.5 border-b border-r border-border">
+                    <td className="sticky left-0 z-10 bg-white dark:bg-stone-900 group-hover:bg-stone-100 dark:group-hover:bg-stone-800 px-4 py-2.5 border-b border-r border-stone-200 dark:border-stone-800">
                       <Link
                         href={`/monitoring/detail?id=${hospitalization.id}`}
-                        className="text-sm font-medium text-foreground hover:text-primary"
+                        className="text-sm font-medium text-stone-900 dark:text-stone-100 hover:text-teal-800 dark:hover:text-teal-500"
                       >
                         {hospitalization.patient?.name}
                       </Link>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-stone-500 dark:text-stone-400">
                         {hospitalization.box?.name ?? 'Sem box'}
                         {hospitalization.status === 'TRIAGE' ? ' · Triagem' : ''}
                       </p>
@@ -191,9 +191,9 @@ export function ExecutionMapTab() {
                         <td
                           key={hour}
                           className={cn(
-                            'relative border-b border-border/70 text-center px-1 py-2 align-middle',
+                            'relative border-b border-stone-200/70 dark:border-stone-800/70 text-center px-1 py-2 align-middle',
                             isToday && hour === currentHour &&
-                              'bg-secondary',
+                              'bg-stone-100 dark:bg-stone-800',
                           )}
                         >
                           {cellExecutions.length > 0 ? (
@@ -214,7 +214,7 @@ export function ExecutionMapTab() {
                             <button
                               type="button"
                               onClick={() => setQuickAdd({ hospitalization, hour })}
-                              className="w-8 h-8 rounded-full inline-flex items-center justify-center text-muted-foreground/50 opacity-0 group-hover:opacity-100 hover:bg-secondary hover:text-primary transition-all"
+                              className="w-8 h-8 rounded-full inline-flex items-center justify-center text-stone-500/50 dark:text-stone-400/50 opacity-0 group-hover:opacity-100 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-teal-800 dark:hover:text-teal-500 transition-all"
                               title="Adicionar registro"
                             >
                               <Plus size={14} />
@@ -245,11 +245,11 @@ export function ExecutionMapTab() {
               return (
                 <div
                   key={execution.id}
-                  className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border"
+                  className="flex items-center justify-between gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-semibold text-foreground truncate">
+                      <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">
                         {execution.prescription?.name}
                       </p>
                       <span
@@ -263,7 +263,7 @@ export function ExecutionMapTab() {
                         {statusInfo.label}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                       {fmtTime(execution.scheduled_at)}
                       {doseLabel(execution.prescription)
                         ? ` · ${doseLabel(execution.prescription)}`
@@ -273,7 +273,7 @@ export function ExecutionMapTab() {
                         : ''}
                     </p>
                     {execution.notes && (
-                      <p className="text-xs text-muted-foreground/70 italic mt-0.5">
+                      <p className="text-xs text-stone-500/70 dark:text-stone-400/70 italic mt-0.5">
                         {execution.notes}
                       </p>
                     )}
@@ -282,7 +282,7 @@ export function ExecutionMapTab() {
                     <Button
                       size="sm"
                       onClick={() => setExecuting(execution)}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
+                      className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 shrink-0"
                       disabled={slot.hospitalization.status === 'TRIAGE'}
                       title={
                         slot.hospitalization.status === 'TRIAGE'
@@ -297,7 +297,7 @@ export function ExecutionMapTab() {
               );
             })}
             {slot.hospitalization.status === 'TRIAGE' && (
-              <p className="text-xs text-warning">
+              <p className="text-xs text-amber-600 dark:text-amber-400">
                 Paciente em triagem: execuções ficam bloqueadas até a situação mudar para
                 Internado.
               </p>

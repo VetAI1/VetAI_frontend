@@ -20,7 +20,7 @@ export function Shot({
       <div
         aria-hidden="true"
         className={cn(
-          'absolute -inset-5 -z-10 rounded-[32px] border border-primary/10 bg-secondary/70',
+          'absolute -inset-5 -z-10 rounded-[32px] border border-teal-800/10 dark:border-teal-500/10 bg-stone-100/70 dark:bg-stone-800/70',
           tilt === 'left' ? '-rotate-3' : 'rotate-3',
         )}
       />

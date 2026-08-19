@@ -41,11 +41,11 @@ export default function Monitoring() {
   const [tab, setTab] = useState<MonitoringTab>('hospitalized');
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Internação" showStorage={false} />
 
-        <div className="mb-6 rounded-lg border border-border bg-card p-2">
+        <div className="mb-6 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-2">
           <nav className="flex gap-1.5 overflow-x-auto scrollbar-thin">
             {TABS.map(({ key, label, icon: Icon }) => (
               <button
@@ -55,8 +55,8 @@ export default function Monitoring() {
                 className={cn(
                   'flex shrink-0 items-center gap-2 rounded-md px-3.5 py-2 text-sm font-semibold whitespace-nowrap transition-colors',
                   tab === key
-                    ? 'bg-primary text-primary-foreground shadow-[var(--shadow-brand)]'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                    ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 shadow-[var(--shadow-brand)]'
+                    : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-900 dark:hover:text-stone-100',
                 )}
               >
                 <Icon size={16} />

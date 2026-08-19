@@ -59,10 +59,14 @@ export function AnalyticsChart({
     );
   }
 
-  const tickColor = cssVar('--muted-foreground', '#64748b');
-  const gridColor = cssVar('--border', 'rgba(0,0,0,0.06)');
-  const tooltipBg = cssVar('--popover', '#0f172a');
-  const tooltipFg = cssVar('--popover-foreground', '#f8fafc');
+  const isDark = document.documentElement.classList.contains('dark');
+  const tickColor = cssVar('--color-stone-500', isDark ? '#a8a29e' : '#78716c');
+  const gridColor = cssVar(
+    '--color-stone-200',
+    isDark ? 'rgba(68,64,60,0.6)' : 'rgba(231,229,228,0.8)',
+  );
+  const tooltipBg = isDark ? '#1c1917' : '#ffffff';
+  const tooltipFg = isDark ? '#f5f5f4' : '#1c1917';
 
   const commonOptions: ChartOptions<any> = {
     responsive: true,

@@ -78,7 +78,7 @@ export function WeekCalendar({
   return (
     <div className="w-full overflow-x-auto">
       <div
-        className="grid border-b border-border bg-card"
+        className="grid border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900"
         style={{ gridTemplateColumns: '48px repeat(7, 1fr)' }}
       >
         <div />
@@ -88,21 +88,21 @@ export function WeekCalendar({
           const hasEvents = (eventsByDate[dateStr] ?? []).length > 0;
           return (
             <div key={i} className="text-center py-2 px-1">
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+              <p className="text-[11px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide">
                 {DAY_NAMES[i]}
               </p>
               <div className="relative mx-auto w-fit mt-0.5">
                 <div
                   className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold transition-colors ${
                     isToday
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-secondary-foreground'
+                      ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950'
+                      : 'text-stone-800 dark:text-stone-100'
                   }`}
                 >
                   {d.getDate()}
                 </div>
                 {hasEvents && !isToday && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-teal-800 dark:bg-teal-500" />
                 )}
               </div>
             </div>
@@ -125,7 +125,7 @@ export function WeekCalendar({
             {hours.map((h) => (
               <div
                 key={h}
-                className="absolute left-0 right-0 border-t border-border/70"
+                className="absolute left-0 right-0 border-t border-stone-200/70 dark:border-stone-800/70"
                 style={{ top: (h - startHour) * HOUR_PX }}
               />
             ))}
@@ -135,7 +135,7 @@ export function WeekCalendar({
             {hours.slice(0, -1).map((h) => (
               <div
                 key={h}
-                className="absolute right-2 text-[10px] text-muted-foreground/70 leading-none select-none"
+                className="absolute right-2 text-[10px] text-stone-500/70 dark:text-stone-400/70 leading-none select-none"
                 style={{ top: (h - startHour) * HOUR_PX + 3 }}
               >
                 {String(h).padStart(2, '0')}:00
@@ -150,7 +150,7 @@ export function WeekCalendar({
             return (
               <div
                 key={i}
-                className="relative border-l border-border"
+                className="relative border-l border-stone-200 dark:border-stone-800"
                 style={{ height: totalHeight }}
               >
                 {dayEvents.map((ev) => {
@@ -159,10 +159,10 @@ export function WeekCalendar({
                   const typeStyle = EVENT_TYPE_MAP[ev.type];
                   const past = isPastEvent(ev, today);
                   const bgClass = past
-                    ? 'bg-secondary border-border'
+                    ? 'bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-800'
                     : typeStyle.bg;
                   const colorClass = past
-                    ? 'text-muted-foreground/70'
+                    ? 'text-stone-500/70 dark:text-stone-400/70'
                     : typeStyle.color;
                   return (
                     <button

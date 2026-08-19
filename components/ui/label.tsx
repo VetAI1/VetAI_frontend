@@ -7,7 +7,7 @@ import * as React from 'react';
 import { cn } from '@/infra/utils';
 
 const labelVariants = cva(
-  'text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+  'text-sm font-medium leading-none text-stone-900 dark:text-stone-100 peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
 );
 
 const Label = React.forwardRef<
@@ -21,7 +21,7 @@ const Label = React.forwardRef<
     {...props}
   >
     {children}
-    {required && <span className="text-destructive ml-0.5">*</span>}
+    {required && <span className="text-red-600 dark:text-red-500 ml-0.5">*</span>}
   </LabelPrimitive.Root>
 ));
 Label.displayName = LabelPrimitive.Root.displayName;
