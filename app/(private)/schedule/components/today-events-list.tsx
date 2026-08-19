@@ -1,5 +1,6 @@
-import { CalendarX, PawPrint, Plus, User } from 'lucide-react';
+import { PawPrint, Plus, User } from 'lucide-react';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ScheduleEvent } from '@/types/schedule';
 import { EVENT_TYPE_MAP } from '@/types/schedule';
@@ -64,21 +65,18 @@ export function TodayEventsList({
           <Skeleton className="h-16 w-full rounded-lg" />
         </div>
       ) : sorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center flex-1 py-10 text-center">
-          <CalendarX
-            size={36}
-            className="text-muted-foreground/50 mb-3"
-          />
-          <p className="text-sm text-muted-foreground">
-            Sem eventos para este dia.
-          </p>
-          <button
-            onClick={onAddClick}
-            className="mt-3 text-sm text-primary hover:underline font-medium"
-          >
-            Agendar evento
-          </button>
-        </div>
+        <EmptyState
+          title="Sem eventos para este dia"
+          className="flex-1 py-10"
+          action={
+            <button
+              onClick={onAddClick}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Agendar evento
+            </button>
+          }
+        />
       ) : (
         <div className="flex flex-col gap-2 overflow-y-auto">
           {sorted.map((ev) => {

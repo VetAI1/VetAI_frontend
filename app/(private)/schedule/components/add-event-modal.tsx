@@ -7,6 +7,7 @@ import { Controller, useForm, type Resolver } from 'react-hook-form';
 import { toLocalDateStr } from '../utils';
 
 import { Modal } from '@/app/components/common/modal';
+import { notifyMutationSuccess } from '@/app/components/common/mutation-feedback';
 import { Autocomplete } from '@/app/components/forms/autocomplete';
 import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
@@ -50,6 +51,7 @@ export function AddEventModal({
   maxHour = 23,
 }: AddEventModalProps) {
   const isEditing = !!editingEvent;
+  const [saving, setSaving] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<
     (ComboBoxItem & { tutorId?: string }) | null
       >(
@@ -161,10 +163,20 @@ export function AddEventModal({
       tutorName: data.tutorName.trim(),
     };
 
-    const saved = isEditing
-      ? await scheduleService.update(editingEvent.id, payload)
-      : await scheduleService.create(payload);
-    onSave(saved);
+    setSaving(true);
+    try {
+      const saved = isEditing
+        ? await scheduleService.update(editingEvent.id, payload)
+        : await scheduleService.create(payload);
+      notifyMutationSuccess(
+        isEditing
+          ? 'Agendamento atualizado com sucesso.'
+          : 'Agendamento criado com sucesso.',
+      );
+      onSave(saved);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -339,11 +351,12 @@ export function AddEventModal({
           )}
         />
         <div className="flex justify-end gap-2 pt-1">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
           </Button>
           <Button
             type="submit"
+            loading={saving}
             className="border-primary bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {isEditing ? 'Salvar alterações' : 'Salvar evento'}

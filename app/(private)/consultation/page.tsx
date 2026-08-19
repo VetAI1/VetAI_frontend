@@ -24,10 +24,12 @@ import { TypingIndicator } from './components/typing-indicator';
 import { ConsultationHistory } from '@/app/components/business/consultation-history';
 import { DiseaseDetailModal } from '@/app/components/business/disease-detail-modal';
 import { Badge } from '@/app/components/common/badge';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useModal } from '@/contexts/modal-context';
 import { useConsultation } from '@/hooks/use-consultation';
 import type { ChatMessage } from '@/hooks/use-consultation';
 import { disconnectSocket } from '@/infra/socket';
@@ -40,13 +42,10 @@ export default function Consultation() {
   const [inputMessage, setInputMessage] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [isCheckingInProgress, setIsCheckingInProgress] = useState(true);
-  const [showHistory, setShowHistory] = useState(false);
   const [markedDiseaseIndex, setMarkedDiseaseIndex] = useState<number | null>(
     null,
   );
-  const [showConfirmFinish, setShowConfirmFinish] = useState(false);
-  const [detailDisease, setDetailDisease] =
-    useState<ConsultationDisease | null>(null);
+  const { open } = useModal();
 
   const {
     messages,
@@ -110,7 +109,6 @@ export default function Consultation() {
       );
       resetMessages(restoredMessages, consultation.diagnosis);
       setMarkedDiseaseIndex(null);
-      setShowConfirmFinish(false);
     },
     [resetMessages],
   );
@@ -161,6 +159,24 @@ export default function Consultation() {
     void navigator.clipboard.writeText(content);
   };
 
+  const openConsultationHistory = () => {
+    open({
+      content: ({ close }) => <ConsultationHistory onClose={close} />,
+    });
+  };
+
+  const openDiseaseDetail = (disease: ConsultationDisease) => {
+    open({
+      content: ({ close }) => (
+        <DiseaseDetailModal
+          disease={disease}
+          generalTreatments={suggestedTreatments}
+          onClose={close}
+        />
+      ),
+    });
+  };
+
   const handleResendMessage = (content: string) => {
     if (isLoading) return;
     sendMessage(content);
@@ -168,7 +184,17 @@ export default function Consultation() {
 
   const handleFinishClick = () => {
     if (diseases.length > 0 && markedDiseaseIndex === null) {
-      setShowConfirmFinish(true);
+      open({
+        content: ({ close }) => (
+          <ConfirmFinishModal
+            onConfirm={() => {
+              close();
+              finishConsultation(undefined);
+            }}
+            onCancel={close}
+          />
+        ),
+      });
       return;
     }
     const selectedName =
@@ -176,11 +202,6 @@ export default function Consultation() {
         ? diseases[markedDiseaseIndex]?.name
         : undefined;
     finishConsultation(selectedName);
-  };
-
-  const handleConfirmFinish = () => {
-    setShowConfirmFinish(false);
-    finishConsultation(undefined);
   };
 
   const getSeverityColor = (severity: 'red' | 'yellow' | 'green') => {
@@ -213,44 +234,39 @@ export default function Consultation() {
       <div className="min-h-screen bg-background w-full">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <Header title="Consulta" showStorage={false} />
-          <div className="flex flex-col items-center justify-center py-20">
-            <Bot size={64} className="text-primary mb-6" />
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Assistente de Anamnese IA
-            </h2>
-            <p className="text-muted-foreground text-center max-w-md mb-8">
-              Inicie uma nova consulta para receber auxílio da inteligência
-              artificial no diagnóstico veterinário.
-            </p>
-            <div className="flex gap-3">
-              <Button
-                onClick={handleNewConsultation}
-                disabled={isCreating}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 h-11"
-              >
-                {isCreating ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" /> Iniciando...
-                  </>
-                ) : (
-                  <>
-                    <Plus size={18} /> Nova consulta
-                  </>
-                )}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowHistory(true)}
-                className="h-11"
-              >
-                <History size={18} /> Histórico
-              </Button>
-            </div>
-          </div>
+          <EmptyState
+            title="Assistente de Anamnese IA"
+            description="Inicie uma nova consulta para receber auxílio da inteligência artificial no diagnóstico veterinário."
+            icon={Bot}
+            className="py-20"
+            action={
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleNewConsultation}
+                  disabled={isCreating}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 h-11"
+                >
+                  {isCreating ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Iniciando...
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={18} /> Nova consulta
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={openConsultationHistory}
+                  className="h-11"
+                >
+                  <History size={18} /> Histórico
+                </Button>
+              </div>
+            }
+          />
         </div>
-        {showHistory && (
-          <ConsultationHistory onClose={() => setShowHistory(false)} />
-        )}
       </div>
     );
   }
@@ -287,7 +303,7 @@ export default function Consultation() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowHistory(true)}
+                onClick={openConsultationHistory}
               >
                 <History size={16} /> Histórico
               </Button>
@@ -464,17 +480,11 @@ export default function Consultation() {
             >
               <div className="space-y-3">
                 {diseases.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <AlertCircle
-                      size={32}
-                      className="mx-auto mb-2 opacity-50"
-                    />
-                    <p className="text-sm">
-                      Nenhuma doença identificada ainda.
-                      <br />
-                      Continue a conversa para análise.
-                    </p>
-                  </div>
+                  <EmptyState
+                    title="Nenhuma doença identificada ainda"
+                    description="Continue a conversa para análise."
+                    icon={AlertCircle}
+                  />
                 ) : (
                   diseases.map((disease, index) => {
                     const prob = normalizeProb(disease.probability);
@@ -489,7 +499,7 @@ export default function Consultation() {
                             : 'border-border'
                         }`}
                         style={{ animationDelay: `${index * 50}ms` }}
-                        onClick={() => setDetailDisease(disease)}
+                        onClick={() => openDiseaseDetail(disease)}
                       >
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex items-start gap-2 flex-1 min-w-0">
@@ -583,14 +593,11 @@ export default function Consultation() {
             >
               <div className="space-y-2">
                 {suggestedInfo.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Info size={32} className="mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">
-                      Nenhuma informação sugerida ainda.
-                      <br />
-                      Continue a conversa para receber sugestões.
-                    </p>
-                  </div>
+                  <EmptyState
+                    title="Nenhuma informação sugerida ainda"
+                    description="Continue a conversa para receber sugestões."
+                    icon={Info}
+                  />
                 ) : (
                   suggestedInfo.map((info, index) => (
                     <div
@@ -616,24 +623,6 @@ export default function Consultation() {
         </div>
       </div>
 
-      {detailDisease && (
-        <DiseaseDetailModal
-          disease={detailDisease}
-          generalTreatments={suggestedTreatments}
-          onClose={() => setDetailDisease(null)}
-        />
-      )}
-
-      {showConfirmFinish && (
-        <ConfirmFinishModal
-          onConfirm={handleConfirmFinish}
-          onCancel={() => setShowConfirmFinish(false)}
-        />
-      )}
-
-      {showHistory && (
-        <ConsultationHistory onClose={() => setShowHistory(false)} />
-      )}
     </div>
   );
 }

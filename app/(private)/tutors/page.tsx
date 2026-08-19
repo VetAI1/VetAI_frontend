@@ -15,25 +15,23 @@ import { useState } from 'react';
 
 import { TutorModal } from './components/tutor-modal';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { tutorsService } from '@/services/tutors.service';
 import type { Tutor } from '@/types/tutor';
 import { formatPhone } from '@/utils/masks';
 
 export default function TutorsPage() {
-  const [showModal, setShowModal] = useState(false);
-  const [editingTutor, setEditingTutor] = useState<Tutor | undefined>(
-    undefined,
-  );
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmDeleteTutor, setConfirmDeleteTutor] = useState<Tutor | null>(
-    null,
-  );
+  const { open } = useModal();
+  const { confirm } = useConfirmation();
 
   const {
     items: tutors,
@@ -52,13 +50,10 @@ export default function TutorsPage() {
   });
 
   const handleCreateSuccess = (tutor: Tutor) => {
-    setShowModal(false);
     prependItem(tutor);
   };
 
   const handleEditSuccess = (updated: Tutor) => {
-    setShowModal(false);
-    setEditingTutor(undefined);
     replaceItem((t) => t.id === updated.id, updated);
   };
 
@@ -70,18 +65,36 @@ export default function TutorsPage() {
     } catch {
     } finally {
       setDeletingId(null);
-      setConfirmDeleteTutor(null);
     }
   };
 
-  const openEdit = (tutor: Tutor) => {
-    setEditingTutor(tutor);
-    setShowModal(true);
+  const confirmDeleteTutor = (tutor: Tutor) => {
+    confirm({
+      title: 'Excluir tutor?',
+      description: `${tutor.name} será removido permanentemente.`,
+      variant: 'danger',
+      confirmLabel: 'Excluir',
+      onConfirm: () => handleDelete(tutor),
+    });
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingTutor(undefined);
+  const openTutorModal = (tutor?: Tutor) => {
+    open({
+      content: ({ close }) => (
+        <TutorModal
+          {...(tutor ? { tutor } : {})}
+          onClose={close}
+          onSuccess={(savedTutor) => {
+            if (tutor) {
+              handleEditSuccess(savedTutor);
+            } else {
+              handleCreateSuccess(savedTutor);
+            }
+            close();
+          }}
+        />
+      ),
+    });
   };
 
   return (
@@ -101,8 +114,7 @@ export default function TutorsPage() {
           headerAction={
             <Button
               onClick={() => {
-                setEditingTutor(undefined);
-                setShowModal(true);
+                openTutorModal();
               }}
               className="bg-primary h-10 text-primary-foreground hover:bg-primary/90"
             >
@@ -127,16 +139,15 @@ export default function TutorsPage() {
           >
             {tutors.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-8 text-center">
-                  <User
-                    size={32}
-                    className="text-muted-foreground/50 mx-auto mb-2"
+                <td colSpan={6} className="p-4">
+                  <EmptyState
+                    title={
+                      search
+                        ? 'Nenhum tutor encontrado'
+                        : 'Nenhum tutor cadastrado ainda'
+                    }
+                    icon={User}
                   />
-                  <p className="text-muted-foreground text-sm">
-                    {search
-                      ? 'Nenhum tutor encontrado.'
-                      : 'Nenhum tutor cadastrado ainda.'}
-                  </p>
                 </td>
               </tr>
             ) : (
@@ -206,7 +217,7 @@ export default function TutorsPage() {
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => openEdit(tutor)}
+                        onClick={() => openTutorModal(tutor)}
                         title="Editar"
                       >
                         <Pencil
@@ -217,7 +228,7 @@ export default function TutorsPage() {
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => setConfirmDeleteTutor(tutor)}
+                        onClick={() => confirmDeleteTutor(tutor)}
                         title="Excluir"
                         disabled={deletingId === tutor.id}
                       >
@@ -238,54 +249,6 @@ export default function TutorsPage() {
           </DataTable>
         </SectionCard>
       </div>
-
-      {showModal && (
-        <TutorModal
-          {...(editingTutor ? { tutor: editingTutor } : {})}
-          onClose={closeModal}
-          onSuccess={editingTutor ? handleEditSuccess : handleCreateSuccess}
-        />
-      )}
-
-      {confirmDeleteTutor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setConfirmDeleteTutor(null)}
-          />
-          <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-foreground mb-2">
-              Excluir tutor?
-            </h3>
-            <p className="text-sm text-muted-foreground mb-6">
-              <strong>{confirmDeleteTutor.name}</strong> será removido
-              permanentemente.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setConfirmDeleteTutor(null)}
-                disabled={!!deletingId}
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={() => {
-                  void handleDelete(confirmDeleteTutor);
-                }}
-                disabled={!!deletingId}
-                className="bg-destructive text-white hover:bg-destructive/90"
-              >
-                {deletingId ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  'Excluir'
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

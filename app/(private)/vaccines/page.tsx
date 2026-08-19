@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { VaccineFormModal } from './components/vaccine-form-modal';
 
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
@@ -154,17 +155,11 @@ export default function VaccinesPage() {
             onSearch={setSearch}
             searchPlaceholder="Buscar vacina..."
             emptyState={
-              <div className="p-8 text-center">
-                <Syringe
-                  size={32}
-                  className="mx-auto mb-2 text-muted-foreground/50"
-                />
-                <p className="text-sm text-muted-foreground">
-                  {search
-                    ? 'Nenhuma vacina encontrada.'
-                    : 'Nenhuma vacina cadastrada ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={Syringe}
+                title={search ? 'Nenhuma vacina encontrada' : 'Nenhuma vacina cadastrada'}
+                description={search ? 'Revise a busca ou tente outro termo.' : 'Cadastre a primeira vacina para começar.'}
+              />
             }
           />
 

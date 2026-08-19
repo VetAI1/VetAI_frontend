@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { MedicineDetailModal } from './components/medicine-detail-modal';
 
 import { Card } from '@/app/components/common/card';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -252,14 +253,15 @@ export default function MedicinesPage() {
             ))}
           </div>
         ) : isEmpty ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-3">
-            <Pill size={36} className="text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">
-              {search || filters.type
-                ? 'Nenhum medicamento encontrado.'
-                : 'Nenhum medicamento cadastrado ainda.'}
-            </p>
-          </div>
+          <EmptyState
+            title={
+              search || filters.type
+                ? 'Nenhum medicamento encontrado'
+                : 'Nenhum medicamento cadastrado ainda'
+            }
+            icon={Pill}
+            className="py-24"
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {medicines.map((medicine) => (

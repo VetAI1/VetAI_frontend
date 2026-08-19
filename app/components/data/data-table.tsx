@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export interface DataTableColumn<T> {
@@ -42,7 +43,7 @@ export function DataTable<T>({
   columns,
   data,
   getRowKey,
-  emptyState = 'Nenhum registro encontrado.',
+  emptyState = <EmptyState />,
   loading = false,
   skeletonRows = 5,
   showSearch = false,
@@ -65,6 +66,8 @@ export function DataTable<T>({
 
   const useColumnsMode = columns !== undefined && data !== undefined;
   const showCards = responsive && useColumnsMode && columns.length > 0;
+  const renderedEmptyState =
+    typeof emptyState === 'string' ? <EmptyState title={emptyState} /> : emptyState;
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -73,13 +76,13 @@ export function DataTable<T>({
 
   const renderTable = (
     <div
-      className="overflow-x-auto overflow-y-auto flex-1"
+      className="flex-1 overflow-x-auto overflow-y-auto rounded-lg border border-border bg-card"
       style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}
     >
       <table
         className={`w-full text-left text-sm${stretchEmptyState ? ' h-full' : ''}${tableClassName ? ` ${tableClassName}` : ''}`}
       >
-        <thead className="border-b border-border bg-muted/40 text-muted-foreground">
+        <thead className="border-b border-border bg-secondary/70 text-muted-foreground">
           <tr>
             {tableHeaders.map((header, index) => {
               const column = columns?.[index];
@@ -142,9 +145,9 @@ export function DataTable<T>({
               <tr>
                 <td
                   colSpan={colSpan}
-                  className="p-8 text-center text-sm text-muted-foreground"
+                  className="p-5"
                 >
-                  {emptyState}
+                  {renderedEmptyState}
                 </td>
               </tr>
             )
@@ -162,7 +165,7 @@ export function DataTable<T>({
         Array.from({ length: skeletonRows }).map((_, rIdx) => (
           <div
             key={`skel-card-${rIdx}`}
-            className="rounded-lg border border-border bg-card p-4"
+            className="rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]"
           >
             <Skeleton className="h-4 w-1/2" />
           </div>
@@ -171,7 +174,7 @@ export function DataTable<T>({
         data.map((row, rowIndex) => (
           <div
             key={getRowKey?.(row, rowIndex) ?? rowIndex}
-            className="rounded-lg border border-border bg-card p-4"
+            className="rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]"
           >
             <div className="flex flex-col gap-2.5">
               {columns.map((column) => (
@@ -194,8 +197,8 @@ export function DataTable<T>({
           </div>
         ))
       ) : (
-        <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center text-sm text-muted-foreground">
-          {emptyState}
+        <div className="md:hidden">
+          {renderedEmptyState}
         </div>
       )}
     </div>

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 import { CatalogItemModal } from './components/catalog-item-modal';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
@@ -261,17 +262,11 @@ export default function CatalogPage() {
             getRowKey={(item) => item.id}
             loading={loading}
             emptyState={
-              <div className="p-8 text-center">
-                <BookOpen
-                  size={32}
-                  className="text-muted-foreground/50 mx-auto mb-2"
-                />
-                <p className="text-muted-foreground text-sm">
-                  {filters.category || filters.active !== undefined
-                    ? 'Nenhum item encontrado para os filtros selecionados.'
-                    : 'Nenhum item no catálogo ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={BookOpen}
+                title={filters.category || filters.active !== undefined ? 'Nenhum item encontrado' : 'Catálogo vazio'}
+                description={filters.category || filters.active !== undefined ? 'Revise os filtros selecionados.' : 'Adicione o primeiro item ao catálogo.'}
+              />
             }
           />
 

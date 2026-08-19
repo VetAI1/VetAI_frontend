@@ -2,9 +2,9 @@
 
 import { ChevronRight, PawPrint, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 import { PatientModal } from '@/app/components/business/patient-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
@@ -14,6 +14,7 @@ import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { patientsService } from '@/services/patients.service';
 import type { Patient } from '@/types/patient';
@@ -23,7 +24,7 @@ interface PatientFilters {
 }
 
 export default function PatientsPage() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { open } = useModal();
 
   const {
     items: patients,
@@ -40,8 +41,21 @@ export default function PatientsPage() {
   });
 
   const handleCreateSuccess = (patient: Patient) => {
-    setShowCreateModal(false);
     prependItem(patient);
+  };
+
+  const openCreateModal = () => {
+    open({
+      content: ({ close }) => (
+        <PatientModal
+          onClose={close}
+          onSuccess={(patient) => {
+            handleCreateSuccess(patient);
+            close();
+          }}
+        />
+      ),
+    });
   };
 
   const columns: DataTableColumn<Patient>[] = [
@@ -121,7 +135,7 @@ export default function PatientsPage() {
           }
           headerAction={
             <Button
-              onClick={() => setShowCreateModal(true)}
+              onClick={openCreateModal}
               className="bg-primary h-10 text-primary-foreground hover:bg-primary/90"
             >
               <Plus size={18} /> Novo Paciente
@@ -137,28 +151,15 @@ export default function PatientsPage() {
             onSearch={setSearch}
             searchPlaceholder="Buscar por nome..."
             emptyState={
-              <div className="p-8 text-center">
-                <PawPrint
-                  size={32}
-                  className="text-muted-foreground/50 mx-auto mb-2"
-                />
-                <p className="text-muted-foreground text-sm">
-                  {search
-                    ? 'Nenhum paciente encontrado.'
-                    : 'Nenhum paciente cadastrado ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={PawPrint}
+                title={search ? 'Nenhum paciente encontrado' : 'Nenhum paciente cadastrado'}
+                description={search ? 'Revise a busca ou tente outro nome.' : 'Cadastre o primeiro paciente para começar.'}
+              />
             }
           />
         </SectionCard>
       </div>
-
-      {showCreateModal && (
-        <PatientModal
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={handleCreateSuccess}
-        />
-      )}
     </div>
   );
 }

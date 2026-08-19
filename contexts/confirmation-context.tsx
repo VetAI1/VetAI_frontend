@@ -33,17 +33,17 @@ const VARIANT_CONFIG: Record<
 > = {
   default: {
     icon: CircleCheck,
-    iconClassName: 'bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400',
+    iconClassName: 'bg-primary/10 text-primary',
     buttonVariant: 'default',
   },
   alert: {
     icon: AlertTriangle,
-    iconClassName: 'bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400',
+    iconClassName: 'bg-warning-soft text-warning',
     buttonVariant: 'default',
   },
   danger: {
     icon: CircleAlert,
-    iconClassName: 'bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400',
+    iconClassName: 'bg-danger-soft text-danger',
     buttonVariant: 'destructive',
   },
 };
@@ -80,15 +80,15 @@ function ConfirmationDialog({
   };
 
   return (
-    <div className='w-[min(calc(100vw-2rem),26rem)] rounded-xl bg-white p-6 shadow-2xl dark:bg-slate-800'>
+    <div className='w-[min(calc(100vw-2rem),26rem)] rounded-xl bg-card p-6 shadow-[var(--shadow-card)]'>
       <div className='flex gap-4'>
         <div className={`flex size-10 shrink-0 items-center justify-center rounded-full ${config.iconClassName}`}>
           <Icon size={20} />
         </div>
         <div className='min-w-0 pt-0.5'>
-          <h2 className='text-lg font-bold text-slate-900 dark:text-white'>{options.title}</h2>
+          <h2 className='text-lg font-bold text-foreground'>{options.title}</h2>
           {options.description && (
-            <p className='mt-1 text-sm text-slate-600 dark:text-slate-300'>
+            <p className='mt-1 text-sm text-muted-foreground'>
               {options.description}
             </p>
           )}

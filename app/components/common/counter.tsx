@@ -13,17 +13,22 @@ interface CounterProps {
 
 export function Counter({
   target,
-  duration = 2000,
+  duration = 300,
   suffix = '',
   prefix = '',
 }: CounterProps) {
-  const { ref, isVisible } = useReveal();
+  const { ref, isVisible, prefersReducedMotion } = useReveal();
   const [count, setCount] = useState(0);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
     if (!isVisible || hasAnimated.current) return;
     hasAnimated.current = true;
+
+    if (prefersReducedMotion) {
+      setCount(target);
+      return;
+    }
 
     const startTime = performance.now();
     const animate = (currentTime: number) => {
@@ -40,7 +45,7 @@ export function Counter({
     };
 
     requestAnimationFrame(animate);
-  }, [isVisible, target, duration]);
+  }, [isVisible, target, duration, prefersReducedMotion]);
 
   return (
     <span ref={ref}>

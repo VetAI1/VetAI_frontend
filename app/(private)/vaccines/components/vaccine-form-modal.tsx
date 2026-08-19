@@ -1,11 +1,11 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
+import { notifyMutationSuccess } from '@/app/components/common/mutation-feedback';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
@@ -72,6 +72,9 @@ export function VaccineFormModal({
             : {}),
         });
       }
+      notifyMutationSuccess(
+        isEdit ? 'Vacina atualizada com sucesso.' : 'Vacina criada com sucesso.',
+      );
       onSuccess();
     } finally {
       setSaving(false);
@@ -149,16 +152,10 @@ export function VaccineFormModal({
           </Button>
           <Button
             type="submit"
-            disabled={saving}
+            loading={saving}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            {saving ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : isEdit ? (
-              'Salvar'
-            ) : (
-              'Criar Vacina'
-            )}
+            {isEdit ? 'Salvar' : 'Criar Vacina'}
           </Button>
         </div>
       </form>

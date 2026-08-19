@@ -1,7 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Loader2, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
@@ -10,6 +10,7 @@ import { DateInput } from '../forms/date-input';
 import { InputWithLabel } from '../forms/input-with-label';
 import { SelectInput } from '../forms/select-input';
 
+import { notifyMutationSuccess } from '@/app/components/common/mutation-feedback';
 import { Button } from '@/components/ui/button';
 import { SPECIE_LABELS } from '@/constants';
 import { useAutoComplete } from '@/hooks/use-auto-complete';
@@ -101,14 +102,6 @@ export function PatientModal({
     }
   }, [patient]);
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
-
   const onSubmit = async (data: PatientFormData) => {
     setSaving(true);
 
@@ -147,6 +140,9 @@ export function PatientModal({
         if (restrictions.length) payload.restrictions = restrictions;
         result = await patientsService.create(payload);
       }
+      notifyMutationSuccess(
+        isEdit ? 'Paciente atualizado com sucesso.' : 'Paciente cadastrado com sucesso.',
+      );
       onSuccess(result);
     } finally {
       setSaving(false);
@@ -154,245 +150,233 @@ export function PatientModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-5 border-b border-border sticky top-0 bg-card z-10">
-          <div>
-            <h2 className="text-lg font-bold text-foreground">
-              {isEdit ? 'Editar Paciente' : 'Novo Paciente'}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {isEdit
-                ? 'Atualize os dados do paciente'
-                : 'Cadastre um novo pet'}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onClose}
-            className="text-muted-foreground"
-          >
-            <X size={18} />
-          </Button>
+    <div className="flex max-h-[calc(100dvh-2rem)] w-[min(calc(100vw-2rem),32rem)] flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-card)]">
+      <div className="flex shrink-0 items-center justify-between border-b border-border p-5">
+        <div>
+          <h2 className="text-lg font-bold text-foreground">
+            {isEdit ? 'Editar Paciente' : 'Novo Paciente'}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {isEdit
+              ? 'Atualize os dados do paciente'
+              : 'Cadastre um novo pet'}
+          </p>
         </div>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onClose}
+          className="text-muted-foreground"
+        >
+          <X size={18} />
+        </Button>
+      </div>
 
-        <div className="p-5 space-y-4">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label="Nome"
+              required
+              type="text"
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Ex: Rex"
+              error={errors.name?.message}
+            />
+          )}
+        />
+
+        <Controller
+          name="specie"
+          control={control}
+          render={({ field }) => (
+            <SelectInput
+              label="Espécie"
+              required
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Selecione a espécie"
+              error={errors.specie?.message}
+              options={[
+                { value: '', label: 'Selecione a espécie' },
+                ...SPECIES.map(([v, l]) => ({ value: v, label: l })),
+              ]}
+            />
+          )}
+        />
+
+        <div className="grid grid-cols-2 gap-3">
           <Controller
-            name="name"
+            name="breed"
             control={control}
             render={({ field }) => (
               <InputWithLabel
-                label="Nome"
-                required
+                label="Raça"
                 type="text"
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Ex: Rex"
-                error={errors.name?.message}
+                placeholder="Ex: Labrador"
               />
             )}
           />
-
           <Controller
-            name="specie"
+            name="sex"
             control={control}
             render={({ field }) => (
               <SelectInput
-                label="Espécie"
-                required
+                label="Sexo"
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Selecione a espécie"
-                error={errors.specie?.message}
+                placeholder="Não informado"
                 options={[
-                  { value: '', label: 'Selecione a espécie' },
-                  ...SPECIES.map(([v, l]) => ({ value: v, label: l })),
+                  { value: '', label: 'Não informado' },
+                  { value: 'MALE', label: 'Macho' },
+                  { value: 'FEMALE', label: 'Fêmea' },
                 ]}
               />
             )}
           />
+        </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Controller
-              name="breed"
-              control={control}
-              render={({ field }) => (
-                <InputWithLabel
-                  label="Raça"
-                  type="text"
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Ex: Labrador"
-                />
-              )}
+        <Controller
+          name="birthDate"
+          control={control}
+          render={({ field }) => (
+            <DateInput
+              label="Data de nascimento"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.birthDate?.message}
             />
-            <Controller
-              name="sex"
-              control={control}
-              render={({ field }) => (
-                <SelectInput
-                  label="Sexo"
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Não informado"
-                  options={[
-                    { value: '', label: 'Não informado' },
-                    { value: 'MALE', label: 'Macho' },
-                    { value: 'FEMALE', label: 'Fêmea' },
-                  ]}
-                />
-              )}
-            />
-          </div>
+          )}
+        />
 
+        <div className="grid grid-cols-2 gap-3">
           <Controller
-            name="birthDate"
+            name="castrationDate"
             control={control}
             render={({ field }) => (
               <DateInput
-                label="Data de nascimento"
+                label="Data de castração"
                 value={field.value}
                 onChange={field.onChange}
-                error={errors.birthDate?.message}
+                error={errors.castrationDate?.message}
               />
             )}
           />
-
-          <div className="grid grid-cols-2 gap-3">
-            <Controller
-              name="castrationDate"
-              control={control}
-              render={({ field }) => (
-                <DateInput
-                  label="Data de castração"
-                  value={field.value}
-                  onChange={field.onChange}
-                  error={errors.castrationDate?.message}
-                />
-              )}
-            />
-            <Controller
-              name="microchip"
-              control={control}
-              render={({ field }) => (
-                <InputWithLabel
-                  label="Microchip"
-                  type="text"
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Ex: 900123456789012"
-                />
-              )}
-            />
-          </div>
-
           <Controller
-            name="restrictions"
+            name="microchip"
             control={control}
             render={({ field }) => (
               <InputWithLabel
-                label="Restrições"
-                tooltip="Alergias e demais restrições do pet. Separe por vírgula — elas aparecem destacadas na ficha e nas internações."
+                label="Microchip"
                 type="text"
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Ex: Alergia a dipirona, Não pode anti-inflamatório"
-                error={errors.restrictions?.message}
+                placeholder="Ex: 900123456789012"
               />
             )}
-          />
-
-          <Controller
-            name="observations"
-            control={control}
-            render={({ field }) => (
-              <InputWithLabel
-                label="Observações"
-                tooltip="Anotações gerais sobre o pet"
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Ex: Fica agitado durante o banho"
-                maxLength={500}
-                error={errors.observations?.message}
-              />
-            )}
-          />
-
-          <Controller
-            name="deathDate"
-            control={control}
-            render={({ field }) => (
-              <DateInput
-                label="Data de falecimento"
-                value={field.value}
-                onChange={field.onChange}
-                error={errors.deathDate?.message}
-              />
-            )}
-          />
-
-          <Autocomplete
-            label="Tutor"
-            required
-            placeholder="Buscar tutor por nome..."
-            search={tutorSearch}
-            onSearchChange={setTutorSearch}
-            items={tutors}
-            getOptionLabel={(tutor) => tutor.name}
-            getOptionDescription={(tutor) => tutor.email}
-            loading={loadingTutors}
-            loadingMore={loadingMoreTutors}
-            hasMorePage={hasMoreTutors}
-            onLoadNextPage={loadNextTutorPage}
-            open={showTutorDropdown}
-            onOpenChange={setShowTutorDropdown}
-            selectedOption={
-              selectedTutor
-                ? {
-                  id: selectedTutor.id,
-                  label: selectedTutor.name,
-                  description: selectedTutor.email,
-                }
-                : null
-            }
-            onSelect={(tutor) => {
-              setSelectedTutor(tutor);
-              setValue('tutorId', tutor.id, { shouldValidate: true });
-              setTutorSearch('');
-            }}
-            onClear={() => {
-              setSelectedTutor(null);
-              setValue('tutorId', '', { shouldValidate: true });
-            }}
-            error={errors.tutorId?.message}
-            emptyMessage="Nenhum tutor encontrado"
           />
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-border">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
+        <Controller
+          name="restrictions"
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label="Restrições"
+              tooltip="Alergias e demais restrições do pet. Separe por vírgula — elas aparecem destacadas na ficha e nas internações."
+              type="text"
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Ex: Alergia a dipirona, Não pode anti-inflamatório"
+              error={errors.restrictions?.message}
+            />
+          )}
+        />
+
+        <Controller
+          name="observations"
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label="Observações"
+              tooltip="Anotações gerais sobre o pet"
+              type="text"
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Ex: Fica agitado durante o banho"
+              maxLength={500}
+              error={errors.observations?.message}
+            />
+          )}
+        />
+
+        <Controller
+          name="deathDate"
+          control={control}
+          render={({ field }) => (
+            <DateInput
+              label="Data de falecimento"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.deathDate?.message}
+            />
+          )}
+        />
+
+        <Autocomplete
+          label="Tutor"
+          required
+          placeholder="Buscar tutor por nome..."
+          search={tutorSearch}
+          onSearchChange={setTutorSearch}
+          items={tutors}
+          getOptionLabel={(tutor) => tutor.name}
+          getOptionDescription={(tutor) => tutor.email}
+          loading={loadingTutors}
+          loadingMore={loadingMoreTutors}
+          hasMorePage={hasMoreTutors}
+          onLoadNextPage={loadNextTutorPage}
+          open={showTutorDropdown}
+          onOpenChange={setShowTutorDropdown}
+          selectedOption={
+            selectedTutor
+              ? {
+                id: selectedTutor.id,
+                label: selectedTutor.name,
+                description: selectedTutor.email,
+              }
+              : null
+          }
+          onSelect={(tutor) => {
+            setSelectedTutor(tutor);
+            setValue('tutorId', tutor.id, { shouldValidate: true });
+            setTutorSearch('');
+          }}
+          onClear={() => {
+            setSelectedTutor(null);
+            setValue('tutorId', '', { shouldValidate: true });
+          }}
+          error={errors.tutorId?.message}
+          emptyMessage="Nenhum tutor encontrado"
+        />
+      </div>
+
+      <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border p-4">
+        <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
-          </Button>
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            disabled={saving}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[100px]"
-          >
-            {saving ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : isEdit ? (
-              'Salvar'
-            ) : (
-              'Cadastrar'
-            )}
-          </Button>
-        </div>
+        </Button>
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          loading={saving}
+          className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[100px]"
+        >
+          {isEdit ? 'Salvar' : 'Cadastrar'}
+        </Button>
       </div>
     </div>
   );

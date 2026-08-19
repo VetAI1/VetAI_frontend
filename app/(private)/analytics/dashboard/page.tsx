@@ -1,8 +1,6 @@
 'use client';
 
 import {
-  CalendarCheck,
-  Microscope,
   PawPrint,
   RefreshCcw,
 } from 'lucide-react';
@@ -11,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Badge } from '@/app/components/common/badge';
 import { Card } from '@/app/components/common/card';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { AnalyticsChart } from '@/components/AnalyticsChart';
@@ -170,15 +169,10 @@ export default function Dashboard() {
                   <Skeleton className="h-14 w-full rounded-lg" />
                 </div>
               ) : todayEvents.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center py-4">
-                  <CalendarCheck
-                    size={32}
-                    className="text-muted-foreground/40 mb-2"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Nenhuma atividade para hoje.
-                  </p>
-                </div>
+                <EmptyState
+                  title="Nenhuma atividade para hoje"
+                  className="h-full"
+                />
               ) : (
                 <div className="flex flex-col gap-2">
                   {todayEvents.map((event) => {
@@ -276,14 +270,8 @@ export default function Dashboard() {
               ))
             ) : studies.length === 0 ? (
               <tr>
-                <td colSpan={5} className="p-8 text-center">
-                  <Microscope
-                    size={32}
-                    className="text-muted-foreground/40 mx-auto mb-2"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Nenhum exame ainda.
-                  </p>
+                <td colSpan={5} className="p-4">
+                  <EmptyState title="Nenhum exame ainda" />
                 </td>
               </tr>
             ) : (
@@ -353,15 +341,7 @@ export default function Dashboard() {
                   </Card>
                 ))
               ) : patients.length === 0 ? (
-                <div className="text-center py-8">
-                  <PawPrint
-                    size={32}
-                    className="text-muted-foreground/40 mx-auto mb-2"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Nenhum paciente ainda.
-                  </p>
-                </div>
+                <EmptyState title="Nenhum paciente ainda" icon={PawPrint} />
               ) : (
                 patients.map((patient) => (
                   <Card key={patient.id} className="p-4">

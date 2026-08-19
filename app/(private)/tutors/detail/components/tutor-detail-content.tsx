@@ -26,6 +26,7 @@ import { AddPaymentModal } from './add-payment-modal';
 import { TutorModal } from '@/app/(private)/tutors/components/tutor-modal';
 import { Card } from '@/app/components/common/card';
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -213,13 +214,15 @@ export function TutorDetailContent() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <Header title="Detalhes do Tutor" showStorage={false} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
+      <div className="min-h-screen w-full bg-background">
+        <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+          <Header title="Detalhes do tutor" showStorage={false} />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
+          </div>
+          <Skeleton className="h-48 rounded-lg" />
+          <Skeleton className="h-48 rounded-lg" />
         </div>
-        <Skeleton className="h-48 rounded-lg" />
-        <Skeleton className="h-48 rounded-lg" />
       </div>
     );
   }
@@ -230,251 +233,274 @@ export function TutorDetailContent() {
     pets.find((p) => p.id === patientId)?.name ?? '—';
 
   return (
-    <div className="space-y-6">
-      <Header title="Detalhes do Tutor" showStorage={false} />
+    <div className="min-h-screen w-full bg-background">
+      <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+        <Header
+          title={tutor.name}
+          subtitle="Dados de contato, pacientes e movimentações"
+          showStorage={false}
+          headerAction={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowEditModal(true)}
+            >
+              <Pencil size={14} />
+              Editar
+            </Button>
+          }
+        />
 
-      {/* Back + actions */}
-      <div className="flex items-center justify-between gap-4">
-        <Link
-          href="/tutors"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Voltar para tutores
-        </Link>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowEditModal(true)}
-          className="gap-1.5"
-        >
-          <Pencil size={14} />
-          Editar
-        </Button>
-      </div>
-
-      {/* Info cards */}
-      <SectionCard title={tutor.name} subtitle="Informações do tutor">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <InfoItem icon={<User size={16} className="text-primary" />} iconBg="bg-primary/10" label="CPF" value={fmtCpf(tutor.cpf)} />
-          <InfoItem icon={<Phone size={16} className="text-info" />} iconBg="bg-info-soft" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
-          <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? '—'} />
-          <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="Endereço" value={tutor.address ?? '—'} />
-        </div>
-      </SectionCard>
-
-      {/* Pets */}
-      <SectionCard
-        title={<span className="flex items-center gap-2"><PawPrint size={18} />Pets</span>}
-        subtitle={`${pets.length} pet${pets.length !== 1 ? 's' : ''} cadastrado${pets.length !== 1 ? 's' : ''}`}
-      >
-        {petsLoading ? (
-          <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 rounded" />)}</div>
-        ) : pets.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">Nenhum pet cadastrado para este tutor.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {pets.map((pet) => (
-              <Link
-                key={pet.id}
-                href={`/patients/detail?id=${pet.id}`}
-                className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/10 transition-all group"
-              >
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <PawPrint size={16} className="text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">{pet.name}</p>
-                  <p className="text-xs text-muted-foreground">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </SectionCard>
-
-      {/* Agendamentos */}
-      <SectionCard
-        title={<span className="flex items-center gap-2"><CalendarClock size={18} />Atividades Agendadas</span>}
-        subtitle={`${upcomingAppointments.length} próxima${upcomingAppointments.length !== 1 ? 's' : ''}`}
-        headerAction={
-          <Button
-            size="sm"
-            onClick={() => setShowAddAppointment(true)}
-            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+        {/* Back + actions */}
+        <div className="flex items-center gap-4">
+          <Link
+            href="/tutors"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
-            <Plus size={14} />
-            Novo agendamento
-          </Button>
-        }
-      >
-        {appointmentsLoading ? (
-          <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
-        ) : upcomingAppointments.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">Nenhum agendamento futuro.</p>
-        ) : (
-          <div className="space-y-3">
-            {upcomingAppointments.map((appt) => (
-              <AppointmentRow
-                key={appt.id}
-                appointment={appt}
-                petName={petNameById(appt.patient_id)}
-                onDelete={() => setConfirmDelete({ type: 'appointment', id: appt.id })}
-              />
-            ))}
-          </div>
-        )}
+            <ArrowLeft size={16} />
+          Voltar para tutores
+          </Link>
+        </div>
 
-        {pastAppointments.length > 0 && (
-          <details className="mt-4">
-            <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground select-none flex items-center gap-1.5 mb-2">
-              <History size={14} />
-              {pastAppointments.length} atividade{pastAppointments.length !== 1 ? 's' : ''} passada{pastAppointments.length !== 1 ? 's' : ''}
-            </summary>
+        {/* Info cards */}
+        <SectionCard title="Informações de contato" subtitle="Dados cadastrados do tutor">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <InfoItem icon={<User size={16} className="text-primary" />} iconBg="bg-primary/10" label="CPF" value={fmtCpf(tutor.cpf)} />
+            <InfoItem icon={<Phone size={16} className="text-info" />} iconBg="bg-info-soft" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
+            <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? '—'} />
+            <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="Endereço" value={tutor.address ?? '—'} />
+          </div>
+        </SectionCard>
+
+        {/* Pets */}
+        <SectionCard
+          title={<span className="flex items-center gap-2"><PawPrint size={18} />Pets</span>}
+          subtitle={`${pets.length} pet${pets.length !== 1 ? 's' : ''} cadastrado${pets.length !== 1 ? 's' : ''}`}
+        >
+          {petsLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 rounded" />)}</div>
+          ) : pets.length === 0 ? (
+            <EmptyState
+              icon={PawPrint}
+              title="Nenhum pet cadastrado"
+              description="Os pacientes vinculados a este tutor aparecerão aqui."
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {pets.map((pet) => (
+                <Link
+                  key={pet.id}
+                  href={`/patients/detail?id=${pet.id}`}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/10 transition-all group"
+                >
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <PawPrint size={16} className="text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">{pet.name}</p>
+                    <p className="text-xs text-muted-foreground">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        {/* Agendamentos */}
+        <SectionCard
+          title={<span className="flex items-center gap-2"><CalendarClock size={18} />Atividades Agendadas</span>}
+          subtitle={`${upcomingAppointments.length} próxima${upcomingAppointments.length !== 1 ? 's' : ''}`}
+          headerAction={
+            <Button
+              size="sm"
+              onClick={() => setShowAddAppointment(true)}
+              className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus size={14} />
+            Novo agendamento
+            </Button>
+          }
+        >
+          {appointmentsLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
+          ) : upcomingAppointments.length === 0 ? (
+            <EmptyState
+              icon={CalendarClock}
+              title="Nenhum agendamento futuro"
+              description="Novos agendamentos aparecerão nesta seção."
+            />
+          ) : (
             <div className="space-y-3">
-              {pastAppointments.map((appt) => (
+              {upcomingAppointments.map((appt) => (
                 <AppointmentRow
                   key={appt.id}
                   appointment={appt}
                   petName={petNameById(appt.patient_id)}
                   onDelete={() => setConfirmDelete({ type: 'appointment', id: appt.id })}
-                  muted
                 />
               ))}
             </div>
-          </details>
-        )}
-      </SectionCard>
+          )}
 
-      {/* Pagamentos pendentes */}
-      <SectionCard
-        title={<span className="flex items-center gap-2"><CreditCard size={18} />Pagamentos Pendentes</span>}
-        subtitle={pendingPayments.length > 0 ? `Total: ${fmtCurrency(totalPending)}` : 'Nenhum pendente'}
-        headerAction={
-          <Button
-            size="sm"
-            onClick={() => setShowAddPayment(true)}
-            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <Plus size={14} />
+          {pastAppointments.length > 0 && (
+            <details className="mt-4">
+              <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground select-none flex items-center gap-1.5 mb-2">
+                <History size={14} />
+                {pastAppointments.length} atividade{pastAppointments.length !== 1 ? 's' : ''} passada{pastAppointments.length !== 1 ? 's' : ''}
+              </summary>
+              <div className="space-y-3">
+                {pastAppointments.map((appt) => (
+                  <AppointmentRow
+                    key={appt.id}
+                    appointment={appt}
+                    petName={petNameById(appt.patient_id)}
+                    onDelete={() => setConfirmDelete({ type: 'appointment', id: appt.id })}
+                    muted
+                  />
+                ))}
+              </div>
+            </details>
+          )}
+        </SectionCard>
+
+        {/* Pagamentos pendentes */}
+        <SectionCard
+          title={<span className="flex items-center gap-2"><CreditCard size={18} />Pagamentos Pendentes</span>}
+          subtitle={pendingPayments.length > 0 ? `Total: ${fmtCurrency(totalPending)}` : 'Nenhum pendente'}
+          headerAction={
+            <Button
+              size="sm"
+              onClick={() => setShowAddPayment(true)}
+              className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus size={14} />
             Registrar cobrança
-          </Button>
-        }
-      >
-        {paymentsLoading ? (
-          <div className="space-y-2">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
-        ) : pendingPayments.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">Nenhum pagamento pendente.</p>
-        ) : (
-          <div className="space-y-3">
-            {pendingPayments.map((payment) => (
-              <PaymentRow
-                key={payment.id}
-                payment={payment}
-                petName={petNameById(payment.patient_id)}
-                onMarkPaid={() => setConfirmMarkPaid(payment)}
-                onDelete={() => setConfirmDelete({ type: 'payment', id: payment.id })}
-              />
-            ))}
-          </div>
-        )}
-      </SectionCard>
-
-      {/* Histórico de compras */}
-      <SectionCard
-        title={<span className="flex items-center gap-2"><History size={18} />Histórico de Compras</span>}
-        subtitle={`${paidPayments.length} registro${paidPayments.length !== 1 ? 's' : ''}`}
-      >
-        {paymentsLoading ? (
-          <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
-        ) : paidPayments.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">Nenhum histórico de compras.</p>
-        ) : (
-          <div className="space-y-3">
-            {paidPayments.map((payment) => (
-              <PaymentRow
-                key={payment.id}
-                payment={payment}
-                petName={petNameById(payment.patient_id)}
-                onDelete={() => setConfirmDelete({ type: 'payment', id: payment.id })}
-              />
-            ))}
-          </div>
-        )}
-      </SectionCard>
-
-      {/* Modals */}
-      {showEditModal && tutor && (
-        <TutorModal
-          tutor={tutor}
-          onClose={() => setShowEditModal(false)}
-          onSuccess={(updated) => {
-            setTutor(updated);
-            setShowEditModal(false);
-          }}
-        />
-      )}
-
-      {showAddAppointment && id && (
-        <AddAppointmentModal
-          tutorId={id}
-          pets={pets}
-          onClose={() => setShowAddAppointment(false)}
-          onSuccess={(appt) => {
-            setAppointments((prev) => [appt, ...prev]);
-            setShowAddAppointment(false);
-          }}
-        />
-      )}
-
-      {showAddPayment && id && (
-        <AddPaymentModal
-          tutorId={id}
-          pets={pets}
-          onClose={() => setShowAddPayment(false)}
-          onSuccess={(payment) => {
-            if (payment.status === 'PENDING') {
-              setPendingPayments((prev) => [payment, ...prev]);
-            } else {
-              setPaidPayments((prev) => [payment, ...prev]);
-            }
-            setShowAddPayment(false);
-          }}
-        />
-      )}
-
-      {confirmDelete && (
-        <ConfirmModal
-          title={
-            confirmDelete.type === 'appointment'
-              ? 'Excluir agendamento'
-              : 'Excluir pagamento'
+            </Button>
           }
-          description="Esta ação não pode ser desfeita. Deseja continuar?"
-          confirmLabel="Excluir"
-          loading={deleting}
-          onConfirm={() => {
-            void (confirmDelete.type === 'appointment'
-              ? handleDeleteAppointment()
-              : handleDeletePayment());
-          }}
-          onClose={() => setConfirmDelete(null)}
-        />
-      )}
+        >
+          {paymentsLoading ? (
+            <div className="space-y-2">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
+          ) : pendingPayments.length === 0 ? (
+            <EmptyState
+              icon={CreditCard}
+              title="Nenhum pagamento pendente"
+              description="As cobranças pendentes aparecerão nesta seção."
+            />
+          ) : (
+            <div className="space-y-3">
+              {pendingPayments.map((payment) => (
+                <PaymentRow
+                  key={payment.id}
+                  payment={payment}
+                  petName={petNameById(payment.patient_id)}
+                  onMarkPaid={() => setConfirmMarkPaid(payment)}
+                  onDelete={() => setConfirmDelete({ type: 'payment', id: payment.id })}
+                />
+              ))}
+            </div>
+          )}
+        </SectionCard>
 
-      {confirmMarkPaid && (
-        <ConfirmModal
-          title="Confirmar pagamento"
-          description={`Marcar cobrança de ${fmtCurrency(confirmMarkPaid.amount)} como pago?`}
-          confirmLabel="Confirmar pagamento"
-          variant="default"
-          loading={markingPaid}
-          onConfirm={() => {
-            void handleMarkPaid();
-          }}
-          onClose={() => setConfirmMarkPaid(null)}
-        />
-      )}
+        {/* Histórico de compras */}
+        <SectionCard
+          title={<span className="flex items-center gap-2"><History size={18} />Histórico de Compras</span>}
+          subtitle={`${paidPayments.length} registro${paidPayments.length !== 1 ? 's' : ''}`}
+        >
+          {paymentsLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
+          ) : paidPayments.length === 0 ? (
+            <EmptyState
+              icon={History}
+              title="Nenhum histórico de compras"
+              description="Os pagamentos concluídos aparecerão nesta seção."
+            />
+          ) : (
+            <div className="space-y-3">
+              {paidPayments.map((payment) => (
+                <PaymentRow
+                  key={payment.id}
+                  payment={payment}
+                  petName={petNameById(payment.patient_id)}
+                  onDelete={() => setConfirmDelete({ type: 'payment', id: payment.id })}
+                />
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        {/* Modals */}
+        {showEditModal && tutor && (
+          <TutorModal
+            tutor={tutor}
+            onClose={() => setShowEditModal(false)}
+            onSuccess={(updated) => {
+              setTutor(updated);
+              setShowEditModal(false);
+            }}
+          />
+        )}
+
+        {showAddAppointment && id && (
+          <AddAppointmentModal
+            tutorId={id}
+            pets={pets}
+            onClose={() => setShowAddAppointment(false)}
+            onSuccess={(appt) => {
+              setAppointments((prev) => [appt, ...prev]);
+              setShowAddAppointment(false);
+            }}
+          />
+        )}
+
+        {showAddPayment && id && (
+          <AddPaymentModal
+            tutorId={id}
+            pets={pets}
+            onClose={() => setShowAddPayment(false)}
+            onSuccess={(payment) => {
+              if (payment.status === 'PENDING') {
+                setPendingPayments((prev) => [payment, ...prev]);
+              } else {
+                setPaidPayments((prev) => [payment, ...prev]);
+              }
+              setShowAddPayment(false);
+            }}
+          />
+        )}
+
+        {confirmDelete && (
+          <ConfirmModal
+            title={
+              confirmDelete.type === 'appointment'
+                ? 'Excluir agendamento'
+                : 'Excluir pagamento'
+            }
+            description="Esta ação não pode ser desfeita. Deseja continuar?"
+            confirmLabel="Excluir"
+            loading={deleting}
+            onConfirm={() => {
+              void (confirmDelete.type === 'appointment'
+                ? handleDeleteAppointment()
+                : handleDeletePayment());
+            }}
+            onClose={() => setConfirmDelete(null)}
+          />
+        )}
+
+        {confirmMarkPaid && (
+          <ConfirmModal
+            title="Confirmar pagamento"
+            description={`Marcar cobrança de ${fmtCurrency(confirmMarkPaid.amount)} como pago?`}
+            confirmLabel="Confirmar pagamento"
+            variant="default"
+            loading={markingPaid}
+            onConfirm={() => {
+              void handleMarkPaid();
+            }}
+            onClose={() => setConfirmMarkPaid(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }

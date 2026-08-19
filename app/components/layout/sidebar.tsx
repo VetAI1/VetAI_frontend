@@ -3,6 +3,7 @@
 import { LogOut, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 import { NAV_ITEMS, type NavItem } from './navigation';
 import { NotificationBell } from './notification-bell';
@@ -12,24 +13,76 @@ import { useTheme } from '@/contexts/theme-context';
 import { useAuth } from '@/infra/auth-context';
 import { cn } from '@/infra/utils';
 
+type SidebarVariant = 'default' | 'admin';
+
+interface SidebarFooterClasses {
+  item: string;
+  destructiveItem: string;
+}
+
+interface SidebarProps {
+  className?: string;
+  header?: ReactNode;
+  homeHref?: string;
+  items?: NavItem[];
+  onNavigate?: () => void;
+  renderFooter?: (classes: SidebarFooterClasses) => ReactNode;
+  variant?: SidebarVariant;
+}
+
+const sidebarStyles = {
+  default: {
+    background: 'border-sidebar-border bg-sidebar',
+    active:
+      'bg-sidebar-accent font-semibold text-sidebar-accent-foreground',
+    disabled: 'cursor-not-allowed text-muted-foreground/40',
+    iconActive: 'text-primary',
+    inactive:
+      'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
+    footerItem:
+      'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
+    footerDestructive: 'text-destructive hover:bg-destructive/10',
+    headerBorder: 'border-sidebar-border',
+  },
+  admin: {
+    background: 'border-admin-sidebar-border bg-admin-sidebar',
+    active:
+      'bg-admin-sidebar-accent font-semibold text-admin-sidebar-accent-foreground',
+    disabled: 'cursor-not-allowed text-admin-sidebar-foreground/40',
+    iconActive: 'text-admin-sidebar-primary',
+    inactive:
+      'text-admin-sidebar-foreground/75 hover:bg-admin-sidebar-accent/60 hover:text-admin-sidebar-foreground',
+    footerItem:
+      'text-admin-sidebar-foreground/75 hover:bg-admin-sidebar-accent/60 hover:text-admin-sidebar-foreground',
+    footerDestructive:
+      'text-admin-sidebar-foreground/75 hover:bg-admin-sidebar-accent/60 hover:text-admin-sidebar-foreground',
+    headerBorder: 'border-admin-sidebar-border',
+  },
+} as const;
+
 function NavLink({
   item,
   isActive,
   isDisabled,
+  onNavigate,
+  variant,
 }: {
   item: NavItem;
   isActive: boolean;
   isDisabled: boolean;
+  onNavigate?: () => void;
+  variant: SidebarVariant;
 }) {
   const Icon = item.icon;
+  const styles = sidebarStyles[variant];
 
   const className = cn(
     'group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
     isDisabled
-      ? 'cursor-not-allowed text-muted-foreground/40'
+      ? styles.disabled
       : isActive
-        ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
-        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
+        ? styles.active
+        : styles.inactive,
   );
 
   const content = (
@@ -38,7 +91,7 @@ function NavLink({
         size={18}
         className={cn(
           'shrink-0 transition-colors',
-          isActive && 'text-primary',
+          isActive && styles.iconActive,
         )}
       />
       <span className="truncate">{item.label}</span>
@@ -59,34 +112,74 @@ function NavLink({
   }
 
   return (
-    <Link key={item.href} href={item.href} className={className}>
+    <Link
+      key={item.href}
+      href={item.href}
+      className={className}
+      {...(onNavigate ? { onClick: onNavigate } : {})}
+    >
       {content}
     </Link>
   );
 }
 
-export function Sidebar() {
+export function Sidebar({
+  className,
+  header,
+  homeHref = '/analytics/dashboard',
+  items = NAV_ITEMS,
+  onNavigate,
+  renderFooter,
+  variant = 'default',
+}: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const { logout, can } = useAuth();
+  const styles = sidebarStyles[variant];
 
   async function handleLogout() {
     await logout();
     router.push('/login');
   }
 
+  const footerClasses = {
+    item: cn(
+      'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+      styles.footerItem,
+    ),
+    destructiveItem: cn(
+      'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+      styles.footerDestructive,
+    ),
+  };
+
   return (
-    <aside className="hidden md:flex h-full w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar print:hidden">
-      <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-5">
-        <Link href="/analytics/dashboard" aria-label="VetAI - início">
-          <BrandLogo />
-        </Link>
-        <NotificationBell />
+    <aside
+      className={cn(
+        'h-full w-64 shrink-0 flex-col border-r print:hidden',
+        styles.background,
+        className ?? 'hidden md:flex',
+      )}
+    >
+      <div
+        className={cn(
+          'flex h-16 items-center justify-between border-b px-5',
+          styles.headerBorder,
+        )}
+      >
+        {header ?? (
+          <>
+            <Link href={homeHref} aria-label="VetAI - início">
+              <BrandLogo />
+            </Link>
+            <NotificationBell />
+          </>
+        )}
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {NAV_ITEMS.map((item) => (
+        {items.map((item) => (
           <NavLink
             key={item.href}
             item={item}
@@ -94,24 +187,29 @@ export function Sidebar() {
               pathname === item.href || pathname.startsWith(`${item.href}/`)
             }
             isDisabled={item.permission ? !can(item.permission) : false}
+            variant={variant}
+            {...(onNavigate ? { onNavigate } : {})}
           />
         ))}
       </nav>
 
-      <div className="space-y-1 border-t border-sidebar-border p-3">
-        <button
-          onClick={toggleTheme}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
-        >
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-        </button>
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
-        >
-          <LogOut size={18} /> Sair
-        </button>
+      <div className={cn('space-y-1 border-t p-3', styles.headerBorder)}>
+        {renderFooter ? (
+          renderFooter(footerClasses)
+        ) : (
+          <>
+            <button onClick={toggleTheme} className={footerClasses.item}>
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+            </button>
+            <button
+              onClick={handleLogout}
+              className={footerClasses.destructiveItem}
+            >
+              <LogOut size={18} /> Sair
+            </button>
+          </>
+        )}
       </div>
     </aside>
   );

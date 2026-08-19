@@ -1,10 +1,11 @@
 'use client';
 
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { billingService } from '@/services/billing.service';
 
 export default function BillingSuccessPage() {
@@ -38,24 +39,38 @@ export default function BillingSuccessPage() {
   }, []);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-6">
-      <section className="w-full max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
-        {confirmed ? <CheckCircle2 className="mx-auto h-12 w-12 text-primary" /> : <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />}
-        <h1 className="mt-4 text-2xl font-bold text-foreground">
-          {confirmed ? 'Pagamento confirmado' : 'Confirmando seu pagamento'}
-        </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          {confirmed
-            ? 'Sua assinatura está ativa e o acesso ao VetAI foi liberado.'
-            : timedOut
-              ? 'Ainda estamos confirmando o pagamento. Atualize esta página em alguns instantes.'
-              : 'A confirmação pode levar alguns segundos. Não feche esta página.'}
-        </p>
-        {confirmed && (
-          <Button asChild className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90">
-            <Link href="/analytics/dashboard">Entrar no VetAI</Link>
-          </Button>
-        )}
+    <main className="min-h-screen w-full bg-background">
+      <section className="mx-auto flex min-h-screen w-full max-w-7xl items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+        <div
+          className="w-full max-w-lg rounded-lg border border-border bg-card p-5 text-center sm:p-6"
+          aria-live="polite"
+        >
+          {confirmed ? (
+            <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
+          ) : timedOut ? (
+            <AlertTriangle className="mx-auto h-12 w-12 text-warning" />
+          ) : (
+            <div aria-busy="true">
+              <span className="sr-only">Confirmando seu pagamento</span>
+              <Skeleton className="mx-auto size-12 rounded-full" />
+            </div>
+          )}
+          <h1 className="mt-4 text-2xl font-bold text-foreground">
+            {confirmed ? 'Pagamento confirmado' : 'Confirmando seu pagamento'}
+          </h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {confirmed
+              ? 'Sua assinatura está ativa e o acesso ao VetAI foi liberado.'
+              : timedOut
+                ? 'Ainda estamos confirmando o pagamento. Atualize esta página em alguns instantes.'
+                : 'A confirmação pode levar alguns segundos. Não feche esta página.'}
+          </p>
+          {confirmed && (
+            <Button asChild className="mt-6">
+              <Link href="/analytics/dashboard">Entrar no VetAI</Link>
+            </Button>
+          )}
+        </div>
       </section>
     </main>
   );

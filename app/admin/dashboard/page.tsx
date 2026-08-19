@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
@@ -88,9 +89,9 @@ export default function AdminDashboard() {
             <tr>
               <td
                 colSpan={5}
-                className="p-8 text-center text-sm text-muted-foreground"
+                className="p-4"
               >
-                Nenhum colaborador ativo.
+                <EmptyState title="Nenhum colaborador ativo" />
               </td>
             </tr>
           ) : (

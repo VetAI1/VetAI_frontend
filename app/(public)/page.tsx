@@ -26,6 +26,7 @@ import { Shot } from '@/app/components/brand/shot';
 import { Counter } from '@/app/components/common/counter';
 import { Reveal } from '@/app/components/common/reveal';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { billingService } from '@/services/billing.service';
 import type { Plan } from '@/types/billing';
 
@@ -113,12 +114,14 @@ function SectionHeading({
 
 export default function LandingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
 
   useEffect(() => {
     void billingService
       .listPlans()
       .then(setPlans)
-      .catch(() => setPlans([]));
+      .catch(() => setPlans([]))
+      .finally(() => setPlansLoading(false));
   }, []);
 
   return (
@@ -164,18 +167,18 @@ export default function LandingPage() {
                     Tecnologia que acompanha o cuidado
                   </div>
                 </Reveal>
-                <Reveal direction="up" delay={80}>
+                <Reveal direction="up" delay={60}>
                   <h1 className="font-display mt-6 text-5xl font-bold leading-[0.98] tracking-[-0.075em] text-foreground sm:text-6xl lg:text-7xl">
                     Gestão clínica que{' '}
                     <span className="text-primary">cuida do seu tempo.</span>
                   </h1>
                 </Reveal>
-                <Reveal direction="up" delay={160}>
+                <Reveal direction="up" delay={120}>
                   <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground md:text-xl">
                     Prontuário, exames e acompanhamento inteligente para a sua equipe ter mais clareza e cada paciente receber mais atenção.
                   </p>
                 </Reveal>
-                <Reveal direction="up" delay={240}>
+                <Reveal direction="up" delay={180}>
                   <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                     <Button asChild size="lg" className="h-12 px-7 text-base">
                       <Link href="/register">Começar sem compromisso <ArrowRight /></Link>
@@ -185,7 +188,7 @@ export default function LandingPage() {
                     </Button>
                   </div>
                 </Reveal>
-                <Reveal direction="up" delay={320}>
+                <Reveal direction="up" delay={240}>
                   <div className="mt-10 flex items-center gap-3 text-sm text-muted-foreground">
                     <div className="flex -space-x-2">
                       {['AP', 'CM', 'MC'].map((initials, index) => (
@@ -199,7 +202,7 @@ export default function LandingPage() {
                 </Reveal>
               </div>
 
-              <Reveal direction="up" delay={180}>
+              <Reveal direction="up" delay={160}>
                 <Shot
                   className="mx-auto w-full max-w-[560px]"
                   floating={
@@ -263,11 +266,13 @@ export default function LandingPage() {
               { value: 50000, suffix: '+', label: 'exames organizados' },
               { value: 15, suffix: ' mil+', label: 'pacientes acompanhados' },
               { value: 24, suffix: 'h', label: 'visão da clínica' },
-            ].map((stat) => (
-              <div key={stat.label} className="px-4 py-7 text-center sm:px-7">
-                <p className="font-data text-2xl font-semibold tracking-[-0.07em] text-primary sm:text-3xl"><Counter target={stat.value} suffix={stat.suffix} /></p>
-                <p className="mt-1 text-xs font-semibold text-muted-foreground">{stat.label}</p>
-              </div>
+            ].map((stat, index) => (
+              <Reveal key={stat.label} direction="up" delay={index * 60}>
+                <div className="px-4 py-7 text-center sm:px-7">
+                  <p className="font-data text-2xl font-semibold tracking-[-0.07em] text-primary sm:text-3xl"><Counter target={stat.value} suffix={stat.suffix} /></p>
+                  <p className="mt-1 text-xs font-semibold text-muted-foreground">{stat.label}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -276,8 +281,8 @@ export default function LandingPage() {
           <Reveal direction="up"><SectionHeading eyebrow="Uma rotina mais fluida" title="Clínico na essência. Simples na rotina." description="Cada ferramenta foi organizada para apoiar a tomada de decisão e reduzir o trabalho repetitivo da equipe." /></Reveal>
           <div className="mt-14 grid gap-5 lg:grid-cols-3">
             {FEATURES.map((feature, index) => (
-              <Reveal key={feature.title} direction="up" delay={index * 100}>
-                <article className="group h-full rounded-[24px] border border-border bg-card p-7 shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/25">
+              <Reveal key={feature.title} direction="up" delay={index * 80}>
+                <article className="group h-full rounded-[24px] border border-border bg-card p-7 shadow-[var(--shadow-card)] transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-primary/25">
                   <div className={`grid size-12 place-items-center rounded-2xl ${index === 1 ? 'bg-brand-sun text-accent-foreground' : 'bg-secondary text-primary'}`}><feature.icon size={23} /></div>
                   <p className="mt-7 text-xs font-bold uppercase tracking-[0.12em] text-primary">{feature.eyebrow}</p>
                   <h3 className="font-display mt-3 text-2xl font-bold tracking-[-0.05em] text-foreground">{feature.title}</h3>
@@ -349,10 +354,22 @@ export default function LandingPage() {
 
         <section id="planos" className="mx-auto max-w-7xl px-5 py-24 sm:px-8 md:py-32">
           <Reveal direction="up"><SectionHeading eyebrow="Planos que acompanham" title="Comece com a sua clínica. Cresça no seu ritmo." description="Escolha a estrutura que faz sentido hoje. Os planos crescem junto com a operação." /></Reveal>
-          {plans.length > 0 ? (
+          {plansLoading ? (
+            <div className="mt-14 grid gap-5 md:grid-cols-3">
+              {[0, 1, 2].map((index) => (
+                <div key={index} className="rounded-[24px] border border-border bg-card p-7">
+                  <Skeleton className="h-7 w-2/5" />
+                  <Skeleton className="mt-4 h-4 w-full" />
+                  <Skeleton className="mt-2 h-4 w-4/5" />
+                  <Skeleton className="mt-7 h-9 w-1/2" />
+                  <Skeleton className="mt-8 h-10 w-full" />
+                </div>
+              ))}
+            </div>
+          ) : plans.length > 0 ? (
             <div className="mt-14 grid gap-5 md:grid-cols-3">
               {plans.map((plan, index) => (
-                <Reveal key={plan.id} direction="up" delay={index * 100}>
+                <Reveal key={plan.id} direction="up" delay={index * 80}>
                   <article className={`relative flex h-full flex-col rounded-[24px] border p-7 ${plan.highlighted ? 'border-primary bg-primary text-primary-foreground shadow-[var(--shadow-brand)]' : 'border-border bg-card shadow-[var(--shadow-card)]'}`}>
                     {plan.highlighted && <span className="absolute -top-3 left-6 rounded-full bg-brand-sun px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-accent-foreground">Mais escolhido</span>}
                     <h3 className="font-display text-2xl font-bold tracking-[-0.05em]">{plan.name}</h3>
@@ -376,7 +393,7 @@ export default function LandingPage() {
             <Reveal direction="up"><SectionHeading eyebrow="Quem usa, sente" title="Mais presença para o que importa." /></Reveal>
             <div className="mt-14 grid gap-5 md:grid-cols-3">
               {TESTIMONIALS.map((testimonial, index) => (
-                <Reveal key={testimonial.name} direction="up" delay={index * 100}>
+                <Reveal key={testimonial.name} direction="up" delay={index * 80}>
                   <blockquote className="flex h-full flex-col rounded-[24px] border border-border bg-background p-7">
                     <Quote className="text-brand-sun" size={28} />
                     <p className="mt-5 flex-1 text-base leading-7 text-foreground">“{testimonial.quote}”</p>
@@ -392,8 +409,8 @@ export default function LandingPage() {
           <div className="absolute inset-0 opacity-15 [background-image:radial-gradient(currentColor_1px,transparent_1px)] [background-size:18px_18px]" />
           <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
-              <div><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold"><ShieldCheck size={14} /> Clínica, dados e cuidado no mesmo lugar</div><h2 className="font-display mt-6 max-w-2xl text-4xl font-bold leading-none tracking-[-0.07em] sm:text-5xl">Sua equipe mais presente em cada decisão clínica.</h2><p className="mt-5 max-w-xl text-lg leading-7 text-primary-foreground/75">Organize a rotina hoje e construa uma experiência de cuidado mais consistente amanhã.</p></div>
-              <Button asChild size="lg" className="h-12 bg-brand-sun px-7 text-base text-primary-foreground shadow-none hover:bg-brand-sun/90"><Link href="/register">Criar conta gratuita <ArrowRight /></Link></Button>
+              <Reveal direction="up"><div><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold"><ShieldCheck size={14} /> Clínica, dados e cuidado no mesmo lugar</div><h2 className="font-display mt-6 max-w-2xl text-4xl font-bold leading-none tracking-[-0.07em] sm:text-5xl">Sua equipe mais presente em cada decisão clínica.</h2><p className="mt-5 max-w-xl text-lg leading-7 text-primary-foreground/75">Organize a rotina hoje e construa uma experiência de cuidado mais consistente amanhã.</p></div></Reveal>
+              <Reveal direction="up" delay={100}><Button asChild size="lg" className="h-12 bg-brand-sun-strong px-7 text-base text-primary-foreground shadow-none hover:bg-brand-sun-strong/90"><Link href="/register">Criar conta gratuita <ArrowRight /></Link></Button></Reveal>
             </div>
           </div>
         </section>

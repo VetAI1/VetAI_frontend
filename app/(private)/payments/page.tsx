@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 import { PaymentModal } from './components/payment-modal';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
@@ -327,17 +328,11 @@ export default function PaymentsPage() {
             getRowKey={(p) => p.id}
             loading={loading}
             emptyState={
-              <div className="p-4 text-center">
-                <CreditCard
-                  size={32}
-                  className="text-muted-foreground/50 mx-auto mb-2"
-                />
-                <p className="text-muted-foreground text-sm">
-                  {filters.status || tutorFilter
-                    ? 'Nenhuma cobrança encontrada para os filtros selecionados.'
-                    : 'Nenhuma cobrança cadastrada ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={CreditCard}
+                title={filters.status || tutorFilter ? 'Nenhuma cobrança encontrada' : 'Nenhuma cobrança cadastrada'}
+                description={filters.status || tutorFilter ? 'Revise os filtros selecionados.' : 'Registre a primeira cobrança para começar.'}
+              />
             }
           />
 

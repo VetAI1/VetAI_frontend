@@ -2,10 +2,10 @@
 
 import { Eye, Microscope, UploadIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 import { UploadExamModal } from '@/app/components/business/upload-exam-modal';
 import { Badge } from '@/app/components/common/badge';
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
@@ -15,6 +15,7 @@ import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { STUDY_STATUS_MAP } from '@/constants';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { studiesService } from '@/services/studies.service';
 import type { Study } from '@/types/study';
@@ -26,7 +27,7 @@ interface StudyFilters {
 }
 
 export default function ExamsPage() {
-  const [showUploadModal, setShowUploadModal] = useState(false);
+  const { open } = useModal();
 
   const {
     items: studies,
@@ -43,8 +44,21 @@ export default function ExamsPage() {
   });
 
   const handleUploadSuccess = (study: Study) => {
-    setShowUploadModal(false);
     prependItem(study);
+  };
+
+  const openUploadModal = () => {
+    open({
+      content: ({ close }) => (
+        <UploadExamModal
+          onClose={close}
+          onSuccess={(study) => {
+            handleUploadSuccess(study);
+            close();
+          }}
+        />
+      ),
+    });
   };
 
   const columns: DataTableColumn<Study>[] = [
@@ -119,7 +133,7 @@ export default function ExamsPage() {
           }
           headerAction={
             <Button
-              onClick={() => setShowUploadModal(true)}
+              onClick={openUploadModal}
               className="bg-primary text-primary-foreground hover:bg-primary/90 h-10"
             >
               <UploadIcon size={18} /> Enviar Exame
@@ -135,28 +149,15 @@ export default function ExamsPage() {
             onSearch={setSearch}
             searchPlaceholder="Buscar exames..."
             emptyState={
-              <div className="p-8 text-center">
-                <Microscope
-                  size={32}
-                  className="text-muted-foreground/50 mx-auto mb-2"
-                />
-                <p className="text-muted-foreground text-sm">
-                  {search
-                    ? 'Nenhum exame encontrado.'
-                    : 'Nenhum exame cadastrado ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={Microscope}
+                title={search ? 'Nenhum exame encontrado' : 'Nenhum exame cadastrado'}
+                description={search ? 'Revise a busca ou tente outro termo.' : 'Envie o primeiro exame para começar.'}
+              />
             }
           />
         </SectionCard>
       </div>
-
-      {showUploadModal && (
-        <UploadExamModal
-          onClose={() => setShowUploadModal(false)}
-          onSuccess={handleUploadSuccess}
-        />
-      )}
     </div>
   );
 }

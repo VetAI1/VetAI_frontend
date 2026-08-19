@@ -31,6 +31,7 @@ Key features include:
 - **Schemas**: camelCase with Schema suffix (e.g., `tutorSchema`, `loginSchema`)
 - **Types**: `NomeData` inferred via `yup.InferType` (e.g., `TutorFormData`)
 - **Route Groups**: `(public)` for unauthenticated, `(private)` for authenticated, `/admin` for admin section
+- **Class composition**: Use `cn` for short conditional class lists. For long, visually grouped class lists, use `cnLines` from `@/infra/utils`, passing one array per visual concern; it preserves `tailwind-merge` conflict resolution.
 
 ### Form Patterns
 

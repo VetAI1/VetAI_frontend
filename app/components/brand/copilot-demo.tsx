@@ -53,12 +53,12 @@ export function CopilotDemo() {
       return;
     }
 
-    const t1 = setTimeout(() => setTyping(true), 600);
-    const t2 = setTimeout(() => setTyping(false), 1600);
-    const t3 = setTimeout(() => setAnalyzing(true), 1800);
-    const t4 = setTimeout(() => setAnalyzing(false), 2800);
+    const t1 = setTimeout(() => setTyping(true), 250);
+    const t2 = setTimeout(() => setTyping(false), 650);
+    const t3 = setTimeout(() => setAnalyzing(true), 650);
+    const t4 = setTimeout(() => setAnalyzing(false), 1000);
     const reveals = FINDINGS.map((_, i) =>
-      setTimeout(() => setVisible(i + 1), 3000 + i * 400),
+      setTimeout(() => setVisible(i + 1), 1250 + i * 200),
     );
     return () => {
       [t1, t2, t3, t4, ...reveals].forEach(clearTimeout);
@@ -123,9 +123,9 @@ export function CopilotDemo() {
             <AnimatePresence>
               {!typing && !analyzing && visible > 0 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={reducedMotion ? false : { opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  transition={{ duration: reducedMotion ? 0 : 0.25, ease: 'easeOut' }}
                   className="space-y-2"
                 >
                   <p className="w-fit rounded-2xl rounded-tl-sm bg-secondary px-4 py-2.5 text-sm text-foreground">
@@ -134,10 +134,10 @@ export function CopilotDemo() {
                   {FINDINGS.slice(0, visible).map((finding) => (
                     <motion.div
                       key={finding.label}
-                      initial={{ opacity: 0, y: 8 }}
+                      initial={reducedMotion ? false : { opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        duration: 0.3,
+                        duration: reducedMotion ? 0 : 0.25,
                         ease: [0.22, 1, 0.36, 1],
                       }}
                       className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background px-3.5 py-2.5"
@@ -162,9 +162,9 @@ export function CopilotDemo() {
                   ))}
                   {visible >= FINDINGS.length && (
                     <motion.p
-                      initial={{ opacity: 0 }}
+                      initial={reducedMotion ? false : { opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: reducedMotion ? 0 : 0.25 }}
                       className="flex items-center gap-1.5 pt-1 text-xs font-semibold text-primary"
                     >
                       <Sparkles size={13} />

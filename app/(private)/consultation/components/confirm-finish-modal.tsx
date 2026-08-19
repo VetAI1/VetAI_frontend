@@ -14,36 +14,32 @@ export function ConfirmFinishModal({
   onCancel,
 }: ConfirmFinishModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onCancel}
-      />
-      <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-lg bg-warning-soft">
-            <Star size={20} className="text-warning" />
-          </div>
-          <h3 className="text-lg font-bold text-foreground">
-            Marcar diagnóstico?
-          </h3>
+    <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-sm flex-col overflow-hidden rounded-xl bg-card shadow-2xl">
+      <div className="flex shrink-0 items-center gap-3 p-6 pb-4">
+        <div className="p-2 rounded-lg bg-warning-soft">
+          <Star size={20} className="text-warning" />
         </div>
-        <p className="text-sm text-muted-foreground mb-5">
+        <h3 className="text-lg font-bold text-foreground">
+          Marcar diagnóstico?
+        </h3>
+      </div>
+      <div className="min-h-0 overflow-y-auto px-6 pb-5">
+        <p className="text-sm text-muted-foreground">
           Você ainda não marcou nenhuma doença como a mais provável. Deseja
           continuar sem marcar ou voltar para selecionar?
         </p>
-        <div className="flex gap-2 justify-end">
-          <Button variant="outline" size="sm" onClick={onCancel}>
-            Voltar e marcar
-          </Button>
-          <Button
-            size="sm"
-            onClick={onConfirm}
-            className="bg-warning text-white hover:bg-warning/90 dark:text-stone-950"
-          >
-            Finalizar assim mesmo
-          </Button>
-        </div>
+      </div>
+      <div className="flex shrink-0 justify-end gap-2 px-6 py-4">
+        <Button variant="outline" size="sm" onClick={onCancel}>
+          Voltar e marcar
+        </Button>
+        <Button
+          size="sm"
+          onClick={onConfirm}
+          className="bg-warning text-white hover:bg-warning/90 dark:text-stone-950"
+        >
+          Finalizar assim mesmo
+        </Button>
       </div>
     </div>
   );
