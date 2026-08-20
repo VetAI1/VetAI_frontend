@@ -6,11 +6,11 @@ export interface ScheduleEvent {
   title: string;
   description?: string;
   date: string; // YYYY-MM-DD
-  startTime: string; // HH:mm
-  endTime?: string; // HH:mm
+  start_time: string; // HH:mm
+  end_time?: string; // HH:mm
   type: EventType;
-  patientName?: string;
-  tutorName?: string;
+  patient_name?: string;
+  tutor_name?: string;
 }
 
 export const EVENT_TYPE_MAP: Record<

@@ -75,28 +75,28 @@ export function EventDetailModal({
             <div>
               <span className={labelCls}>Horário</span>
               <p className={valueCls}>
-                {event.startTime}
-                {event.endTime ? ` – ${event.endTime}` : ''}
+                {event.start_time}
+                {event.end_time ? ` – ${event.end_time}` : ''}
               </p>
             </div>
           </div>
 
-          {event.patientName && (
+          {event.patient_name && (
             <div className={rowCls}>
               <PawPrint size={16} className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0" />
               <div>
                 <span className={labelCls}>Paciente</span>
-                <p className={valueCls}>{event.patientName}</p>
+                <p className={valueCls}>{event.patient_name}</p>
               </div>
             </div>
           )}
 
-          {event.tutorName && (
+          {event.tutor_name && (
             <div className={rowCls}>
               <User size={16} className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0" />
               <div>
                 <span className={labelCls}>Tutor</span>
-                <p className={valueCls}>{event.tutorName}</p>
+                <p className={valueCls}>{event.tutor_name}</p>
               </div>
             </div>
           )}

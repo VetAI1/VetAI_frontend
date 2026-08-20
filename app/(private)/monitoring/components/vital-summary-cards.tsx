@@ -45,7 +45,7 @@ export function VitalSummaryCards({ specie, records }: VitalSummaryCardsProps) {
         return (
           <div
             key={def.key}
-            className="bg-white dark:bg-stone-900 rounded-xl shadow-sm border border-stone-200/70 dark:border-stone-800/70 p-4"
+            className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200/70 dark:border-stone-800/70 p-4"
           >
             <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
               {def.label}

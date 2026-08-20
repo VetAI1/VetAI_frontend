@@ -1,6 +1,6 @@
 'use client';
 
-import { ClipboardCheck, Loader2, Plus } from 'lucide-react';
+import { ClipboardCheck, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -23,9 +23,11 @@ import {
   type QuickAddKind,
 } from './quick-add-modals';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Modal } from '@/app/components/common/modal';
 import { DateInput } from '@/app/components/forms/date-input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/infra/utils';
 import { monitoringService } from '@/services/monitoring.service';
 import type { Execution, Hospitalization } from '@/types/monitoring';
@@ -108,7 +110,7 @@ export function ExecutionMapTab() {
 
   return (
     <div>
-      <div className="bg-white dark:bg-stone-900 rounded-lg shadow p-4 mb-4 flex flex-col sm:flex-row sm:items-end gap-3 sm:justify-between">
+      <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-4 mb-4 flex flex-col sm:flex-row sm:items-end gap-3 sm:justify-between">
         <div className="flex items-end gap-2">
           <div className="w-44">
             <DateInput label="Dia" value={date} onChange={setDate} />
@@ -133,21 +135,40 @@ export function ExecutionMapTab() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-teal-800 dark:text-teal-500" />
+        <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <Skeleton className="h-4 w-44 shrink-0" />
+            <div className="flex gap-2 flex-1 overflow-hidden">
+              {Array.from({ length: 18 }).map((_, i) => (
+                <Skeleton key={i} className="h-8 w-8 rounded-full shrink-0" />
+              ))}
+            </div>
+          </div>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 px-4 py-3 border-b border-stone-200/70 dark:border-stone-800/70"
+            >
+              <div className="shrink-0">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-20 mt-1.5" />
+              </div>
+              <div className="flex gap-2 flex-1 overflow-hidden">
+                {Array.from({ length: 18 }).map((_, j) => (
+                  <Skeleton key={j} className="h-8 w-8 rounded-full shrink-0" />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       ) : hospitalizations.length === 0 ? (
-        <div className="bg-white dark:bg-stone-900 rounded-lg shadow p-12 text-center">
-          <ClipboardCheck size={48} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-4" />
-          <p className="text-stone-500 dark:text-stone-400 font-medium">
-            Nenhum animal internado
-          </p>
-          <p className="text-sm text-stone-500/70 dark:text-stone-400/70 mt-1">
-            O mapa de execução mostra a programação de cada paciente internado.
-          </p>
-        </div>
+        <EmptyState
+          icon={ClipboardCheck}
+          title="Nenhum animal internado"
+          description="O mapa de execução mostra a programação de cada paciente internado."
+        />
       ) : (
-        <div className="bg-white dark:bg-stone-900 rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
           <div className="overflow-x-auto overflow-y-hidden scrollbar-thin">
             <table className="border-collapse w-max min-w-full">
               <thead>
@@ -203,7 +224,7 @@ export function ExecutionMapTab() {
                                 setSlot({ hospitalization, hour, executions: cellExecutions })
                               }
                               className={cn(
-                                'w-8 h-8 rounded-full text-xs font-bold inline-flex items-center justify-center transition-colors shadow-sm',
+                                'w-8 h-8 rounded-full text-xs font-bold inline-flex items-center justify-center transition-colors',
                                 chipClass(cellExecutions),
                               )}
                               title={`${cellExecutions.length} procedimento(s) às ${String(hour).padStart(2, '0')}h`}

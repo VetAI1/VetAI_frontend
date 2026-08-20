@@ -1,3 +1,5 @@
+import { Plus } from 'lucide-react';
+
 import { DAY_NAMES, getDaysInMonth, getFirstDayOfMonth } from '../utils';
 
 import { EVENT_TYPE_MAP } from '@/types/schedule';
@@ -10,6 +12,7 @@ interface CalendarProps {
   selectedDate: string | null;
   today: string;
   onSelectDate: (date: string) => void;
+  onAddClick: (date: string) => void;
   onEventClick: (event: ScheduleEvent) => void;
 }
 
@@ -20,6 +23,7 @@ export function Calendar({
   selectedDate,
   today,
   onSelectDate,
+  onAddClick,
   onEventClick,
 }: CalendarProps) {
   const daysInMonth = getDaysInMonth(year, month);
@@ -64,7 +68,7 @@ export function Calendar({
           return (
             <div
               key={dateStr}
-              className={`relative h-[72px] flex flex-col items-start p-1.5 rounded-lg border text-left transition-colors ${
+              className={`group relative h-[72px] flex flex-col items-start p-1.5 rounded-lg border text-left transition-colors ${
                 isSelected
                   ? 'bg-teal-800/10 dark:bg-teal-500/10 border-teal-800/40 dark:border-teal-500/40'
                   : 'border-transparent hover:bg-stone-100/60 dark:hover:bg-stone-800/60'
@@ -85,6 +89,17 @@ export function Calendar({
               >
                 {day}
               </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddClick(dateStr);
+                }}
+                className="absolute right-1.5 top-1.5 z-20 grid size-5 scale-90 place-items-center rounded-md bg-teal-800 text-white opacity-0 transition-[opacity,transform] duration-150 group-hover:scale-100 group-hover:opacity-100 hover:bg-teal-800/90 focus-visible:scale-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-800/40 motion-reduce:transition-none dark:bg-teal-500 dark:text-stone-950 dark:hover:bg-teal-500/90"
+                aria-label={`Adicionar evento em ${dateStr}`}
+              >
+                <Plus size={13} />
+              </button>
 
               <div className="relative z-10 flex flex-col gap-0.5 w-full overflow-hidden">
                 {dayEvents.slice(0, 2).map((ev) => {
@@ -96,7 +111,7 @@ export function Calendar({
                     ? 'text-stone-500/70 dark:text-stone-400/70'
                     : EVENT_TYPE_MAP[ev.type].color;
                   const dotColor = past
-                    ? 'bg-slate-300 dark:bg-slate-600'
+                    ? 'bg-stone-300 dark:bg-stone-600'
                     : EVENT_TYPE_MAP[ev.type].dot;
                   return (
                     <button

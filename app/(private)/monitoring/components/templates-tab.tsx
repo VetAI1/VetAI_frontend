@@ -1,18 +1,20 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ClipboardList, Loader2, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { ClipboardList, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { doseLabel, FREQUENCY_LABELS, PRESCRIPTION_TYPE_MAP } from '../utils';
 
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Modal } from '@/app/components/common/modal';
 import { SectionCard } from '@/app/components/data/section-card';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   templateInfoSchema,
   type TemplateInfoFormData,
@@ -391,17 +393,32 @@ export function TemplatesTab() {
       }
     >
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-teal-800 dark:text-teal-500" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4"
+            >
+              <div className="flex items-start gap-3">
+                <Skeleton className="h-10 w-10 shrink-0" />
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+              <div className="mt-4 space-y-1.5">
+                <Skeleton className="h-9 w-full rounded-lg" />
+                <Skeleton className="h-9 w-full rounded-lg" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : templates.length === 0 ? (
-        <div className="text-center py-12">
-          <ClipboardList size={48} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-3" />
-          <p className="text-stone-500 dark:text-stone-400">Nenhum modelo cadastrado</p>
-          <p className="text-sm text-stone-500/70 dark:text-stone-400/70 mt-1">
-            Crie modelos para quadros comuns, como pós-operatório ou gastroenterite.
-          </p>
-        </div>
+        <EmptyState
+          icon={ClipboardList}
+          title="Nenhum modelo cadastrado"
+          description="Crie modelos para quadros comuns, como pós-operatório ou gastroenterite."
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {templates.map((template) => {
@@ -411,7 +428,7 @@ export function TemplatesTab() {
             return (
               <div
                 key={template.id}
-                className="flex flex-col rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-teal-800/50 dark:hover:border-teal-500/50 hover:shadow-md transition-all"
+                className="flex flex-col rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-teal-800/50 dark:hover:border-teal-500/50 transition-colors"
               >
                 <div className="flex items-start gap-3 p-4 pb-3">
                   <div className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">

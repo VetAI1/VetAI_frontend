@@ -1,16 +1,18 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Beaker, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Beaker, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Modal } from '@/app/components/common/modal';
 import { SectionCard } from '@/app/components/data/section-card';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   clinicalParameterSchema,
   type ClinicalParameterFormData,
@@ -209,16 +211,28 @@ export function ParametersTab() {
       }
     >
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-teal-800 dark:text-teal-500" />
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between gap-3 py-1"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-5 w-14 rounded-full" />
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-8 w-8" />
+                <Skeleton className="h-8 w-8" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : parameters.length === 0 ? (
-        <div className="text-center py-12">
-          <Beaker size={48} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-3" />
-          <p className="text-stone-500 dark:text-stone-400">Nenhum parâmetro cadastrado</p>
-        </div>
+        <EmptyState icon={Beaker} title="Nenhum parâmetro cadastrado" />
       ) : (
-        <div className="divide-y divide-border/70">
+        <div className="divide-y divide-stone-200/70 dark:divide-stone-800/70">
           {parameters.map((parameter) => (
             <div
               key={parameter.id}

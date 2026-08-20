@@ -5,8 +5,8 @@ import type { ScheduleEvent } from '@/types/schedule';
 type ScheduleEventPayload = Omit<ScheduleEvent, 'id'>;
 
 export interface ScheduleListParams extends QueryParams {
-  patientName?: string;
-  tutorName?: string;
+  patient_name?: string;
+  tutor_name?: string;
   date?: string;
 }
 
@@ -23,11 +23,11 @@ export const scheduleService = {
   },
 
   async listByPatient(
-    patientName: string,
+    patient_name: string,
     fromDate?: string,
   ): Promise<ScheduleEvent[]> {
     const params: ScheduleListParams = {
-      patientName,
+      patient_name,
       size: 500,
       sort: 'date',
       direction: 'asc',

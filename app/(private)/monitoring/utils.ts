@@ -33,12 +33,12 @@ export const STATUS_MAP: Record<
   DECEASED: {
     label: 'Óbito',
     badge: 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100',
-    dot: 'bg-slate-500',
+    dot: 'bg-stone-500',
   },
   CANCELLED: {
     label: 'Cancelada',
     badge: 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400',
-    dot: 'bg-slate-400',
+    dot: 'bg-stone-400',
   },
 };
 
@@ -142,7 +142,7 @@ export const EXECUTION_STATUS_MAP: Record<
   CANCELLED: {
     label: 'Cancelada',
     badge: 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400',
-    chip: 'bg-slate-300 dark:bg-slate-600 text-slate-600 dark:text-slate-300',
+    chip: 'bg-stone-300 dark:bg-stone-600 text-stone-600 dark:text-stone-300',
   },
 };
 

@@ -11,7 +11,9 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { AddEventModal } from './components/add-event-modal';
 import { Calendar } from './components/calendar';
+import { DaySummaryCards } from './components/day-summary-cards';
 import { EventDetailModal } from './components/event-detail-modal';
+import { EventTypeLegend } from './components/event-type-legend';
 import {
   ScheduleSettings,
   loadScheduleSettings,
@@ -23,6 +25,7 @@ import { MONTH_NAMES, toLocalDateStr } from './utils';
 
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useModal } from '@/contexts/modal-context';
 import { scheduleService } from '@/services/schedule.service';
 import type { ScheduleEvent } from '@/types/schedule';
@@ -52,6 +55,23 @@ function formatWeekRange(weekStart: Date): string {
     return `${startDay} – ${endDay} de ${startMonth} ${year}`;
   }
   return `${startDay} ${startMonth} – ${endDay} ${endMonth} ${year}`;
+}
+
+function CalendarSkeleton() {
+  return (
+    <div className="w-full">
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <Skeleton key={i} className="h-4 w-10 mx-auto" />
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {Array.from({ length: 35 }).map((_, i) => (
+          <Skeleton key={i} className="h-[72px] w-full rounded-lg" />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function SchedulePage() {
@@ -134,10 +154,11 @@ export default function SchedulePage() {
     await loadEvents();
   }
 
-  const openAddModal = (date: string) => open({
+  const openAddModal = (date: string, time?: string) => open({
     content: ({ close }) => (
       <AddEventModal
         initialDate={date}
+        initialTime={time}
         onClose={close}
         onSave={async () => { await loadEvents(); close(); }}
         minHour={scheduleSettings.weekStartHour}
@@ -177,12 +198,16 @@ export default function SchedulePage() {
       : formatWeekRange(weekStart);
 
   return (
-    <main className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
+    <div className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Agendamentos" showStorage={false} />
 
+        <div className="mb-6">
+          <DaySummaryCards events={selectedEvents} loading={loadingEvents} />
+        </div>
+
         <div className="flex flex-col gap-4 xl:flex-row">
-          <div className="flex-1 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-sm sm:p-6">
+          <div className="flex-1 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 sm:p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-1">
                 <button
@@ -237,27 +262,36 @@ export default function SchedulePage() {
             </div>
 
             {viewMode === 'month' ? (
-              <Calendar
-                year={currentYear}
-                month={currentMonth}
-                events={loadingEvents ? [] : events}
-                selectedDate={selectedDate}
-                today={todayStr}
-                onSelectDate={setSelectedDate}
-                onEventClick={openDetailModal}
-              />
+              loadingEvents ? (
+                <CalendarSkeleton />
+              ) : (
+                <Calendar
+                  year={currentYear}
+                  month={currentMonth}
+                  events={events}
+                  selectedDate={selectedDate}
+                  today={todayStr}
+                  onSelectDate={setSelectedDate}
+                  onAddClick={openAddModal}
+                  onEventClick={openDetailModal}
+                />
+              )
+            ) : loadingEvents ? (
+              <CalendarSkeleton />
             ) : (
               <WeekCalendar
                 weekStart={weekStart}
-                events={loadingEvents ? [] : events}
+                events={events}
                 today={todayStr}
                 startHour={scheduleSettings.weekStartHour}
                 endHour={scheduleSettings.weekEndHour}
                 onEventClick={openDetailModal}
+                onSlotClick={(date, time) => openAddModal(date, time)}
               />
             )}
 
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <EventTypeLegend />
               <Button
                 disabled={loadingEvents}
                 onClick={() => handleAddClick(selectedDate)}
@@ -268,7 +302,7 @@ export default function SchedulePage() {
             </div>
           </div>
 
-          <div className="w-full rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-sm sm:p-6 xl:sticky xl:top-6 xl:h-fit xl:w-80">
+          <div className="w-full rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 sm:p-6 xl:sticky xl:top-6 xl:h-fit xl:w-80">
             <TodayEventsList
               date={selectedDate}
               events={selectedEvents}
@@ -283,7 +317,6 @@ export default function SchedulePage() {
           </div>
         </div>
       </div>
-
-    </main>
+    </div>
   );
 }

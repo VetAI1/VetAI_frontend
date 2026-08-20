@@ -31,11 +31,11 @@ export const scheduleEventSchema = yup.object({
     .string()
     .required('Data é obrigatória.')
     .matches(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida.'),
-  startTime: yup
+  start_time: yup
     .string()
     .required('O horário de início é obrigatório.')
     .matches(/^\d{2}:\d{2}$/, 'Horário inválido.'),
-  endTime: yup
+  end_time: yup
     .string()
     .optional()
     .matches(/^$|^\d{2}:\d{2}$/, 'Horário inválido.'),
@@ -43,8 +43,8 @@ export const scheduleEventSchema = yup.object({
     .mixed<EventType>()
     .oneOf(['consultation', 'surgery', 'vaccine', 'exam', 'other'])
     .required('Tipo é obrigatório.'),
-  patientName: yup.string().trim().required('Paciente é obrigatório.'),
-  tutorName: yup.string().trim().required('Tutor é obrigatório.'),
+  patient_name: yup.string().trim().required('Paciente é obrigatório.'),
+  tutor_name: yup.string().trim().required('Tutor é obrigatório.'),
 });
 
 export type ScheduleEventFormData = yup.InferType<typeof scheduleEventSchema>;

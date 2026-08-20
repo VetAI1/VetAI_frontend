@@ -2,6 +2,7 @@
 
 import { AlarmClockOff, CalendarCheck, PawPrint, Stethoscope } from 'lucide-react';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import type { MonitoringSummary } from '@/types/monitoring';
 
 interface SummaryCardsProps {
@@ -41,16 +42,16 @@ export function SummaryCards({ summary, loading = false }: SummaryCardsProps) {
       {CARDS.map(({ key, label, icon: Icon }) => (
         <div
           key={key}
-          className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm p-4 flex items-center gap-3"
+          className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-4 flex items-center gap-3"
         >
           <div className={`p-2.5 rounded-lg shrink-0 ${ICON_CLASS}`}>
             <Icon size={20} />
           </div>
           <div className="min-w-0">
             {loading ? (
-              <div className="h-7 w-10 bg-stone-100 dark:bg-stone-800 rounded animate-pulse" />
+              <Skeleton className="h-7 w-10" />
             ) : (
-              <p className="text-2xl font-bold text-stone-900 dark:text-stone-100 leading-tight">
+              <p className="font-data text-3xl font-semibold tracking-tight text-stone-900 dark:text-stone-100 leading-tight">
                 {summary?.[key] ?? 0}
               </p>
             )}

@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   BedDouble,
   CalendarClock,
-  Loader2,
   PawPrint,
   Plus,
   Search,
@@ -17,8 +16,11 @@ import { RISK_MAP, STATUS_MAP, daysSince, dayRangeISO, fmtDate, todayLocalISODat
 import { HospitalizeModal } from './hospitalize-modal';
 import { SummaryCards } from './summary-cards';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   CLINICAL_STATUS_CLASSES,
   CLINICAL_STATUS_LABELS,
@@ -171,7 +173,7 @@ export function HospitalizedTab() {
     <div>
       <SummaryCards summary={summary} loading={summaryLoading} />
 
-      <div className="bg-white dark:bg-stone-900 rounded-lg shadow p-4 mb-6">
+      <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-4 mb-6">
         <div className="flex flex-col lg:flex-row gap-3 lg:items-end">
           <div className="flex-1 min-w-0">
             <label className="block text-sm font-medium text-stone-800 dark:text-stone-100 mb-1.5">
@@ -182,11 +184,11 @@ export function HospitalizedTab() {
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500/70 dark:text-stone-400/70"
               />
-              <input
+              <Input
                 type="text"
                 placeholder="Nome do paciente..."
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-stone-200 dark:border-stone-800 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 placeholder:text-stone-500/70 dark:placeholder:text-stone-400/70 focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-500"
+                className="pl-10"
               />
             </div>
           </div>
@@ -250,19 +252,43 @@ export function HospitalizedTab() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-teal-800 dark:text-teal-500" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="relative overflow-hidden bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-4 pl-6"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute inset-y-0 left-0 w-2 bg-stone-100 dark:bg-stone-800"
+              />
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Skeleton className="h-11 w-11 shrink-0" />
+                  <div className="space-y-1.5 min-w-0 flex-1">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-1.5 mb-3">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+              <div className="space-y-1.5">
+                <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-3 w-28" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : isEmpty ? (
-        <div className="bg-white dark:bg-stone-900 rounded-lg shadow p-12 text-center">
-          <PawPrint size={48} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-4" />
-          <p className="text-stone-500 dark:text-stone-400 font-medium">
-            Nenhum animal internado no momento
-          </p>
-          <p className="text-sm text-stone-500/70 dark:text-stone-400/70 mt-1">
-            Clique em “Internar paciente” para registrar uma nova internação.
-          </p>
-        </div>
+        <EmptyState
+          icon={PawPrint}
+          title="Nenhum animal internado no momento"
+          description="Clique em “Internar paciente” para registrar uma nova internação."
+        />
       ) : (
         <>
           <div className="space-y-6">
@@ -290,7 +316,7 @@ export function HospitalizedTab() {
                           router.push(`/monitoring/${hospitalization.id}`)
                         }
                         title={risk.label}
-                        className="relative overflow-hidden text-left bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-md transition-all p-4 pl-6"
+                        className="relative overflow-hidden text-left bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-teal-800/25 dark:hover:border-teal-500/25 transition-colors p-4 pl-6"
                       >
                         <span
                           aria-hidden="true"

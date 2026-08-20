@@ -1,15 +1,17 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { BedDouble, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { BedDouble, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Modal } from '@/app/components/common/modal';
 import { SectionCard } from '@/app/components/data/section-card';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { boxSchema, type BoxFormData } from '@/schemas/monitoring';
 import { monitoringService } from '@/services/monitoring.service';
 import type { Box } from '@/types/monitoring';
@@ -149,20 +151,35 @@ export function BoxesTab() {
       }
     >
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-teal-800 dark:text-teal-500" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-4 rounded-lg border border-stone-200 dark:border-stone-800"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Skeleton className="h-5 w-5 shrink-0" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                <div className="flex gap-1 shrink-0">
+                  <Skeleton className="h-8 w-8" />
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              </div>
+              <Skeleton className="h-3 w-28 mt-2" />
+              <Skeleton className="h-4 w-24 mt-3" />
+            </div>
+          ))}
         </div>
       ) : boxes.length === 0 ? (
-        <div className="text-center py-12">
-          <BedDouble size={48} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-3" />
-          <p className="text-stone-500 dark:text-stone-400">Nenhum box cadastrado</p>
-        </div>
+        <EmptyState icon={BedDouble} title="Nenhum box cadastrado" />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {boxes.map((box) => (
             <div
               key={box.id}
-              className={`p-4 rounded-xl border transition-colors ${
+              className={`p-4 rounded-lg border transition-colors ${
                 box.occupied
                   ? 'border-red-600/30 dark:border-red-500/30 bg-red-50 dark:bg-red-900'
                   : 'border-emerald-700/30 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-900'

@@ -202,13 +202,13 @@ export default function Dashboard() {
                               {event.title}
                             </span>
                             <span className="shrink-0 font-data text-xs text-stone-500 dark:text-stone-400">
-                              {event.startTime}
-                              {event.endTime ? ` – ${event.endTime}` : ''}
+                              {event.start_time}
+                              {event.end_time ? ` – ${event.end_time}` : ''}
                             </span>
                           </div>
-                          {event.patientName && (
+                          {event.patient_name && (
                             <p className="mt-0.5 truncate text-xs text-stone-500 dark:text-stone-400">
-                              {event.patientName}
+                              {event.patient_name}
                             </p>
                           )}
                           {event.description && (

@@ -1,6 +1,5 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import {
@@ -16,6 +15,7 @@ import { DateInput } from '@/app/components/forms/date-input';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { TimeInput } from '@/app/components/forms/time-input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { monitoringService } from '@/services/monitoring.service';
 import type { PrescriptionTemplate } from '@/types/monitoring';
 
@@ -105,8 +105,16 @@ export function ApplyTemplateModal({
       maxWidth="xl"
     >
       {loading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 size={24} className="animate-spin text-teal-800 dark:text-teal-500" />
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-3 rounded-lg border border-stone-200 dark:border-stone-800"
+            >
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-28 mt-2" />
+            </div>
+          ))}
         </div>
       ) : templates.length === 0 ? (
         <p className="text-sm text-stone-500 dark:text-stone-400 py-6 text-center">

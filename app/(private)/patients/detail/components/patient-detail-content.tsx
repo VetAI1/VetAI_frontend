@@ -563,7 +563,7 @@ export function PatientDetailContent() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{ev.title}</p>
                     <p className="text-xs text-stone-500 dark:text-stone-400">
-                      {dateLabel} · {ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}
+                      {dateLabel} · {ev.start_time}{ev.end_time ? ` – ${ev.end_time}` : ''}
                     </p>
                   </div>
                   <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border shrink-0 ${typeStyle.bg} ${typeStyle.color}`}>

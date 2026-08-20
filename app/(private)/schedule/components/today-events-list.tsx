@@ -21,7 +21,7 @@ export function TodayEventsList({
   loading = false,
 }: TodayEventsListProps) {
   const sorted = [...events].sort((a, b) =>
-    a.startTime.localeCompare(b.startTime),
+    a.start_time.localeCompare(b.start_time),
   );
 
   const dateFormatted = new Date(`${date}T00:00:00`).toLocaleDateString(
@@ -101,20 +101,20 @@ export function TodayEventsList({
                   <span
                     className={`text-xs shrink-0 font-medium ${typeInfo.color}`}
                   >
-                    {ev.startTime}
-                    {ev.endTime ? ` – ${ev.endTime}` : ''}
+                    {ev.start_time}
+                    {ev.end_time ? ` – ${ev.end_time}` : ''}
                   </span>
                 </span>
-                {(ev.patientName ?? ev.tutorName) && (
+                {(ev.patient_name ?? ev.tutor_name) && (
                   <span className="flex flex-col gap-0.5 mt-1.5 pl-4">
-                    {ev.patientName && (
+                    {ev.patient_name && (
                       <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
-                        <PawPrint size={11} /> {ev.patientName}
+                        <PawPrint size={11} /> {ev.patient_name}
                       </span>
                     )}
-                    {ev.tutorName && (
+                    {ev.tutor_name && (
                       <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
-                        <User size={11} /> {ev.tutorName}
+                        <User size={11} /> {ev.tutor_name}
                       </span>
                     )}
                   </span>

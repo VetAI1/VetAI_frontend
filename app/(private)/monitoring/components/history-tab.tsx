@@ -1,12 +1,13 @@
 'use client';
 
-import { FileText, History, Loader2 } from 'lucide-react';
+import { FileText, History } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
 
 import { fmtDate, fmtDateTime, RISK_MAP, STATUS_MAP } from '../utils';
 import { ReportModal } from './report-modal';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { DataTable, type DataTableColumn } from '@/app/components/data/data-table';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
@@ -165,6 +166,7 @@ export function HistoryTab() {
         columns={columns}
         data={items}
         getRowKey={(row) => row.id}
+        loading={loading}
         showSearch
         onSearch={setSearch}
         searchPlaceholder="Buscar por paciente..."
@@ -188,17 +190,10 @@ export function HistoryTab() {
           </div>
         }
         emptyState={
-          loading ? (
-            <span className="flex items-center justify-center gap-2 py-6">
-              <Loader2 size={18} className="animate-spin text-teal-800 dark:text-teal-500" />
-              Carregando...
-            </span>
-          ) : (
-            <span className="flex flex-col items-center gap-2 py-6 text-stone-500/70 dark:text-stone-400/70">
-              <History size={32} className="text-stone-500/50 dark:text-stone-400/50" />
-              Nenhuma internação encontrada
-            </span>
-          )
+          <EmptyState
+            icon={History}
+            title="Nenhuma internação encontrada"
+          />
         }
       />
 

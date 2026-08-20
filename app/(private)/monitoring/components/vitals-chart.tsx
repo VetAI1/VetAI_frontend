@@ -54,7 +54,7 @@ export function VitalsChart({ specie, definition, records }: VitalsChartProps) {
 
   if (points.length === 0) {
     return (
-      <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm border border-stone-200/70 dark:border-stone-800/70 p-4">
+      <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200/70 dark:border-stone-800/70 p-4">
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
             {definition.label}
@@ -143,7 +143,7 @@ export function VitalsChart({ specie, definition, records }: VitalsChartProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm border border-stone-200/70 dark:border-stone-800/70 p-4">
+    <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200/70 dark:border-stone-800/70 p-4">
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
           {definition.label}

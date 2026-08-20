@@ -13,7 +13,6 @@ import {
   Clock,
   FileDown,
   History,
-  Loader2,
   MapPin,
   MessageSquarePlus,
   MoveRight,
@@ -67,6 +66,7 @@ import {
 } from '../../utils';
 
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Modal } from '@/app/components/common/modal';
 import { WhatsAppIcon } from '@/app/components/common/whatsapp-icon';
 import { SectionCard } from '@/app/components/data/section-card';
@@ -76,6 +76,7 @@ import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { TimeInput } from '@/app/components/forms/time-input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   evaluateCadence,
   formatVitalDuration,
@@ -675,8 +676,31 @@ export function HospitalizationDetailContent() {
 
   if (loading || !hospitalization) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 size={32} className="animate-spin text-teal-800 dark:text-teal-500" />
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-5">
+          <div className="flex items-start gap-4">
+            <Skeleton className="h-12 w-12 shrink-0" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <Skeleton className="h-6 w-56" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-stone-200/70 dark:border-stone-800/70">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full" />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-5">
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-1/3" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-2/5" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -766,7 +790,7 @@ export function HospitalizationDetailContent() {
 
   return (
     <div className="space-y-6 pb-10">
-      <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm p-5">
+      <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-5">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div className="flex items-start gap-4 min-w-0">
             <button
@@ -777,7 +801,7 @@ export function HospitalizationDetailContent() {
             >
               <ArrowLeft size={18} />
             </button>
-            <div className="p-3 rounded-xl bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
+            <div className="p-3 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
               <Stethoscope size={28} />
             </div>
             <div className="min-w-0">
@@ -1073,8 +1097,17 @@ export function HospitalizationDetailContent() {
             }
           >
             {vitalsLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="animate-spin text-teal-800 dark:text-teal-500" size={24} />
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg border border-stone-200/70 dark:border-stone-800/70 p-4"
+                  >
+                    <Skeleton className="h-3 w-14" />
+                    <Skeleton className="h-7 w-10 mt-2" />
+                    <Skeleton className="h-3 w-16 mt-3" />
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="space-y-4">
@@ -1125,16 +1158,31 @@ export function HospitalizationDetailContent() {
             }
           >
             {prescriptionsLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 size={24} className="animate-spin text-teal-800 dark:text-teal-500" />
+              <div className="space-y-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="p-3 rounded-lg border border-stone-200 dark:border-stone-800"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0 space-y-1.5">
+                        <Skeleton className="h-4 w-44" />
+                        <Skeleton className="h-3 w-64" />
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Skeleton className="h-8 w-8" />
+                        <Skeleton className="h-8 w-8" />
+                        <Skeleton className="h-8 w-8" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : prescriptions.length === 0 ? (
-              <div className="text-center py-8">
-                <Pill size={40} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-2" />
-                <p className="text-stone-500 dark:text-stone-400 text-sm">
-              Nenhuma prescrição registrada
-                </p>
-              </div>
+              <EmptyState
+                icon={Pill}
+                title="Nenhuma prescrição registrada"
+              />
             ) : (
               <div className="space-y-2">
                 {prescriptions.map((prescription) => {
@@ -1268,16 +1316,25 @@ export function HospitalizationDetailContent() {
           }
         >
           {timelineLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 size={24} className="animate-spin text-teal-800 dark:text-teal-500" />
+            <div className="space-y-5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex gap-3">
+                  <Skeleton className="h-10 w-20 shrink-0" />
+                  <div className="flex flex-col items-center">
+                    <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-1.5 pt-1">
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : timelineItems.length === 0 ? (
-            <div className="text-center py-8">
-              <CalendarClock size={40} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-2" />
-              <p className="text-stone-500 dark:text-stone-400 text-sm">
-              Nenhum registro ainda
-              </p>
-            </div>
+            <EmptyState
+              icon={CalendarClock}
+              title="Nenhum registro ainda"
+            />
           ) : (
             <div>
               {timelineItems.map((item, index) => {
