@@ -23,15 +23,7 @@ export function getSocket(): Socket {
     const responseObj = errObj.response as Record<string, unknown> | undefined;
 
     const code = errObj.code ?? responseObj?.code;
-    const msg = String(errObj.message ?? responseObj?.message ?? '');
-    const status = errObj.status ?? errObj.statusCode ?? responseObj?.statusCode ?? responseObj?.status;
-
-    if (
-      code === 'INSUFFICIENT_AI_CREDITS' ||
-      status === 403 ||
-      msg.toLowerCase().includes('insufficient ai credits') ||
-      msg.toLowerCase().includes('créditos de ia insuficientes')
-    ) {
+    if (code === 'INSUFFICIENT_AI_CREDITS') {
       notifyInsufficientAiCredits();
     }
   };

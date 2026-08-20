@@ -113,13 +113,7 @@ export function useConsultation({
 
       const code = String(errObj.code ?? responseObj?.code ?? '');
       const msg = String(errObj.message ?? responseObj?.message ?? (typeof payload === 'string' ? payload : ''));
-      const status = Number(errObj.status ?? errObj.statusCode ?? responseObj?.statusCode ?? responseObj?.status ?? 0);
-
-      const isInsufficientCredits =
-        code === 'INSUFFICIENT_AI_CREDITS' ||
-        status === 403 ||
-        msg.toLowerCase().includes('insufficient ai credits') ||
-        msg.toLowerCase().includes('créditos de ia insuficientes');
+      const isInsufficientCredits = code === 'INSUFFICIENT_AI_CREDITS';
 
       if (isInsufficientCredits) {
         notifyInsufficientAiCredits();

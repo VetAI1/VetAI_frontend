@@ -167,10 +167,7 @@ async function request<T>(
       }
 
       const isInsufficientCredits =
-        response.status === 403 &&
-        ((errorData as { code?: string })?.code === 'INSUFFICIENT_AI_CREDITS' ||
-          errorMessage.toLowerCase().includes('insufficient ai credits') ||
-          errorMessage.toLowerCase().includes('créditos de ia insuficientes'));
+        (errorData as { code?: string })?.code === 'INSUFFICIENT_AI_CREDITS';
 
       if (isInsufficientCredits) {
         notifyInsufficientAiCredits();
