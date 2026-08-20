@@ -69,7 +69,7 @@ export function HistoryTab() {
       header: 'Paciente',
       render: (row) => (
         <Link
-          href={`/monitoring/detail?id=${row.id}`}
+          href={`/monitoring/${row.id}`}
           className="font-medium text-stone-900 dark:text-stone-100 hover:text-teal-800 dark:hover:text-teal-500"
         >
           {row.patient?.name ?? '—'}

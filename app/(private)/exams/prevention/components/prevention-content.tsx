@@ -10,7 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { Badge } from '@/app/components/common/badge';
@@ -22,8 +22,8 @@ import { studiesService } from '@/services/studies.service';
 import type { Study } from '@/types/study';
 
 export function PreventionContent() {
-  const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+  const params = useParams<{ slug: string }>();
+  const id = params.slug;
   const [study, setStudy] = useState<Study | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -92,7 +92,7 @@ export function PreventionContent() {
           Nenhuma análise de prevenção disponível para este exame.
         </p>
         <Link
-          href={`/exams/detail?id=${study.id}`}
+          href={`/exams/${study.id}`}
           className="mt-4 inline-block"
         >
           <Button variant="outline">Voltar ao exame</Button>
@@ -104,7 +104,7 @@ export function PreventionContent() {
   return (
     <>
       <div className="flex items-center gap-4 mb-6">
-        <Link href={`/exams/detail?id=${study.id}`}>
+        <Link href={`/exams/${study.id}`}>
           <Button variant="ghost" size="icon">
             <ArrowLeft size={20} />
           </Button>

@@ -30,7 +30,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { calcAge, fmtDate, fmtDateTime, parseBirthDate, STUDY_STATUS_COLORS, STUDY_STATUS_LABELS } from '../utils';
@@ -47,12 +47,13 @@ import { buildPrescriptionPdf } from '../utils/prescription-pdf';
 import { PatientModal } from '@/app/components/business/patient-modal';
 import { UploadExamModal } from '@/app/components/business/upload-exam-modal';
 import { Card } from '@/app/components/common/card';
-import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import { WhatsAppIcon } from '@/app/components/common/whatsapp-icon';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
+import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { useAuth } from '@/infra/auth-context';
 import { documentsService } from '@/services/documents.service';
 import { healthRecordsService } from '@/services/health-records.service';
@@ -86,9 +87,9 @@ function byAuthor(record: HealthRecord): string {
 }
 
 export function PatientDetailContent() {
-  const searchParams = useSearchParams();
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const id = searchParams.get('id');
+  const id = params.slug;
   const { user } = useAuth();
 
   const [patient, setPatient] = useState<Patient | null>(null);
@@ -96,21 +97,11 @@ export function PatientDetailContent() {
   const [hospital, setHospital] = useState<Hospital | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showAddWeight, setShowAddWeight] = useState(false);
-  const [showAddClinicalNote, setShowAddClinicalNote] = useState(false);
-  const [showAddVaccine, setShowAddVaccine] = useState(false);
-  const [showAddNote, setShowAddNote] = useState(false);
-  const [showAddPrescription, setShowAddPrescription] = useState(false);
-  const [showBudget, setShowBudget] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const { confirm } = useConfirmation();
+  const { open } = useModal();
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [viewingDoc, setViewingDoc] = useState<{ url: string; mimeType: string; fileName: string } | null>(null);
   const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ onConfirm: () => Promise<void> } | null>(null);
-  const [confirmDeleting, setConfirmDeleting] = useState(false);
 
   const [exams, setExams] = useState<Study[]>([]);
   const [weightRecords, setWeightRecords] = useState<HealthRecord[]>([]);
@@ -233,16 +224,14 @@ export function PatientDetailContent() {
 
   const handleDelete = async () => {
     if (!patient) return;
-    setDeleting(true);
     try {
       await patientsService.delete(patient.id);
       router.push('/patients');
-    } catch { setDeleting(false); }
+    } catch { /* silently fail */ }
   };
 
   const handleEditSuccess = (updated: Patient) => {
     setPatient(updated);
-    setShowEditModal(false);
     if (updated.tutor_id) tutorsService.get(updated.tutor_id).then(setTutor).catch(() => null);
   };
 
@@ -289,15 +278,6 @@ export function PatientDetailContent() {
   const closeDocViewer = () => {
     if (viewingDoc) URL.revokeObjectURL(viewingDoc.url);
     setViewingDoc(null);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deleteConfirm) return;
-    setConfirmDeleting(true);
-    try {
-      await deleteConfirm.onConfirm();
-      setDeleteConfirm(null);
-    } catch { /* silently fail */ } finally { setConfirmDeleting(false); }
   };
 
   if (loading) return (
@@ -366,6 +346,70 @@ export function PatientDetailContent() {
     ? whatsappLink(tutor.phone, `Olá ${tutor.name.trim()}, tudo bem?`)
     : null;
 
+  const requestDelete = (onConfirm: () => Promise<void>, title = 'Excluir registro?') => {
+    confirm({
+      title,
+      description: 'Esta ação não pode ser desfeita. O registro será removido permanentemente.',
+      variant: 'danger',
+      confirmLabel: 'Excluir',
+      onConfirm,
+    });
+  };
+
+  const openEditModal = () => open({
+    content: ({ close }) => (
+      <PatientModal
+        patient={patient}
+        onClose={close}
+        onSuccess={(updated) => { handleEditSuccess(updated); close(); }}
+      />
+    ),
+  });
+
+  const openUploadModal = () => open({
+    content: ({ close }) => (
+      <UploadExamModal
+        preselectedPatient={patient}
+        onClose={close}
+        onSuccess={() => { close(); void fetchExams(); }}
+      />
+    ),
+  });
+
+  const openAddWeightModal = () => open({
+    content: ({ close }) => (
+      <AddWeightModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchWeights(); }} />
+    ),
+  });
+
+  const openAddClinicalNoteModal = () => open({
+    content: ({ close }) => (
+      <AddClinicalNoteModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchClinicalNotes(); }} />
+    ),
+  });
+
+  const openAddVaccineModal = () => open({
+    content: ({ close }) => (
+      <AddVaccineModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchVaccines(); }} />
+    ),
+  });
+
+  const openAddNoteModal = () => open({
+    content: ({ close }) => (
+      <AddNoteModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchNotes(); }} />
+    ),
+  });
+
+  const openAddPrescriptionModal = () => open({
+    content: ({ close }) => (
+      <AddPrescriptionModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchPrescriptions(); }} />
+    ),
+  });
+
+  const openBudgetModal = () => open({
+    content: ({ close }) => <BudgetModal patient={patient} tutor={tutor} onClose={close} />,
+  });
+
   return (
     <>
       <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -379,12 +423,12 @@ export function PatientDetailContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setShowBudget(true)} title="Gerar orçamento de serviços">
+          <Button variant="outline" onClick={openBudgetModal} title="Gerar orçamento de serviços">
             <Receipt size={16} />
             Orçamento
           </Button>
-          <Button variant="outline" size="icon" onClick={() => setShowEditModal(true)} title="Editar"><Pencil size={16} /></Button>
-          <Button variant="outline" size="icon" onClick={() => setShowDeleteConfirm(true)} title="Excluir" className="text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900 border-red-600/30 dark:border-red-500/30">
+          <Button variant="outline" size="icon" onClick={openEditModal} title="Editar"><Pencil size={16} /></Button>
+          <Button variant="outline" size="icon" onClick={() => requestDelete(handleDelete, 'Excluir paciente?')} title="Excluir" className="text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900 border-red-600/30 dark:border-red-500/30">
             <Trash2 size={16} />
           </Button>
         </div>
@@ -534,7 +578,7 @@ export function PatientDetailContent() {
 
       <SectionCard title="Exames" subtitle="Exames vinculados a este paciente" className="mb-6"
         headerAction={
-          <Button onClick={() => setShowUploadModal(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+          <Button onClick={openUploadModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
             <Plus size={16} /> Adicionar Exame
           </Button>
         }
@@ -574,7 +618,7 @@ export function PatientDetailContent() {
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STUDY_STATUS_COLORS[exam.status] ?? ''}`}>
                     {STUDY_STATUS_LABELS[exam.status] ?? exam.status}
                   </span>
-                  <Link href={`/exams/detail?id=${exam.id}`}>
+                  <Link href={`/exams/${exam.id}`}>
                     <Button variant="ghost" size="icon" className="h-7 w-7"><FileText size={14} /></Button>
                   </Link>
                 </div>
@@ -590,7 +634,7 @@ export function PatientDetailContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <SectionCard title="Histórico de Pesos" subtitle="Acompanhe a evolução do peso"
           headerAction={
-            <Button onClick={() => setShowAddWeight(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+            <Button onClick={openAddWeightModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Registrar Peso
             </Button>
           }
@@ -629,7 +673,7 @@ export function PatientDetailContent() {
                         {rec.notes && <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5">{rec.notes}</p>}
                       </div>
                     </div>
-                    <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchWeights) })} />
+                    <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchWeights))} />
                   </div>
                 );
               })}
@@ -639,7 +683,7 @@ export function PatientDetailContent() {
 
         <SectionCard title="Registros Clínicos" subtitle="Mais recentes no topo"
           headerAction={
-            <Button onClick={() => setShowAddClinicalNote(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+            <Button onClick={openAddClinicalNoteModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Novo Registro
             </Button>
           }
@@ -676,7 +720,7 @@ export function PatientDetailContent() {
                         </div>
                         <p className="text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap">{meta.description}</p>
                       </div>
-                      <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchClinicalNotes) })} />
+                      <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchClinicalNotes))} />
                     </div>
                   </Card>
                 );
@@ -689,7 +733,7 @@ export function PatientDetailContent() {
       <div className="space-y-4 mb-6">
         <SectionCard title="Vacinas" subtitle="Histórico de vacinação"
           headerAction={
-            <Button onClick={() => setShowAddVaccine(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+            <Button onClick={openAddVaccineModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Registrar Vacina
             </Button>
           }
@@ -749,7 +793,7 @@ export function PatientDetailContent() {
                           {meta.previous_dose_date ? fmtDate(meta.previous_dose_date) : '—'}
                         </td>
                         <td className="py-3 px-3 text-xs text-stone-500 dark:text-stone-400">{meta.applied_by ?? '—'}</td>
-                        <td className="py-3 text-end px-3"><DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchVaccines) })} /></td>
+                        <td className="py-3 text-end px-3"><DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchVaccines))} /></td>
                       </tr>
                     );
                   })}
@@ -761,7 +805,7 @@ export function PatientDetailContent() {
 
         <SectionCard title="Receituário" subtitle="Receitas e prescrições"
           headerAction={
-            <Button onClick={() => setShowAddPrescription(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+            <Button onClick={openAddPrescriptionModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Nova Receita
             </Button>
           }
@@ -852,7 +896,7 @@ export function PatientDetailContent() {
                         >
                           <FileText size={14} />
                         </Button>
-                        <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchPrescriptions) })} />
+                        <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchPrescriptions))} />
                       </div>
                     </div>
                   </Card>
@@ -866,7 +910,7 @@ export function PatientDetailContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionCard title="Notas e Observações" subtitle="Observações gerais sobre o paciente"
           headerAction={
-            <Button onClick={() => setShowAddNote(true)} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+            <Button onClick={openAddNoteModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Nova Nota
             </Button>
           }
@@ -901,7 +945,7 @@ export function PatientDetailContent() {
                         <p className="text-sm text-stone-800 dark:text-stone-100 whitespace-pre-wrap">{meta.text}</p>
                         <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-1">{fmtDateTime(rec.created_at)}{byAuthor(rec)}</p>
                       </div>
-                      <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchNotes) })} />
+                      <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchNotes))} />
                     </div>
                   </Card>
                 );
@@ -975,7 +1019,7 @@ export function PatientDetailContent() {
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      onClick={() => setDeleteConfirm({ onConfirm: () => handleDeleteDocument(doc.id) })}
+                      onClick={() => requestDelete(() => handleDeleteDocument(doc.id))}
                       className="text-stone-500/70 dark:text-stone-400/70 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
                     >
                       <Trash2 size={14} />
@@ -1016,36 +1060,6 @@ export function PatientDetailContent() {
         </div>
       )}
 
-      {deleteConfirm && (
-        <ConfirmModal
-          title="Excluir registro?"
-          description="Esta ação não pode ser desfeita. O registro será removido permanentemente."
-          confirmLabel="Excluir"
-          loading={confirmDeleting}
-          onConfirm={() => { void handleConfirmDelete(); }}
-          onClose={() => setDeleteConfirm(null)}
-        />
-      )}
-
-      {showDeleteConfirm && (
-        <ConfirmModal
-          title="Excluir paciente?"
-          description={`Esta ação não pode ser desfeita. ${patient.name} será removido permanentemente.`}
-          confirmLabel="Excluir"
-          loading={deleting}
-          onConfirm={() => { void handleDelete(); }}
-          onClose={() => setShowDeleteConfirm(false)}
-        />
-      )}
-
-      {showEditModal && <PatientModal patient={patient} onClose={() => setShowEditModal(false)} onSuccess={handleEditSuccess} />}
-      {showUploadModal && <UploadExamModal preselectedPatient={patient} onClose={() => setShowUploadModal(false)} onSuccess={() => { setShowUploadModal(false); void fetchExams(); }} />}
-      {showAddWeight && <AddWeightModal patientId={patient.id} onClose={() => setShowAddWeight(false)} onSuccess={() => { setShowAddWeight(false); void fetchWeights(); }} />}
-      {showAddClinicalNote && <AddClinicalNoteModal patientId={patient.id} onClose={() => setShowAddClinicalNote(false)} onSuccess={() => { setShowAddClinicalNote(false); void fetchClinicalNotes(); }} />}
-      {showAddVaccine && <AddVaccineModal patientId={patient.id} onClose={() => setShowAddVaccine(false)} onSuccess={() => { setShowAddVaccine(false); void fetchVaccines(); }} />}
-      {showAddNote && <AddNoteModal patientId={patient.id} onClose={() => setShowAddNote(false)} onSuccess={() => { setShowAddNote(false); void fetchNotes(); }} />}
-      {showAddPrescription && <AddPrescriptionModal patientId={patient.id} onClose={() => setShowAddPrescription(false)} onSuccess={() => { setShowAddPrescription(false); void fetchPrescriptions(); }} />}
-      {showBudget && <BudgetModal patient={patient} tutor={tutor} onClose={() => setShowBudget(false)} />}
     </>
   );
 }

@@ -3,7 +3,7 @@
 import { Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
 
-import { PreventionContent } from './components/prevention-content';
+import { PreventionContent } from '../../prevention/components/prevention-content';
 
 import { Header } from '@/app/components/layout/header';
 

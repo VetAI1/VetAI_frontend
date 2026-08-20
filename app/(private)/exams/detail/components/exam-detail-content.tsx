@@ -11,7 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { formatReference } from '../utils';
@@ -28,9 +28,9 @@ import type { AlteredValueInfo, Study } from '@/types/study';
 const STATUS_MAP = STUDY_STATUS_MAP;
 
 export function ExamDetailContent() {
-  const searchParams = useSearchParams();
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const id = searchParams.get('id');
+  const id = params.slug;
   const [study, setStudy] = useState<Study | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedValue, setSelectedValue] = useState<AlteredValueInfo | null>(
@@ -209,7 +209,7 @@ export function ExamDetailContent() {
           </Button>
           {study.status === 'COMPLETED' && hasAlteredValues && (
             <Button
-              onClick={() => router.push(`/exams/prevention?id=${study.id}`)}
+              onClick={() => router.push(`/exams/${study.id}/prevention`)}
               className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 gap-2 text-sm"
             >
               <ShieldCheck size={16} />

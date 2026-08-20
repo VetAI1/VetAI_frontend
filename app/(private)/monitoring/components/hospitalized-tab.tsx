@@ -287,7 +287,7 @@ export function HospitalizedTab() {
                         key={hospitalization.id}
                         type="button"
                         onClick={() =>
-                          router.push(`/monitoring/detail?id=${hospitalization.id}`)
+                          router.push(`/monitoring/${hospitalization.id}`)
                         }
                         title={risk.label}
                         className="relative overflow-hidden text-left bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-md transition-all p-4 pl-6"

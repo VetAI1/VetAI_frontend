@@ -205,7 +205,7 @@ export default function TutorsPage() {
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center justify-end gap-1">
-                      <Link href={`/tutors/detail?id=${tutor.id}`}>
+                      <Link href={`/tutors/${tutor.id}`}>
                         <Button
                           variant="ghost"
                           size="icon-sm"

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import { TutorDetailContent } from './components/tutor-detail-content';
+import { TutorDetailContent } from '../../tutors/detail/components/tutor-detail-content';
 
 export default function TutorDetailPage() {
   return (

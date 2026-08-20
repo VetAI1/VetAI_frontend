@@ -64,7 +64,7 @@ export default function PatientsPage() {
       header: 'Animal',
       render: (patient) => (
         <Link
-          href={`/patients/detail?id=${patient.id}`}
+          href={`/patients/${patient.id}`}
           className="flex items-center gap-3"
         >
           <div className="w-10 h-10 rounded-full bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
@@ -109,7 +109,7 @@ export default function PatientsPage() {
       align: 'right',
       width: '60px',
       render: (patient) => (
-        <Link href={`/patients/detail?id=${patient.id}`}>
+        <Link href={`/patients/${patient.id}`}>
           <ChevronRight
             className="inline text-stone-500/50 dark:text-stone-400/50 hover:text-teal-800 dark:hover:text-teal-500 transition-colors"
             size={20}

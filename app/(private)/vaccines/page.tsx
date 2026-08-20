@@ -1,11 +1,9 @@
 'use client';
 
 import { ChevronLeft, ChevronRight, Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
-import { useState } from 'react';
 
 import { VaccineFormModal } from './components/vaccine-form-modal';
 
-import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
@@ -14,16 +12,16 @@ import {
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { vaccinesService } from '@/services/vaccines.service';
 import type { Vaccine } from '@/types/vaccine';
 import { fmtDate, fmtPeriod } from '@/utils/date-format';
 
 export default function VaccinesPage() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editVaccine, setEditVaccine] = useState<Vaccine | null>(null);
-  const [deleteVaccine, setDeleteVaccine] = useState<Vaccine | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const { confirm } = useConfirmation();
+  const { open } = useModal();
 
   const {
     items: vaccines,
@@ -41,17 +39,27 @@ export default function VaccinesPage() {
     debounceMs: 300,
   });
 
-  const handleDelete = async () => {
-    if (!deleteVaccine) return;
-    setDeleting(true);
-    try {
-      await vaccinesService.delete(deleteVaccine.id);
-      setDeleteVaccine(null);
-      await refresh();
-    } catch {
-    } finally {
-      setDeleting(false);
-    }
+  const openVaccineModal = (vaccine?: Vaccine) => open({
+    content: ({ close }) => (
+      <VaccineFormModal
+        {...(vaccine ? { vaccine } : {})}
+        onClose={close}
+        onSuccess={() => { close(); void refresh(); }}
+      />
+    ),
+  });
+
+  const handleDelete = (vaccine: Vaccine) => {
+    confirm({
+      title: 'Excluir vacina?',
+      description: `A vacina "${vaccine.name}" (${vaccine.code}) será removida permanentemente do catálogo.`,
+      variant: 'danger',
+      confirmLabel: 'Excluir',
+      onConfirm: async () => {
+        await vaccinesService.delete(vaccine.id);
+        await refresh();
+      },
+    });
   };
 
   const columns: DataTableColumn<Vaccine>[] = [
@@ -108,7 +116,7 @@ export default function VaccinesPage() {
           <Button
             variant="ghost"
             size="icon-sm"
-            onClick={() => setEditVaccine(vaccine)}
+            onClick={() => openVaccineModal(vaccine)}
           >
             <Pencil size={15} />
           </Button>
@@ -116,7 +124,7 @@ export default function VaccinesPage() {
             variant="ghost"
             size="icon-sm"
             className="text-red-600 dark:text-red-500 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
-            onClick={() => setDeleteVaccine(vaccine)}
+            onClick={() => handleDelete(vaccine)}
           >
             <Trash2 size={15} />
           </Button>
@@ -139,7 +147,7 @@ export default function VaccinesPage() {
           }
           headerAction={
             <Button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => openVaccineModal()}
               className="bg-teal-800 dark:bg-teal-500 h-10 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={18} /> Nova Vacina
@@ -198,39 +206,6 @@ export default function VaccinesPage() {
         </SectionCard>
       </div>
 
-      {showCreateModal && (
-        <VaccineFormModal
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
-            setShowCreateModal(false);
-            void refresh();
-          }}
-        />
-      )}
-
-      {editVaccine && (
-        <VaccineFormModal
-          vaccine={editVaccine}
-          onClose={() => setEditVaccine(null)}
-          onSuccess={() => {
-            setEditVaccine(null);
-            void refresh();
-          }}
-        />
-      )}
-
-      {deleteVaccine && (
-        <ConfirmModal
-          title="Excluir vacina?"
-          description={`A vacina "${deleteVaccine.name}" (${deleteVaccine.code}) será removida permanentemente do catálogo.`}
-          confirmLabel="Excluir"
-          loading={deleting}
-          onConfirm={() => {
-            void handleDelete();
-          }}
-          onClose={() => setDeleteVaccine(null)}
-        />
-      )}
     </div>
   );
 }

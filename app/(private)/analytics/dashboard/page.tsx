@@ -304,7 +304,7 @@ export default function Dashboard() {
                         variant="link"
                         size="sm"
                         onClick={() =>
-                          router.push(`/exams/detail?id=${study.id}`)
+                          router.push(`/exams/${study.id}`)
                         }
                         className="text-teal-800 dark:text-teal-500 h-auto p-0"
                       >

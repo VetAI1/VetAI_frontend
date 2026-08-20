@@ -174,7 +174,7 @@ export function ExecutionMapTab() {
                   <tr key={hospitalization.id} className="group">
                     <td className="sticky left-0 z-10 bg-white dark:bg-stone-900 group-hover:bg-stone-100 dark:group-hover:bg-stone-800 px-4 py-2.5 border-b border-r border-stone-200 dark:border-stone-800">
                       <Link
-                        href={`/monitoring/detail?id=${hospitalization.id}`}
+                        href={`/monitoring/${hospitalization.id}`}
                         className="text-sm font-medium text-stone-900 dark:text-stone-100 hover:text-teal-800 dark:hover:text-teal-500"
                       >
                         {hospitalization.patient?.name}

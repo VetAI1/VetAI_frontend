@@ -17,7 +17,7 @@ import {
   User,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { AddAppointmentModal } from './add-appointment-modal';
@@ -32,6 +32,7 @@ import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
+import { useModal } from '@/contexts/modal-context';
 import { appointmentsService } from '@/services/appointments.service';
 import { paymentsService } from '@/services/payments.service';
 import { tutorsService } from '@/services/tutors.service';
@@ -69,9 +70,9 @@ function fmtCpf(cpf: string): string {
 }
 
 export function TutorDetailContent() {
-  const searchParams = useSearchParams();
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const id = searchParams.get('id');
+  const id = params.slug;
 
   const [tutor, setTutor] = useState<Tutor | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,9 +87,7 @@ export function TutorDetailContent() {
   const [paidPayments, setPaidPayments] = useState<Payment[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
 
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showAddAppointment, setShowAddAppointment] = useState(false);
-  const [showAddPayment, setShowAddPayment] = useState(false);
+  const { open } = useModal();
 
   const [confirmDelete, setConfirmDelete] = useState<{ type: 'appointment' | 'payment'; id: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -232,6 +231,45 @@ export function TutorDetailContent() {
   const petNameById = (patientId?: string) =>
     pets.find((p) => p.id === patientId)?.name ?? '—';
 
+  const openEditModal = () => open({
+    content: ({ close }) => (
+      <TutorModal
+        tutor={tutor}
+        onClose={close}
+        onSuccess={(updated) => { setTutor(updated); close(); }}
+      />
+    ),
+  });
+
+  const openAppointmentModal = () => open({
+    content: ({ close }) => (
+      <AddAppointmentModal
+        tutorId={id!}
+        pets={pets}
+        onClose={close}
+        onSuccess={(appt) => { setAppointments((prev) => [appt, ...prev]); close(); }}
+      />
+    ),
+  });
+
+  const openPaymentModal = () => open({
+    content: ({ close }) => (
+      <AddPaymentModal
+        tutorId={id!}
+        pets={pets}
+        onClose={close}
+        onSuccess={(payment) => {
+          if (payment.status === 'PENDING') {
+            setPendingPayments((prev) => [payment, ...prev]);
+          } else {
+            setPaidPayments((prev) => [payment, ...prev]);
+          }
+          close();
+        }}
+      />
+    ),
+  });
+
   return (
     <div className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
       <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -243,7 +281,7 @@ export function TutorDetailContent() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setShowEditModal(true)}
+              onClick={openEditModal}
             >
               <Pencil size={14} />
               Editar
@@ -290,7 +328,7 @@ export function TutorDetailContent() {
               {pets.map((pet) => (
                 <Link
                   key={pet.id}
-                  href={`/patients/detail?id=${pet.id}`}
+                  href={`/patients/${pet.id}`}
                   className="flex items-center gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-teal-800/40 dark:hover:border-teal-500/40 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all group"
                 >
                   <div className="w-9 h-9 rounded-full bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
@@ -313,7 +351,7 @@ export function TutorDetailContent() {
           headerAction={
             <Button
               size="sm"
-              onClick={() => setShowAddAppointment(true)}
+              onClick={openAppointmentModal}
               className="gap-1.5 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={14} />
@@ -370,7 +408,7 @@ export function TutorDetailContent() {
           headerAction={
             <Button
               size="sm"
-              onClick={() => setShowAddPayment(true)}
+              onClick={openPaymentModal}
               className="gap-1.5 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={14} />
@@ -427,46 +465,6 @@ export function TutorDetailContent() {
             </div>
           )}
         </SectionCard>
-
-        {/* Modals */}
-        {showEditModal && tutor && (
-          <TutorModal
-            tutor={tutor}
-            onClose={() => setShowEditModal(false)}
-            onSuccess={(updated) => {
-              setTutor(updated);
-              setShowEditModal(false);
-            }}
-          />
-        )}
-
-        {showAddAppointment && id && (
-          <AddAppointmentModal
-            tutorId={id}
-            pets={pets}
-            onClose={() => setShowAddAppointment(false)}
-            onSuccess={(appt) => {
-              setAppointments((prev) => [appt, ...prev]);
-              setShowAddAppointment(false);
-            }}
-          />
-        )}
-
-        {showAddPayment && id && (
-          <AddPaymentModal
-            tutorId={id}
-            pets={pets}
-            onClose={() => setShowAddPayment(false)}
-            onSuccess={(payment) => {
-              if (payment.status === 'PENDING') {
-                setPendingPayments((prev) => [payment, ...prev]);
-              } else {
-                setPaidPayments((prev) => [payment, ...prev]);
-              }
-              setShowAddPayment(false);
-            }}
-          />
-        )}
 
         {confirmDelete && (
           <ConfirmModal

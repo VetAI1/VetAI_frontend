@@ -108,7 +108,7 @@ export default function ExamsPage() {
       align: 'right',
       width: '80px',
       render: (study) => (
-        <Link href={`/exams/detail?id=${study.id}`}>
+        <Link href={`/exams/${study.id}`}>
           <Button variant="ghost" size="icon-sm" title="Ver detalhes">
             <Eye size={16} className="text-stone-500 dark:text-stone-400" />
           </Button>

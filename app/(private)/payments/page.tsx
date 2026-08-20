@@ -17,6 +17,7 @@ import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { useAutoComplete } from '@/hooks/use-auto-complete';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { paymentsService } from '@/services/payments.service';
@@ -62,11 +63,8 @@ interface PaymentFilters {
 
 export default function PaymentsPage() {
   const { confirm } = useConfirmation();
+  const { open } = useModal();
   const [tutorFilter, setTutorFilter] = useState<Tutor | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [editingPayment, setEditingPayment] = useState<Payment | undefined>(
-    undefined,
-  );
 
   const {
     items: payments,
@@ -114,16 +112,19 @@ export default function PaymentsPage() {
     setFilters((prev) => ({ ...prev, tutor_id: '' }));
   };
 
-  const handleCreateSuccess = (p: Payment) => {
-    setShowModal(false);
-    prependItem(p);
-  };
-
-  const handleEditSuccess = (updated: Payment) => {
-    setShowModal(false);
-    setEditingPayment(undefined);
-    replaceItem((item) => item.id === updated.id, updated);
-  };
+  const openPaymentModal = (payment?: Payment) => open({
+    content: ({ close }) => (
+      <PaymentModal
+        {...(payment ? { payment } : {})}
+        onClose={close}
+        onSuccess={(updated) => {
+          if (payment) replaceItem((item) => item.id === updated.id, updated);
+          else prependItem(updated);
+          close();
+        }}
+      />
+    ),
+  });
 
   const handleDelete = (payment: Payment) => {
     confirm({
@@ -140,13 +141,7 @@ export default function PaymentsPage() {
   };
 
   const openEdit = (p: Payment) => {
-    setEditingPayment(p);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingPayment(undefined);
+    openPaymentModal(p);
   };
 
   const totalPages = meta?.total_pages ?? 1;
@@ -272,10 +267,7 @@ export default function PaymentsPage() {
           }
           headerAction={
             <Button
-              onClick={() => {
-                setEditingPayment(undefined);
-                setShowModal(true);
-              }}
+              onClick={() => openPaymentModal()}
               className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-10"
             >
               <Plus size={18} /> Nova Cobrança
@@ -375,13 +367,6 @@ export default function PaymentsPage() {
         </SectionCard>
       </div>
 
-      {showModal && (
-        <PaymentModal
-          {...(editingPayment ? { payment: editingPayment } : {})}
-          onClose={closeModal}
-          onSuccess={editingPayment ? handleEditSuccess : handleCreateSuccess}
-        />
-      )}
     </div>
   );
 }

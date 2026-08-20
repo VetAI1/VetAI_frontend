@@ -32,7 +32,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
@@ -460,9 +460,9 @@ function RescheduleModal({
 }
 
 export function HospitalizationDetailContent() {
-  const searchParams = useSearchParams();
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const id = searchParams.get('id');
+  const id = params.slug;
 
   const [hospitalization, setHospitalization] = useState<Hospitalization | null>(null);
   const [loading, setLoading] = useState(true);
@@ -783,7 +783,7 @@ export function HospitalizationDetailContent() {
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <Link
-                  href={`/patients/detail?id=${hospitalization.patient?.id}`}
+                  href={`/patients/${hospitalization.patient?.id}`}
                   className="text-xl font-bold text-stone-900 dark:text-stone-100 hover:text-teal-800 dark:hover:text-teal-500"
                 >
                   {hospitalization.patient?.name}

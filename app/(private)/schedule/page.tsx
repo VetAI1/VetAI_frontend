@@ -23,6 +23,7 @@ import { MONTH_NAMES, toLocalDateStr } from './utils';
 
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { useModal } from '@/contexts/modal-context';
 import { scheduleService } from '@/services/schedule.service';
 import type { ScheduleEvent } from '@/types/schedule';
 
@@ -68,12 +69,7 @@ export default function SchedulePage() {
   const [events, setEvents] = useState<ScheduleEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
-  const [detailEvent, setDetailEvent] = useState<ScheduleEvent | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [addInitialDate, setAddInitialDate] = useState<string | undefined>(
-    undefined,
-  );
-  const [editingEvent, setEditingEvent] = useState<ScheduleEvent | null>(null);
+  const { open } = useModal();
 
   const loadEvents = useCallback(async () => {
     setLoadingEvents(true);
@@ -131,19 +127,47 @@ export default function SchedulePage() {
   }
 
   function handleAddClick(date?: string) {
-    setAddInitialDate(date ?? selectedDate);
-    setShowAddModal(true);
-  }
-
-  async function handleEventSaved() {
-    await loadEvents();
-    setShowAddModal(false);
-    setEditingEvent(null);
+    openAddModal(date ?? selectedDate);
   }
 
   async function handleEventDeleted() {
     await loadEvents();
   }
+
+  const openAddModal = (date: string) => open({
+    content: ({ close }) => (
+      <AddEventModal
+        initialDate={date}
+        onClose={close}
+        onSave={async () => { await loadEvents(); close(); }}
+        minHour={scheduleSettings.weekStartHour}
+        maxHour={scheduleSettings.weekEndHour}
+      />
+    ),
+  });
+
+  const openEditModal = (event: ScheduleEvent) => open({
+    content: ({ close }) => (
+      <AddEventModal
+        event={event}
+        onClose={close}
+        onSave={async () => { await loadEvents(); close(); }}
+        minHour={scheduleSettings.weekStartHour}
+        maxHour={scheduleSettings.weekEndHour}
+      />
+    ),
+  });
+
+  const openDetailModal = (event: ScheduleEvent) => open({
+    content: ({ close }) => (
+      <EventDetailModal
+        event={event}
+        onClose={close}
+        onDelete={handleEventDeleted}
+        onEdit={(selectedEvent) => { close(); openEditModal(selectedEvent); }}
+      />
+    ),
+  });
 
   const selectedEvents = events.filter((e) => e.date === selectedDate);
 
@@ -220,7 +244,7 @@ export default function SchedulePage() {
                 selectedDate={selectedDate}
                 today={todayStr}
                 onSelectDate={setSelectedDate}
-                onEventClick={setDetailEvent}
+                onEventClick={openDetailModal}
               />
             ) : (
               <WeekCalendar
@@ -229,7 +253,7 @@ export default function SchedulePage() {
                 today={todayStr}
                 startHour={scheduleSettings.weekStartHour}
                 endHour={scheduleSettings.weekEndHour}
-                onEventClick={setDetailEvent}
+                onEventClick={openDetailModal}
               />
             )}
 
@@ -248,7 +272,7 @@ export default function SchedulePage() {
             <TodayEventsList
               date={selectedDate}
               events={selectedEvents}
-              onEventClick={setDetailEvent}
+              onEventClick={openDetailModal}
               onAddClick={() => handleAddClick(selectedDate)}
               loading={loadingEvents}
             />
@@ -260,34 +284,6 @@ export default function SchedulePage() {
         </div>
       </div>
 
-      {showAddModal && (
-        <AddEventModal
-          initialDate={addInitialDate}
-          onClose={() => setShowAddModal(false)}
-          onSave={handleEventSaved}
-          minHour={scheduleSettings.weekStartHour}
-          maxHour={scheduleSettings.weekEndHour}
-        />
-      )}
-
-      {editingEvent && (
-        <AddEventModal
-          event={editingEvent}
-          onClose={() => setEditingEvent(null)}
-          onSave={handleEventSaved}
-          minHour={scheduleSettings.weekStartHour}
-          maxHour={scheduleSettings.weekEndHour}
-        />
-      )}
-
-      {detailEvent && (
-        <EventDetailModal
-          event={detailEvent}
-          onClose={() => setDetailEvent(null)}
-          onDelete={handleEventDeleted}
-          onEdit={(ev) => setEditingEvent(ev)}
-        />
-      )}
     </main>
   );
 }

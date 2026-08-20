@@ -1,7 +1,6 @@
 'use client';
 
 import { BookOpen, Pencil, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { CatalogItemModal } from './components/catalog-item-modal';
@@ -16,6 +15,7 @@ import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { catalogService } from '@/services/catalog.service';
 import {
@@ -50,10 +50,7 @@ interface CatalogFilters {
 
 export default function CatalogPage() {
   const { confirm } = useConfirmation();
-  const [showModal, setShowModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<CatalogItem | undefined>(
-    undefined,
-  );
+  const { open } = useModal();
 
   const {
     items,
@@ -86,16 +83,19 @@ export default function CatalogPage() {
     }));
   };
 
-  const handleCreateSuccess = (item: CatalogItem) => {
-    setShowModal(false);
-    prependItem(item);
-  };
-
-  const handleEditSuccess = (updated: CatalogItem) => {
-    setShowModal(false);
-    setEditingItem(undefined);
-    replaceItem((i) => i.id === updated.id, updated);
-  };
+  const openCatalogModal = (item?: CatalogItem) => open({
+    content: ({ close }) => (
+      <CatalogItemModal
+        {...(item ? { item } : {})}
+        onClose={close}
+        onSuccess={(updated) => {
+          if (item) replaceItem((current) => current.id === updated.id, updated);
+          else prependItem(updated);
+          close();
+        }}
+      />
+    ),
+  });
 
   const handleDelete = (item: CatalogItem) => {
     confirm({
@@ -112,13 +112,7 @@ export default function CatalogPage() {
   };
 
   const openEdit = (item: CatalogItem) => {
-    setEditingItem(item);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingItem(undefined);
+    openCatalogModal(item);
   };
 
   const totalPages = meta?.total_pages ?? 1;
@@ -222,10 +216,7 @@ export default function CatalogPage() {
           }
           headerAction={
             <Button
-              onClick={() => {
-                setEditingItem(undefined);
-                setShowModal(true);
-              }}
+              onClick={() => openCatalogModal()}
               className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-10"
             >
               <Plus size={18} /> Novo item
@@ -308,13 +299,6 @@ export default function CatalogPage() {
         </SectionCard>
       </div>
 
-      {showModal && (
-        <CatalogItemModal
-          {...(editingItem ? { item: editingItem } : {})}
-          onClose={closeModal}
-          onSuccess={editingItem ? handleEditSuccess : handleCreateSuccess}
-        />
-      )}
     </div>
   );
 }
