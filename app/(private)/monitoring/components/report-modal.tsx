@@ -78,12 +78,12 @@ export function ReportModal({ hospitalization, onClose }: ReportModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/70 backdrop-blur-sm">
-      <div className="flex items-center justify-between gap-3 bg-teal-700 px-4 py-3 text-white">
+      <div className="flex items-center justify-between gap-3 bg-teal-800 dark:bg-teal-500 px-4 py-3 text-white dark:text-stone-950">
         <div className="min-w-0">
           <p className="text-sm font-semibold truncate">
             Prontuário de internação
           </p>
-          <p className="text-xs text-teal-100 truncate">
+          <p className="text-xs text-white/70 dark:text-stone-950/70 truncate">
             {hospitalization.patient?.name}
           </p>
         </div>
@@ -93,7 +93,7 @@ export function ReportModal({ hospitalization, onClose }: ReportModalProps) {
             variant="ghost"
             onClick={() => save?.()}
             disabled={!save}
-            className="text-teal-100 hover:text-white hover:bg-teal-600"
+            className="text-white/70 dark:text-stone-950/70 hover:text-white dark:hover:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             <Download size={16} />
             Baixar PDF
@@ -103,7 +103,7 @@ export function ReportModal({ hospitalization, onClose }: ReportModalProps) {
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="text-teal-100 hover:text-white hover:bg-teal-600"
+            className="text-white/70 dark:text-stone-950/70 hover:text-white dark:hover:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             title="Fechar"
           >
             <X size={18} />

@@ -35,8 +35,8 @@ export function EventDetailModal({
   }
 
   const rowCls = 'flex items-start gap-3 text-sm';
-  const labelCls = 'text-slate-500 dark:text-slate-400 min-w-[80px]';
-  const valueCls = 'text-slate-900 dark:text-white font-medium';
+  const labelCls = 'text-stone-500 dark:text-stone-400 min-w-[80px]';
+  const valueCls = 'text-stone-900 dark:text-stone-100 font-medium';
 
   const dateFormatted = new Date(`${event.date}T00:00:00`).toLocaleDateString(
     'pt-BR',
@@ -62,7 +62,7 @@ export function EventDetailModal({
           <div className={rowCls}>
             <CalendarDays
               size={16}
-              className="text-slate-400 mt-0.5 shrink-0"
+              className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0"
             />
             <div>
               <span className={labelCls}>Data</span>
@@ -71,50 +71,50 @@ export function EventDetailModal({
           </div>
 
           <div className={rowCls}>
-            <Clock size={16} className="text-slate-400 mt-0.5 shrink-0" />
+            <Clock size={16} className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0" />
             <div>
               <span className={labelCls}>Horário</span>
               <p className={valueCls}>
-                {event.startTime}
-                {event.endTime ? ` – ${event.endTime}` : ''}
+                {event.start_time}
+                {event.end_time ? ` – ${event.end_time}` : ''}
               </p>
             </div>
           </div>
 
-          {event.patientName && (
+          {event.patient_name && (
             <div className={rowCls}>
-              <PawPrint size={16} className="text-slate-400 mt-0.5 shrink-0" />
+              <PawPrint size={16} className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0" />
               <div>
                 <span className={labelCls}>Paciente</span>
-                <p className={valueCls}>{event.patientName}</p>
+                <p className={valueCls}>{event.patient_name}</p>
               </div>
             </div>
           )}
 
-          {event.tutorName && (
+          {event.tutor_name && (
             <div className={rowCls}>
-              <User size={16} className="text-slate-400 mt-0.5 shrink-0" />
+              <User size={16} className="text-stone-500/70 dark:text-stone-400/70 mt-0.5 shrink-0" />
               <div>
                 <span className={labelCls}>Tutor</span>
-                <p className={valueCls}>{event.tutorName}</p>
+                <p className={valueCls}>{event.tutor_name}</p>
               </div>
             </div>
           )}
 
           {event.description && (
-            <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 text-sm text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-700">
+            <div className="bg-stone-100 dark:bg-stone-800 rounded-lg p-3 text-sm text-stone-800 dark:text-stone-100 border border-stone-200/70 dark:border-stone-800/70">
               {event.description}
             </div>
           )}
         </div>
 
-        <div className="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-700">
+        <div className="flex justify-between items-center pt-2 border-t border-stone-200/70 dark:border-stone-800/70">
           <Button
             variant="ghost"
             onClick={() => {
               void handleDelete();
             }}
-            className="gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+            className="gap-1.5 text-red-600 dark:text-red-500 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
           >
             <Trash2 size={15} /> Excluir
           </Button>
@@ -127,7 +127,7 @@ export function EventDetailModal({
                 onEdit(event);
                 onClose();
               }}
-              className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600 gap-1.5"
+              className="bg-teal-800 dark:bg-teal-500 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 text-white dark:text-stone-950 border-teal-800 dark:border-teal-500 gap-1.5"
             >
               <Pencil size={14} /> Editar
             </Button>

@@ -1,718 +1,385 @@
 'use client';
 
 import {
-  Activity,
   ArrowRight,
-  BarChart3,
-  Brain,
+  BrainCircuit,
+  ChartNoAxesCombined,
   Check,
   ChevronRight,
+  ClipboardPlus,
   FileText,
-  Heart,
-  Microscope,
-  Shield,
+  HeartPulse,
+  PawPrint,
+  Quote,
+  ShieldCheck,
   Sparkles,
-  Star,
-  Upload,
-  Users,
-  Zap,
+  Stethoscope,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { ProductShowcase } from './components/product-showcase';
+import { TextReveal } from './components/text-reveal';
+
+import { BrandLogo } from '@/app/components/brand/brand-logo';
+import { CopilotDemo } from '@/app/components/brand/copilot-demo';
+import { Shot } from '@/app/components/brand/shot';
 import { Counter } from '@/app/components/common/counter';
 import { Reveal } from '@/app/components/common/reveal';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { billingService } from '@/services/billing.service';
 import type { Plan } from '@/types/billing';
 
 const FEATURES = [
   {
-    icon: Brain,
-    title: 'Diagnóstico com IA',
+    icon: ClipboardPlus,
+    eyebrow: 'Prontuário vivo',
+    title: 'Tudo do paciente, no momento certo.',
     description:
-      'Inteligência artificial avançada que auxilia na análise e diagnóstico veterinário com precisão.',
-    color: 'text-purple-500',
-    bg: 'bg-purple-50 dark:bg-purple-950/30',
+      'Histórico, prescrições, peso, vacinas e anotações clínicas em uma visão feita para a rotina.',
   },
   {
-    icon: Microscope,
-    title: 'Análise de Exames',
+    icon: BrainCircuit,
+    eyebrow: 'IA com contexto',
+    title: 'Exames que viram conversa clínica.',
     description:
-      'Envie exames laboratoriais e obtenha interpretações automáticas e detalhadas em segundos.',
-    color: 'text-teal-500',
-    bg: 'bg-teal-50 dark:bg-teal-950/30',
+      'Envie arquivos e receba leituras organizadas para apoiar sua decisão, não substituí-la.',
   },
   {
-    icon: BarChart3,
-    title: 'Monitoramento em Tempo Real',
+    icon: HeartPulse,
+    eyebrow: 'Cuidado contínuo',
+    title: 'Acompanhe cada sinal com clareza.',
     description:
-      'Acompanhe a evolução dos pacientes com gráficos e alertas inteligentes.',
-    color: 'text-blue-500',
-    bg: 'bg-blue-50 dark:bg-blue-950/30',
-  },
-  {
-    icon: FileText,
-    title: 'Prontuário Digital',
-    description:
-      'Histórico completo do paciente, com registros de peso, medicações e exames em um só lugar.',
-    color: 'text-amber-500',
-    bg: 'bg-amber-50 dark:bg-amber-950/30',
-  },
-  {
-    icon: Shield,
-    title: 'Dados Seguros',
-    description:
-      'Seus dados e dos seus pacientes protegidos com criptografia de ponta a ponta.',
-    color: 'text-emerald-500',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-  },
-  {
-    icon: Upload,
-    title: 'Upload Inteligente',
-    description:
-      'Envie exames em diversos formatos e deixe a IA extrair automaticamente os dados relevantes.',
-    color: 'text-rose-500',
-    bg: 'bg-rose-50 dark:bg-rose-950/30',
+      'Monitoramento e alertas que deixam a equipe presente, mesmo fora da sala de atendimento.',
   },
 ];
 
 const TESTIMONIALS = [
   {
+    quote:
+      'O VetAI deixou nossa rotina mais leve. A equipe encontra o histórico completo sem interromper o atendimento.',
     name: 'Dra. Ana Paula',
     role: 'Clínica VetCare',
-    text: 'O VetAI revolucionou como faço diagnósticos. A análise automática de exames me economiza horas de trabalho.',
-    avatar: 'AP',
+    initials: 'AP',
   },
   {
+    quote:
+      'A análise organizada dos exames nos ajuda a ganhar tempo, sem perder o olhar clínico que cada caso pede.',
     name: 'Dr. Carlos Mendes',
     role: 'Hospital Animal',
-    text: 'A precisão da IA é impressionante. Já identifiquei condições que poderiam ter passado despercebidas.',
-    avatar: 'CM',
+    initials: 'CM',
   },
   {
+    quote:
+      'O acompanhamento de internação ficou muito mais seguro para quem está na clínica e para quem entra no plantão.',
     name: 'Dra. Mariana Costa',
     role: 'PetCenter',
-    text: 'O monitoramento em tempo real mudou completamente o cuidado pós-operatório dos meus pacientes.',
-    avatar: 'MC',
+    initials: 'MC',
   },
 ];
 
+function formatPrice(cents: number) {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(cents / 100);
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div className="max-w-2xl">
+      <span className="inline-flex items-center gap-2 rounded-full bg-stone-100 dark:bg-stone-800 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-stone-800 dark:text-stone-100">
+        <span className="size-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
+        {eyebrow}
+      </span>
+      <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100 sm:text-4xl md:text-5xl">
+        <TextReveal text={title} />
+      </h2>
+      {description && (
+        <p className="mt-5 max-w-xl text-base leading-7 text-stone-500 dark:text-stone-400 md:text-lg">
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
 
   useEffect(() => {
     void billingService
       .listPlans()
       .then(setPlans)
-      .catch(() => setPlans([]));
+      .catch(() => setPlans([]))
+      .finally(() => setPlansLoading(false));
   }, []);
 
-  function formatPrice(cents: number) {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(cents / 100);
-  }
-
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950">
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Activity className="text-teal-600" size={28} />
-            <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">
-              VetAI
-            </span>
+    <div className="min-h-screen overflow-x-hidden bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 text-stone-900 dark:text-stone-100">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-stone-200/80 dark:border-stone-800/80 bg-[oklch(0.985_0.01_95)]/85 dark:bg-stone-950/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8">
+          <Link href="/" aria-label="VetAI - início">
+            <BrandLogo />
           </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="#features"
-              className="text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors"
-            >
-              Funcionalidades
+          <div className="hidden items-center gap-7 lg:flex">
+            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#produto">
+              Produto
             </a>
-            <a
-              href="#pricing"
-              className="text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors"
-            >
+            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#planos">
               Planos
             </a>
-            <a
-              href="#testimonials"
-              className="text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors"
-            >
-              Depoimentos
+            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#relatos">
+              Relatos
             </a>
           </div>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" className="text-sm">
-                Entrar
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button className="bg-teal-600 hover:bg-teal-700 text-white text-sm">
-                Criar Conta
-              </Button>
-            </Link>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button asChild variant="ghost" className="hidden sm:inline-flex">
+              <Link href="/login">Entrar</Link>
+            </Button>
+            <Button asChild size="sm" className="px-4 sm:px-5">
+              <Link href="/register">Criar conta <ArrowRight /></Link>
+            </Button>
           </div>
         </div>
       </nav>
 
-      <section className="relative pt-32 pb-20 md:pt-44 md:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-b from-teal-50/50 to-white dark:from-teal-950/20 dark:to-slate-950" />
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-teal-400/10 rounded-full blur-3xl" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Reveal direction="up">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-sm font-medium mb-6">
-              <Sparkles size={16} />
-              Plataforma de IA para veterinários
-            </div>
-          </Reveal>
-
-          <Reveal direction="up" delay={100}>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white leading-tight max-w-4xl mx-auto">
-              Diagnósticos veterinários com{' '}
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-teal-600 to-emerald-500">
-                inteligência artificial
-              </span>
-            </h1>
-          </Reveal>
-
-          <Reveal direction="up" delay={200}>
-            <p className="mt-6 text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              Transforme a forma como você cuida dos seus pacientes. Análise
-              automática de exames, diagnósticos assistidos por IA e
-              monitoramento em tempo real.
-            </p>
-          </Reveal>
-
-          <Reveal direction="up" delay={300}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="bg-teal-600 hover:bg-teal-700 text-white px-8 h-12 text-base"
-                >
-                  Começar Gratuitamente
-                  <ArrowRight size={18} />
-                </Button>
-              </Link>
-              <a href="#features">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="px-8 h-12 text-base"
-                >
-                  Ver Funcionalidades
-                </Button>
-              </a>
-            </div>
-          </Reveal>
-
-          <Reveal direction="up" delay={400}>
-            <div className="mt-16 relative max-w-5xl mx-auto">
-              <div className="absolute -inset-4 bg-linear-to-r from-teal-500/20 via-emerald-500/20 to-teal-500/20 rounded-2xl blur-2xl" />
-              <div className="relative rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="ml-2 text-xs text-slate-400">
-                    vetai.app/dashboard
-                  </span>
-                </div>
-                <div className="p-6 md:p-8 bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    {[
-                      { label: 'Pacientes', value: '1.234' },
-                      { label: 'Exames Analisados', value: '5.678' },
-                      { label: 'Precisão IA', value: '98,5%' },
-                      { label: 'Tempo Economizado', value: '340h' },
-                    ].map((stat) => (
-                      <div
-                        key={stat.label}
-                        className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700"
-                      >
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                          {stat.label}
-                        </p>
-                        <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                          {stat.value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="h-32 md:h-48 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center">
-                    <div className="text-center">
-                      <Activity
-                        size={40}
-                        className="text-teal-500 mx-auto mb-2"
-                      />
-                      <p className="text-sm text-slate-400">
-                        Dashboard Preview
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      <section className="py-16 bg-slate-50 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              {
-                value: 2500,
-                suffix: '+',
-                label: 'Veterinários ativos',
-                icon: Users,
-              },
-              {
-                value: 50000,
-                suffix: '+',
-                label: 'Exames analisados',
-                icon: Microscope,
-              },
-              {
-                value: 98,
-                suffix: '%',
-                label: 'Precisão da IA',
-                icon: Zap,
-              },
-              {
-                value: 15000,
-                suffix: '+',
-                label: 'Pacientes monitorados',
-                icon: Heart,
-              },
-            ].map((stat, i) => (
-              <Reveal key={stat.label} direction="up" delay={i * 100}>
-                <div className="flex flex-col items-center">
-                  <stat.icon
-                    size={28}
-                    className="text-teal-600 dark:text-teal-400 mb-3"
-                  />
-                  <p className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-                    <Counter target={stat.value} suffix={stat.suffix} />
-                  </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    {stat.label}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="features" className="py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal direction="up">
-            <div className="text-center mb-16">
-              <span className="inline-block px-3 py-1 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-sm font-medium mb-4">
-                Funcionalidades
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-                Tudo que você precisa em um só lugar
-              </h2>
-              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                Ferramentas poderosas pensadas para o dia a dia do veterinário
-                moderno.
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURES.map((feature, i) => (
-              <Reveal key={feature.title} direction="up" delay={i * 80}>
-                <div className="group relative p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-teal-300 dark:hover:border-teal-700 transition-all hover:shadow-lg hover:shadow-teal-500/5">
-                  <div
-                    className={`inline-flex p-3 rounded-lg ${feature.bg} mb-4`}
-                  >
-                    <feature.icon size={24} className={feature.color} />
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 md:py-28 bg-slate-50 dark:bg-slate-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal direction="up">
-            <div className="text-center mb-16">
-              <span className="inline-block px-3 py-1 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-sm font-medium mb-4">
-                Como funciona?
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-                Simples, rápido e preciso
-              </h2>
-              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                Três passos para transformar a forma como você diagnostica.
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="flex flex-col md:flex-row items-stretch justify-center gap-6 lg:gap-0 max-w-5xl mx-auto">
-            {[
-              {
-                step: '01',
-                title: 'Envie o Exame',
-                description:
-                  'Faça upload do exame laboratorial em PDF, imagem ou qualquer formato suportado.',
-                icon: Upload,
-                color: 'from-teal-500 to-emerald-500',
-                shadow: 'shadow-teal-500/20',
-              },
-              {
-                step: '02',
-                title: 'IA Analisa',
-                description:
-                  'Nossa inteligência artificial processa e extrai todos os dados relevantes automaticamente.',
-                icon: Brain,
-                color: 'from-purple-500 to-indigo-500',
-                shadow: 'shadow-purple-500/20',
-              },
-              {
-                step: '03',
-                title: 'Receba o Diagnóstico',
-                description:
-                  'Obtenha resultados interpretados com sugestões de diagnóstico e próximos passos.',
-                icon: FileText,
-                color: 'from-amber-500 to-orange-500',
-                shadow: 'shadow-amber-500/20',
-              },
-            ].flatMap((item, i, arr) => {
-              const card = (
-                <Reveal key={item.step} direction="up" delay={i * 150}>
-                  <div className="relative bg-white dark:bg-slate-800 rounded-2xl p-8 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all hover:shadow-xl hover:-translate-y-1 duration-300 text-center h-full">
-                    <div
-                      className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} shadow-lg ${item.shadow} mb-5`}
-                    >
-                      <item.icon size={24} className="text-white" />
-                    </div>
-                    <div className="absolute top-4 right-4 text-xs font-bold text-slate-300 dark:text-slate-600">
-                      PASSO {item.step}
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">
-                      {item.title}
-                    </h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                      {item.description}
-                    </p>
+      <main>
+        <section className="relative isolate pt-32 pb-16 sm:pt-40 md:pb-24">
+          <div className="surface-pattern absolute inset-x-0 top-0 -z-10 h-[540px] opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+          <div className="absolute -z-10 right-[7%] top-32 hidden size-40 rounded-full border border-teal-800/15 dark:border-teal-500/15 bg-stone-100/50 dark:bg-stone-800/50 md:block" />
+          <div className="absolute -z-10 left-[8%] top-64 hidden size-12 rounded-full bg-amber-500/65 dark:bg-amber-400/65 md:block" />
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="grid items-center gap-14 lg:grid-cols-[1.02fr_0.98fr]">
+              <div className="max-w-2xl">
+                <Reveal direction="up">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-teal-800/15 dark:border-teal-500/15 bg-white dark:bg-stone-900 px-3 py-1.5 text-xs font-bold text-teal-800 dark:text-teal-500 shadow-sm">
+                    <PawPrint size={14} />
+                    Tecnologia que acompanha o cuidado
                   </div>
                 </Reveal>
-              );
-
-              if (i < arr.length - 1) {
-                return [
-                  card,
-                  <div
-                    key={`arrow-${i}`}
-                    className="hidden md:flex items-center justify-center px-2 lg:px-4 shrink-0"
-                  >
-                    <div className="flex items-center gap-1 text-slate-300 dark:text-slate-600">
-                      <div className="w-6 lg:w-10 h-px bg-slate-300 dark:bg-slate-700" />
-                      <ChevronRight size={16} />
-                    </div>
-                  </div>,
-                ];
-              }
-              return [card];
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section id="pricing" className="py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal direction="up">
-            <div className="text-center mb-16">
-              <span className="inline-block px-3 py-1 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-sm font-medium mb-4">
-                Planos
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-                Escolha o plano ideal para você
-              </h2>
-              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                Comece gratuitamente e escale conforme sua necessidade.
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
-            {plans.map((plan, i) => {
-              const { highlighted } = plan;
-
-              return (
-                <Reveal key={plan.id} direction="up" delay={i * 100}>
-                  <div
-                    className={`relative rounded-2xl p-8 flex flex-col h-full ${
-                      highlighted
-                        ? 'bg-gradient-to-b from-teal-600/90 to-emerald-700/90 backdrop-blur-xl text-white shadow-2xl shadow-teal-500/25 scale-105 border border-white/20 ring-1 ring-teal-400/30'
-                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
-                    }`}
-                  >
-                    {highlighted && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-400/20 dark:text-teal-200 text-xs font-bold uppercase tracking-wide border border-teal-200 dark:border-teal-400/30 shadow-sm">
-                        Mais Popular
-                      </div>
-                    )}
-                    <h3
-                      className={`text-lg font-semibold ${highlighted ? 'text-white' : 'text-slate-900 dark:text-white'}`}
-                    >
-                      {plan.name}
-                    </h3>
-                    <p
-                      className={`text-sm mt-1 ${highlighted ? 'text-teal-100' : 'text-slate-500 dark:text-slate-400'}`}
-                    >
-                      {plan.description}
-                    </p>
-                    <div className="mt-6 mb-8">
-                      <span
-                        className={`text-4xl font-bold ${highlighted ? 'text-white' : 'text-slate-900 dark:text-white'}`}
-                      >
-                        {formatPrice(plan.monthlyPrice)}
-                      </span>
-                      {plan.billingMode === 'subscription' && (
-                        <span
-                          className={`text-sm ${highlighted ? 'text-teal-200' : 'text-slate-500 dark:text-slate-400'}`}
-                        >
-                          /mês
+                <Reveal direction="up" delay={60}>
+                  <h1 className="font-display mt-6 text-5xl font-bold leading-[0.98] tracking-[-0.075em] text-stone-900 dark:text-stone-100 sm:text-6xl lg:text-7xl">
+                    <TextReveal text="Gestão clínica que" />{' '}
+                    <span className="text-teal-800 dark:text-teal-500"><TextReveal text="cuida do seu tempo." /></span>
+                  </h1>
+                </Reveal>
+                <Reveal direction="up" delay={120}>
+                  <p className="mt-6 max-w-xl text-lg leading-8 text-stone-500 dark:text-stone-400 md:text-xl">
+                    Prontuário, exames e acompanhamento inteligente para a sua equipe ter mais clareza e cada paciente receber mais atenção.
+                  </p>
+                </Reveal>
+                <Reveal direction="up" delay={180}>
+                  <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                    <Button asChild size="lg" className="h-12 px-7 text-base">
+                      <Link href="/register">Começar sem compromisso <ArrowRight /></Link>
+                    </Button>
+                    <Button asChild variant="outline" size="lg" className="h-12 px-7 text-base">
+                      <a href="#produto">Conhecer a plataforma</a>
+                    </Button>
+                  </div>
+                </Reveal>
+                <Reveal direction="up" delay={240}>
+                  <div className="mt-10 flex items-center gap-3 text-sm text-stone-500 dark:text-stone-400">
+                    <div className="flex -space-x-2">
+                      {['AP', 'CM', 'MC'].map((initials, index) => (
+                        <span key={initials} className={`grid size-8 place-items-center rounded-full border-2 border-stone-50 dark:border-stone-950 text-[10px] font-bold text-white dark:text-stone-950 ${index === 1 ? 'bg-amber-500 dark:bg-amber-400 text-amber-900 dark:text-amber-100' : 'bg-teal-800 dark:bg-teal-500'}`}>
+                          {initials}
                         </span>
-                      )}
-                    </div>
-                    <ul className="space-y-3 mb-8 flex-1">
-                      <li className="flex items-start gap-3">
-                        <Users
-                          size={18}
-                          className={`mt-0.5 shrink-0 ${highlighted ? 'text-teal-200' : 'text-teal-600 dark:text-teal-400'}`}
-                        />
-                        <span
-                          className={`text-sm ${highlighted ? 'text-teal-50' : 'text-slate-600 dark:text-slate-400'}`}
-                        >
-                          Até {plan.userLimit}{' '}
-                          {plan.userLimit === 1 ? 'usuário' : 'usuários'}
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <Sparkles
-                          size={18}
-                          className={`mt-0.5 shrink-0 ${highlighted ? 'text-teal-200' : 'text-teal-600 dark:text-teal-400'}`}
-                        />
-                        <span
-                          className={`text-sm ${highlighted ? 'text-teal-50' : 'text-slate-600 dark:text-slate-400'}`}
-                        >
-                          {plan.aiCredits} créditos de IA por mês
-                        </span>
-                      </li>
-                      {plan.features.map((feature) => (
-                        <li
-                          key={feature.key}
-                          className="flex items-start gap-3"
-                        >
-                          <Check
-                            size={18}
-                            className={`mt-0.5 shrink-0 ${highlighted ? 'text-teal-200' : 'text-teal-600 dark:text-teal-400'}`}
-                          />
-                          <span
-                            className={`text-sm ${highlighted ? 'text-teal-50' : 'text-slate-600 dark:text-slate-400'}`}
-                          >
-                            {feature.label}
-                          </span>
-                        </li>
                       ))}
-                    </ul>
-                    <Link href={`/register?plan_id=${plan.id}`}>
-                      <Button
-                        className={`w-full ${
-                          highlighted
-                            ? 'bg-white text-teal-700 hover:bg-teal-50'
-                            : 'bg-teal-600 text-white hover:bg-teal-700'
-                        }`}
-                        size="lg"
-                      >
-                        Escolher plano
-                        <ChevronRight size={16} />
-                      </Button>
-                    </Link>
+                    </div>
+                    Feito para a rotina de clínicas e hospitais veterinários.
                   </div>
                 </Reveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+              </div>
 
-      <section
-        id="testimonials"
-        className="py-20 bg-slate-50 dark:bg-slate-900/50"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal direction="up">
-            <div className="text-center mb-16">
-              <span className="inline-block px-3 py-1 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-sm font-medium mb-4">
-                Depoimentos
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-                O que nossos clientes dizem
-              </h2>
+              <Reveal direction="up" delay={160}>
+                <Shot
+                  className="mx-auto w-full max-w-[560px]"
+                  floating={
+                    <>
+                      <div className="animate-float absolute -right-5 top-12 hidden rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3 shadow-[var(--shadow-card)] lg:block">
+                        <div className="flex items-center gap-2">
+                          <span className="grid size-8 place-items-center rounded-xl bg-amber-500 dark:bg-amber-400 text-amber-900 dark:text-amber-100"><HeartPulse size={16} /></span>
+                          <div><p className="text-[10px] font-semibold text-stone-500 dark:text-stone-400">Acompanhamento</p><p className="text-xs font-bold text-stone-900 dark:text-stone-100">Sinais estáveis</p></div>
+                        </div>
+                      </div>
+                      <div className="animate-float-delayed absolute -bottom-5 -left-7 hidden rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3 py-2.5 shadow-[var(--shadow-card)] lg:flex lg:items-center lg:gap-2">
+                        <span className="grid size-7 place-items-center rounded-full bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500"><PawPrint size={14} /></span>
+                        <span className="text-xs font-bold text-stone-900 dark:text-stone-100">Luna · retorno em dia</span>
+                      </div>
+                    </>
+                  }
+                >
+                  <ProductShowcase />
+                </Shot>
+              </Reveal>
             </div>
-          </Reveal>
+          </div>
+        </section>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((testimonial, i) => (
-              <Reveal key={testimonial.name} direction="up" delay={i * 100}>
-                <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
-                  <div className="flex gap-1 mb-4">
-                    {Array.from({ length: 5 }).map((_, j) => (
-                      <Star
-                        key={j}
-                        size={16}
-                        className="text-amber-400 fill-amber-400"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
-                    &ldquo;{testimonial.text}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white text-sm font-bold">
-                      {testimonial.avatar}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        {testimonial.name}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {testimonial.role}
-                      </p>
-                    </div>
-                  </div>
+        <section className="border-y border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y divide-border sm:grid-cols-4 sm:divide-y-0 px-5 sm:px-8">
+            {[
+              { value: 2500, suffix: '+', label: 'veterinários ativos' },
+              { value: 50000, suffix: '+', label: 'exames organizados' },
+              { value: 15, suffix: ' mil+', label: 'pacientes acompanhados' },
+              { value: 24, suffix: 'h', label: 'visão da clínica' },
+            ].map((stat, index) => (
+              <Reveal key={stat.label} direction="up" delay={index * 60}>
+                <div className="px-4 py-7 text-center sm:px-7">
+                  <p className="font-data text-2xl font-semibold tracking-[-0.07em] text-teal-800 dark:text-teal-500 sm:text-3xl"><Counter target={stat.value} suffix={stat.suffix} /></p>
+                  <p className="mt-1 text-xs font-semibold text-stone-500 dark:text-stone-400">{stat.label}</p>
                 </div>
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="py-20 md:py-28 relative overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900 via-teal-950 to-slate-900" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl" />
+        <section id="produto" className="relative isolate overflow-hidden border-y border-stone-200 bg-[oklch(0.985_0.01_95)] py-24 dark:border-stone-800 dark:bg-stone-950 md:py-32">
+          <div className="surface-pattern pointer-events-none absolute inset-0 z-0 opacity-50 [mask-image:linear-gradient(135deg,black,transparent_60%)]" />
+          <div className="pointer-events-none absolute -right-20 top-12 z-0 size-72 rounded-full border border-teal-800/15 dark:border-teal-500/15" />
+          <div className="pointer-events-none absolute left-[7%] top-28 z-0 size-5 rounded-full bg-amber-500/70 dark:bg-amber-400/70" />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+            <Reveal direction="up"><SectionHeading eyebrow="Uma rotina mais fluida" title="Clínico na essência. Simples na rotina." description="Cada ferramenta foi organizada para apoiar a tomada de decisão e reduzir o trabalho repetitivo da equipe." /></Reveal>
+            <div className="mt-14 grid gap-5 lg:grid-cols-3">
+              {FEATURES.map((feature, index) => (
+                <Reveal key={feature.title} direction="up" delay={index * 80}>
+                  <article className="group h-full rounded-[24px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-7 shadow-[var(--shadow-card)] transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-teal-800/25 dark:hover:border-teal-500/25">
+                    <div className={`grid size-12 place-items-center rounded-2xl ${index === 1 ? 'bg-amber-500 dark:bg-amber-400 text-amber-900 dark:text-amber-100' : 'bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500'}`}><feature.icon size={23} /></div>
+                    <p className="mt-7 text-xs font-bold uppercase tracking-[0.12em] text-teal-800 dark:text-teal-500">{feature.eyebrow}</p>
+                    <h3 className="font-display mt-3 text-2xl font-bold tracking-[-0.05em] text-stone-900 dark:text-stone-100">{feature.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-stone-500 dark:text-stone-400">{feature.description}</p>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal direction="up">
-            <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-              <div className="flex-1 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm font-medium mb-6">
-                  <Sparkles size={14} />
-                  Comece gratuitamente
+            <Reveal direction="up" delay={120}>
+              <Shot tilt="right" className="mx-auto mt-16 max-w-4xl">
+                <ProductShowcase initialScreen="patients" />
+              </Shot>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className="relative isolate overflow-hidden border-y border-amber-500/20 bg-amber-500/10 py-24 dark:border-amber-400/15 dark:bg-stone-900 md:py-32">
+          <div className="pointer-events-none absolute -left-20 bottom-4 z-0 size-72 rounded-full border border-amber-500/35 dark:border-amber-400/20" />
+          <div className="pointer-events-none absolute right-[8%] top-16 z-0 grid size-36 place-items-center rounded-full bg-teal-800/10 dark:bg-teal-500/10">
+            <span className="size-3 rounded-full bg-teal-800/60 dark:bg-teal-500/60" />
+          </div>
+          <div className="surface-pattern pointer-events-none absolute inset-y-0 right-0 z-0 w-1/2 opacity-40 [mask-image:linear-gradient(to_left,black,transparent)]" />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+              <Reveal direction="up">
+                <SectionHeading eyebrow="Do exame à conduta" title="Tecnologia presente. Decisão sempre sua." description="O VetAI organiza dados e destaca contexto. Quem cuida, interpreta e decide continua sendo você." />
+                <div className="mt-8 space-y-4">
+                  {[
+                    { icon: FileText, title: 'Envie', text: 'Exames e documentos chegam ao prontuário.' },
+                    { icon: Sparkles, title: 'Revise', text: 'A IA estrutura leituras para sua avaliação.' },
+                    { icon: Stethoscope, title: 'Cuide', text: 'Registre a conduta e acompanhe a evolução.' },
+                  ].map((step, index) => (
+                    <div key={step.title} className="flex gap-4">
+                      <span className="font-data mt-0.5 shrink-0 text-sm font-semibold text-teal-800 dark:text-teal-500">0{index + 1}</span>
+                      <div>
+                        <h3 className="font-display flex items-center gap-2 text-xl font-bold tracking-[-0.05em]"><step.icon className="text-teal-800 dark:text-teal-500" size={18} />{step.title}</h3>
+                        <p className="mt-1 text-sm leading-6 text-stone-500 dark:text-stone-400">{step.text}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-5">
-                  Pronto para transformar{' '}
-                  <span className="text-transparent bg-clip-text bg-linear-to-r from-teal-400 to-emerald-400">
-                    sua clínica?
-                  </span>
-                </h2>
-                <p className="text-slate-400 text-lg leading-relaxed max-w-lg mb-8">
-                  Junte-se a milhares de veterinários que já usam inteligência
-                  artificial para diagnósticos mais rápidos e precisos.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center gap-4 lg:justify-start justify-center">
-                  <Link href="/register">
-                    <Button
-                      size="lg"
-                      className="bg-teal-500 hover:bg-teal-400 text-white px-8 h-12 text-base font-semibold shadow-lg shadow-teal-500/25"
-                    >
-                      Criar Conta Gratuita
-                      <ArrowRight size={18} />
-                    </Button>
-                  </Link>
-                  <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      size="lg"
-                      className="text-slate-300 hover:text-white hover:bg-white/10 px-8 h-12 text-base"
-                    >
-                      Já tenho conta
-                      <ChevronRight size={16} />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
+              </Reveal>
+              <Reveal direction="up" delay={150}>
+                <Shot className="mx-auto w-full max-w-[520px]">
+                  <CopilotDemo />
+                </Shot>
+              </Reveal>
+            </div>
+          </div>
+        </section>
 
-              <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
-                {[
-                  {
-                    value: 2500,
-                    suffix: '+',
-                    label: 'Veterinários',
-                    icon: Users,
-                  },
-                  {
-                    value: 50000,
-                    suffix: '+',
-                    label: 'Exames',
-                    icon: Microscope,
-                  },
-                  { value: 98, suffix: '%', label: 'Precisão IA', icon: Zap },
-                  {
-                    value: 15000,
-                    suffix: '+',
-                    label: 'Pacientes',
-                    icon: Heart,
-                  },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="p-5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors text-center"
-                  >
-                    <stat.icon
-                      size={20}
-                      className="text-teal-400 mx-auto mb-2"
-                    />
-                    <p className="text-2xl font-bold text-white">
-                      <Counter target={stat.value} suffix={stat.suffix} />
-                    </p>
-                    <p className="text-xs text-slate-400 mt-1">{stat.label}</p>
+        <section id="planos" className="relative isolate overflow-hidden bg-white py-24 dark:bg-stone-950 md:py-32">
+          <div className="pointer-events-none absolute right-[9%] top-16 z-0 size-4 rounded-full bg-amber-500/70 dark:bg-amber-400/70" />
+          <div className="pointer-events-none absolute -right-16 bottom-8 z-0 size-64 rounded-full border border-teal-800/15 dark:border-teal-500/15" />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+            <Reveal direction="up"><SectionHeading eyebrow="Planos que acompanham" title="Comece com a sua clínica. Cresça no seu ritmo." description="Escolha a estrutura que faz sentido hoje. Os planos crescem junto com a operação." /></Reveal>
+            {plansLoading ? (
+              <div className="mt-14 grid gap-5 md:grid-cols-3">
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className="rounded-[24px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-7">
+                    <Skeleton className="h-7 w-2/5" />
+                    <Skeleton className="mt-4 h-4 w-full" />
+                    <Skeleton className="mt-2 h-4 w-4/5" />
+                    <Skeleton className="mt-7 h-9 w-1/2" />
+                    <Skeleton className="mt-8 h-10 w-full" />
                   </div>
                 ))}
               </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+            ) : plans.length > 0 ? (
+              <div className="mt-14 grid gap-5 md:grid-cols-3">
+                {plans.map((plan, index) => (
+                  <Reveal key={plan.id} direction="up" delay={index * 80}>
+                    <article className={`relative flex h-full flex-col rounded-[24px] border p-7 ${plan.highlighted ? 'border-teal-800 dark:border-teal-500 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 shadow-[var(--shadow-brand)]' : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-[var(--shadow-card)]'}`}>
+                      {plan.highlighted && <span className="absolute -top-3 left-6 rounded-full bg-amber-500 dark:bg-amber-400 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-100">Mais escolhido</span>}
+                      <h3 className="font-display text-2xl font-bold tracking-[-0.05em]">{plan.name}</h3>
+                      <p className={`mt-2 text-sm leading-6 ${plan.highlighted ? 'text-white/75 dark:text-stone-950/75' : 'text-stone-500 dark:text-stone-400'}`}>{plan.description}</p>
+                      <div className="mt-7"><span className="font-data text-3xl font-semibold tracking-[-0.08em]">{formatPrice(plan.monthlyPrice)}</span>{plan.billingMode === 'subscription' && <span className={`ml-1 text-sm ${plan.highlighted ? 'text-white/70 dark:text-stone-950/70' : 'text-stone-500 dark:text-stone-400'}`}>/mês</span>}</div>
+                      <ul className="mt-7 flex-1 space-y-3">
+                        <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400" />Até {plan.userLimit} {plan.userLimit === 1 ? 'usuário' : 'usuários'}</li>
+                        <li className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400" />{plan.aiCredits} créditos de IA por mês</li>
+                        {plan.features.map((feature) => <li key={feature.key} className="flex gap-2 text-sm"><Check size={17} className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400" />{feature.label}</li>)}
+                      </ul>
+                      <Button asChild variant={plan.highlighted ? 'secondary' : 'default'} className="mt-8 w-full"><Link href={`/register?plan_id=${plan.id}`}>Escolher plano <ChevronRight /></Link></Button>
+                    </article>
+                  </Reveal>
+                ))}
+              </div>
+            ) : <div className="mt-12 rounded-2xl border border-dashed border-stone-200 dark:border-stone-800 bg-stone-100/40 dark:bg-stone-800/40 p-8 text-center text-sm text-stone-500 dark:text-stone-400">Os planos estarão disponíveis em instantes.</div>}
+          </div>
+        </section>
 
-      <footer className="border-t border-slate-200 dark:border-slate-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <Activity className="text-teal-600" size={24} />
-              <span className="font-bold text-lg text-slate-900 dark:text-white">
-                VetAI
-              </span>
-            </div>
-            <div className="flex items-center justify-center gap-6 w-full">
-              <p className="text-sm text-slate-400 dark:text-slate-500">
-                &copy; 2026 VetAI. Todos os direitos reservados.
-              </p>
+        <section id="relatos" className="relative isolate overflow-hidden border-y border-stone-200 bg-[oklch(0.985_0.01_95)] py-24 dark:border-stone-800 dark:bg-stone-900 md:py-32">
+          <div className="surface-pattern pointer-events-none absolute inset-y-0 left-0 z-0 w-1/2 opacity-35 [mask-image:linear-gradient(to_right,black,transparent)]" />
+          <div className="pointer-events-none absolute left-[8%] top-16 z-0 size-24 rounded-full border border-amber-500/30 dark:border-amber-400/20" />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+            <Reveal direction="up"><SectionHeading eyebrow="Quem usa, sente" title="Mais presença para o que importa." /></Reveal>
+            <div className="mt-14 grid gap-5 md:grid-cols-3">
+              {TESTIMONIALS.map((testimonial, index) => (
+                <Reveal key={testimonial.name} direction="up" delay={index * 80}>
+                  <blockquote className="flex h-full flex-col rounded-[24px] border border-stone-200 dark:border-stone-800 bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 p-7">
+                    <Quote className="text-amber-500 dark:text-amber-400" size={28} />
+                    <p className="mt-5 flex-1 text-base leading-7 text-stone-900 dark:text-stone-100">“{testimonial.quote}”</p>
+                    <footer className="mt-8 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-teal-800 dark:bg-teal-500 text-xs font-bold text-white dark:text-stone-950">{testimonial.initials}</span><div><cite className="not-italic text-sm font-bold">{testimonial.name}</cite><p className="text-xs text-stone-500 dark:text-stone-400">{testimonial.role}</p></div></footer>
+                  </blockquote>
+                </Reveal>
+              ))}
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="relative overflow-hidden bg-teal-800 dark:bg-teal-500 py-24 text-white dark:text-stone-950 md:py-28">
+          <div className="absolute inset-0 opacity-15 [background-image:radial-gradient(currentColor_1px,transparent_1px)] [background-size:18px_18px]" />
+          <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+              <Reveal direction="up"><div><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold"><ShieldCheck size={14} /> Clínica, dados e cuidado no mesmo lugar</div><h2 className="font-display mt-6 max-w-2xl text-4xl font-bold leading-none tracking-[-0.07em] sm:text-5xl">Sua equipe mais presente em cada decisão clínica.</h2><p className="mt-5 max-w-xl text-lg leading-7 text-white/75 dark:text-stone-950/75">Organize a rotina hoje e construa uma experiência de cuidado mais consistente amanhã.</p></div></Reveal>
+              <Reveal direction="up" delay={100}><Button asChild size="lg" className="h-12 bg-amber-700 dark:bg-amber-300 px-7 text-base text-white dark:text-stone-950 shadow-none hover:bg-amber-700/90 dark:hover:bg-amber-300/90"><Link href="/register">Criar conta gratuita <ArrowRight /></Link></Button></Reveal>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 py-10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 sm:flex-row sm:items-center sm:justify-between sm:px-8"><BrandLogo /><p className="text-xs text-stone-500 dark:text-stone-400">© 2026 VetAI. Tecnologia que acompanha o cuidado.</p><div className="flex items-center gap-2 text-xs font-semibold text-stone-500 dark:text-stone-400"><ChartNoAxesCombined size={14} className="text-teal-800 dark:text-teal-500" /> Gestão veterinária inteligente</div></div>
       </footer>
     </div>
   );

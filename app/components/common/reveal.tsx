@@ -14,10 +14,10 @@ interface RevealProps {
 }
 
 const directionStyles: Record<Direction, string> = {
-  up: 'translate-y-8',
-  down: '-translate-y-8',
-  left: 'translate-x-8',
-  right: '-translate-x-8',
+  up: 'translate-y-4',
+  down: '-translate-y-4',
+  left: 'translate-x-4',
+  right: '-translate-x-4',
   none: '',
 };
 
@@ -26,24 +26,24 @@ export function Reveal({
   className,
   direction = 'up',
   delay = 0,
-  duration = 700,
+  duration = 300,
 }: RevealProps) {
-  const { ref, isVisible } = useReveal();
+  const { ref, isVisible, prefersReducedMotion } = useReveal();
 
   return (
     <div
       ref={ref}
       className={cn(
-        'transition-all',
+        'transition-[opacity,transform] motion-reduce:transition-none',
         isVisible
           ? 'opacity-100 translate-x-0 translate-y-0'
           : `opacity-0 ${directionStyles[direction]}`,
         className,
       )}
       style={{
-        transitionDuration: `${duration}ms`,
-        transitionDelay: `${delay}ms`,
-        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        transitionDuration: `${prefersReducedMotion ? 0 : duration}ms`,
+        transitionDelay: `${prefersReducedMotion ? 0 : delay}ms`,
+        transitionTimingFunction: 'var(--ease-brand)',
       }}
     >
       {children}

@@ -1,11 +1,11 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
+import { notifyMutationSuccess } from '@/app/components/common/mutation-feedback';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
@@ -72,6 +72,9 @@ export function VaccineFormModal({
             : {}),
         });
       }
+      notifyMutationSuccess(
+        isEdit ? 'Vacina atualizada com sucesso.' : 'Vacina criada com sucesso.',
+      );
       onSuccess();
     } finally {
       setSaving(false);
@@ -122,17 +125,17 @@ export function VaccineFormModal({
               />
             )}
           />
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
             Usado para calcular automaticamente a próxima revacinação ao
             registrar uma dose.
           </p>
         </div>
 
         {isEdit && (
-          <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="p-3 bg-stone-100 dark:bg-stone-800 rounded-lg">
+            <p className="text-xs text-stone-500 dark:text-stone-400">
               Código:{' '}
-              <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
+              <span className="font-mono font-medium text-stone-800 dark:text-stone-100">
                 {vaccine.code}
               </span>
             </p>
@@ -149,16 +152,10 @@ export function VaccineFormModal({
           </Button>
           <Button
             type="submit"
-            disabled={saving}
-            className="bg-teal-600 text-white hover:bg-teal-700"
+            loading={saving}
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
-            {saving ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : isEdit ? (
-              'Salvar'
-            ) : (
-              'Criar Vacina'
-            )}
+            {isEdit ? 'Salvar' : 'Criar Vacina'}
           </Button>
         </div>
       </form>

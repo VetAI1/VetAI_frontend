@@ -1,24 +1,27 @@
 'use client';
 
-import { Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
 
 import { VaccineFormModal } from './components/vaccine-form-modal';
 
-import { ConfirmModal } from '@/app/components/common/confirm-modal';
-import { DataTable } from '@/app/components/data/data-table';
+import { EmptyState } from '@/app/components/common/empty-state';
+import {
+  DataTable,
+  type DataTableColumn,
+} from '@/app/components/data/data-table';
+import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { vaccinesService } from '@/services/vaccines.service';
 import type { Vaccine } from '@/types/vaccine';
 import { fmtDate, fmtPeriod } from '@/utils/date-format';
 
 export default function VaccinesPage() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editVaccine, setEditVaccine] = useState<Vaccine | null>(null);
-  const [deleteVaccine, setDeleteVaccine] = useState<Vaccine | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const { confirm } = useConfirmation();
+  const { open } = useModal();
 
   const {
     items: vaccines,
@@ -36,178 +39,173 @@ export default function VaccinesPage() {
     debounceMs: 300,
   });
 
-  const handleDelete = async () => {
-    if (!deleteVaccine) return;
-    setDeleting(true);
-    try {
-      await vaccinesService.delete(deleteVaccine.id);
-      setDeleteVaccine(null);
-      await refresh();
-    } catch {
-    } finally {
-      setDeleting(false);
-    }
+  const openVaccineModal = (vaccine?: Vaccine) => open({
+    content: ({ close }) => (
+      <VaccineFormModal
+        {...(vaccine ? { vaccine } : {})}
+        onClose={close}
+        onSuccess={() => { close(); void refresh(); }}
+      />
+    ),
+  });
+
+  const handleDelete = (vaccine: Vaccine) => {
+    confirm({
+      title: 'Excluir vacina?',
+      description: `A vacina "${vaccine.name}" (${vaccine.code}) será removida permanentemente do catálogo.`,
+      variant: 'danger',
+      confirmLabel: 'Excluir',
+      onConfirm: async () => {
+        await vaccinesService.delete(vaccine.id);
+        await refresh();
+      },
+    });
   };
 
+  const columns: DataTableColumn<Vaccine>[] = [
+    {
+      key: 'name',
+      header: 'Nome',
+      render: (vaccine) => (
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-emerald-50 dark:bg-emerald-900">
+            <Syringe size={15} className="text-emerald-700 dark:text-emerald-500" />
+          </div>
+          <span className="text-sm font-medium text-stone-900 dark:text-stone-100">
+            {vaccine.name}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'code',
+      header: 'Código',
+      render: (vaccine) => (
+        <span className="font-data inline-flex items-center rounded-md bg-stone-100 dark:bg-stone-800 px-2 py-0.5 text-xs font-medium text-stone-500 dark:text-stone-400">
+          {vaccine.code}
+        </span>
+      ),
+    },
+    {
+      key: 'revaccination_period_days',
+      header: 'Período de Revacinação',
+      render: (vaccine) =>
+        vaccine.revaccination_period_days ? (
+          <span className="inline-flex items-center rounded-full bg-teal-800/10 dark:bg-teal-500/10 px-2.5 py-0.5 text-xs font-medium text-teal-800 dark:text-teal-500">
+            {fmtPeriod(vaccine.revaccination_period_days)}
+          </span>
+        ) : (
+          <span className="text-xs text-stone-500/70 dark:text-stone-400/70">—</span>
+        ),
+    },
+    {
+      key: 'created_at',
+      header: 'Criado em',
+      render: (vaccine) => (
+        <span className="text-sm text-stone-500 dark:text-stone-400">
+          {fmtDate(vaccine.created_at)}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Ações',
+      align: 'right',
+      render: (vaccine) => (
+        <div className="flex items-center justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => openVaccineModal(vaccine)}
+          >
+            <Pencil size={15} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-red-600 dark:text-red-500 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
+            onClick={() => handleDelete(vaccine)}
+          >
+            <Trash2 size={15} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const totalPages = meta?.total_pages ?? 1;
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Catálogo de Vacinas" showStorage={false} />
 
-        <DataTable
-          headers={[
-            'Nome',
-            'Código',
-            'Período de Revacinação',
-            'Criado em',
-            'Ações',
-          ]}
-          showSearch
-          searchPlaceholder="Buscar vacina..."
-          onSearch={setSearch}
-          columnWidths={['flex-1', 'w-32', 'w-44', 'w-36', 'w-24']}
-          loading={loading}
-          actions={
+        <SectionCard
+          title="Vacinas"
+          subtitle={
+            meta ? `${meta.total_elements} vacinas no total` : undefined
+          }
+          headerAction={
             <Button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800 h-9"
+              onClick={() => openVaccineModal()}
+              className="bg-teal-800 dark:bg-teal-500 h-10 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
-              <Plus size={16} /> Nova Vacina
+              <Plus size={18} /> Nova Vacina
             </Button>
           }
         >
-          {vaccines.length === 0 ? (
-            <tr>
-              <td colSpan={5} className="py-12 text-center">
-                <Syringe
-                  size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
-                />
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {search
-                    ? 'Nenhuma vacina encontrada.'
-                    : 'Nenhuma vacina cadastrada ainda.'}
-                </p>
-              </td>
-            </tr>
-          ) : (
-            vaccines.map((vaccine) => (
-              <tr
-                key={vaccine.id}
-                className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
-              >
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                      <Syringe
-                        size={14}
-                        className="text-green-600 dark:text-green-400"
-                      />
-                    </div>
-                    <span className="text-sm font-medium text-slate-900 dark:text-white">
-                      {vaccine.name}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                    {vaccine.code}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  {vaccine.revaccination_period_days ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400">
-                      {fmtPeriod(vaccine.revaccination_period_days)}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-slate-400 dark:text-slate-500">
-                      —
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
-                  {fmtDate(vaccine.created_at)}
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => setEditVaccine(vaccine)}
-                    >
-                      <Pencil size={13} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                      onClick={() => setDeleteVaccine(vaccine)}
-                    >
-                      <Trash2 size={13} />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))
-          )}
-        </DataTable>
+          <DataTable
+            columns={columns}
+            data={vaccines}
+            getRowKey={(vaccine) => vaccine.id}
+            loading={loading}
+            showSearch
+            onSearch={setSearch}
+            searchPlaceholder="Buscar vacina..."
+            emptyState={
+              <EmptyState
+                icon={Syringe}
+                title={search ? 'Nenhuma vacina encontrada' : 'Nenhuma vacina cadastrada'}
+                description={search ? 'Revise a busca ou tente outro termo.' : 'Cadastre a primeira vacina para começar.'}
+              />
+            }
+          />
 
-        {(meta?.total_pages ?? 1) > 1 && (
-          <div className="flex justify-center gap-2 mt-4">
-            {Array.from(
-              { length: meta?.total_pages ?? 1 },
-              (_, i) => i + 1,
-            ).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
-                  p === page
-                    ? 'bg-teal-600 text-white'
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-                }`}
+          {totalPages > 1 && (
+            <div className="mt-6 flex justify-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 1}
+                onClick={() => setPage(page - 1)}
               >
-                {p}
-              </button>
-            ))}
-          </div>
-        )}
+                <ChevronLeft size={15} />
+                Anterior
+              </Button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Button
+                  key={p}
+                  variant={p === page ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === totalPages}
+                onClick={() => setPage(page + 1)}
+              >
+                Próxima
+                <ChevronRight size={15} />
+              </Button>
+            </div>
+          )}
+        </SectionCard>
       </div>
 
-      {showCreateModal && (
-        <VaccineFormModal
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
-            setShowCreateModal(false);
-            void refresh();
-          }}
-        />
-      )}
-
-      {editVaccine && (
-        <VaccineFormModal
-          vaccine={editVaccine}
-          onClose={() => setEditVaccine(null)}
-          onSuccess={() => {
-            setEditVaccine(null);
-            void refresh();
-          }}
-        />
-      )}
-
-      {deleteVaccine && (
-        <ConfirmModal
-          title="Excluir vacina?"
-          description={`A vacina "${deleteVaccine.name}" (${deleteVaccine.code}) será removida permanentemente do catálogo.`}
-          confirmLabel="Excluir"
-          loading={deleting}
-          onConfirm={() => {
-            void handleDelete();
-          }}
-          onClose={() => setDeleteVaccine(null)}
-        />
-      )}
     </div>
   );
 }

@@ -288,12 +288,12 @@ export function PrescriptionModal({
           )}
         />
 
-        <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+        <label className="flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={saveAsTemplate}
             onChange={(e) => setSaveAsTemplate(e.target.checked)}
-            className="rounded border-slate-300 dark:border-slate-600 text-teal-600 focus:ring-teal-500"
+            className="rounded border-stone-200 dark:border-stone-800 text-teal-800 dark:text-teal-500 focus:ring-teal-600 dark:focus:ring-teal-500"
           />
           Salvar também como modelo de prescrição
         </label>
@@ -305,7 +305,7 @@ export function PrescriptionModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Prescrever
           </Button>

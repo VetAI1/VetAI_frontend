@@ -2,7 +2,7 @@
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { Modal } from '@/app/components/common/modal';
@@ -29,12 +29,9 @@ export function AddVaccineModal({
   onClose,
   onSuccess,
 }: AddVaccineModalProps) {
-  const [showVaccineDropdown, setShowVaccineDropdown] = useState(false);
   const [selectedVaccine, setSelectedVaccine] = useState<Vaccine | null>(null);
   const [loadingPrevDose, setLoadingPrevDose] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
     items: catalogVaccines,
@@ -44,6 +41,8 @@ export function AddVaccineModal({
     loadNextPage: loadNextCatalogPage,
     search: vaccineSearch,
     setSearch: setVaccineSearch,
+    open: showVaccineDropdown,
+    setOpen: setShowVaccineDropdown,
   } = useAutoComplete<Vaccine>({
     fetcher: vaccinesService.list,
     pageSize: 20,
@@ -80,19 +79,6 @@ export function AddVaccineModal({
     nextDate.setDate(nextDate.getDate() + periodDays);
     return nextDate.toISOString().slice(0, 10);
   };
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
-        setShowVaccineDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
 
   const handleSelectVaccine = async (vaccine: Vaccine) => {
     setSelectedVaccine(vaccine);
@@ -209,7 +195,7 @@ export function AddVaccineModal({
         />
 
         {loadingPrevDose && (
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400">
             <Loader2 size={12} className="animate-spin" /> Buscando dose
             anterior...
           </div>
@@ -283,11 +269,11 @@ export function AddVaccineModal({
         </div>
 
         {selectedVaccine?.revaccination_period_days ? (
-          <div className="rounded-lg border border-teal-200 bg-teal-50 p-3 dark:border-teal-700 dark:bg-teal-900/20">
-            <p className="mb-0.5 text-xs font-medium text-teal-700 dark:text-teal-400">
+          <div className="rounded-lg border border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10 p-3">
+            <p className="mb-0.5 text-xs font-medium text-teal-800 dark:text-teal-500">
               Próxima Revacinação (calculada automaticamente)
             </p>
-            <p className="text-sm font-semibold text-teal-900 dark:text-teal-300">
+            <p className="text-sm font-semibold text-teal-800 dark:text-teal-500">
               {calcRevaccinationDate(
                 date,
                 selectedVaccine.revaccination_period_days,
@@ -300,14 +286,14 @@ export function AddVaccineModal({
                 ).toLocaleDateString('pt-BR')
                 : '—'}
             </p>
-            <p className="mt-0.5 text-xs text-teal-600 dark:text-teal-500">
+            <p className="mt-0.5 text-xs text-teal-800 dark:text-teal-500">
               Baseado no período de {selectedVaccine.revaccination_period_days}{' '}
               dias da vacina
             </p>
           </div>
         ) : selectedVaccine ? (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-700/50">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 p-3">
+            <p className="text-xs text-stone-500 dark:text-stone-400">
               Esta vacina não possui período de revacinação definido no
               catálogo.
             </p>
@@ -354,7 +340,7 @@ export function AddVaccineModal({
           <Button
             type="submit"
             disabled={saving}
-            className="bg-teal-600 text-white hover:bg-teal-700"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : 'Salvar'}
           </Button>

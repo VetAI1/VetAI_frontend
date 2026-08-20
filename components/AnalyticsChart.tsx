@@ -50,6 +50,24 @@ export function AnalyticsChart({
   loading = false,
   className,
 }: AnalyticsChartProps) {
+  function cssVar(name: string, fallback: string): string {
+    if (typeof window === 'undefined') return fallback;
+    return (
+      getComputedStyle(document.documentElement)
+        .getPropertyValue(name)
+        .trim() || fallback
+    );
+  }
+
+  const isDark = document.documentElement.classList.contains('dark');
+  const tickColor = cssVar('--color-stone-500', isDark ? '#a8a29e' : '#78716c');
+  const gridColor = cssVar(
+    '--color-stone-200',
+    isDark ? 'rgba(68,64,60,0.6)' : 'rgba(231,229,228,0.8)',
+  );
+  const tooltipBg = isDark ? '#1c1917' : '#ffffff';
+  const tooltipFg = isDark ? '#f5f5f4' : '#1c1917';
+
   const commonOptions: ChartOptions<any> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -57,17 +75,17 @@ export function AnalyticsChart({
       legend: {
         position: 'bottom' as const,
         labels: {
-          color: '#64748b', // slate-500
+          color: tickColor,
           font: { size: 12 },
           usePointStyle: true,
           padding: 20,
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-        titleColor: '#fff',
-        bodyColor: '#cbd5e1',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: tooltipBg,
+        titleColor: tooltipFg,
+        bodyColor: tooltipFg,
+        borderColor: gridColor,
         borderWidth: 1,
         padding: 12,
         displayColors: true,
@@ -79,11 +97,11 @@ export function AnalyticsChart({
         : {
           x: {
             grid: { display: false },
-            ticks: { color: '#64748b' },
+            ticks: { color: tickColor },
           },
           y: {
-            grid: { color: 'rgba(0, 0, 0, 0.05)' },
-            ticks: { color: '#64748b' },
+            grid: { color: gridColor },
+            ticks: { color: tickColor },
             beginAtZero: true,
           },
         },

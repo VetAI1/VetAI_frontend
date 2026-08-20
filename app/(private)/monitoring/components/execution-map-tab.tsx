@@ -1,6 +1,6 @@
 'use client';
 
-import { ClipboardCheck, Loader2, Plus } from 'lucide-react';
+import { ClipboardCheck, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -23,9 +23,11 @@ import {
   type QuickAddKind,
 } from './quick-add-modals';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Modal } from '@/app/components/common/modal';
 import { DateInput } from '@/app/components/forms/date-input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/infra/utils';
 import { monitoringService } from '@/services/monitoring.service';
 import type { Execution, Hospitalization } from '@/types/monitoring';
@@ -108,7 +110,7 @@ export function ExecutionMapTab() {
 
   return (
     <div>
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-4 mb-4 flex flex-col sm:flex-row sm:items-end gap-3 sm:justify-between">
+      <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-4 mb-4 flex flex-col sm:flex-row sm:items-end gap-3 sm:justify-between">
         <div className="flex items-end gap-2">
           <div className="w-44">
             <DateInput label="Dia" value={date} onChange={setDate} />
@@ -119,7 +121,7 @@ export function ExecutionMapTab() {
             </Button>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-stone-500 dark:text-stone-400">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-full bg-blue-500" /> Programada
           </span>
@@ -133,35 +135,54 @@ export function ExecutionMapTab() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-teal-600" />
+        <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <Skeleton className="h-4 w-44 shrink-0" />
+            <div className="flex gap-2 flex-1 overflow-hidden">
+              {Array.from({ length: 18 }).map((_, i) => (
+                <Skeleton key={i} className="h-8 w-8 rounded-full shrink-0" />
+              ))}
+            </div>
+          </div>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 px-4 py-3 border-b border-stone-200/70 dark:border-stone-800/70"
+            >
+              <div className="shrink-0">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-20 mt-1.5" />
+              </div>
+              <div className="flex gap-2 flex-1 overflow-hidden">
+                {Array.from({ length: 18 }).map((_, j) => (
+                  <Skeleton key={j} className="h-8 w-8 rounded-full shrink-0" />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       ) : hospitalizations.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-12 text-center">
-          <ClipboardCheck size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-          <p className="text-slate-500 dark:text-slate-400 font-medium">
-            Nenhum animal internado
-          </p>
-          <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
-            O mapa de execução mostra a programação de cada paciente internado.
-          </p>
-        </div>
+        <EmptyState
+          icon={ClipboardCheck}
+          title="Nenhum animal internado"
+          description="O mapa de execução mostra a programação de cada paciente internado."
+        />
       ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
           <div className="overflow-x-auto overflow-y-hidden scrollbar-thin">
             <table className="border-collapse w-max min-w-full">
               <thead>
                 <tr>
-                  <th className="sticky left-0 z-10 bg-slate-50 dark:bg-slate-900 text-left px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide border-b border-r border-slate-200 dark:border-slate-700 min-w-44">
+                  <th className="sticky left-0 z-10 bg-stone-100 dark:bg-stone-800 text-left px-4 py-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wide border-b border-r border-stone-200 dark:border-stone-800 min-w-44">
                     Paciente
                   </th>
                   {HOURS.map((hour) => (
                     <th
                       key={hour}
                       className={cn(
-                        'px-1.5 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700 min-w-12',
+                        'px-1.5 py-3 text-center text-[11px] font-semibold text-stone-500 dark:text-stone-400 border-b border-stone-200 dark:border-stone-800 min-w-12',
                         isToday && hour === currentHour &&
-                          'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100',
+                          'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100',
                       )}
                     >
                       {String(hour).padStart(2, '0')}h
@@ -172,14 +193,14 @@ export function ExecutionMapTab() {
               <tbody>
                 {hospitalizations.map((hospitalization) => (
                   <tr key={hospitalization.id} className="group">
-                    <td className="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/90 px-4 py-2.5 border-b border-r border-slate-200 dark:border-slate-700">
+                    <td className="sticky left-0 z-10 bg-white dark:bg-stone-900 group-hover:bg-stone-100 dark:group-hover:bg-stone-800 px-4 py-2.5 border-b border-r border-stone-200 dark:border-stone-800">
                       <Link
-                        href={`/monitoring/detail?id=${hospitalization.id}`}
-                        className="text-sm font-medium text-slate-900 dark:text-white hover:text-teal-600 dark:hover:text-teal-400"
+                        href={`/monitoring/${hospitalization.id}`}
+                        className="text-sm font-medium text-stone-900 dark:text-stone-100 hover:text-teal-800 dark:hover:text-teal-500"
                       >
                         {hospitalization.patient?.name}
                       </Link>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      <p className="text-[11px] text-stone-500 dark:text-stone-400">
                         {hospitalization.box?.name ?? 'Sem box'}
                         {hospitalization.status === 'TRIAGE' ? ' · Triagem' : ''}
                       </p>
@@ -191,9 +212,9 @@ export function ExecutionMapTab() {
                         <td
                           key={hour}
                           className={cn(
-                            'relative border-b border-slate-100 dark:border-slate-700/60 text-center px-1 py-2 align-middle',
+                            'relative border-b border-stone-200/70 dark:border-stone-800/70 text-center px-1 py-2 align-middle',
                             isToday && hour === currentHour &&
-                              'bg-slate-100 dark:bg-slate-700/40',
+                              'bg-stone-100 dark:bg-stone-800',
                           )}
                         >
                           {cellExecutions.length > 0 ? (
@@ -203,7 +224,7 @@ export function ExecutionMapTab() {
                                 setSlot({ hospitalization, hour, executions: cellExecutions })
                               }
                               className={cn(
-                                'w-8 h-8 rounded-full text-xs font-bold inline-flex items-center justify-center transition-colors shadow-sm',
+                                'w-8 h-8 rounded-full text-xs font-bold inline-flex items-center justify-center transition-colors',
                                 chipClass(cellExecutions),
                               )}
                               title={`${cellExecutions.length} procedimento(s) às ${String(hour).padStart(2, '0')}h`}
@@ -214,7 +235,7 @@ export function ExecutionMapTab() {
                             <button
                               type="button"
                               onClick={() => setQuickAdd({ hospitalization, hour })}
-                              className="w-8 h-8 rounded-full inline-flex items-center justify-center text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-teal-600 dark:hover:text-teal-400 transition-all"
+                              className="w-8 h-8 rounded-full inline-flex items-center justify-center text-stone-500/50 dark:text-stone-400/50 opacity-0 group-hover:opacity-100 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-teal-800 dark:hover:text-teal-500 transition-all"
                               title="Adicionar registro"
                             >
                               <Plus size={14} />
@@ -245,11 +266,11 @@ export function ExecutionMapTab() {
               return (
                 <div
                   key={execution.id}
-                  className="flex items-center justify-between gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700"
+                  className="flex items-center justify-between gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                      <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">
                         {execution.prescription?.name}
                       </p>
                       <span
@@ -263,7 +284,7 @@ export function ExecutionMapTab() {
                         {statusInfo.label}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                       {fmtTime(execution.scheduled_at)}
                       {doseLabel(execution.prescription)
                         ? ` · ${doseLabel(execution.prescription)}`
@@ -273,7 +294,7 @@ export function ExecutionMapTab() {
                         : ''}
                     </p>
                     {execution.notes && (
-                      <p className="text-xs text-slate-400 dark:text-slate-500 italic mt-0.5">
+                      <p className="text-xs text-stone-500/70 dark:text-stone-400/70 italic mt-0.5">
                         {execution.notes}
                       </p>
                     )}
@@ -282,7 +303,7 @@ export function ExecutionMapTab() {
                     <Button
                       size="sm"
                       onClick={() => setExecuting(execution)}
-                      className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 shrink-0"
+                      className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 shrink-0"
                       disabled={slot.hospitalization.status === 'TRIAGE'}
                       title={
                         slot.hospitalization.status === 'TRIAGE'

@@ -22,26 +22,23 @@ export const STATUS_MAP: Record<
   },
   HOSPITALIZED: {
     label: 'Internado',
-    badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    badge: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
     dot: 'bg-blue-500',
   },
   DISCHARGED: {
     label: 'Alta',
-    badge:
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    badge: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
     dot: 'bg-green-500',
   },
   DECEASED: {
     label: 'Óbito',
-    badge:
-      'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
-    dot: 'bg-slate-500',
+    badge: 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100',
+    dot: 'bg-stone-500',
   },
   CANCELLED: {
     label: 'Cancelada',
-    badge:
-      'bg-slate-100 text-slate-500 dark:bg-slate-700/60 dark:text-slate-400',
-    dot: 'bg-slate-400',
+    badge: 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400',
+    dot: 'bg-stone-400',
   },
 };
 
@@ -51,8 +48,7 @@ export const RISK_MAP: Record<
 > = {
   LOW: {
     label: 'Baixo risco',
-    badge:
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    badge: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
     dot: 'bg-green-500',
   },
   MEDIUM: {
@@ -63,7 +59,7 @@ export const RISK_MAP: Record<
   },
   HIGH: {
     label: 'Alto risco',
-    badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    badge: 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500',
     dot: 'bg-red-500',
   },
 };
@@ -74,11 +70,11 @@ export const PRESCRIPTION_TYPE_MAP: Record<
 > = {
   MEDICATION: {
     label: 'Medicamento',
-    badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    badge: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
   },
   PROCEDURE: {
     label: 'Procedimento',
-    badge: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300',
+    badge: 'bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500',
   },
   FLUID: {
     label: 'Fluidoterapia',
@@ -130,25 +126,23 @@ export const EXECUTION_STATUS_MAP: Record<
 > = {
   PENDING: {
     label: 'Programada',
-    badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-    chip: 'bg-blue-500 hover:bg-blue-600 text-white',
+    badge: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
+    chip: 'bg-sky-700 dark:bg-sky-500 text-white hover:bg-sky-700/90 dark:hover:bg-sky-500/90',
   },
   LATE: {
     label: 'Atrasada',
-    badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
-    chip: 'bg-red-500 hover:bg-red-600 text-white',
+    badge: 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500',
+    chip: 'bg-red-600 dark:bg-red-500 text-white hover:bg-red-600/90 dark:hover:bg-red-500/90',
   },
   DONE: {
     label: 'Concluída',
-    badge:
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-    chip: 'bg-green-500 hover:bg-green-600 text-white',
+    badge: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
+    chip: 'bg-emerald-700 dark:bg-emerald-500 text-white hover:bg-emerald-700/90 dark:hover:bg-emerald-500/90',
   },
   CANCELLED: {
     label: 'Cancelada',
-    badge:
-      'bg-slate-100 text-slate-500 dark:bg-slate-700/60 dark:text-slate-400',
-    chip: 'bg-slate-300 dark:bg-slate-600 text-slate-600 dark:text-slate-300',
+    badge: 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400',
+    chip: 'bg-stone-300 dark:bg-stone-600 text-stone-600 dark:text-stone-300',
   },
 };
 

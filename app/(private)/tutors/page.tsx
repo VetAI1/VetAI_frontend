@@ -15,25 +15,23 @@ import { useState } from 'react';
 
 import { TutorModal } from './components/tutor-modal';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { tutorsService } from '@/services/tutors.service';
 import type { Tutor } from '@/types/tutor';
 import { formatPhone } from '@/utils/masks';
 
 export default function TutorsPage() {
-  const [showModal, setShowModal] = useState(false);
-  const [editingTutor, setEditingTutor] = useState<Tutor | undefined>(
-    undefined,
-  );
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmDeleteTutor, setConfirmDeleteTutor] = useState<Tutor | null>(
-    null,
-  );
+  const { open } = useModal();
+  const { confirm } = useConfirmation();
 
   const {
     items: tutors,
@@ -52,13 +50,10 @@ export default function TutorsPage() {
   });
 
   const handleCreateSuccess = (tutor: Tutor) => {
-    setShowModal(false);
     prependItem(tutor);
   };
 
   const handleEditSuccess = (updated: Tutor) => {
-    setShowModal(false);
-    setEditingTutor(undefined);
     replaceItem((t) => t.id === updated.id, updated);
   };
 
@@ -70,23 +65,41 @@ export default function TutorsPage() {
     } catch {
     } finally {
       setDeletingId(null);
-      setConfirmDeleteTutor(null);
     }
   };
 
-  const openEdit = (tutor: Tutor) => {
-    setEditingTutor(tutor);
-    setShowModal(true);
+  const confirmDeleteTutor = (tutor: Tutor) => {
+    confirm({
+      title: 'Excluir tutor?',
+      description: `${tutor.name} será removido permanentemente.`,
+      variant: 'danger',
+      confirmLabel: 'Excluir',
+      onConfirm: () => handleDelete(tutor),
+    });
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingTutor(undefined);
+  const openTutorModal = (tutor?: Tutor) => {
+    open({
+      content: ({ close }) => (
+        <TutorModal
+          {...(tutor ? { tutor } : {})}
+          onClose={close}
+          onSuccess={(savedTutor) => {
+            if (tutor) {
+              handleEditSuccess(savedTutor);
+            } else {
+              handleCreateSuccess(savedTutor);
+            }
+            close();
+          }}
+        />
+      ),
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Tutores" showStorage={false} />
 
         <SectionCard
@@ -101,10 +114,9 @@ export default function TutorsPage() {
           headerAction={
             <Button
               onClick={() => {
-                setEditingTutor(undefined);
-                setShowModal(true);
+                openTutorModal();
               }}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              className="bg-teal-800 dark:bg-teal-500 h-10 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={18} /> Novo Tutor
             </Button>
@@ -127,107 +139,106 @@ export default function TutorsPage() {
           >
             {tutors.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-8 text-center">
-                  <User
-                    size={32}
-                    className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
+                <td colSpan={6} className="p-4">
+                  <EmptyState
+                    title={
+                      search
+                        ? 'Nenhum tutor encontrado'
+                        : 'Nenhum tutor cadastrado ainda'
+                    }
+                    icon={User}
                   />
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    {search
-                      ? 'Nenhum tutor encontrado.'
-                      : 'Nenhum tutor cadastrado ainda.'}
-                  </p>
                 </td>
               </tr>
             ) : (
               tutors.map((tutor) => (
                 <tr
                   key={tutor.id}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                  className="hover:bg-stone-100/60 dark:hover:bg-stone-800/60 transition-colors"
                 >
-                  <td className="p-4">
+                  <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
                         <User
                           size={16}
-                          className="text-teal-600 dark:text-teal-400"
+                          className="text-teal-800 dark:text-teal-500"
                         />
                       </div>
-                      <p className="font-medium text-slate-900 dark:text-white">
+                      <p className="font-medium text-stone-900 dark:text-stone-100">
                         {tutor.name}
                       </p>
                     </div>
                   </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
+                  <td className="p-4 text-stone-500 dark:text-stone-400">
                     {tutor.cpf ?? (
-                      <span className="text-slate-400 dark:text-slate-500">
+                      <span className="text-stone-500/70 dark:text-stone-400/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
+                  <td className="p-4 text-stone-500 dark:text-stone-400">
                     {tutor.phone ? (
                       <span className="flex items-center gap-1.5">
-                        <Phone size={13} className="text-slate-400" />
+                        <Phone size={13} className="text-stone-500/70 dark:text-stone-400/70" />
                         {formatPhone(tutor.phone)}
                       </span>
                     ) : (
-                      <span className="text-slate-400 dark:text-slate-500">
+                      <span className="text-stone-500/70 dark:text-stone-400/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
+                  <td className="p-4 text-stone-500 dark:text-stone-400">
                     {tutor.email ? (
                       <span className="flex items-center gap-1.5">
-                        <Mail size={13} className="text-slate-400" />
+                        <Mail size={13} className="text-stone-500/70 dark:text-stone-400/70" />
                         {tutor.email}
                       </span>
                     ) : (
-                      <span className="text-slate-400 dark:text-slate-500">
+                      <span className="text-stone-500/70 dark:text-stone-400/70">
                         —
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-300">
+                  <td className="p-4 text-stone-500 dark:text-stone-400">
                     {new Date(tutor.created_at).toLocaleDateString('pt-BR')}
                   </td>
-                  <td className="p-4">
+                  <td className="py-3 px-4">
                     <div className="flex items-center justify-end gap-1">
-                      <Link href={`/tutors/detail?id=${tutor.id}`}>
+                      <Link href={`/tutors/${tutor.id}`}>
                         <Button
                           variant="ghost"
                           size="icon-sm"
                           title="Ver detalhes"
                         >
-                          <Eye size={15} className="text-teal-600 dark:text-teal-400" />
+                          <Eye size={15} className="text-teal-800 dark:text-teal-500" />
                         </Button>
                       </Link>
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => openEdit(tutor)}
+                        onClick={() => openTutorModal(tutor)}
                         title="Editar"
                       >
                         <Pencil
                           size={15}
-                          className="text-slate-500 dark:text-slate-400"
+                          className="text-stone-500 dark:text-stone-400"
                         />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => setConfirmDeleteTutor(tutor)}
+                        onClick={() => confirmDeleteTutor(tutor)}
                         title="Excluir"
                         disabled={deletingId === tutor.id}
                       >
                         {deletingId === tutor.id ? (
                           <Loader2
                             size={15}
-                            className="animate-spin text-red-500"
+                            className="animate-spin text-red-600 dark:text-red-500"
                           />
                         ) : (
-                          <Trash2 size={15} className="text-red-500" />
+                          <Trash2 size={15} className="text-red-600 dark:text-red-500" />
                         )}
                       </Button>
                     </div>
@@ -238,54 +249,6 @@ export default function TutorsPage() {
           </DataTable>
         </SectionCard>
       </div>
-
-      {showModal && (
-        <TutorModal
-          {...(editingTutor ? { tutor: editingTutor } : {})}
-          onClose={closeModal}
-          onSuccess={editingTutor ? handleEditSuccess : handleCreateSuccess}
-        />
-      )}
-
-      {confirmDeleteTutor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setConfirmDeleteTutor(null)}
-          />
-          <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-              Excluir tutor?
-            </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-              <strong>{confirmDeleteTutor.name}</strong> será removido
-              permanentemente.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setConfirmDeleteTutor(null)}
-                disabled={!!deletingId}
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={() => {
-                  void handleDelete(confirmDeleteTutor);
-                }}
-                disabled={!!deletingId}
-                className="bg-red-600 text-white hover:bg-red-700"
-              >
-                {deletingId ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  'Excluir'
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

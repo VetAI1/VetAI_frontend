@@ -92,12 +92,12 @@ export function ExecuteModal({
   return (
     <Modal title="Registrar Execução" onClose={onClose} maxWidth="md">
       {info && (
-        <div className="mb-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-700">
+        <div className="mb-4 p-3 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-800">
           <div className="flex items-center justify-between gap-2">
-            <p className="font-semibold text-slate-900 dark:text-white text-sm">
+            <p className="font-semibold text-stone-900 dark:text-stone-100 text-sm">
               {info.name}
               {info.dose ? (
-                <span className="font-normal text-slate-500 dark:text-slate-400"> · {info.dose}</span>
+                <span className="font-normal text-stone-500 dark:text-stone-400"> · {info.dose}</span>
               ) : null}
             </p>
             <span
@@ -106,7 +106,7 @@ export function ExecuteModal({
               {PRESCRIPTION_TYPE_MAP[info.type].label}
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
             {info.patient ? `Paciente: ${info.patient}` : ''}
             {info.scheduled ? ` · Programado para ${info.scheduled}` : ''}
           </p>
@@ -173,7 +173,7 @@ export function ExecuteModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Concluir execução
           </Button>

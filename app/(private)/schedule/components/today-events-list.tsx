@@ -1,5 +1,6 @@
-import { CalendarX, PawPrint, Plus, User } from 'lucide-react';
+import { PawPrint, Plus, User } from 'lucide-react';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ScheduleEvent } from '@/types/schedule';
 import { EVENT_TYPE_MAP } from '@/types/schedule';
@@ -20,7 +21,7 @@ export function TodayEventsList({
   loading = false,
 }: TodayEventsListProps) {
   const sorted = [...events].sort((a, b) =>
-    a.startTime.localeCompare(b.startTime),
+    a.start_time.localeCompare(b.start_time),
   );
 
   const dateFormatted = new Date(`${date}T00:00:00`).toLocaleDateString(
@@ -36,22 +37,22 @@ export function TodayEventsList({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white capitalize">
+          <h2 className="text-base font-semibold text-stone-900 dark:text-stone-100 capitalize">
             {dateFormatted}
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {loading ? (
-              <Skeleton className="h-3 w-16" />
-            ) : sorted.length === 0 ? (
-              'Nenhum evento'
-            ) : (
-              `${sorted.length} evento${sorted.length > 1 ? 's' : ''}`
-            )}
-          </p>
+          {loading ? (
+            <Skeleton className="mt-0.5 h-3 w-16" />
+          ) : (
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+              {sorted.length === 0
+                ? 'Nenhum evento'
+                : `${sorted.length} evento${sorted.length > 1 ? 's' : ''}`}
+            </p>
+          )}
         </div>
         <button
           onClick={onAddClick}
-          className="flex items-center gap-1.5 text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-medium text-teal-800 dark:text-teal-500 hover:text-teal-800 dark:hover:text-teal-500 transition-colors"
         >
           <Plus size={14} /> Adicionar
         </button>
@@ -64,21 +65,18 @@ export function TodayEventsList({
           <Skeleton className="h-16 w-full rounded-lg" />
         </div>
       ) : sorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center flex-1 py-10 text-center">
-          <CalendarX
-            size={36}
-            className="text-slate-300 dark:text-slate-600 mb-3"
-          />
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Sem eventos para este dia.
-          </p>
-          <button
-            onClick={onAddClick}
-            className="mt-3 text-sm text-teal-600 dark:text-teal-400 hover:underline font-medium"
-          >
-            Agendar evento
-          </button>
-        </div>
+        <EmptyState
+          title="Sem eventos para este dia"
+          className="flex-1 py-10"
+          action={
+            <button
+              onClick={onAddClick}
+              className="text-sm font-medium text-teal-800 dark:text-teal-500 hover:underline"
+            >
+              Agendar evento
+            </button>
+          }
+        />
       ) : (
         <div className="flex flex-col gap-2 overflow-y-auto">
           {sorted.map((ev) => {
@@ -89,37 +87,37 @@ export function TodayEventsList({
                 onClick={() => onEventClick(ev)}
                 className={`w-full text-left rounded-lg border p-3 transition-all hover:shadow-sm ${typeInfo.bg}`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
+                <span className="flex items-start justify-between gap-2">
+                  <span className="flex items-center gap-2 min-w-0">
                     <span
                       className={`w-2 h-2 rounded-full shrink-0 mt-0.5 ${typeInfo.dot}`}
                     />
-                    <p
+                    <span
                       className={`text-sm font-semibold truncate ${typeInfo.color}`}
                     >
                       {ev.title}
-                    </p>
-                  </div>
+                    </span>
+                  </span>
                   <span
                     className={`text-xs shrink-0 font-medium ${typeInfo.color}`}
                   >
-                    {ev.startTime}
-                    {ev.endTime ? ` – ${ev.endTime}` : ''}
+                    {ev.start_time}
+                    {ev.end_time ? ` – ${ev.end_time}` : ''}
                   </span>
-                </div>
-                {(ev.patientName ?? ev.tutorName) && (
-                  <div className="flex flex-col gap-0.5 mt-1.5 pl-4">
-                    {ev.patientName && (
-                      <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                        <PawPrint size={11} /> {ev.patientName}
-                      </div>
+                </span>
+                {(ev.patient_name ?? ev.tutor_name) && (
+                  <span className="flex flex-col gap-0.5 mt-1.5 pl-4">
+                    {ev.patient_name && (
+                      <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
+                        <PawPrint size={11} /> {ev.patient_name}
+                      </span>
                     )}
-                    {ev.tutorName && (
-                      <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                        <User size={11} /> {ev.tutorName}
-                      </div>
+                    {ev.tutor_name && (
+                      <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
+                        <User size={11} /> {ev.tutor_name}
+                      </span>
                     )}
-                  </div>
+                  </span>
                 )}
               </button>
             );

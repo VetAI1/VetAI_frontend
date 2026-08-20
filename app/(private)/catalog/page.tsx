@@ -1,11 +1,11 @@
 'use client';
 
 import { BookOpen, Pencil, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { CatalogItemModal } from './components/catalog-item-modal';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
@@ -15,6 +15,7 @@ import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { catalogService } from '@/services/catalog.service';
 import {
@@ -49,10 +50,7 @@ interface CatalogFilters {
 
 export default function CatalogPage() {
   const { confirm } = useConfirmation();
-  const [showModal, setShowModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<CatalogItem | undefined>(
-    undefined,
-  );
+  const { open } = useModal();
 
   const {
     items,
@@ -85,16 +83,19 @@ export default function CatalogPage() {
     }));
   };
 
-  const handleCreateSuccess = (item: CatalogItem) => {
-    setShowModal(false);
-    prependItem(item);
-  };
-
-  const handleEditSuccess = (updated: CatalogItem) => {
-    setShowModal(false);
-    setEditingItem(undefined);
-    replaceItem((i) => i.id === updated.id, updated);
-  };
+  const openCatalogModal = (item?: CatalogItem) => open({
+    content: ({ close }) => (
+      <CatalogItemModal
+        {...(item ? { item } : {})}
+        onClose={close}
+        onSuccess={(updated) => {
+          if (item) replaceItem((current) => current.id === updated.id, updated);
+          else prependItem(updated);
+          close();
+        }}
+      />
+    ),
+  });
 
   const handleDelete = (item: CatalogItem) => {
     confirm({
@@ -111,13 +112,7 @@ export default function CatalogPage() {
   };
 
   const openEdit = (item: CatalogItem) => {
-    setEditingItem(item);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingItem(undefined);
+    openCatalogModal(item);
   };
 
   const totalPages = meta?.total_pages ?? 1;
@@ -128,11 +123,11 @@ export default function CatalogPage() {
       header: 'Nome',
       render: (item) => (
         <div>
-          <p className="font-medium text-slate-900 dark:text-white">
+          <p className="font-medium text-stone-900 dark:text-stone-100">
             {item.name}
           </p>
           {item.description && (
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate max-w-xs">
+            <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5 truncate max-w-xs">
               {item.description}
             </p>
           )}
@@ -159,7 +154,7 @@ export default function CatalogPage() {
       header: 'Preço',
       width: '130px',
       render: (item) => (
-        <span className="text-slate-700 dark:text-slate-300 font-medium">
+        <span className="text-stone-800 dark:text-stone-100 font-medium">
           {fmtCurrency(item.price)}
         </span>
       ),
@@ -170,11 +165,11 @@ export default function CatalogPage() {
       width: '110px',
       render: (item) =>
         item.active ? (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500">
             Ativo
           </span>
         ) : (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
             Inativo
           </span>
         ),
@@ -192,7 +187,7 @@ export default function CatalogPage() {
             onClick={() => openEdit(item)}
             title="Editar"
           >
-            <Pencil size={15} className="text-slate-500 dark:text-slate-400" />
+            <Pencil size={15} className="text-stone-500 dark:text-stone-400" />
           </Button>
           <Button
             variant="ghost"
@@ -200,7 +195,7 @@ export default function CatalogPage() {
             onClick={() => handleDelete(item)}
             title="Excluir"
           >
-            <Trash2 size={15} className="text-red-500" />
+            <Trash2 size={15} className="text-red-600 dark:text-red-500" />
           </Button>
         </div>
       ),
@@ -208,8 +203,8 @@ export default function CatalogPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Catálogo" showStorage={false} />
 
         <SectionCard
@@ -221,11 +216,8 @@ export default function CatalogPage() {
           }
           headerAction={
             <Button
-              onClick={() => {
-                setEditingItem(undefined);
-                setShowModal(true);
-              }}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              onClick={() => openCatalogModal()}
+              className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-10"
             >
               <Plus size={18} /> Novo item
             </Button>
@@ -261,17 +253,11 @@ export default function CatalogPage() {
             getRowKey={(item) => item.id}
             loading={loading}
             emptyState={
-              <div className="p-8 text-center">
-                <BookOpen
-                  size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
-                />
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
-                  {filters.category || filters.active !== undefined
-                    ? 'Nenhum item encontrado para os filtros selecionados.'
-                    : 'Nenhum item no catálogo ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={BookOpen}
+                title={filters.category || filters.active !== undefined ? 'Nenhum item encontrado' : 'Catálogo vazio'}
+                description={filters.category || filters.active !== undefined ? 'Revise os filtros selecionados.' : 'Adicione o primeiro item ao catálogo.'}
+              />
             }
           />
 
@@ -293,7 +279,7 @@ export default function CatalogPage() {
                   onClick={() => setPage(n)}
                   className={
                     n === page
-                      ? 'bg-teal-600 text-white hover:bg-teal-700 border-teal-600'
+                      ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 border-teal-800 dark:border-teal-500'
                       : ''
                   }
                 >
@@ -313,13 +299,6 @@ export default function CatalogPage() {
         </SectionCard>
       </div>
 
-      {showModal && (
-        <CatalogItemModal
-          {...(editingItem ? { item: editingItem } : {})}
-          onClose={closeModal}
-          onSuccess={editingItem ? handleEditSuccess : handleCreateSuccess}
-        />
-      )}
     </div>
   );
 }

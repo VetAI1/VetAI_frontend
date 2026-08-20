@@ -32,7 +32,7 @@ export interface InputWithLabelProps<
 
 const InputWithLabelInner = React.forwardRef<
   HTMLInputElement,
-  Omit<InputWithLabelProps, 'control' | 'name'> & {
+  Omit<InputWithLabelProps, 'control'> & {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
       }
@@ -52,14 +52,17 @@ const InputWithLabelInner = React.forwardRef<
         ref,
       ) {
         const [open, setOpen] = React.useState(false);
+        const generatedId = React.useId();
+        const inputId = props.id ?? generatedId;
 
         return (
           <div className={cn('w-full', containerClassName)}>
             {label && (
               <div className="mb-2 flex items-center gap-2">
                 <Label
+                  htmlFor={inputId}
                   {...(required ? { required } : {})}
-                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  className="text-sm font-semibold tracking-[-0.01em] text-stone-900 dark:text-stone-100"
                 >
                   {label}
                 </Label>
@@ -74,7 +77,7 @@ const InputWithLabelInner = React.forwardRef<
                           onMouseEnter={() => setOpen(true)}
                           onMouseLeave={() => setOpen(false)}
                         >
-                          <Info className="h-4 w-4 cursor-help text-slate-400 dark:text-slate-500" />
+                          <Info className="h-4 w-4 cursor-help text-stone-500 dark:text-stone-400" />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
@@ -87,9 +90,10 @@ const InputWithLabelInner = React.forwardRef<
             )}
             <div className="relative">
               <Input
+                id={inputId}
                 className={cn(
                   error &&
-              'border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500 dark:border-red-500',
+                    'border-red-600 dark:border-red-500 bg-red-600/5 dark:bg-red-500/5 focus-visible:border-red-600 dark:focus-visible:border-red-500 focus-visible:ring-red-600/20 dark:focus-visible:ring-red-500/20',
                   className,
                 )}
                 ref={ref}
@@ -98,13 +102,13 @@ const InputWithLabelInner = React.forwardRef<
                 {...props}
               />
               {endAdornment && (
-                <div className="absolute inset-y-0 right-3 flex items-center">
+                <div className="absolute inset-y-0 right-3 flex items-center text-stone-500 dark:text-stone-400">
                   {endAdornment}
                 </div>
               )}
             </div>
             {error && (
-              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
+              <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-500">{error}</p>
             )}
           </div>
         );
@@ -129,6 +133,7 @@ const InputWithLabel = React.forwardRef(
           control={control}
           render={({ field }) => (
             <InputWithLabelInner
+              {...(name ? { name } : {})}
               value={field.value ?? ''}
               onChange={(event) => {
                 field.onChange(event);
@@ -144,6 +149,7 @@ const InputWithLabel = React.forwardRef(
 
     return (
       <InputWithLabelInner
+        {...(name ? { name } : {})}
         value={value ?? ''}
         onChange={onChange ?? (() => {})}
         {...props}

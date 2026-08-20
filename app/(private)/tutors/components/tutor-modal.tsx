@@ -1,10 +1,11 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Loader2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
+import { useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
+import { notifyMutationSuccess } from '@/app/components/common/mutation-feedback';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
 import { tutorSchema, type TutorFormData } from '@/schemas/tutor';
@@ -41,14 +42,6 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
     },
   });
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
-
   const onSubmit = async (data: TutorFormData) => {
     setSaving(true);
 
@@ -73,6 +66,9 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
         if (data.address?.trim()) payload.address = data.address.trim();
         result = await tutorsService.create(payload);
       }
+      notifyMutationSuccess(
+        isEdit ? 'Tutor atualizado com sucesso.' : 'Tutor cadastrado com sucesso.',
+      );
       onSuccess(result);
     } finally {
       setSaving(false);
@@ -80,132 +76,120 @@ export function TutorModal({ tutor, onClose, onSuccess }: TutorModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              {isEdit ? 'Editar Tutor' : 'Novo Tutor'}
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              {isEdit ? 'Atualize os dados do tutor' : 'Cadastre um novo tutor'}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onClose}
-            className="text-slate-500"
-          >
-            <X size={18} />
-          </Button>
+    <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-xl bg-white dark:bg-stone-900 shadow-2xl">
+      <div className="flex shrink-0 items-center justify-between border-b border-stone-200 dark:border-stone-800 p-5">
+        <div>
+          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+            {isEdit ? 'Editar Tutor' : 'Novo Tutor'}
+          </h2>
+          <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
+            {isEdit ? 'Atualize os dados do tutor' : 'Cadastre um novo tutor'}
+          </p>
         </div>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onClose}
+          className="text-stone-500 dark:text-stone-400"
+        >
+          <X size={18} />
+        </Button>
+      </div>
 
-        <div className="p-5 space-y-4">
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <InputWithLabel
-                label="Nome"
-                required
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Ex: João Silva"
-                error={errors.name?.message}
-              />
-            )}
-          />
+      <div className="min-h-0 overflow-y-auto p-5 space-y-4">
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label="Nome"
+              required
+              type="text"
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Ex: João Silva"
+              error={errors.name?.message}
+            />
+          )}
+        />
 
-          <Controller
-            name="cpf"
-            control={control}
-            render={({ field }) => (
-              <InputWithLabel
-                label="CPF"
-                required
-                type="text"
-                value={field.value}
-                onChange={(e) => field.onChange(formatCPF(e.target.value))}
-                placeholder="Ex: 123.456.789-09"
-                error={errors.cpf?.message}
-              />
-            )}
-          />
+        <Controller
+          name="cpf"
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label="CPF"
+              required
+              type="text"
+              value={field.value}
+              onChange={(e) => field.onChange(formatCPF(e.target.value))}
+              placeholder="Ex: 123.456.789-09"
+              error={errors.cpf?.message}
+            />
+          )}
+        />
 
-          <Controller
-            name="phone"
-            control={control}
-            render={({ field }) => (
-              <InputWithLabel
-                label="Telefone"
-                required
-                type="tel"
-                inputMode="numeric"
-                maxLength={15}
-                value={field.value}
-                onChange={(e) => field.onChange(formatPhone(e.target.value))}
-                placeholder="Ex: (11) 99999-9999"
-                error={errors.phone?.message}
-              />
-            )}
-          />
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label="Telefone"
+              required
+              type="tel"
+              inputMode="numeric"
+              maxLength={15}
+              value={field.value}
+              onChange={(e) => field.onChange(formatPhone(e.target.value))}
+              placeholder="Ex: (11) 99999-9999"
+              error={errors.phone?.message}
+            />
+          )}
+        />
 
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <InputWithLabel
-                label="E-mail"
-                required
-                type="email"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Ex: joao@email.com"
-                error={errors.email?.message}
-              />
-            )}
-          />
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label="E-mail"
+              required
+              type="email"
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Ex: joao@email.com"
+              error={errors.email?.message}
+            />
+          )}
+        />
 
-          <Controller
-            name='address'
-            control={control}
-            render={({ field }) => (
-              <InputWithLabel
-                label='Endereço'
-                type='text'
-                value={field.value ?? ''}
-                onChange={field.onChange}
-                placeholder='Ex: Rua das Flores, 123 - São Paulo/SP'
-                error={errors.address?.message}
-              />
-            )}
-          />
-        </div>
+        <Controller
+          name='address'
+          control={control}
+          render={({ field }) => (
+            <InputWithLabel
+              label='Endereço'
+              type='text'
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              placeholder='Ex: Rua das Flores, 123 - São Paulo/SP'
+              error={errors.address?.message}
+            />
+          )}
+        />
+      </div>
 
-        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-200 dark:border-slate-700">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
+      <div className="flex shrink-0 items-center justify-end gap-3 border-t border-stone-200 dark:border-stone-800 px-5 py-4">
+        <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
-          </Button>
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            disabled={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800 min-w-[100px]"
-          >
-            {saving ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : isEdit ? (
-              'Salvar'
-            ) : (
-              'Cadastrar'
-            )}
-          </Button>
-        </div>
+        </Button>
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          loading={saving}
+          className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 min-w-[100px]"
+        >
+          {isEdit ? 'Salvar' : 'Cadastrar'}
+        </Button>
       </div>
     </div>
   );

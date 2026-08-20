@@ -41,7 +41,6 @@ export function HospitalizeModal({
   const [vets, setVets] = useState<Collaborator[]>([]);
   const [boxes, setBoxes] = useState<Box[]>([]);
 
-  const [patientOpen, setPatientOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<{
     id: string;
     label: string;
@@ -91,6 +90,8 @@ export function HospitalizeModal({
     hasMorePage: hasMorePatients,
     setSearch: setPatientSearch,
     loadNextPage: loadNextPatientPage,
+    open: patientOpen,
+    setOpen: setPatientOpen,
   } = useAutoComplete({
     fetcher: patientsService.list,
     pageSize: 10,
@@ -444,7 +445,7 @@ export function HospitalizeModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             {isEdit ? 'Salvar alterações' : 'Internar'}
           </Button>

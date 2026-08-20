@@ -11,6 +11,7 @@ export interface ModalProps {
   description?: string | undefined;
   children: ReactNode;
   onClose: () => void;
+  footer?: ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
@@ -28,6 +29,7 @@ export function Modal({
   description,
   children,
   onClose,
+  footer,
   maxWidth = 'md',
   className,
 }: ModalProps) {
@@ -39,18 +41,18 @@ export function Modal({
       />
       <div
         className={cn(
-          'relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col',
+          'relative bg-white dark:bg-stone-900 rounded-xl shadow-[var(--shadow-card)] w-full animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col',
           MAX_WIDTH_MAP[maxWidth],
           className,
         )}
       >
-        <div className="flex items-start justify-between p-5 border-b border-slate-200 dark:border-slate-700 shrink-0">
+        <div className="flex items-start justify-between p-5 border-b border-stone-200 dark:border-stone-800 shrink-0">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
               {title}
             </h3>
             {description && (
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
                 {description}
               </p>
             )}
@@ -59,13 +61,17 @@ export function Modal({
             variant="ghost"
             size="icon-sm"
             onClick={onClose}
-            className="ml-4 shrink-0 text-slate-500"
+            aria-label="Fechar"
+            className="ml-4 shrink-0 text-stone-500 dark:text-stone-400"
           >
             <X size={18} />
           </Button>
         </div>
 
-        <div className="overflow-y-auto flex-1 p-5">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
+        {footer && (
+          <div className="shrink-0 border-t border-stone-200 dark:border-stone-800 p-4">{footer}</div>
+        )}
       </div>
     </div>
   );

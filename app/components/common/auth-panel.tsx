@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Activity,
   Microscope,
   PawPrint,
   Stethoscope,
@@ -9,6 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+import { BrandLogo } from '@/app/components/brand/brand-logo';
 import { Counter } from '@/app/components/common/counter';
 
 interface StatItem {
@@ -33,51 +33,33 @@ const STATS: StatItem[] = [
 interface AuthPanelProps {
   title: string;
   description: string;
-  gradient?: string;
 }
 
-export function AuthPanel({
-  title,
-  description,
-  gradient = 'from-teal-600 via-teal-700 to-emerald-800',
-}: AuthPanelProps) {
+export function AuthPanel({ title, description }: AuthPanelProps) {
   return (
-    <div
-      className={`hidden lg:flex lg:w-1/2 bg-linear-to-br ${gradient} relative overflow-hidden`}
-    >
-      <div
-        className="absolute inset-0 opacity-10 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            'url(\'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?q=80&w=2070&auto=format&fit=crop\')',
-        }}
-      />
+    <aside className="relative hidden min-h-0 overflow-hidden bg-teal-800 dark:bg-teal-500 lg:flex">
+      <div className="absolute inset-0 opacity-[0.15] [background-image:radial-gradient(var(--color-white)_1px,transparent_1px)] [background-size:18px_18px]" />
+      <div className="absolute -right-24 top-24 size-80 rounded-full border border-white/15 dark:border-stone-950/15" />
+      <div className="absolute right-12 top-40 size-32 rounded-full border border-white/10 dark:border-stone-950/10" />
+      <div className="absolute -bottom-24 -left-20 size-96 rounded-full bg-white/5 dark:bg-stone-950/5" />
+      <div className="absolute -bottom-16 left-24 size-56 rounded-full border border-amber-500/25 dark:border-amber-400/25" />
 
-      <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/5 animate-pulse" />
-      <div
-        className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full bg-white/5 animate-pulse"
-        style={{ animationDelay: '1s' }}
-      />
-      <div
-        className="absolute top-1/2 right-1/4 w-48 h-48 rounded-full bg-white/5 animate-pulse"
-        style={{ animationDelay: '2s' }}
-      />
-
-      <div className="relative z-10 flex flex-col justify-between px-12 xl:px-16 py-12 w-full">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
-            <Activity className="text-white" size={22} />
-          </div>
-          <span className="text-2xl font-bold text-white tracking-tight">
-            VetAI
-          </span>
+      <div className="relative z-10 flex w-full flex-col justify-between px-12 py-12 xl:px-16">
+        <Link href="/" aria-label="VetAI - início">
+          <BrandLogo light />
         </Link>
 
-        <div>
-          <h2 className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-4">
+        <div className="max-w-lg">
+          <p className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-white dark:text-stone-950">
+            <span className="flex size-5 items-center justify-center rounded-full bg-amber-500/20 dark:bg-amber-400/20">
+              <span className="size-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
+            </span>
+            Gestão veterinária inteligente
+          </p>
+          <h2 className="font-display text-4xl font-bold leading-[1.02] tracking-[-0.06em] text-white dark:text-stone-950 xl:text-5xl">
             {title}
           </h2>
-          <p className="text-teal-100/90 text-lg leading-relaxed max-w-md">
+          <p className="mt-5 max-w-md text-lg leading-relaxed text-white/80 dark:text-stone-950/80">
             {description}
           </p>
 
@@ -87,17 +69,19 @@ export function AuthPanel({
               return (
                 <div
                   key={stat.label}
-                  className="p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/15 transition-colors"
+                  className="rounded-2xl border border-white/15 dark:border-stone-950/15 bg-white/10 dark:bg-stone-950/10 p-4 shadow-[var(--shadow-brand)]"
                 >
-                  <Icon size={20} className="text-teal-200 mb-2" />
-                  <div className="text-2xl font-bold text-white">
+                  <span className="mb-3 flex size-8 items-center justify-center rounded-lg bg-white/10 dark:bg-stone-950/10 text-amber-500 dark:text-amber-400">
+                    <Icon size={17} />
+                  </span>
+                  <div className="font-data text-2xl font-semibold tracking-[-0.06em] text-white dark:text-stone-950">
                     <Counter
                       target={stat.value}
                       duration={2000}
                       suffix={stat.suffix}
                     />
                   </div>
-                  <p className="text-xs text-teal-200/80 mt-0.5">
+                  <p className="mt-1 text-xs text-white/70 dark:text-stone-950/70">
                     {stat.label}
                   </p>
                 </div>
@@ -106,20 +90,14 @@ export function AuthPanel({
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-teal-200/70 text-xs">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            Criptografia de ponta a ponta
+        <div className="flex items-center justify-between border-t border-white/15 dark:border-stone-950/15 pt-6 text-xs text-white/75 dark:text-stone-950/75">
+          <div className="flex items-center gap-2">
+            <div className="size-2 rounded-full bg-amber-500 dark:bg-amber-400 ring-4 ring-amber-500/10 dark:ring-amber-400/10" />
+            Organização para a rotina clínica
           </div>
-          <div className="flex items-center gap-2 text-teal-200/70 text-xs">
-            <div
-              className="w-2 h-2 rounded-full bg-green-400 animate-pulse"
-              style={{ animationDelay: '500ms' }}
-            />
-            LGPD Compliant
-          </div>
+          <span className="font-data text-white/55 dark:text-stone-950/55">VETAI</span>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

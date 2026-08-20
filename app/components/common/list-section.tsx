@@ -20,7 +20,7 @@ export function ListSection({
     <div className={`rounded-xl border p-4 ${bgColor}`}>
       <div className="flex items-center gap-2 mb-3">
         <Icon size={15} className={iconColor} />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
           {label}
         </span>
       </div>
@@ -28,7 +28,7 @@ export function ListSection({
         {items.map((item, i) => (
           <li
             key={i}
-            className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-300"
+            className="flex items-start gap-2.5 text-sm text-stone-900/80 dark:text-stone-100/80"
           >
             <span
               className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${iconColor.replace(

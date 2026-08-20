@@ -1,30 +1,23 @@
 'use client';
 
-import {
-  Check,
-  ChevronDown,
-  CreditCard,
-  Loader2,
-  Pencil,
-  Plus,
-  Trash2,
-  User,
-  X,
-} from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { CreditCard, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { PaymentModal } from './components/payment-modal';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
 } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
+import { Autocomplete } from '@/app/components/forms/autocomplete';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { useAutoComplete } from '@/hooks/use-auto-complete';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { paymentsService } from '@/services/payments.service';
@@ -44,120 +37,6 @@ const STATUS_FILTER_OPTIONS = [
     label: PAYMENT_STATUS_LABELS[s],
   })),
 ];
-
-interface TutorFilter {
-  id: string;
-  name: string;
-}
-
-function TutorFilterComboBox({
-  value,
-  onSelect,
-  onClear,
-}: {
-  value: TutorFilter | null;
-  onSelect: (t: TutorFilter) => void;
-  onClear: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const {
-    items: tutors,
-    search,
-    loading,
-    setSearch,
-  } = useAutoComplete<Tutor>({
-    fetcher: tutorsService.list,
-    pageSize: 8,
-    enabled: open,
-  });
-
-  useEffect(() => {
-    const handle = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handle);
-    return () => document.removeEventListener('mousedown', handle);
-  }, []);
-
-  if (value) {
-    return (
-      <div className="flex items-center gap-1.5 h-9 pl-3 pr-2 rounded-lg border border-teal-400 dark:border-teal-600 bg-teal-50 dark:bg-teal-900/20 text-sm text-teal-700 dark:text-teal-300 font-medium">
-        <User size={13} className="shrink-0" />
-        <span className="truncate max-w-40">{value.name}</span>
-        <button
-          type="button"
-          onClick={onClear}
-          className="ml-1 text-teal-500 hover:text-red-500 transition-colors"
-        >
-          <X size={13} />
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div ref={ref} className="relative">
-      <div className="relative">
-        <User
-          size={14}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-        />
-        <input
-          className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 pl-8 pr-8 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
-          placeholder="Filtrar por tutor..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => setOpen(true)}
-        />
-        <ChevronDown
-          size={14}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-        />
-      </div>
-      {open && (
-        <div className="absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-lg max-h-52 overflow-y-auto">
-          {loading ? (
-            <p className="text-xs text-slate-400 px-3 py-2 flex items-center gap-2">
-              <Loader2 size={12} className="animate-spin" /> Buscando...
-            </p>
-          ) : tutors.length === 0 ? (
-            <p className="text-xs text-slate-400 px-3 py-2">
-              {search.length < 2
-                ? 'Digite ao menos 2 caracteres...'
-                : 'Nenhum tutor encontrado'}
-            </p>
-          ) : (
-            tutors.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onSelect({ id: t.id, name: t.name });
-                  setOpen(false);
-                  setSearch('');
-                }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-              >
-                <Check size={12} className="text-teal-500 opacity-0" />
-                <span className="text-slate-900 dark:text-white">
-                  {t.name}
-                </span>
-              </button>
-            ))
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function fmtDate(iso?: string) {
   if (!iso) return '—';
@@ -184,11 +63,8 @@ interface PaymentFilters {
 
 export default function PaymentsPage() {
   const { confirm } = useConfirmation();
-  const [tutorFilter, setTutorFilter] = useState<TutorFilter | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [editingPayment, setEditingPayment] = useState<Payment | undefined>(
-    undefined,
-  );
+  const { open } = useModal();
+  const [tutorFilter, setTutorFilter] = useState<Tutor | null>(null);
 
   const {
     items: payments,
@@ -207,11 +83,26 @@ export default function PaymentsPage() {
     pageSize: 15,
   });
 
+  const {
+    items: tutors,
+    search: tutorSearch,
+    loading: tutorsLoading,
+    loadingMore: tutorsLoadingMore,
+    hasMorePage: hasMoreTutors,
+    open: tutorFilterOpen,
+    setOpen: setTutorFilterOpen,
+    setSearch: setTutorSearch,
+    loadNextPage: loadNextTutorPage,
+  } = useAutoComplete<Tutor>({
+    fetcher: tutorsService.list,
+    pageSize: 8,
+  });
+
   const handleStatusChange = (status: string) => {
     setFilters((prev) => ({ ...prev, status }));
   };
 
-  const handleTutorSelect = (t: TutorFilter) => {
+  const handleTutorSelect = (t: Tutor) => {
     setTutorFilter(t);
     setFilters((prev) => ({ ...prev, tutor_id: t.id }));
   };
@@ -221,16 +112,19 @@ export default function PaymentsPage() {
     setFilters((prev) => ({ ...prev, tutor_id: '' }));
   };
 
-  const handleCreateSuccess = (p: Payment) => {
-    setShowModal(false);
-    prependItem(p);
-  };
-
-  const handleEditSuccess = (updated: Payment) => {
-    setShowModal(false);
-    setEditingPayment(undefined);
-    replaceItem((item) => item.id === updated.id, updated);
-  };
+  const openPaymentModal = (payment?: Payment) => open({
+    content: ({ close }) => (
+      <PaymentModal
+        {...(payment ? { payment } : {})}
+        onClose={close}
+        onSuccess={(updated) => {
+          if (payment) replaceItem((item) => item.id === updated.id, updated);
+          else prependItem(updated);
+          close();
+        }}
+      />
+    ),
+  });
 
   const handleDelete = (payment: Payment) => {
     confirm({
@@ -247,13 +141,7 @@ export default function PaymentsPage() {
   };
 
   const openEdit = (p: Payment) => {
-    setEditingPayment(p);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingPayment(undefined);
+    openPaymentModal(p);
   };
 
   const totalPages = meta?.total_pages ?? 1;
@@ -271,11 +159,11 @@ export default function PaymentsPage() {
           : '—';
         return (
           <div>
-            <p className="font-medium text-slate-900 dark:text-white">
+            <p className="font-medium text-stone-900 dark:text-stone-100">
               {itemsSummary}
             </p>
             {p.notes && (
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate max-w-xs">
+              <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5 truncate max-w-xs">
                 {p.notes}
               </p>
             )}
@@ -288,7 +176,7 @@ export default function PaymentsPage() {
       header: 'Valor',
       width: '120px',
       render: (p) => (
-        <span className="text-slate-700 dark:text-slate-300 font-medium">
+        <span className="text-stone-800 dark:text-stone-100 font-medium">
           {fmtAmount(p.amount)}
         </span>
       ),
@@ -300,8 +188,8 @@ export default function PaymentsPage() {
       render: (p) => {
         const statusKey = (p.status?.toUpperCase() as PaymentStatus) ?? 'PENDING';
         const colors = PAYMENT_STATUS_COLORS[statusKey] ?? {
-          bg: 'bg-slate-100 dark:bg-slate-800',
-          text: 'text-slate-700 dark:text-slate-300',
+          bg: 'bg-stone-100 dark:bg-stone-800',
+          text: 'text-stone-800 dark:text-stone-100',
         };
         const label = PAYMENT_STATUS_LABELS[statusKey] ?? p.status ?? 'Pendente';
         return (
@@ -318,7 +206,7 @@ export default function PaymentsPage() {
       header: 'Vencimento',
       width: '120px',
       render: (p) => (
-        <span className="text-slate-600 dark:text-slate-300 text-sm">
+        <span className="text-stone-500 dark:text-stone-400 text-sm">
           {fmtDate(p.due_date)}
         </span>
       ),
@@ -328,11 +216,11 @@ export default function PaymentsPage() {
       header: 'Pago em',
       width: '120px',
       render: (p) => (
-        <span className="text-slate-600 dark:text-slate-300 text-sm">
+        <span className="text-stone-500 dark:text-stone-400 text-sm">
           {p.paid_at ? (
             fmtDate(p.paid_at)
           ) : (
-            <span className="text-slate-400 dark:text-slate-500">—</span>
+            <span className="text-stone-500/70 dark:text-stone-400/70">—</span>
           )}
         </span>
       ),
@@ -350,7 +238,7 @@ export default function PaymentsPage() {
             onClick={() => openEdit(p)}
             title="Editar"
           >
-            <Pencil size={15} className="text-slate-500 dark:text-slate-400" />
+            <Pencil size={15} className="text-stone-500 dark:text-stone-400" />
           </Button>
           <Button
             variant="ghost"
@@ -358,7 +246,7 @@ export default function PaymentsPage() {
             onClick={() => handleDelete(p)}
             title="Excluir"
           >
-            <Trash2 size={15} className="text-red-500" />
+            <Trash2 size={15} className="text-red-600 dark:text-red-500" />
           </Button>
         </div>
       ),
@@ -366,8 +254,8 @@ export default function PaymentsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Pagamentos" showStorage={false} />
 
         <SectionCard
@@ -379,11 +267,8 @@ export default function PaymentsPage() {
           }
           headerAction={
             <Button
-              onClick={() => {
-                setEditingPayment(undefined);
-                setShowModal(true);
-              }}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              onClick={() => openPaymentModal()}
+              className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-10"
             >
               <Plus size={18} /> Nova Cobrança
             </Button>
@@ -400,10 +285,31 @@ export default function PaymentsPage() {
               />
             </div>
             <div className="w-64">
-              <TutorFilterComboBox
-                value={tutorFilter}
+              <Autocomplete
+                placeholder="Filtrar por tutor..."
+                search={tutorSearch}
+                onSearchChange={setTutorSearch}
+                items={tutors}
+                getOptionLabel={(tutor) => tutor.name}
+                getOptionDescription={(tutor) => tutor.email}
+                loading={tutorsLoading}
+                loadingMore={tutorsLoadingMore}
+                hasMorePage={hasMoreTutors}
+                onLoadNextPage={loadNextTutorPage}
+                open={tutorFilterOpen}
+                onOpenChange={setTutorFilterOpen}
+                selectedOption={
+                  tutorFilter
+                    ? {
+                      id: tutorFilter.id,
+                      label: tutorFilter.name,
+                      description: tutorFilter.email,
+                    }
+                    : null
+                }
                 onSelect={handleTutorSelect}
                 onClear={handleTutorClear}
+                emptyMessage="Nenhum tutor encontrado"
               />
             </div>
           </div>
@@ -414,17 +320,11 @@ export default function PaymentsPage() {
             getRowKey={(p) => p.id}
             loading={loading}
             emptyState={
-              <div className="p-4 text-center">
-                <CreditCard
-                  size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
-                />
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
-                  {filters.status || tutorFilter
-                    ? 'Nenhuma cobrança encontrada para os filtros selecionados.'
-                    : 'Nenhuma cobrança cadastrada ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={CreditCard}
+                title={filters.status || tutorFilter ? 'Nenhuma cobrança encontrada' : 'Nenhuma cobrança cadastrada'}
+                description={filters.status || tutorFilter ? 'Revise os filtros selecionados.' : 'Registre a primeira cobrança para começar.'}
+              />
             }
           />
 
@@ -447,7 +347,7 @@ export default function PaymentsPage() {
                   onClick={() => setPage(n)}
                   className={
                     n === page
-                      ? 'bg-teal-600 text-white hover:bg-teal-700 border-teal-600'
+                      ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 border-teal-800 dark:border-teal-500'
                       : ''
                   }
                 >
@@ -467,13 +367,6 @@ export default function PaymentsPage() {
         </SectionCard>
       </div>
 
-      {showModal && (
-        <PaymentModal
-          {...(editingPayment ? { payment: editingPayment } : {})}
-          onClose={closeModal}
-          onSuccess={editingPayment ? handleEditSuccess : handleCreateSuccess}
-        />
-      )}
     </div>
   );
 }

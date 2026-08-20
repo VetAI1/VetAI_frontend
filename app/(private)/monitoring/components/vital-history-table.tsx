@@ -29,7 +29,7 @@ export function VitalHistoryTable({
 
   if (ordered.length === 0) {
     return (
-      <p className="text-sm text-slate-400 dark:text-slate-500 text-center py-8">
+      <p className="text-sm text-stone-500/70 dark:text-stone-400/70 text-center py-8">
         Nenhuma medição registrada ainda.
       </p>
     );
@@ -39,20 +39,20 @@ export function VitalHistoryTable({
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-slate-200 dark:border-slate-700 text-left">
-            <th className="p-3 font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          <tr className="border-b border-stone-200 dark:border-stone-800 text-left">
+            <th className="p-3 font-medium text-stone-500 dark:text-stone-400 whitespace-nowrap">
               Data/Hora
             </th>
             {VITAL_DEFINITIONS.map((def) => (
               <th
                 key={def.key}
-                className="p-3 font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap text-center"
+                className="p-3 font-medium text-stone-500 dark:text-stone-400 whitespace-nowrap text-center"
               >
                 {def.short}
                 <span className="block text-[10px] font-normal">{def.unit}</span>
               </th>
             ))}
-            <th className="p-3 font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+            <th className="p-3 font-medium text-stone-500 dark:text-stone-400 whitespace-nowrap">
               Registrado por
             </th>
           </tr>
@@ -63,12 +63,12 @@ export function VitalHistoryTable({
               key={record.id}
               onClick={() => setSelected(record)}
               title="Clique para ver os detalhes da aferição"
-              className="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer"
+              className="border-b border-stone-200/70 dark:border-stone-800/70 hover:bg-stone-100/60 dark:hover:bg-stone-800/60 cursor-pointer"
             >
-              <td className="p-3 whitespace-nowrap text-slate-600 dark:text-slate-300">
+              <td className="p-3 whitespace-nowrap text-stone-500 dark:text-stone-400">
                 {fmtDateTime(record.measured_at)}
                 {record.notes && (
-                  <span className="block text-[11px] text-slate-400 dark:text-slate-500 max-w-[180px] truncate">
+                  <span className="block text-[11px] text-stone-500/70 dark:text-stone-400/70 max-w-[180px] truncate">
                     {record.notes}
                   </span>
                 )}
@@ -79,24 +79,24 @@ export function VitalHistoryTable({
                 return (
                   <td
                     key={def.key}
-                    className={`p-3 text-center font-medium ${value !== undefined && value !== null ? EVALUATION_TEXT_COLORS[evaluation] : 'text-slate-300 dark:text-slate-600'}`}
+                    className={`p-3 text-center font-medium ${value !== undefined && value !== null ? EVALUATION_TEXT_COLORS[evaluation] : 'text-stone-500/50 dark:text-stone-400/50'}`}
                   >
                     {value !== undefined && value !== null ? value : '—'}
                   </td>
                 );
               })}
-              <td className="p-3 whitespace-nowrap text-slate-600 dark:text-slate-300">
+              <td className="p-3 whitespace-nowrap text-stone-500 dark:text-stone-400">
                 {record.recorded_by ? (
                   <>
                     {record.recorded_by.name}
                     {record.recorded_by.crmv && (
-                      <span className="block text-[11px] text-slate-400 dark:text-slate-500">
+                      <span className="block text-[11px] text-stone-500/70 dark:text-stone-400/70">
                         CRMV {record.recorded_by.crmv}
                       </span>
                     )}
                   </>
                 ) : (
-                  <span className="text-slate-300 dark:text-slate-600">—</span>
+                  <span className="text-stone-500/50 dark:text-stone-400/50">—</span>
                 )}
               </td>
             </tr>
@@ -120,20 +120,20 @@ export function VitalHistoryTable({
                 return (
                   <div
                     key={def.key}
-                    className="rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 px-3 py-2"
+                    className="rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200/70 dark:border-stone-800/70 px-3 py-2"
                   >
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-stone-500/70 dark:text-stone-400/70">
                       {def.label}
                     </p>
                     <p
-                      className={`text-sm font-semibold ${hasValue ? EVALUATION_TEXT_COLORS[evaluation] : 'text-slate-300 dark:text-slate-600'}`}
+                      className={`text-sm font-semibold ${hasValue ? EVALUATION_TEXT_COLORS[evaluation] : 'text-stone-500/50 dark:text-stone-400/50'}`}
                     >
                       {hasValue ? `${value} ${def.unit}` : '—'}
                     </p>
                     {hasValue &&
                       evaluation !== 'normal' &&
                       evaluation !== 'unknown' && (
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                      <p className="text-[10px] text-stone-500/70 dark:text-stone-400/70">
                         {EVALUATION_LABELS[evaluation]} da faixa
                       </p>
                     )}
@@ -144,19 +144,19 @@ export function VitalHistoryTable({
 
             {(selected.clinical_values?.length ?? 0) > 0 && (
               <div>
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                <p className="text-sm font-semibold text-stone-800 dark:text-stone-100 mb-2">
                   Parâmetros Clínicos
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {selected.clinical_values?.map((item) => (
                     <div
                       key={item.name}
-                      className="rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 px-3 py-2"
+                      className="rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200/70 dark:border-stone-800/70 px-3 py-2"
                     >
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-stone-500/70 dark:text-stone-400/70">
                         {item.name}
                       </p>
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
                         {item.value}
                         {item.unit ? ` ${item.unit}` : ''}
                       </p>
@@ -168,10 +168,10 @@ export function VitalHistoryTable({
 
             {selected.notes && (
               <div>
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <p className="text-sm font-semibold text-stone-800 dark:text-stone-100 mb-1">
                   Observações
                 </p>
-                <p className="text-sm text-slate-600 dark:text-slate-300">
+                <p className="text-sm text-stone-500 dark:text-stone-400">
                   {selected.notes}
                 </p>
               </div>

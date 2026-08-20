@@ -1,6 +1,6 @@
 export { BRAZIL_STATES } from './address';
 export { AI_OPERATION_LABELS } from './billing';
-export { CHART_COLORS, chartColor, chartFill } from './charts';
+export { chartColor, chartFill } from './charts';
 export { SEX_LABELS, SPECIE_LABELS } from './species';
 export { STUDY_STATUS_MAP } from './study';
 export * from './monitoring';

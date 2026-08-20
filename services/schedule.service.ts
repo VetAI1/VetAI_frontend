@@ -5,15 +5,33 @@ import type { ScheduleEvent } from '@/types/schedule';
 type ScheduleEventPayload = Omit<ScheduleEvent, 'id'>;
 
 export interface ScheduleListParams extends QueryParams {
-  patientName?: string;
-  tutorName?: string;
+  patient_name?: string;
+  tutor_name?: string;
   date?: string;
+  from?: string;
+  to?: string;
+}
+
+function buildScheduleQuery(params?: ScheduleListParams): string {
+  const base = buildQuery(params);
+  if (!params) return base;
+
+  const extra = new URLSearchParams();
+  if (params.patient_name) extra.set('patient_name', params.patient_name);
+  if (params.tutor_name) extra.set('tutor_name', params.tutor_name);
+  if (params.date) extra.set('date', params.date);
+  if (params.from) extra.set('from', params.from);
+  if (params.to) extra.set('to', params.to);
+
+  const extraQuery = extra.toString();
+  if (!extraQuery) return base;
+  return base ? `${base}&${extraQuery}` : `?${extraQuery}`;
 }
 
 export const scheduleService = {
   async list(params?: ScheduleListParams): Promise<ScheduleEvent[]> {
     const response = await httpClient<PaginatedResponse<ScheduleEvent>>(
-      `schedule/events${buildQuery(params)}`,
+      `schedule/events${buildScheduleQuery(params)}`,
     );
     return response.data;
   },
@@ -23,11 +41,11 @@ export const scheduleService = {
   },
 
   async listByPatient(
-    patientName: string,
+    patient_name: string,
     fromDate?: string,
   ): Promise<ScheduleEvent[]> {
     const params: ScheduleListParams = {
-      patientName,
+      patient_name,
       size: 500,
       sort: 'date',
       direction: 'asc',

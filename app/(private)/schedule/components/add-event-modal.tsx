@@ -7,6 +7,7 @@ import { Controller, useForm, type Resolver } from 'react-hook-form';
 import { toLocalDateStr } from '../utils';
 
 import { Modal } from '@/app/components/common/modal';
+import { notifyMutationSuccess } from '@/app/components/common/mutation-feedback';
 import { Autocomplete } from '@/app/components/forms/autocomplete';
 import { FormTextarea } from '@/app/components/forms/form-textarea';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
@@ -34,6 +35,7 @@ interface ComboBoxItem {
 
 interface AddEventModalProps {
   initialDate?: string | undefined;
+  initialTime?: string | undefined;
   event?: ScheduleEvent;
   onClose: () => void;
   onSave: (event: ScheduleEvent) => void;
@@ -43,6 +45,7 @@ interface AddEventModalProps {
 
 export function AddEventModal({
   initialDate,
+  initialTime,
   event: editingEvent,
   onClose,
   onSave,
@@ -50,18 +53,17 @@ export function AddEventModal({
   maxHour = 23,
 }: AddEventModalProps) {
   const isEditing = !!editingEvent;
-  const [patientOpen, setPatientOpen] = useState(false);
-  const [tutorOpen, setTutorOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<
     (ComboBoxItem & { tutorId?: string }) | null
       >(
-      editingEvent?.patientName
-        ? { id: editingEvent.patientName, label: editingEvent.patientName }
+      editingEvent?.patient_name
+        ? { id: editingEvent.patient_name, label: editingEvent.patient_name }
         : null,
       );
   const [selectedTutor, setSelectedTutor] = useState<ComboBoxItem | null>(
-    editingEvent?.tutorName
-      ? { id: editingEvent.tutorName, label: editingEvent.tutorName }
+    editingEvent?.tutor_name
+      ? { id: editingEvent.tutor_name, label: editingEvent.tutor_name }
       : null,
   );
 
@@ -73,6 +75,8 @@ export function AddEventModal({
     loadNextPage: loadNextPatientPage,
     search: patientSearch,
     setSearch: setPatientSearch,
+    open: patientOpen,
+    setOpen: setPatientOpen,
   } = useAutoComplete<Patient>({
     fetcher: patientsService.list,
     pageSize: 8,
@@ -87,6 +91,8 @@ export function AddEventModal({
     loadNextPage: loadNextTutorPage,
     search: tutorSearch,
     setSearch: setTutorSearch,
+    open: tutorOpen,
+    setOpen: setTutorOpen,
   } = useAutoComplete<Tutor>({
     fetcher: tutorsService.list,
     pageSize: 8,
@@ -106,11 +112,11 @@ export function AddEventModal({
       title: editingEvent?.title ?? '',
       description: editingEvent?.description ?? '',
       date: editingEvent?.date ?? initialDate ?? toLocalDateStr(new Date()),
-      startTime: editingEvent?.startTime ?? '',
-      endTime: editingEvent?.endTime ?? '',
+      start_time: editingEvent?.start_time ?? initialTime ?? '',
+      end_time: editingEvent?.end_time ?? '',
       type: editingEvent?.type ?? 'consultation',
-      patientName: editingEvent?.patientName ?? '',
-      tutorName: editingEvent?.tutorName ?? '',
+      patient_name: editingEvent?.patient_name ?? '',
+      tutor_name: editingEvent?.tutor_name ?? '',
     },
   });
 
@@ -126,7 +132,7 @@ export function AddEventModal({
     };
 
     setSelectedPatient(nextSelection);
-    setValue('patientName', patient.name, { shouldValidate: true });
+    setValue('patient_name', patient.name, { shouldValidate: true });
     setPatientSearch('');
 
     if (patient.tutor_id && !selectedTutor) {
@@ -138,7 +144,7 @@ export function AddEventModal({
           description: tutor.phone ?? tutor.email,
         };
         setSelectedTutor(tutorOption);
-        setValue('tutorName', tutor.name, { shouldValidate: true });
+        setValue('tutor_name', tutor.name, { shouldValidate: true });
       } catch {
         // keep form usable even if tutor auto-fill fails
       }
@@ -152,17 +158,27 @@ export function AddEventModal({
         ? { description: data.description.trim() }
         : {}),
       date: data.date,
-      startTime: data.startTime,
-      ...(data.endTime ? { endTime: data.endTime } : {}),
+      start_time: data.start_time,
+      ...(data.end_time ? { end_time: data.end_time } : {}),
       type: data.type,
-      patientName: data.patientName.trim(),
-      tutorName: data.tutorName.trim(),
+      patient_name: data.patient_name.trim(),
+      tutor_name: data.tutor_name.trim(),
     };
 
-    const saved = isEditing
-      ? await scheduleService.update(editingEvent.id, payload)
-      : await scheduleService.create(payload);
-    onSave(saved);
+    setSaving(true);
+    try {
+      const saved = isEditing
+        ? await scheduleService.update(editingEvent.id, payload)
+        : await scheduleService.create(payload);
+      notifyMutationSuccess(
+        isEditing
+          ? 'Agendamento atualizado com sucesso.'
+          : 'Agendamento criado com sucesso.',
+      );
+      onSave(saved);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -227,7 +243,7 @@ export function AddEventModal({
 
         <div className="grid grid-cols-2 gap-3">
           <Controller
-            name="startTime"
+            name="start_time"
             control={control}
             render={({ field }) => (
               <TimeInput
@@ -237,13 +253,13 @@ export function AddEventModal({
                 onChange={field.onChange}
                 minHour={minHour}
                 maxHour={maxHour}
-                error={errors.startTime?.message}
+                error={errors.start_time?.message}
               />
             )}
           />
 
           <Controller
-            name="endTime"
+            name="end_time"
             control={control}
             render={({ field }) => (
               <TimeInput
@@ -252,7 +268,7 @@ export function AddEventModal({
                 onChange={field.onChange}
                 minHour={minHour}
                 maxHour={maxHour}
-                error={errors.endTime?.message}
+                error={errors.end_time?.message}
               />
             )}
           />
@@ -283,9 +299,9 @@ export function AddEventModal({
           }}
           onClear={() => {
             setSelectedPatient(null);
-            setValue('patientName', '', { shouldValidate: true });
+            setValue('patient_name', '', { shouldValidate: true });
           }}
-          error={errors.patientName?.message}
+          error={errors.patient_name?.message}
           emptyMessage="Nenhum paciente encontrado"
         />
 
@@ -311,14 +327,14 @@ export function AddEventModal({
               label: tutor.name,
               description: tutor.phone ?? tutor.email,
             });
-            setValue('tutorName', tutor.name, { shouldValidate: true });
+            setValue('tutor_name', tutor.name, { shouldValidate: true });
             setTutorSearch('');
           }}
           onClear={() => {
             setSelectedTutor(null);
-            setValue('tutorName', '', { shouldValidate: true });
+            setValue('tutor_name', '', { shouldValidate: true });
           }}
-          error={errors.tutorName?.message}
+          error={errors.tutor_name?.message}
           emptyMessage="Nenhum tutor encontrado"
         />
 
@@ -337,12 +353,13 @@ export function AddEventModal({
           )}
         />
         <div className="flex justify-end gap-2 pt-1">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
           </Button>
           <Button
             type="submit"
-            className="border-teal-600 bg-teal-600 text-white hover:bg-teal-700"
+            loading={saving}
+            className="border-teal-800 dark:border-teal-500 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             {isEditing ? 'Salvar alterações' : 'Salvar evento'}
           </Button>

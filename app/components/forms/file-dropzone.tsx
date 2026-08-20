@@ -1,6 +1,7 @@
 'use client';
 
 import { FileText, Upload } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useRef, useState } from 'react';
 
 import { FieldShell } from '../forms/field-shell';
@@ -26,16 +27,17 @@ export function FileDropzone({
 }: FileDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   return (
     <FieldShell label={label} required={required} error={error}>
       <div
-        className={`relative cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+        className={`relative cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors duration-200 ${
           isDragging
-            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20'
+            ? 'border-teal-800 dark:border-teal-500 bg-stone-100 dark:bg-stone-800'
             : file
-              ? 'border-teal-400 bg-teal-50/50 dark:bg-teal-900/10'
-              : 'border-slate-300 hover:border-teal-400 hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700/50'
+              ? 'border-teal-800/50 dark:border-teal-500/50 bg-stone-100/60 dark:bg-stone-800/60'
+              : 'border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-teal-800/50 dark:hover:border-teal-500/50 hover:bg-stone-100/60 dark:hover:bg-stone-800/60'
         }`}
         onClick={() => inputRef.current?.click()}
         onDragOver={(event) => {
@@ -57,37 +59,52 @@ export function FileDropzone({
           onChange={(event) => onFileSelect(event.target.files?.[0] ?? null)}
         />
 
-        {file ? (
-          <div className="flex items-center justify-center gap-3">
-            <FileText
-              size={24}
-              className="shrink-0 text-teal-600 dark:text-teal-400"
-            />
-            <div className="min-w-0 text-left">
-              <p className="truncate text-sm font-medium text-teal-800 dark:text-teal-300">
-                {file.name}
+        <AnimatePresence mode="wait" initial={false}>
+          {file ? (
+            <motion.div
+              key="selected-file"
+              initial={reducedMotion ? false : { opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={reducedMotion ? {} : { opacity: 0, scale: 0.96 }}
+              transition={{ duration: reducedMotion ? 0 : 0.2 }}
+              className="flex items-center justify-center gap-3"
+            >
+              <FileText
+                size={24}
+                className="shrink-0 text-teal-800 dark:text-teal-500"
+              />
+              <div className="min-w-0 text-left">
+                <p className="truncate text-sm font-semibold text-stone-800 dark:text-stone-100">
+                  {file.name}
+                </p>
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  {(file.size / 1024 / 1024).toFixed(2)} MB · Clique para trocar
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty-file"
+              initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reducedMotion ? {} : { opacity: 0, y: -6 }}
+              transition={{ duration: reducedMotion ? 0 : 0.2 }}
+            >
+              <Upload
+                size={24}
+                className="mx-auto mb-2 text-stone-500 dark:text-stone-400"
+              />
+              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+                Arraste o arquivo aqui ou clique para selecionar
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {(file.size / 1024 / 1024).toFixed(2)} MB · Clique para trocar
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <Upload
-              size={24}
-              className="mx-auto mb-2 text-slate-400 dark:text-slate-500"
-            />
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Arraste o arquivo aqui ou clique para selecionar
-            </p>
-            {helperText && (
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                {helperText}
-              </p>
-            )}
-          </>
-        )}
+              {helperText && (
+                <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+                  {helperText}
+                </p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </FieldShell>
   );

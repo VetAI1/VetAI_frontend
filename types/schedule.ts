@@ -6,11 +6,16 @@ export interface ScheduleEvent {
   title: string;
   description?: string;
   date: string; // YYYY-MM-DD
-  startTime: string; // HH:mm
-  endTime?: string; // HH:mm
+  start_time: string; // HH:mm
+  end_time?: string; // HH:mm
   type: EventType;
-  patientName?: string;
-  tutorName?: string;
+  patient_name?: string;
+  tutor_name?: string;
+}
+
+export interface ScheduleDateRange {
+  from: string;
+  to: string;
 }
 
 export const EVENT_TYPE_MAP: Record<
@@ -19,21 +24,21 @@ export const EVENT_TYPE_MAP: Record<
 > = {
   consultation: {
     label: 'Consulta',
-    color: 'text-blue-700 dark:text-blue-300',
-    bg: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800',
-    dot: 'bg-blue-500',
+    color: 'text-sky-700 dark:text-sky-500',
+    bg: 'bg-sky-50 dark:bg-sky-900 border-sky-700/30 dark:border-sky-500/30',
+    dot: 'bg-sky-700 dark:bg-sky-500',
   },
   surgery: {
     label: 'Cirurgia',
-    color: 'text-red-700 dark:text-red-300',
-    bg: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800',
-    dot: 'bg-red-500',
+    color: 'text-red-600 dark:text-red-500',
+    bg: 'bg-red-50 dark:bg-red-900 border-red-600/30 dark:border-red-500/30',
+    dot: 'bg-red-600 dark:bg-red-500',
   },
   vaccine: {
     label: 'Vacina',
-    color: 'text-green-700 dark:text-green-300',
-    bg: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800',
-    dot: 'bg-green-500',
+    color: 'text-emerald-700 dark:text-emerald-500',
+    bg: 'bg-emerald-50 dark:bg-emerald-900 border-emerald-700/30 dark:border-emerald-500/30',
+    dot: 'bg-emerald-700 dark:bg-emerald-500',
   },
   exam: {
     label: 'Exame',
@@ -43,8 +48,8 @@ export const EVENT_TYPE_MAP: Record<
   },
   other: {
     label: 'Outro',
-    color: 'text-slate-700 dark:text-slate-300',
-    bg: 'bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600',
-    dot: 'bg-slate-500',
+    color: 'text-stone-800 dark:text-stone-100',
+    bg: 'bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-800',
+    dot: 'bg-stone-500/60 dark:bg-stone-400/60',
   },
 };

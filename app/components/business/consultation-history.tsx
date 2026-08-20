@@ -14,6 +14,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 
 import { Badge } from '@/app/components/common/badge';
+import { useModal } from '@/contexts/modal-context';
 import { consultationsService } from '@/services/consultations.service';
 import type { Consultation } from '@/types/consultation';
 import { normalizeProb } from '@/utils/date-format';
@@ -22,11 +23,164 @@ interface ConsultationHistoryProps {
   onClose: () => void;
 }
 
+interface ConsultationDetailProps {
+  consultation: Consultation;
+  onClose: () => void;
+}
+
+const formatDate = (date: string) =>
+  new Date(date).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+function ConsultationDetail({ consultation, onClose }: ConsultationDetailProps) {
+  return (
+    <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white dark:bg-stone-900 shadow-2xl">
+      <div className="flex shrink-0 items-center justify-between border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+        <div>
+          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+            Detalhes da Consulta
+          </h2>
+          <p className="text-xs text-stone-500 dark:text-stone-400">
+            {formatDate(consultation.started_at)}
+            {consultation.finished_at &&
+              ` - ${formatDate(consultation.finished_at)}`}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800"
+          aria-label="Fechar"
+        >
+          <X size={18} className="text-stone-500 dark:text-stone-400" />
+        </button>
+      </div>
+
+      <div className="flex-1 space-y-5 overflow-y-auto p-5">
+        {consultation.diagnosis?.summary && (
+          <div className="rounded-lg border border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10 p-4">
+            <h3 className="mb-1 text-sm font-semibold text-teal-800 dark:text-teal-500">Resumo</h3>
+            <p className="text-sm text-teal-800 dark:text-teal-500">
+              {consultation.diagnosis.summary}
+            </p>
+          </div>
+        )}
+
+        {consultation.diagnosis?.diseases?.length > 0 && (
+          <div>
+            <h3 className="mb-2 text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Diagnósticos
+            </h3>
+            <div className="space-y-2">
+              {consultation.diagnosis.diseases.map((d, i) => {
+                const isSelected =
+                  consultation.diagnosis?.selectedDiseaseName === d.name;
+                return (
+                  <div
+                    key={i}
+                    className={`flex items-center justify-between rounded-lg border p-3 ${
+                      isSelected
+                        ? 'border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10'
+                        : 'border-stone-200 dark:border-stone-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {isSelected ? (
+                        <Star
+                          size={14}
+                          className="text-teal-800 dark:text-teal-500"
+                          fill="currentColor"
+                        />
+                      ) : (
+                        <AlertCircle
+                          size={14}
+                          className={
+                            d.severity === 'red'
+                              ? 'text-red-600 dark:text-red-500'
+                              : d.severity === 'yellow'
+                                ? 'text-amber-600 dark:text-amber-400'
+                                : 'text-emerald-700 dark:text-emerald-500'
+                          }
+                        />
+                      )}
+                      <span className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                        {d.name}
+                      </span>
+                      {isSelected && (
+                        <span className="text-xs font-medium text-teal-800 dark:text-teal-500">
+                          (selecionada)
+                        </span>
+                      )}
+                    </div>
+                    <Badge color={d.severity}>{normalizeProb(d.probability)}%</Badge>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {consultation.diagnosis?.suggestedTreatments?.length > 0 && (
+          <div>
+            <h3 className="mb-2 text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Tratamentos sugeridos
+            </h3>
+            <div className="space-y-2">
+              {consultation.diagnosis.suggestedTreatments.map((t, i) => (
+                <div key={i} className="rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 p-3">
+                  <p className="text-sm text-stone-500 dark:text-stone-400">{t}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <h3 className="mb-2 text-sm font-semibold text-stone-900 dark:text-stone-100">Mensagens</h3>
+          <div className="max-h-[400px] space-y-3 overflow-y-auto rounded-lg bg-stone-100 dark:bg-stone-800 p-3">
+            {consultation.messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+              >
+                <div
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+                    msg.role === 'user' ? 'bg-teal-800 dark:bg-teal-500' : 'bg-stone-100 dark:bg-stone-800'
+                  }`}
+                >
+                  {msg.role === 'user' ? (
+                    <User size={12} className="text-white" />
+                  ) : (
+                    <Bot size={12} className="text-white" />
+                  )}
+                </div>
+                <div
+                  className={`max-w-[80%] rounded-lg p-2.5 text-sm ${
+                    msg.role === 'user'
+                      ? 'bg-teal-800 dark:bg-teal-500 text-white'
+                      : 'border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100'
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedConsultation, setSelectedConsultation] =
-    useState<Consultation | null>(null);
+  const { open } = useModal();
 
   const fetchConsultations = useCallback(async () => {
     setIsLoading(true);
@@ -48,273 +202,100 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
     void fetchConsultations();
   }, [fetchConsultations]);
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (selectedConsultation) {
-          setSelectedConsultation(null);
-        } else {
-          onClose();
-        }
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose, selectedConsultation]);
-
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+  const openConsultationDetail = (consultation: Consultation) => {
+    open({
+      content: ({ close }) => (
+        <ConsultationDetail consultation={consultation} onClose={close} />
+      ),
     });
-
-  if (selectedConsultation) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-          onClick={() => setSelectedConsultation(null)}
-        />
-        <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-          <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-5 flex items-center justify-between z-10">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Detalhes da Consulta
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {formatDate(selectedConsultation.started_at)}
-                {selectedConsultation.finished_at &&
-                  ` — ${formatDate(selectedConsultation.finished_at)}`}
-              </p>
-            </div>
-            <button
-              onClick={() => setSelectedConsultation(null)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
-            >
-              <X size={18} className="text-slate-500" />
-            </button>
-          </div>
-
-          <div className="overflow-y-auto flex-1 p-5 space-y-5">
-            {selectedConsultation.diagnosis?.summary && (
-              <div className="p-4 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg">
-                <h3 className="text-sm font-semibold text-teal-800 dark:text-teal-200 mb-1">
-                  Resumo
-                </h3>
-                <p className="text-sm text-teal-700 dark:text-teal-300">
-                  {selectedConsultation.diagnosis.summary}
-                </p>
-              </div>
-            )}
-
-            {selectedConsultation.diagnosis?.diseases?.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                  Diagnósticos
-                </h3>
-                <div className="space-y-2">
-                  {selectedConsultation.diagnosis.diseases.map((d, i) => {
-                    const isSelected =
-                      selectedConsultation.diagnosis?.selectedDiseaseName ===
-                      d.name;
-                    return (
-                      <div
-                        key={i}
-                        className={`flex items-center justify-between p-3 border rounded-lg ${
-                          isSelected
-                            ? 'border-teal-400 dark:border-teal-600 bg-teal-50/50 dark:bg-teal-900/10'
-                            : 'border-slate-200 dark:border-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          {isSelected ? (
-                            <Star
-                              size={14}
-                              className="text-teal-600 dark:text-teal-400"
-                              fill="currentColor"
-                            />
-                          ) : (
-                            <AlertCircle
-                              size={14}
-                              className={
-                                d.severity === 'red'
-                                  ? 'text-red-500'
-                                  : d.severity === 'yellow'
-                                    ? 'text-yellow-500'
-                                    : 'text-green-500'
-                              }
-                            />
-                          )}
-                          <span className="text-sm font-medium text-slate-900 dark:text-white">
-                            {d.name}
-                          </span>
-                          {isSelected && (
-                            <span className="text-xs text-teal-600 dark:text-teal-400 font-medium">
-                              (selecionada)
-                            </span>
-                          )}
-                        </div>
-                        <Badge color={d.severity}>
-                          {normalizeProb(d.probability)}%
-                        </Badge>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {selectedConsultation.diagnosis?.suggestedTreatments?.length >
-              0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                  Tratamentos sugeridos
-                </h3>
-                <div className="space-y-2">
-                  {selectedConsultation.diagnosis.suggestedTreatments.map(
-                    (t, i) => (
-                      <div
-                        key={i}
-                        className="p-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg"
-                      >
-                        <p className="text-sm text-slate-700 dark:text-slate-300">
-                          {t}
-                        </p>
-                      </div>
-                    ),
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                Mensagens
-              </h3>
-              <div className="space-y-3 max-h-[400px] overflow-y-auto p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
-                {selectedConsultation.messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-                  >
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                        msg.role === 'user' ? 'bg-teal-600' : 'bg-slate-600'
-                      }`}
-                    >
-                      {msg.role === 'user' ? (
-                        <User size={12} className="text-white" />
-                      ) : (
-                        <Bot size={12} className="text-white" />
-                      )}
-                    </div>
-                    <div
-                      className={`max-w-[80%] p-2.5 rounded-lg text-sm ${
-                        msg.role === 'user'
-                          ? 'bg-teal-600 text-white'
-                          : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-        <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-5 flex items-center justify-between z-10">
-          <div className="flex items-center gap-2">
-            <History size={20} className="text-teal-600" />
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Histórico de consultas
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
-          >
-            <X size={18} className="text-slate-500" />
-          </button>
+    <div className="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white dark:bg-stone-900 shadow-2xl">
+      <div className="flex shrink-0 items-center justify-between border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+        <div className="flex items-center gap-2">
+          <History size={20} className="text-teal-800 dark:text-teal-500" />
+          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+            Histórico de consultas
+          </h2>
         </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800"
+          aria-label="Fechar"
+        >
+          <X size={18} className="text-stone-500 dark:text-stone-400" />
+        </button>
+      </div>
 
-        <div className="overflow-y-auto flex-1 p-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 size={24} className="animate-spin text-teal-600" />
-            </div>
-          ) : consultations.length === 0 ? (
-            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-              <History size={32} className="mx-auto mb-2 opacity-50" />
-              <p className="text-sm">Nenhuma consulta realizada ainda.</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {consultations.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedConsultation(c)}
-                  className="w-full text-left p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge
-                          color={c.status === 'COMPLETED' ? 'green' : 'blue'}
-                        >
-                          {c.status === 'COMPLETED'
-                            ? 'Finalizada'
-                            : 'Em andamento'}
-                        </Badge>
-                        {c.diagnosis?.diseases?.length > 0 && (
-                          <span className="text-xs text-slate-500 dark:text-slate-400">
-                            {c.diagnosis.diseases.length} diagnóstico(s)
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                        <Clock size={12} />
-                        <span>{formatDate(c.started_at)}</span>
-                      </div>
-                      {c.diagnosis?.selectedDiseaseName && (
-                        <div className="flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400 mt-1">
-                          <Star size={10} fill="currentColor" />
-                          <span className="font-medium">
-                            {c.diagnosis.selectedDiseaseName}
-                          </span>
-                        </div>
+      <div className="flex-1 overflow-y-auto p-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 size={24} className="animate-spin text-teal-800 dark:text-teal-500" />
+          </div>
+        ) : consultations.length === 0 ? (
+          <div className="py-12 text-center text-stone-500 dark:text-stone-400">
+            <History size={32} className="mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Nenhuma consulta realizada ainda.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {consultations.map((consultation) => (
+              <button
+                key={consultation.id}
+                type="button"
+                onClick={() => openConsultationDetail(consultation)}
+                className="group w-full rounded-lg border border-stone-200 dark:border-stone-800 p-4 text-left transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
+              >
+                <span className="flex items-center justify-between">
+                  <span className="min-w-0 flex-1">
+                    <span className="mb-1 flex items-center gap-2">
+                      <Badge
+                        color={
+                          consultation.status === 'COMPLETED' ? 'green' : 'blue'
+                        }
+                      >
+                        {consultation.status === 'COMPLETED'
+                          ? 'Finalizada'
+                          : 'Em andamento'}
+                      </Badge>
+                      {consultation.diagnosis?.diseases?.length > 0 && (
+                        <span className="text-xs text-stone-500 dark:text-stone-400">
+                          {consultation.diagnosis.diseases.length} diagnóstico(s)
+                        </span>
                       )}
-                      {c.diagnosis?.diseases?.length > 0 &&
-                        !c.diagnosis?.selectedDiseaseName && (
-                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 truncate">
-                          {c.diagnosis.diseases.map((d) => d.name).join(', ')}
-                        </p>
-                      )}
-                    </div>
-                    <ChevronRight
-                      size={16}
-                      className="text-slate-400 group-hover:text-teal-600 transition-colors shrink-0 ml-2"
-                    />
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+                      <Clock size={12} />
+                      <span>{formatDate(consultation.started_at)}</span>
+                    </span>
+                    {consultation.diagnosis?.selectedDiseaseName && (
+                      <span className="mt-1 flex items-center gap-1 text-xs text-teal-800 dark:text-teal-500">
+                        <Star size={10} fill="currentColor" />
+                        <span className="font-medium">
+                          {consultation.diagnosis.selectedDiseaseName}
+                        </span>
+                      </span>
+                    )}
+                    {consultation.diagnosis?.diseases?.length > 0 &&
+                      !consultation.diagnosis.selectedDiseaseName && (
+                      <span className="mt-1 block truncate text-xs text-stone-500 dark:text-stone-400">
+                        {consultation.diagnosis.diseases
+                          .map((disease) => disease.name)
+                          .join(', ')}
+                      </span>
+                    )}
+                  </span>
+                  <ChevronRight
+                    size={16}
+                    className="ml-2 shrink-0 text-stone-500/70 dark:text-stone-400/70 transition-colors group-hover:text-teal-800 dark:group-hover:text-teal-500"
+                  />
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

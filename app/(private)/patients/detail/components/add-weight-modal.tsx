@@ -141,7 +141,7 @@ export function AddWeightModal({
           <Button
             type="submit"
             disabled={saving}
-            className="bg-teal-600 text-white hover:bg-teal-700"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : 'Salvar'}
           </Button>

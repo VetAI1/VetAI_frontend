@@ -41,6 +41,7 @@ export function useAuthProvider() {
   }, [clearSession]);
 
   useEffect(() => {
+    if (state.isAuthenticated) return;
     void refreshAccessToken()
       .then(({ user }) => {
         setState({ user, isLoading: false, isAuthenticated: true });
@@ -48,7 +49,7 @@ export function useAuthProvider() {
       .catch(() => {
         clearSession();
       });
-  }, [clearSession]);
+  }, [clearSession, state.isAuthenticated]);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -91,6 +92,17 @@ export function useAuthProvider() {
     setState((previous) => ({ ...previous, user }));
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    const user = await authService.me();
+    setState((previous) => ({
+      ...previous,
+      user,
+      isLoading: false,
+      isAuthenticated: true,
+    }));
+    return user;
+  }, []);
+
   const can = useCallback(
     (permission: string): boolean => {
       if (!state.user) return false;
@@ -107,7 +119,7 @@ export function useAuthProvider() {
     [state.user],
   );
 
-  return { ...state, login, register, logout, updateUser, can };
+  return { ...state, login, register, logout, updateUser, refreshUser, can };
 }
 
 interface AuthState {
@@ -121,6 +133,7 @@ interface AuthContextType extends AuthState {
   register: (data: Parameters<typeof authService.register>[0]) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: User) => void;
+  refreshUser: () => Promise<User>;
   can: (permission: string) => boolean;
 }
 

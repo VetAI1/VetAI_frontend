@@ -161,25 +161,25 @@ function CalendarDropdown({
         e.preventDefault();
         e.stopPropagation();
       }}
-      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-slate-900/60 p-3 animate-in fade-in-0 zoom-in-95 duration-150"
+      className="animate-in rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3 text-stone-900 dark:text-stone-100 shadow-[var(--shadow-card)] fade-in-0 zoom-in-95 duration-150"
     >
       <div className="flex items-center justify-between mb-3 px-1">
         <button
           type="button"
           onClick={prevMonth}
-          className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+          className="rounded-md p-1 text-stone-500 dark:text-stone-400 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-teal-800 dark:hover:text-teal-500"
         >
           <ChevronLeft size={16} />
         </button>
 
-        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 select-none">
+        <span className="select-none text-sm font-semibold text-stone-900 dark:text-stone-100">
           {MONTHS[viewMonth]} {viewYear}
         </span>
 
         <button
           type="button"
           onClick={nextMonth}
-          className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+          className="rounded-md p-1 text-stone-500 dark:text-stone-400 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-teal-800 dark:hover:text-teal-500"
         >
           <ChevronRight size={16} />
         </button>
@@ -189,7 +189,7 @@ function CalendarDropdown({
         {DAYS_SHORT.map((d) => (
           <div
             key={d}
-            className="text-center text-[11px] font-medium text-slate-400 dark:text-slate-500 py-1 select-none"
+            className="select-none py-1 text-center text-[11px] font-medium text-stone-500 dark:text-stone-400"
           >
             {d}
           </div>
@@ -219,10 +219,10 @@ function CalendarDropdown({
               className={cn(
                 'mx-auto flex h-8 w-8 items-center justify-center rounded-full text-sm transition-all duration-100 select-none',
                 isSelected
-                  ? 'bg-teal-500 text-white font-semibold shadow-sm shadow-teal-300 dark:shadow-teal-900'
+                  ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 font-semibold shadow-[var(--shadow-brand)]'
                   : isToday
-                    ? 'bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 font-semibold ring-1 ring-teal-400 dark:ring-teal-600'
-                    : 'text-slate-700 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-900/30 hover:text-teal-700 dark:hover:text-teal-300',
+                    ? 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100 font-semibold ring-1 ring-teal-600/35 dark:ring-teal-500/35'
+                    : 'text-stone-900 dark:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-800 dark:hover:text-stone-100',
               )}
             >
               {day}
@@ -231,21 +231,21 @@ function CalendarDropdown({
         })}
       </div>
 
-      <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+      <div className="mt-3 flex items-center justify-between border-t border-stone-200 dark:border-stone-800 pt-2.5">
         <button
           type="button"
           onClick={() => {
             onSelect('');
             onClose();
           }}
-          className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-1"
+          className="px-1 text-xs text-stone-500 dark:text-stone-400 transition-colors hover:text-stone-900 dark:hover:text-stone-100"
         >
           Limpar
         </button>
         <button
           type="button"
           onClick={goToToday}
-          className="text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors px-1"
+          className="px-1 text-xs font-semibold text-teal-800 dark:text-teal-500 transition-colors hover:text-teal-800/70 dark:hover:text-teal-500/70"
         >
           Hoje
         </button>
@@ -333,10 +333,10 @@ function DateInputInner({
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block"
+          className="mb-2 block text-sm font-semibold tracking-[-0.01em] text-stone-900 dark:text-stone-100"
         >
           {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
+          {required && <span className="text-red-600 dark:text-red-500 ml-0.5">*</span>}
         </label>
       )}
       <div className="relative" ref={containerRef}>
@@ -349,10 +349,10 @@ function DateInputInner({
           maxLength={10}
           disabled={disabled}
           className={cn(
-            'w-full px-3 py-2.5 pr-10 text-sm border rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors',
+            'w-full rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 pr-10 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-500 dark:placeholder:text-stone-400 transition-colors duration-200 hover:border-teal-800/35 dark:hover:border-teal-500/35 focus:border-teal-800 dark:focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-600/30 dark:focus:ring-teal-500/30',
             error
-              ? 'border-red-400 dark:border-red-500 focus:ring-red-500 focus:border-red-500'
-              : 'border-slate-200 dark:border-slate-600',
+              ? 'border-red-600 dark:border-red-500 bg-red-600/5 dark:bg-red-500/5 focus:border-red-600 dark:focus:border-red-500 focus:ring-red-600/20 dark:focus:ring-red-500/20'
+              : '',
             disabled && 'opacity-60 cursor-not-allowed',
             className,
           )}
@@ -365,8 +365,8 @@ function DateInputInner({
           className={cn(
             'absolute right-3 top-1/2 -translate-y-1/2 transition-colors disabled:cursor-not-allowed',
             open
-              ? 'text-teal-600 dark:text-teal-400'
-              : 'text-slate-400 hover:text-teal-600 dark:hover:text-teal-400',
+              ? 'text-teal-800 dark:text-teal-500'
+              : 'text-stone-500 dark:text-stone-400 hover:text-teal-800 dark:hover:text-teal-500',
           )}
         >
           <Calendar size={15} />
@@ -388,7 +388,7 @@ function DateInputInner({
         )}
 
       {error && (
-        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{error}</p>
+        <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-500">{error}</p>
       )}
     </div>
   );

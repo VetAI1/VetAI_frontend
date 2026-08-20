@@ -168,8 +168,8 @@ export default function AdminSubscriptionPage() {
       key: 'operation',
       header: 'Operação',
       render: (item) => (
-        <div className="flex items-center gap-2 font-medium text-slate-900 dark:text-white">
-          <Sparkles className="h-4 w-4 text-teal-500" />
+        <div className="flex items-center gap-2 font-medium text-stone-900 dark:text-stone-100">
+          <Sparkles className="h-4 w-4 text-teal-800 dark:text-teal-500" />
           <span>
             {AI_OPERATION_LABELS[item.operation] ?? 'Processamento IA'}
           </span>
@@ -180,7 +180,7 @@ export default function AdminSubscriptionPage() {
       key: 'charged_credits',
       header: 'Créditos',
       render: (item) => (
-        <span className="font-semibold text-slate-800 dark:text-slate-200">
+        <span className="font-semibold text-stone-900 dark:text-stone-100">
           {item.charged_credits || item.reserved_credits || 0}
         </span>
       ),
@@ -189,7 +189,7 @@ export default function AdminSubscriptionPage() {
       key: 'created_at',
       header: 'Data/Hora',
       render: (item) => (
-        <span className="text-slate-500 text-xs dark:text-slate-400">
+        <span className="text-xs text-stone-500 dark:text-stone-400">
           {formatDateTime(item.created_at)}
         </span>
       ),
@@ -225,290 +225,317 @@ export default function AdminSubscriptionPage() {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6 pb-12">
-      <Header
-        title="Plano & Assinatura"
-        showStorage={false}
-        headerAction={
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void loadData(true)}
-            disabled={loading || refreshing}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw
-              size={16}
-              className={refreshing ? 'animate-spin' : ''}
-            />
-            Atualizar
-          </Button>
-        }
-      />
+    <div className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+        <Header
+          title="Plano & Assinatura"
+          showStorage={false}
+          headerAction={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void loadData(true)}
+              disabled={loading || refreshing}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw
+                size={16}
+                className={refreshing ? 'animate-spin' : ''}
+              />
+              Atualizar
+            </Button>
+          }
+        />
 
-      {loading ? (
-        <div className="space-y-6">
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
-            <Skeleton className="h-6 w-40" />
-            <div className="grid gap-6 md:grid-cols-3 pt-2">
-              <Skeleton className="h-28 w-full rounded-lg" />
-              <Skeleton className="h-28 w-full rounded-lg" />
-              <Skeleton className="h-28 w-full rounded-lg" />
+        {loading ? (
+          <div className="space-y-6">
+            <SectionCard title={<Skeleton className="h-6 w-40" />}>
+              <div className="grid gap-4 pt-2 md:grid-cols-3">
+                <Skeleton className="h-28 w-full rounded-lg" />
+                <Skeleton className="h-28 w-full rounded-lg" />
+                <Skeleton className="h-28 w-full rounded-lg" />
+              </div>
+            </SectionCard>
+            <div className="grid gap-4 md:grid-cols-2">
+              <SectionCard title={<Skeleton className="h-6 w-48" />}>
+                <Skeleton className="h-16 w-full rounded-lg" />
+              </SectionCard>
+              <SectionCard title={<Skeleton className="h-6 w-48" />}>
+                <Skeleton className="h-16 w-full rounded-lg" />
+              </SectionCard>
             </div>
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-16 w-full rounded-lg" />
-            </div>
-            <div className="rounded-lg bg-white p-4 shadow dark:bg-slate-800 sm:p-6 space-y-4">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-16 w-full rounded-lg" />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* BANNER SE ESTIVER CANCELADA */}
-          {subscription?.status === 'canceled' && (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-6 shadow-sm dark:border-red-900/50 dark:bg-red-950/30">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        ) : (
+          <>
+            {/* BANNER SE ESTIVER CANCELADA */}
+            {subscription?.status === 'canceled' && (
+              <div className="rounded-lg border border-red-600/30 dark:border-red-500/30 bg-red-50 dark:bg-red-900 p-5 sm:p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="rounded-full bg-red-50 dark:bg-red-900 p-2.5 text-red-600 dark:text-red-500">
+                      <XCircle className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-red-600 dark:text-red-500">
+                        Assinatura Cancelada
+                      </h3>
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-500">
+                        {subscription.canceledAt && (
+                          <span>
+                            Solicitação efetuada em{' '}
+                            <strong>
+                              {formatDate(subscription.canceledAt)}
+                            </strong>
+                            .{' '}
+                          </span>
+                        )}
+                        O acesso ao sistema está bloqueado. Regularize
+                        pendências e assine novamente para voltar a usar o
+                        VetAI.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* BANNER SE ESTIVER TRIALING */}
+            {subscription?.status === 'trialing' && (
+              <div className="rounded-lg border border-sky-700/30 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-900 p-5 sm:p-6">
                 <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-red-100 p-2.5 text-red-600 dark:bg-red-900/40 dark:text-red-400">
-                    <XCircle className="h-6 w-6" />
+                  <div className="rounded-full bg-sky-50 dark:bg-sky-900 p-2.5 text-sky-700 dark:text-sky-500">
+                    <Info className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-red-900 dark:text-red-200">
-                      Assinatura Cancelada
+                    <h3 className="text-base font-bold text-sky-700 dark:text-sky-500">
+                      Período de Teste Gratuito (Trial)
                     </h3>
-                    <p className="mt-1 text-sm text-red-700 dark:text-red-300">
-                      {subscription.canceledAt && (
-                        <span>
-                          Solicitação efetuada em{' '}
-                          <strong>{formatDate(subscription.canceledAt)}</strong>.{' '}
-                        </span>
-                      )}
-                      O acesso ao sistema está bloqueado. Regularize pendências e assine novamente para voltar a usar o VetAI.
+                    <p className="mt-1 text-sm text-sky-700 dark:text-sky-500">
+                      Aproveite todos os recursos do plano. O período de teste
+                      encerra em{' '}
+                      <strong>
+                        {formatDate(
+                          subscription.currentPeriodEnd ||
+                            subscription.nextRenewalAt,
+                        )}
+                      </strong>
+                      .
                     </p>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* BANNER SE ESTIVER TRIALING */}
-          {subscription?.status === 'trialing' && (
-            <div className="rounded-xl border border-blue-200 bg-blue-50 p-6 shadow-sm dark:border-blue-900/50 dark:bg-blue-950/30">
-              <div className="flex items-start gap-4">
-                <div className="rounded-full bg-blue-100 p-2.5 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
-                  <Info className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-blue-900 dark:text-blue-200">
-                    Período de Teste Gratuito (Trial)
-                  </h3>
-                  <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                    Aproveite todos os recursos do plano. O período de teste encerra em{' '}
-                    <strong>{formatDate(subscription.currentPeriodEnd || subscription.nextRenewalAt)}</strong>.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* DETALHES DA ASSINATURA ATUAL */}
-          <SectionCard
-            title="Assinatura Atual"
-            subtitle="Informações sobre o plano contratado e faturamento"
-            headerAction={
-              subscription?.status !== 'canceled' && canPay ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsCancelModalOpen(true)}
-                  className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/40"
-                >
-                  Cancelar Plano
-                </Button>
-              ) : null
-            }
-          >
-            <div className="grid gap-6 md:grid-cols-3">
-              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
-                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <Crown size={15} className="text-amber-500" /> Plano Atual
-                </span>
-                <span className="text-xl font-bold text-slate-900 dark:text-white">
-                  {currentPlan?.name || 'Plano Personalizado'}
-                </span>
-                <span className="text-sm text-slate-500 dark:text-slate-400">
-                  {currentPlan?.basePrice || currentPlan?.monthlyPrice
-                    ? `${formatCurrency(currentPlan.basePrice ?? currentPlan.monthlyPrice ?? 0)} / mês`
-                    : 'Consulte suporte'}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
-                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <CheckCircle2 size={15} className="text-teal-500" /> Status da Assinatura
-                </span>
-                <div className="flex items-center gap-2 mt-1">
-                  {getStatusBadge(subscription?.status)}
-                </div>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  {subscription?.status === 'canceled'
-                    ? 'Acesso bloqueado até uma nova assinatura'
-                    : 'Renovação automática ativada'}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-700/30">
-                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <Calendar size={15} className="text-blue-500" /> Data de Renovação / Vigência
-                </span>
-                <span className="text-xl font-bold text-slate-900 dark:text-white">
-                  {formatDate(
-                    subscription?.nextRenewalAt || subscription?.currentPeriodEnd,
-                  )}
-                </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  Ciclo atual: {formatDate(subscription?.currentPeriodStart)} até{' '}
-                  {formatDate(subscription?.currentPeriodEnd)}
-                </span>
-              </div>
-            </div>
-          </SectionCard>
-
-          {/* RESUMO DOS USOS (KPIS) */}
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* ASSENTOS / COLABORADORES */}
+            {/* DETALHES DA ASSINATURA ATUAL */}
             <SectionCard
-              title="Assentos de Colaboradores"
-              subtitle="Usuários ativos cadastrados no sistema"
-            >
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-teal-500/10 p-3 text-teal-600 dark:text-teal-400">
-                      <Users size={22} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                        Assentos em Uso
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {collaboratorsCount} <span className="text-sm font-normal text-slate-500">/ {totalSeats}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-teal-600 dark:text-teal-400">
-                    {seatsUsagePercent}%
-                  </span>
-                </div>
-
-                <Progress value={seatsUsagePercent} className="h-3" />
-
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                  <span>Plano Base: {userLimit} assentos</span>
-                  <span>Adicionais: {additionalSeats} assentos</span>
-                </div>
-
-                {collaboratorsCount >= totalSeats && (
-                  <div className="flex items-center gap-2 rounded-lg bg-amber-50 p-2.5 text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
-                    <AlertTriangle size={16} className="shrink-0" />
-                    <span>
-                      Você atingiu o limite de assentos contratados no seu plano.
-                    </span>
-                  </div>
-                )}
-              </div>
-            </SectionCard>
-
-            {/* CRÉDITOS DE IA */}
-            <SectionCard
-              title="Créditos de Inteligência Artificial"
-              subtitle="Consumo de créditos para análises e diagnósticos"
+              title="Assinatura Atual"
+              subtitle="Informações sobre o plano contratado e faturamento"
               headerAction={
-                canPay ? (
+                subscription?.status !== 'canceled' && canPay ? (
                   <Button
+                    variant="outline"
                     size="sm"
-                    asChild
-                    className="bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-1.5"
+                    onClick={() => setIsCancelModalOpen(true)}
+                    className="border-red-600/30 dark:border-red-500/30 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-600 dark:hover:text-red-500"
                   >
-                    <Link href="/admin/subscription/buy-credits">
-                      <Sparkles size={14} />
-                      Comprar Créditos
-                    </Link>
+                    Cancelar Plano
                   </Button>
                 ) : null
               }
             >
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-indigo-500/10 p-3 text-indigo-600 dark:text-indigo-400">
-                      <Bot size={22} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                        Créditos Consumidos
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {usedCredits.toLocaleString('pt-BR')}{' '}
-                        <span className="text-sm font-normal text-slate-500">
-                          / {totalCredits.toLocaleString('pt-BR')}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                    {creditsUsagePercent}%
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="flex flex-col gap-1.5 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 p-4">
+                  <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                    <Crown size={15} className="text-amber-500 dark:text-amber-400" /> Plano Atual
+                  </span>
+                  <span className="text-xl font-bold text-stone-900 dark:text-stone-100">
+                    {currentPlan?.name || 'Plano Personalizado'}
+                  </span>
+                  <span className="text-sm text-stone-500 dark:text-stone-400">
+                    {currentPlan?.basePrice || currentPlan?.monthlyPrice
+                      ? `${formatCurrency(currentPlan.basePrice ?? currentPlan.monthlyPrice ?? 0)} / mês`
+                      : 'Consulte suporte'}
                   </span>
                 </div>
 
-                <Progress value={creditsUsagePercent} className="h-3" />
+                <div className="flex flex-col gap-1.5 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 p-4">
+                  <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                    <CheckCircle2 size={15} className="text-teal-800 dark:text-teal-500" /> Status
+                    da Assinatura
+                  </span>
+                  <div className="flex items-center gap-2 mt-1">
+                    {getStatusBadge(subscription?.status)}
+                  </div>
+                  <span className="text-xs text-stone-500 dark:text-stone-400">
+                    {subscription?.status === 'canceled'
+                      ? 'Acesso bloqueado até uma nova assinatura'
+                      : 'Renovação automática ativada'}
+                  </span>
+                </div>
 
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                  <span>Disponíveis: {availableCredits.toLocaleString('pt-BR')} créditos</span>
-                  <span>Reservados: {(aiCredits?.reservedCredits ?? 0).toLocaleString('pt-BR')}</span>
+                <div className="flex flex-col gap-1.5 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 p-4">
+                  <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                    <Calendar size={15} className="text-sky-700 dark:text-sky-500" /> Data de
+                    Renovação / Vigência
+                  </span>
+                  <span className="text-xl font-bold text-stone-900 dark:text-stone-100">
+                    {formatDate(
+                      subscription?.nextRenewalAt ||
+                        subscription?.currentPeriodEnd,
+                    )}
+                  </span>
+                  <span className="text-xs text-stone-500 dark:text-stone-400">
+                    Ciclo atual: {formatDate(subscription?.currentPeriodStart)}{' '}
+                    até {formatDate(subscription?.currentPeriodEnd)}
+                  </span>
                 </div>
               </div>
             </SectionCard>
-          </div>
 
-          {/* TABELA DE USOS RECENTES DE IA */}
-          <SectionCard
-            title="Usos Recentes de IA"
-            subtitle="Histórico das últimas operações e diagnósticos processados"
-          >
-            {aiUsageList.length === 0 ? (
-              <div className="py-12 text-center text-sm text-slate-500 dark:text-slate-400">
-                Nenhum uso recente de Inteligência Artificial registrado neste período.
-              </div>
-            ) : (
-              <DataTable
-                data={aiUsageList}
-                columns={usageColumns}
-                getRowKey={(item) => item.id}
-              />
-            )}
-          </SectionCard>
-        </>
-      )}
+            {/* RESUMO DOS USOS (KPIS) */}
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* ASSENTOS / COLABORADORES */}
+              <SectionCard
+                title="Assentos de Colaboradores"
+                subtitle="Usuários ativos cadastrados no sistema"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg bg-teal-800/10 dark:bg-teal-500/10 p-3 text-teal-800 dark:text-teal-500">
+                        <Users size={22} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+                          Assentos em Uso
+                        </p>
+                        <p className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                          {collaboratorsCount}{' '}
+                          <span className="text-sm font-normal text-stone-500 dark:text-stone-400">
+                            / {totalSeats}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-teal-800 dark:text-teal-500">
+                      {seatsUsagePercent}%
+                    </span>
+                  </div>
 
-      {/* MODAL CONFIRMAÇÃO DE CANCELAMENTO */}
-      {isCancelModalOpen && (
-        <ConfirmModal
-          title="Cancelar Assinatura"
-          description={`Tem certeza de que deseja cancelar a assinatura do plano ${currentPlan?.name || ''}? Seu acesso ao sistema será bloqueado imediatamente. Para voltar, será necessário regularizar pendências e assinar novamente.`}
-          confirmLabel="Sim, cancelar plano"
-          cancelLabel="Manter plano"
-          variant="danger"
-          loading={canceling}
-          onConfirm={() => void handleCancelSubscription()}
-          onClose={() => setIsCancelModalOpen(false)}
-        />
-      )}
+                  <Progress value={seatsUsagePercent} className="h-3" />
+
+                  <div className="flex items-center justify-between text-xs text-stone-500 dark:text-stone-400">
+                    <span>Plano Base: {userLimit} assentos</span>
+                    <span>Adicionais: {additionalSeats} assentos</span>
+                  </div>
+
+                  {collaboratorsCount >= totalSeats && (
+                    <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900 p-2.5 text-xs text-amber-600 dark:text-amber-400">
+                      <AlertTriangle size={16} className="shrink-0" />
+                      <span>
+                        Você atingiu o limite de assentos contratados no seu
+                        plano.
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </SectionCard>
+
+              {/* CRÉDITOS DE IA */}
+              <SectionCard
+                title="Créditos de Inteligência Artificial"
+                subtitle="Consumo de créditos para análises e diagnósticos"
+                headerAction={
+                  canPay ? (
+                    <Button
+                      size="sm"
+                      asChild
+                      className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 flex items-center gap-1.5"
+                    >
+                      <Link href="/admin/subscription/buy-credits">
+                        <Sparkles size={14} />
+                        Comprar Créditos
+                      </Link>
+                    </Button>
+                  ) : null
+                }
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg bg-teal-800/10 dark:bg-teal-500/10 p-3 text-teal-800 dark:text-teal-500">
+                        <Bot size={22} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+                          Créditos Consumidos
+                        </p>
+                        <p className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                          {usedCredits.toLocaleString('pt-BR')}{' '}
+                          <span className="text-sm font-normal text-stone-500 dark:text-stone-400">
+                            / {totalCredits.toLocaleString('pt-BR')}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-teal-800 dark:text-teal-500">
+                      {creditsUsagePercent}%
+                    </span>
+                  </div>
+
+                  <Progress value={creditsUsagePercent} className="h-3" />
+
+                  <div className="flex items-center justify-between text-xs text-stone-500 dark:text-stone-400">
+                    <span>
+                      Disponíveis: {availableCredits.toLocaleString('pt-BR')}{' '}
+                      créditos
+                    </span>
+                    <span>
+                      Reservados:{' '}
+                      {(aiCredits?.reservedCredits ?? 0).toLocaleString(
+                        'pt-BR',
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </SectionCard>
+            </div>
+
+            {/* TABELA DE USOS RECENTES DE IA */}
+            <SectionCard
+              title="Usos Recentes de IA"
+              subtitle="Histórico das últimas operações e diagnósticos processados"
+            >
+              {aiUsageList.length === 0 ? (
+                <div className="py-12 text-center text-sm text-stone-500 dark:text-stone-400">
+                  Nenhum uso recente de Inteligência Artificial registrado neste
+                  período.
+                </div>
+              ) : (
+                <DataTable
+                  data={aiUsageList}
+                  columns={usageColumns}
+                  getRowKey={(item) => item.id}
+                />
+              )}
+            </SectionCard>
+          </>
+        )}
+
+        {/* MODAL CONFIRMAÇÃO DE CANCELAMENTO */}
+        {isCancelModalOpen && (
+          <ConfirmModal
+            title="Cancelar Assinatura"
+            description={`Tem certeza de que deseja cancelar a assinatura do plano ${currentPlan?.name || ''}? Seu acesso ao sistema será bloqueado imediatamente. Para voltar, será necessário regularizar pendências e assinar novamente.`}
+            confirmLabel="Sim, cancelar plano"
+            cancelLabel="Manter plano"
+            variant="danger"
+            loading={canceling}
+            onConfirm={() => void handleCancelSubscription()}
+            onClose={() => setIsCancelModalOpen(false)}
+          />
+        )}
+      </div>
     </div>
   );
 }

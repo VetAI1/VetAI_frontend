@@ -9,7 +9,8 @@
     "tsc": "tsc --noEmit",
     "format": "eslint --fix",
     "format:check": "eslint",
-    "lint": "eslint"
+    "lint": "eslint",
+    "audit:contrast": "playwright test tests/contrast.spec.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -26,6 +27,7 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.553.0",
+    "motion": "^13.1.0",
     "next": "16.2.4",
     "react": "19.2.0",
     "react-chartjs-2": "^5.2.0",
@@ -38,7 +40,9 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@netlify/plugin-nextjs": "^5.15.9",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

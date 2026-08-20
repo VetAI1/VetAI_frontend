@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Activity,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -11,15 +10,17 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { AuthPanel } from '@/app/components/common/auth-panel';
+import { AuthShell } from '@/app/components/common/auth-shell';
 import { PasswordStrength } from '@/app/components/common/password-strength';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/infra/auth-context';
 import { billingService } from '@/services/billing.service';
 import type { RegisterPayload } from '@/types/auth';
@@ -289,497 +290,517 @@ function RegisterForm() {
   const data = getValues();
 
   return (
-    <div className="flex min-h-screen lg:h-dvh lg:overflow-hidden">
-      <AuthPanel
-        title={isInvite ? 'Você foi convidado' : 'Cadastre sua clínica'}
-        description={
-          isInvite
-            ? 'Crie sua conta para entrar na equipe da clínica.'
-            : 'Organize sua clínica, escolha um plano e finalize com pagamento seguro.'
-        }
-        gradient="from-emerald-600 via-teal-700 to-cyan-800"
-      />
+    <AuthShell
+      workspaceClassName="max-w-3xl lg:my-0"
+      surface="plain"
+      title={isInvite ? 'Você foi convidado' : 'Cadastre sua clínica'}
+      description={
+        isInvite
+          ? 'Crie sua conta para entrar na equipe da clínica.'
+          : 'Organize sua clínica, escolha um plano e finalize com pagamento seguro.'
+      }
+    >
 
-      <div className="flex-1 bg-white p-6 dark:bg-slate-950 sm:p-8 lg:overflow-y-auto">
-        <div className="mx-auto w-full max-w-3xl">
-          <div className="mb-8 flex items-center gap-2 lg:hidden">
-            <Activity className="text-teal-600" size={28} />
-            <span className="text-xl font-bold text-slate-900 dark:text-white">
-              VetAI
-            </span>
-          </div>
+      {!isInvite && (
+        <ol className="mb-8 flex items-center gap-3">
+          {[
+            { label: 'Clínica e acesso', done: step > 1, active: step === 1 },
+            { label: 'Plano', done: step > 2, active: step === 2 },
+            { label: 'Pagamento', done: false, active: step === 3 },
+          ].map((item, index) => (
+            <li
+              key={item.label}
+              className="flex flex-1 items-center gap-3 last:flex-none"
+            >
+              <div
+                className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-bold transition-colors ${item.done || item.active ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950' : 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100'}`}
+              >
+                {item.done ? (
+                  <Check size={13} />
+                ) : (
+                  <span className="font-data">{index + 1}</span>
+                )}
+                <span className="hidden sm:inline">{item.label}</span>
+              </div>
+              {index < 2 && (
+                <div className={`h-px flex-1 ${item.done ? 'bg-teal-800 dark:bg-teal-500' : 'bg-stone-200 dark:bg-stone-800'}`} />
+              )}
+            </li>
+          ))}
+        </ol>
+      )}
 
-          {!isInvite && (
-            <div className="mb-8 flex items-center gap-2">
-              {[1, 2, 3].map((number) => (
-                <div
-                  key={number}
-                  className="flex flex-1 items-center gap-2 last:flex-none"
-                >
-                  <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${step >= number ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500 dark:bg-slate-800'}`}
-                  >
-                    {number}
-                  </div>
-                  {number < 3 && (
-                    <div
-                      className={`h-px flex-1 ${step > number ? 'bg-teal-600' : 'bg-slate-200 dark:bg-slate-800'}`}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <form
-            onSubmit={handleSubmit(submitRegistration)}
+      <form
+        onSubmit={handleSubmit(submitRegistration)}
+        className="space-y-6 pb-8"
+      >
+        {step === 1 && (
+          <motion.div
+            key="step-1"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-6"
           >
-            {step === 1 && (
-              <>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    {isInvite ? 'Criar sua conta' : 'Dados da clínica e acesso'}
-                  </h1>
-                  <p className="mt-2 text-slate-500 dark:text-slate-400">
-                    {isInvite
-                      ? 'Preencha seus dados para aceitar o convite.'
-                      : 'Estas informações identificam sua clínica e seu responsável.'}
-                  </p>
-                </div>
+            <div>
+              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100">
+                {isInvite ? 'Criar sua conta' : 'Dados da clínica e acesso'}
+              </h1>
+              <p className="mt-2 text-stone-500 dark:text-stone-400">
+                {isInvite
+                  ? 'Preencha seus dados para aceitar o convite.'
+                  : 'Estas informações identificam sua clínica e seu responsável.'}
+              </p>
+            </div>
 
-                {!isInvite && (
-                  <section className="space-y-6">
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      <InputWithLabel
-                        label="Nome da clínica"
-                        name="hospitalName"
-                        control={control}
-                        error={errors.hospitalName?.message}
-                        required
-                      />
-                      <InputWithLabel
-                        label="CNPJ"
-                        name="cnpj"
-                        control={control}
-                        error={errors.cnpj?.message}
-                        onChange={(event) =>
-                          setValue('cnpj', formatCNPJ(event.target.value))
-                        }
-                        autoCapitalize="characters"
-                        maxLength={18}
-                        required
-                      />
-                      <InputWithLabel
-                        label="Telefone da clínica"
-                        name="hospitalPhone"
-                        control={control}
-                        error={errors.hospitalPhone?.message}
-                        onChange={(event) =>
-                          setValue(
-                            'hospitalPhone',
-                            formatPhone(event.target.value),
-                          )
-                        }
-                        placeholder="(11) 3456-7890"
-                        inputMode="tel"
-                        containerClassName="sm:col-span-2"
-                        maxLength={15}
-                        required
-                      />
-                      <div className="flex items-center gap-2 pt-2 sm:col-span-2">
-                        <input
-                          type="checkbox"
-                          id="isUserResponsible"
-                          {...registerField('isUserResponsible')}
-                          className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500 dark:border-slate-700 dark:bg-slate-900"
-                        />
-                        <label
-                          htmlFor="isUserResponsible"
-                          className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none"
-                        >
-                          Eu sou o responsável
-                        </label>
-                      </div>
-                      {!isUserResponsible && (
-                        <>
-                          <InputWithLabel
-                            label="Nome do responsável"
-                            name="responsible.name"
-                            control={control}
-                            error={errors.responsible?.name?.message}
-                            required
-                          />
-                          <InputWithLabel
-                            label="CRMV do responsável"
-                            name="responsible.crmv"
-                            control={control}
-                            error={errors.responsible?.crmv?.message}
-                            required
-                          />
-                        </>
-                      )}
-                    </div>
-                    <div className="border-t border-slate-200 pt-6 dark:border-slate-800">
-                      <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
-                        Endereço da clínica
-                      </h2>
-                      <div className="grid gap-5 sm:grid-cols-3">
-                        <InputWithLabel
-                          label="CEP"
-                          name="address.zipCode"
-                          control={control}
-                          error={errors.address?.zipCode?.message}
-                          onChange={(event) => {
-                            const zipCode = formatCEP(event.target.value);
-                            setValue('address.zipCode', zipCode, {
-                              shouldValidate: true,
-                            });
-                            void lookupAddress(zipCode);
-                          }}
-                          inputMode="numeric"
-                          maxLength={9}
-                          required
-                        />
-                        <InputWithLabel
-                          label="Estado"
-                          name="address.state"
-                          control={control}
-                          error={errors.address?.state?.message}
-                          maxLength={2}
-                          required
-                        />
-                        <InputWithLabel
-                          label="Cidade"
-                          name="address.city"
-                          control={control}
-                          error={errors.address?.city?.message}
-                          required
-                        />
-                        <InputWithLabel
-                          label="Rua"
-                          name="address.street"
-                          control={control}
-                          error={errors.address?.street?.message}
-                          containerClassName="sm:col-span-2"
-                          required
-                        />
-                        <InputWithLabel
-                          label="Número"
-                          name="address.number"
-                          control={control}
-                          error={errors.address?.number?.message}
-                          required
-                        />
-                        <InputWithLabel
-                          label="Bairro"
-                          name="address.neighborhood"
-                          control={control}
-                          error={errors.address?.neighborhood?.message}
-                          required
-                        />
-                        <InputWithLabel
-                          label="Complemento"
-                          name="address.complement"
-                          control={control}
-                        />
-                      </div>
-                      {(cepLookupLoading || cepLookupError) && (
-                        <p
-                          className={`mt-3 text-sm ${cepLookupError ? 'text-red-500' : 'text-slate-500'}`}
-                        >
-                          {cepLookupError ?? 'Buscando endereço...'}
-                        </p>
-                      )}
-                    </div>
-                  </section>
-                )}
-
-                <section className="border-t border-slate-200 pt-6 dark:border-slate-800">
-                  <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
-                    Dados de acesso
-                  </h2>
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <InputWithLabel
-                      label="Nome completo"
-                      name="name"
-                      control={control}
-                      error={errors.name?.message}
-                      autoComplete="name"
-                      required
-                    />
-                    <InputWithLabel
-                      label="Email"
-                      type="email"
-                      name="email"
-                      control={control}
-                      error={errors.email?.message}
-                      autoComplete="email"
-                      required
-                    />
-                    <InputWithLabel
-                      label="CPF"
-                      name="cpf"
-                      control={control}
-                      error={errors.cpf?.message}
-                      onChange={(event) =>
-                        setValue('cpf', formatCPF(event.target.value), {
-                          shouldValidate: true,
-                        })
-                      }
-                      inputMode="numeric"
-                      autoComplete="off"
-                      maxLength={14}
-                      required
-                    />
-                    <InputWithLabel
-                      label="Seu CRMV"
-                      name="crmv"
-                      control={control}
-                      error={errors.crmv?.message}
-                      required
-                    />
-                    <InputWithLabel
-                      label="Área de atuação"
-                      name="specialty"
-                      control={control}
-                      error={errors.specialty?.message}
-                      placeholder="Ex.: Clínico Geral"
-                    />
-                    <InputWithLabel
-                      label="Senha"
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      control={control}
-                      error={errors.password?.message}
-                      autoComplete="new-password"
-                      required
-                      endAdornment={
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="text-slate-400"
-                        >
-                          {showPassword ? (
-                            <EyeOff size={18} />
-                          ) : (
-                            <Eye size={18} />
-                          )}
-                        </button>
-                      }
-                    />
-                    <InputWithLabel
-                      label="Confirmar senha"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      name="confirmPassword"
-                      control={control}
-                      error={errors.confirmPassword?.message}
-                      autoComplete="new-password"
-                      required
-                      endAdornment={
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className="text-slate-400"
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff size={18} />
-                          ) : (
-                            <Eye size={18} />
-                          )}
-                        </button>
-                      }
+            {!isInvite && (
+              <section className="space-y-6">
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <InputWithLabel
+                    label="Nome da clínica"
+                    name="hospitalName"
+                    control={control}
+                    error={errors.hospitalName?.message}
+                    required
+                  />
+                  <InputWithLabel
+                    label="CNPJ"
+                    name="cnpj"
+                    control={control}
+                    error={errors.cnpj?.message}
+                    onChange={(event) =>
+                      setValue('cnpj', formatCNPJ(event.target.value))
+                    }
+                    autoCapitalize="characters"
+                    maxLength={18}
+                    required
+                  />
+                  <InputWithLabel
+                    label="Telefone da clínica"
+                    name="hospitalPhone"
+                    control={control}
+                    error={errors.hospitalPhone?.message}
+                    onChange={(event) =>
+                      setValue(
+                        'hospitalPhone',
+                        formatPhone(event.target.value),
+                      )
+                    }
+                    placeholder="(11) 3456-7890"
+                    inputMode="tel"
+                    containerClassName="sm:col-span-2"
+                    maxLength={15}
+                    required
+                  />
+                  <div className="pt-2 sm:col-span-2">
+                    <Checkbox
+                      {...registerField('isUserResponsible')}
+                      label="Eu sou o responsável"
                     />
                   </div>
-                  <PasswordStrength password={password} />
-                </section>
-              </>
+                  {!isUserResponsible && (
+                    <>
+                      <InputWithLabel
+                        label="Nome do responsável"
+                        name="responsible.name"
+                        control={control}
+                        error={errors.responsible?.name?.message}
+                        required
+                      />
+                      <InputWithLabel
+                        label="CRMV do responsável"
+                        name="responsible.crmv"
+                        control={control}
+                        error={errors.responsible?.crmv?.message}
+                        required
+                      />
+                    </>
+                  )}
+                </div>
+                <div className="border-t border-stone-200 dark:border-stone-800 pt-6">
+                  <h2 className="mb-4 text-base font-semibold text-stone-900 dark:text-stone-100">
+                        Endereço da clínica
+                  </h2>
+                  <div className="grid gap-5 sm:grid-cols-3">
+                    <InputWithLabel
+                      label="CEP"
+                      name="address.zipCode"
+                      control={control}
+                      error={errors.address?.zipCode?.message}
+                      onChange={(event) => {
+                        const zipCode = formatCEP(event.target.value);
+                        setValue('address.zipCode', zipCode, {
+                          shouldValidate: true,
+                        });
+                        void lookupAddress(zipCode);
+                      }}
+                      inputMode="numeric"
+                      maxLength={9}
+                      required
+                    />
+                    <InputWithLabel
+                      label="Estado"
+                      name="address.state"
+                      control={control}
+                      error={errors.address?.state?.message}
+                      maxLength={2}
+                      required
+                    />
+                    <InputWithLabel
+                      label="Cidade"
+                      name="address.city"
+                      control={control}
+                      error={errors.address?.city?.message}
+                      required
+                    />
+                    <InputWithLabel
+                      label="Rua"
+                      name="address.street"
+                      control={control}
+                      error={errors.address?.street?.message}
+                      containerClassName="sm:col-span-2"
+                      required
+                    />
+                    <InputWithLabel
+                      label="Número"
+                      name="address.number"
+                      control={control}
+                      error={errors.address?.number?.message}
+                      required
+                    />
+                    <InputWithLabel
+                      label="Bairro"
+                      name="address.neighborhood"
+                      control={control}
+                      error={errors.address?.neighborhood?.message}
+                      required
+                    />
+                    <InputWithLabel
+                      label="Complemento"
+                      name="address.complement"
+                      control={control}
+                    />
+                  </div>
+                  {(cepLookupLoading || cepLookupError) && (
+                    <p
+                      className={`mt-3 text-sm ${cepLookupError ? 'text-red-600 dark:text-red-500' : 'text-stone-500 dark:text-stone-400'}`}
+                    >
+                      {cepLookupError ?? 'Buscando endereço...'}
+                    </p>
+                  )}
+                </div>
+              </section>
             )}
 
-            {!isInvite && step === 2 && (
-              <>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            <section className="border-t border-stone-200 dark:border-stone-800 pt-6">
+              <h2 className="mb-4 text-base font-semibold text-stone-900 dark:text-stone-100">
+                    Dados de acesso
+              </h2>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <InputWithLabel
+                  label="Nome completo"
+                  name="name"
+                  control={control}
+                  error={errors.name?.message}
+                  autoComplete="name"
+                  required
+                />
+                <InputWithLabel
+                  label="Email"
+                  type="email"
+                  name="email"
+                  control={control}
+                  error={errors.email?.message}
+                  autoComplete="email"
+                  required
+                />
+                <InputWithLabel
+                  label="CPF"
+                  name="cpf"
+                  control={control}
+                  error={errors.cpf?.message}
+                  onChange={(event) =>
+                    setValue('cpf', formatCPF(event.target.value), {
+                      shouldValidate: true,
+                    })
+                  }
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={14}
+                  required
+                />
+                <InputWithLabel
+                  label="Seu CRMV"
+                  name="crmv"
+                  control={control}
+                  error={errors.crmv?.message}
+                  required
+                />
+                <InputWithLabel
+                  label="Área de atuação"
+                  name="specialty"
+                  control={control}
+                  error={errors.specialty?.message}
+                  placeholder="Ex.: Clínico Geral"
+                  containerClassName="sm:col-span-2"
+                />
+                <div className="grid gap-5 sm:col-span-2 sm:grid-cols-2">
+                  <InputWithLabel
+                    label="Senha"
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    control={control}
+                    error={errors.password?.message}
+                    autoComplete="new-password"
+                    required
+                    endAdornment={
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    }
+                  />
+                  <InputWithLabel
+                    label="Confirmar senha"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    control={control}
+                    error={errors.confirmPassword?.message}
+                    autoComplete="new-password"
+                    required
+                    endAdornment={
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    }
+                  />
+                </div>
+              </div>
+              <PasswordStrength password={password} />
+            </section>
+          </motion.div>
+        )}
+
+        {!isInvite && step === 2 && (
+          <motion.div
+            key="step-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-6"
+          >
+            <div>
+              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100">
                     Escolha seu plano
-                  </h1>
-                  <p className="mt-2 text-slate-500 dark:text-slate-400">
+              </h1>
+              <p className="mt-2 text-stone-500 dark:text-stone-400">
                     Todos os limites e recursos abaixo são definidos pelo seu
                     plano.
-                  </p>
-                </div>
-                {plansLoading ? (
-                  <p className="text-sm text-slate-500">Carregando planos...</p>
-                ) : (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {plans.map((plan) => (
-                      <button
-                        key={plan.id}
-                        type="button"
-                        onClick={() => setValue('planId', plan.id)}
-                        className={`rounded-2xl border p-5 text-left ${planId === plan.id ? 'border-teal-600 bg-teal-50 ring-1 ring-teal-600 dark:bg-teal-950/30' : 'border-slate-200 dark:border-slate-800'}`}
-                      >
-                        <div className="flex justify-between gap-4">
-                          <div>
-                            <h2 className="font-semibold text-slate-900 dark:text-white">
-                              {plan.name}
-                            </h2>
-                            <p className="mt-1 text-sm text-slate-500">
-                              {plan.description}
-                            </p>
-                          </div>
-                          {planId === plan.id && (
-                            <Check className="text-teal-600" />
-                          )}
-                        </div>
-                        <p className="mt-4 text-2xl font-bold text-teal-700 dark:text-teal-300">
-                          {formatPrice(plan.monthlyPrice)}
-                          <span className="text-sm font-normal">/mês</span>
+              </p>
+            </div>
+            {plansLoading ? (
+              <p className="text-sm text-stone-500 dark:text-stone-400">Carregando planos...</p>
+            ) : (
+              <fieldset className="grid gap-4 md:grid-cols-2">
+                <legend className="sr-only">Selecione um plano</legend>
+                {plans.map((plan) => (
+                  <div
+                    key={plan.id}
+                    className={`relative rounded-2xl border p-5 text-left transition-colors ${planId === plan.id ? 'border-teal-800 dark:border-teal-500 bg-stone-100 dark:bg-stone-800 ring-1 ring-teal-600/25 dark:ring-teal-500/25' : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-teal-800/30 dark:hover:border-teal-500/30'}`}
+                  >
+                    <input
+                      {...registerField('planId')}
+                      id={`plan-${plan.id}`}
+                      type="radio"
+                      value={plan.id}
+                      className="sr-only"
+                    />
+                    <label
+                      htmlFor={`plan-${plan.id}`}
+                      className="absolute inset-0 z-10 cursor-pointer rounded-2xl"
+                    >
+                      <span className="sr-only">Selecionar plano {plan.name}</span>
+                    </label>
+                    <div className="flex justify-between gap-4">
+                      <div>
+                        <h2 className="font-semibold text-stone-900 dark:text-stone-100">
+                          {plan.name}
+                        </h2>
+                        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+                          {plan.description}
                         </p>
-                        <ul className="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-                          <li className="flex gap-2">
-                            <Users size={16} />
-                            Até {plan.userLimit}{' '}
-                            {plan.userLimit === 1 ? 'usuário' : 'usuários'}
-                          </li>
-                          <li className="flex gap-2">
-                            <Sparkles size={16} />
-                            {plan.aiCredits} créditos de IA/mês
-                          </li>
-                          {plan.features.map((feature) => (
-                            <li key={feature.key} className="flex gap-2">
-                              <Check size={16} className="text-teal-600" />
-                              {feature.label}
-                            </li>
-                          ))}
-                        </ul>
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {errors.planId?.message && (
-                  <p className="text-xs text-red-500">
-                    {errors.planId.message}
-                  </p>
-                )}
-              </>
-            )}
-
-            {!isInvite && step === 3 && selectedPlan && (
-              <>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    Revise e prossiga para o pagamento
-                  </h1>
-                  <p className="mt-2 text-slate-500 dark:text-slate-400">
-                    Você será direcionado ao ambiente seguro da Stripe para
-                    inserir os dados do cartão.
-                  </p>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-                    <h2 className="font-semibold text-slate-900 dark:text-white">
-                      Clínica
-                    </h2>
-                    <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-                      {data.hospitalName}
-                    </p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300">
-                      {data.cnpj}
-                    </p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300">
-                      {data.hospitalPhone}
-                    </p>
-                    <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-                      {data.address?.street}, {data.address?.number} -{' '}
-                      {data.address?.city}/{data.address?.state}
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-teal-200 bg-teal-50 p-5 dark:border-teal-900 dark:bg-teal-950/30">
-                    <h2 className="font-semibold text-slate-900 dark:text-white">
-                      {selectedPlan.name}
-                    </h2>
-                    <p className="mt-2 text-2xl font-bold text-teal-700 dark:text-teal-300">
-                      {formatPrice(selectedPlan.monthlyPrice)}
+                      </div>
+                      {planId === plan.id && (
+                        <Check className="text-teal-800 dark:text-teal-500" />
+                      )}
+                    </div>
+                    <p className="font-data mt-4 text-2xl font-semibold text-teal-800 dark:text-teal-500">
+                      {formatPrice(plan.monthlyPrice)}
                       <span className="text-sm font-normal">/mês</span>
                     </p>
-                    <p className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                      <Users size={16} />
-                      Até {selectedPlan.userLimit} usuários
-                    </p>
-                    <p className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                      <Sparkles size={16} />
-                      {selectedPlan.aiCredits} créditos de IA/mês
-                    </p>
+                    <ul className="mt-4 space-y-2 text-sm text-stone-500 dark:text-stone-400">
+                      <li className="flex gap-2">
+                        <Users size={16} />
+                            Até {plan.userLimit}{' '}
+                        {plan.userLimit === 1 ? 'usuário' : 'usuários'}
+                      </li>
+                      <li className="flex gap-2">
+                        <Sparkles size={16} />
+                        {plan.aiCredits} créditos de IA/mês
+                      </li>
+                      {plan.features.map((feature) => (
+                        <li key={feature.key} className="flex gap-2">
+                          <Check size={16} className="text-teal-800 dark:text-teal-500" />
+                          {feature.label}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-                <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
-                  <ShieldCheck className="shrink-0 text-teal-600" size={20} />O
+                ))}
+              </fieldset>
+            )}
+            {errors.planId?.message && (
+              <p className="text-xs text-red-600 dark:text-red-500">
+                {errors.planId.message}
+              </p>
+            )}
+          </motion.div>
+        )}
+
+        {!isInvite && step === 3 && selectedPlan && (
+          <motion.div
+            key="step-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-6"
+          >
+            <div>
+              <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100">
+                    Revise e prossiga para o pagamento
+              </h1>
+              <p className="mt-2 text-stone-500 dark:text-stone-400">
+                    Você será direcionado ao ambiente seguro da Stripe para
+                    inserir os dados do cartão.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+                <h2 className="font-semibold text-stone-900 dark:text-stone-100">
+                      Clínica
+                </h2>
+                <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
+                  {data.hospitalName}
+                </p>
+                <p className="text-sm text-stone-500 dark:text-stone-400">
+                  {data.cnpj}
+                </p>
+                {data.hospitalPhone && (
+                  <p className="text-sm text-stone-500 dark:text-stone-400">
+                    {data.hospitalPhone}
+                  </p>
+                )}
+                <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
+                  {data.address?.street}, {data.address?.number} -{' '}
+                  {data.address?.city}/{data.address?.state}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-teal-800/25 dark:border-teal-500/25 bg-stone-100 dark:bg-stone-800 p-5">
+                <h2 className="font-semibold text-stone-900 dark:text-stone-100">
+                  {selectedPlan.name}
+                </h2>
+                <p className="font-data mt-2 text-2xl font-semibold text-teal-800 dark:text-teal-500">
+                  {formatPrice(selectedPlan.monthlyPrice)}
+                  <span className="text-sm font-normal">/mês</span>
+                </p>
+                <p className="mt-3 flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
+                  <Users size={16} />
+                      Até {selectedPlan.userLimit} usuários
+                </p>
+                <p className="mt-2 flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
+                  <Sparkles size={16} />
+                  {selectedPlan.aiCredits} créditos de IA/mês
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 rounded-2xl bg-stone-100 dark:bg-stone-800 p-4 text-sm text-stone-800 dark:text-stone-100">
+              <ShieldCheck className="shrink-0 text-teal-800 dark:text-teal-500" size={20} />O
                   pagamento é processado de forma segura pela Stripe. O VetAI
                   não armazena os dados do seu cartão.
-                </div>
-              </>
-            )}
-
-            <div className="flex justify-between gap-3 pt-2">
-              {step > 1 && !isInvite ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setStep((current) => current - 1)}
-                >
-                  <ChevronLeft size={16} />
-                  Voltar
-                </Button>
-              ) : (
-                <span />
-              )}
-              {isInvite ? (
-                <Button
-                  type="button"
-                  onClick={() => {
-                    if (validateAccountAndClinic()) void submitRegistration();
-                  }}
-                  loading={loading}
-                  className="bg-teal-600 text-white hover:bg-teal-700"
-                >
-                  Aceitar convite
-                </Button>
-              ) : step < totalSteps ? (
-                <Button
-                  type="button"
-                  onClick={nextStep}
-                  className="bg-teal-600 text-white hover:bg-teal-700"
-                >
-                  Continuar
-                  <ChevronRight size={16} />
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  loading={loading}
-                  className="bg-teal-600 text-white hover:bg-teal-700"
-                >
-                  Ir para pagamento seguro
-                  <ChevronRight size={16} />
-                </Button>
-              )}
             </div>
-          </form>
+          </motion.div>
+        )}
 
-          <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
-            Já tem uma conta?{' '}
-            <Link
-              href="/login"
-              className="font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400"
+        <div className="flex justify-between gap-3 pt-2">
+          {step > 1 && !isInvite ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setStep((current) => current - 1)}
             >
-              Entrar
-            </Link>
-          </p>
+              <ChevronLeft size={16} />
+                  Voltar
+            </Button>
+          ) : (
+            <span />
+          )}
+          {isInvite ? (
+            <Button
+              type="button"
+              onClick={() => {
+                if (validateAccountAndClinic()) void submitRegistration();
+              }}
+              loading={loading}
+            >
+                  Aceitar convite
+            </Button>
+          ) : step < totalSteps ? (
+            <Button
+              type="button"
+              onClick={nextStep}
+            >
+                  Continuar
+              <ChevronRight size={16} />
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              loading={loading}
+            >
+                  Ir para pagamento seguro
+              <ChevronRight size={16} />
+            </Button>
+          )}
         </div>
-      </div>
-    </div>
+      </form>
+
+      <p className="mt-8 text-center text-sm text-stone-500 dark:text-stone-400">
+            Já tem uma conta?{' '}
+        <Link
+          href="/login"
+          className="font-bold text-teal-800 dark:text-teal-500 hover:underline"
+        >
+              Entrar
+        </Link>
+      </p>
+    </AuthShell>
   );
 }
 
@@ -787,8 +808,8 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
-          <p className="text-slate-500">Carregando...</p>
+        <div className="flex min-h-screen items-center justify-center bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
+          <p className="text-stone-500 dark:text-stone-400">Carregando...</p>
         </div>
       }
     >

@@ -2,9 +2,9 @@
 
 import { ChevronRight, PawPrint, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 import { PatientModal } from '@/app/components/business/patient-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
@@ -14,6 +14,7 @@ import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { patientsService } from '@/services/patients.service';
 import type { Patient } from '@/types/patient';
@@ -23,7 +24,7 @@ interface PatientFilters {
 }
 
 export default function PatientsPage() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { open } = useModal();
 
   const {
     items: patients,
@@ -40,8 +41,21 @@ export default function PatientsPage() {
   });
 
   const handleCreateSuccess = (patient: Patient) => {
-    setShowCreateModal(false);
     prependItem(patient);
+  };
+
+  const openCreateModal = () => {
+    open({
+      content: ({ close }) => (
+        <PatientModal
+          onClose={close}
+          onSuccess={(patient) => {
+            handleCreateSuccess(patient);
+            close();
+          }}
+        />
+      ),
+    });
   };
 
   const columns: DataTableColumn<Patient>[] = [
@@ -50,13 +64,13 @@ export default function PatientsPage() {
       header: 'Animal',
       render: (patient) => (
         <Link
-          href={`/patients/detail?id=${patient.id}`}
+          href={`/patients/${patient.id}`}
           className="flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
-            <PawPrint size={18} className="text-teal-600 dark:text-teal-400" />
+          <div className="w-10 h-10 rounded-full bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
+            <PawPrint size={18} className="text-teal-800 dark:text-teal-500" />
           </div>
-          <p className="font-medium text-slate-900 dark:text-white">
+          <p className="font-medium text-stone-900 dark:text-stone-100">
             {patient.name}
           </p>
         </Link>
@@ -66,7 +80,7 @@ export default function PatientsPage() {
       key: 'specie',
       header: 'Espécie',
       render: (patient) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-stone-500 dark:text-stone-400">
           {SPECIE_LABELS[patient.specie] ?? patient.specie}
         </span>
       ),
@@ -75,7 +89,7 @@ export default function PatientsPage() {
       key: 'breed',
       header: 'Raça',
       render: (patient) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-stone-500 dark:text-stone-400">
           {patient.breed ?? '-'}
         </span>
       ),
@@ -84,7 +98,7 @@ export default function PatientsPage() {
       key: 'created_at',
       header: 'Cadastrado em',
       render: (patient) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-stone-500 dark:text-stone-400">
           {new Date(patient.created_at).toLocaleDateString('pt-BR')}
         </span>
       ),
@@ -95,9 +109,9 @@ export default function PatientsPage() {
       align: 'right',
       width: '60px',
       render: (patient) => (
-        <Link href={`/patients/detail?id=${patient.id}`}>
+        <Link href={`/patients/${patient.id}`}>
           <ChevronRight
-            className="inline text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+            className="inline text-stone-500/50 dark:text-stone-400/50 hover:text-teal-800 dark:hover:text-teal-500 transition-colors"
             size={20}
           />
         </Link>
@@ -106,8 +120,8 @@ export default function PatientsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Pacientes" showStorage={false} />
 
         <SectionCard
@@ -121,8 +135,8 @@ export default function PatientsPage() {
           }
           headerAction={
             <Button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              onClick={openCreateModal}
+              className="bg-teal-800 dark:bg-teal-500 h-10 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               <Plus size={18} /> Novo Paciente
             </Button>
@@ -137,28 +151,15 @@ export default function PatientsPage() {
             onSearch={setSearch}
             searchPlaceholder="Buscar por nome..."
             emptyState={
-              <div className="p-8 text-center">
-                <PawPrint
-                  size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
-                />
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
-                  {search
-                    ? 'Nenhum paciente encontrado.'
-                    : 'Nenhum paciente cadastrado ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={PawPrint}
+                title={search ? 'Nenhum paciente encontrado' : 'Nenhum paciente cadastrado'}
+                description={search ? 'Revise a busca ou tente outro nome.' : 'Cadastre o primeiro paciente para começar.'}
+              />
             }
           />
         </SectionCard>
       </div>
-
-      {showCreateModal && (
-        <PatientModal
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={handleCreateSuccess}
-        />
-      )}
     </div>
   );
 }

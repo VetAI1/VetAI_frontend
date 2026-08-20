@@ -78,7 +78,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex w-full flex-col gap-6 pb-12">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Configurações da clínica" showStorage={false} />
         <SectionCard
           title="Identificação"
@@ -108,7 +108,7 @@ export default function SettingsPage() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex w-full flex-col gap-6 pb-12"
+      className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
     >
       <Header title="Configurações da clínica" showStorage={false} />
 
@@ -139,7 +139,7 @@ export default function SettingsPage() {
 
       {canEdit && (
         <div className="flex justify-end">
-          <Button type="submit" loading={isSubmitting} className="bg-teal-600 text-white hover:bg-teal-700">
+          <Button type="submit" loading={isSubmitting} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90">
             <Save size={16} />Salvar alterações
           </Button>
         </div>

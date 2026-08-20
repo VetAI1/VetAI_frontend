@@ -1,22 +1,33 @@
-// Paleta dos gráficos: variações do teal, a cor do sistema. A ordem alterna
-// entre tons escuros e claros para que fatias vizinhas continuem distinguíveis
-// num gráfico monocromático.
-export const CHART_COLORS = [
-  '#0d9488', // teal-600 — cor base do sistema
-  '#5eead4', // teal-300
-  '#0f766e', // teal-700
-  '#2dd4bf', // teal-400
-  '#115e59', // teal-800
-  '#14b8a6', // teal-500
-  '#99f6e4', // teal-200
-  '#134e4a', // teal-900
+const DEFAULT_PALETTE = [
+  '#0d9488',
+  '#f59e0b',
+  '#3b82f6',
+  '#10b981',
+  '#f97316',
 ] as const;
 
-export function chartColor(index: number): string {
-  return CHART_COLORS[index % CHART_COLORS.length]!;
+// As cores reais vivem nos tokens --chart-1..5 (globals.css) para funcionarem
+// em light e dark. Fallback hex cobre SSR/pré-hidratação.
+function readChartVar(index: number): string | null {
+  if (typeof window === 'undefined') return null;
+  const root = getComputedStyle(document.documentElement);
+  return (
+    root.getPropertyValue(`--chart-${(index % 5) + 1}`).trim() || null
+  );
 }
 
-// Mesmo tom com ~10% de opacidade, para o preenchimento sob a linha.
+export function chartColor(index: number): string {
+  return (
+    readChartVar(index) ??
+    DEFAULT_PALETTE[index % DEFAULT_PALETTE.length]!
+  );
+}
+
+// Mesmo tom com ~16% de opacidade, para o preenchimento sob a linha.
 export function chartFill(index: number): string {
-  return `${chartColor(index)}1a`;
+  const base = readChartVar(index);
+  if (base?.startsWith('oklch')) {
+    return base.replace(')', ' / 0.16)');
+  }
+  return `${DEFAULT_PALETTE[index % DEFAULT_PALETTE.length]!}29`;
 }

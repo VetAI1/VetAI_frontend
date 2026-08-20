@@ -30,7 +30,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { calcAge, fmtDate, fmtDateTime, parseBirthDate, STUDY_STATUS_COLORS, STUDY_STATUS_LABELS } from '../utils';
@@ -47,12 +47,13 @@ import { buildPrescriptionPdf } from '../utils/prescription-pdf';
 import { PatientModal } from '@/app/components/business/patient-modal';
 import { UploadExamModal } from '@/app/components/business/upload-exam-modal';
 import { Card } from '@/app/components/common/card';
-import { ConfirmModal } from '@/app/components/common/confirm-modal';
 import { WhatsAppIcon } from '@/app/components/common/whatsapp-icon';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
+import { useConfirmation } from '@/contexts/confirmation-context';
+import { useModal } from '@/contexts/modal-context';
 import { useAuth } from '@/infra/auth-context';
 import { documentsService } from '@/services/documents.service';
 import { healthRecordsService } from '@/services/health-records.service';
@@ -86,9 +87,9 @@ function byAuthor(record: HealthRecord): string {
 }
 
 export function PatientDetailContent() {
-  const searchParams = useSearchParams();
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const id = searchParams.get('id');
+  const id = params.slug;
   const { user } = useAuth();
 
   const [patient, setPatient] = useState<Patient | null>(null);
@@ -96,21 +97,11 @@ export function PatientDetailContent() {
   const [hospital, setHospital] = useState<Hospital | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showAddWeight, setShowAddWeight] = useState(false);
-  const [showAddClinicalNote, setShowAddClinicalNote] = useState(false);
-  const [showAddVaccine, setShowAddVaccine] = useState(false);
-  const [showAddNote, setShowAddNote] = useState(false);
-  const [showAddPrescription, setShowAddPrescription] = useState(false);
-  const [showBudget, setShowBudget] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const { confirm } = useConfirmation();
+  const { open } = useModal();
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [viewingDoc, setViewingDoc] = useState<{ url: string; mimeType: string; fileName: string } | null>(null);
   const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ onConfirm: () => Promise<void> } | null>(null);
-  const [confirmDeleting, setConfirmDeleting] = useState(false);
 
   const [exams, setExams] = useState<Study[]>([]);
   const [weightRecords, setWeightRecords] = useState<HealthRecord[]>([]);
@@ -233,16 +224,14 @@ export function PatientDetailContent() {
 
   const handleDelete = async () => {
     if (!patient) return;
-    setDeleting(true);
     try {
       await patientsService.delete(patient.id);
       router.push('/patients');
-    } catch { setDeleting(false); }
+    } catch { /* silently fail */ }
   };
 
   const handleEditSuccess = (updated: Patient) => {
     setPatient(updated);
-    setShowEditModal(false);
     if (updated.tutor_id) tutorsService.get(updated.tutor_id).then(setTutor).catch(() => null);
   };
 
@@ -291,15 +280,6 @@ export function PatientDetailContent() {
     setViewingDoc(null);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!deleteConfirm) return;
-    setConfirmDeleting(true);
-    try {
-      await deleteConfirm.onConfirm();
-      setDeleteConfirm(null);
-    } catch { /* silently fail */ } finally { setConfirmDeleting(false); }
-  };
-
   if (loading) return (
     <div className="flex flex-col gap-6">
       {/* Header skeleton */}
@@ -315,7 +295,7 @@ export function PatientDetailContent() {
       {/* Info cards skeleton */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div key={i} className="flex flex-col gap-2 p-3 rounded-xl border border-stone-200 dark:border-stone-800">
             <Skeleton className="w-7 h-7 rounded-lg" />
             <Skeleton className="h-3 w-16" />
             <Skeleton className="h-4 w-24" />
@@ -325,7 +305,7 @@ export function PatientDetailContent() {
       </div>
       {/* Sections skeleton */}
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-xl border border-slate-200 dark:border-slate-700 p-5 flex flex-col gap-3">
+        <div key={i} className="rounded-xl border border-stone-200 dark:border-stone-800 p-5 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1.5">
               <Skeleton className="h-4 w-32" />
@@ -352,8 +332,8 @@ export function PatientDetailContent() {
 
   if (!patient) return (
     <div className="text-center py-20">
-      <PawPrint size={48} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-      <p className="text-slate-500 dark:text-slate-400">Paciente não encontrado.</p>
+      <PawPrint size={48} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-4" />
+      <p className="text-stone-500 dark:text-stone-400">Paciente não encontrado.</p>
       <Link href="/patients" className="mt-4 inline-block">
         <Button variant="outline">Voltar</Button>
       </Link>
@@ -366,44 +346,108 @@ export function PatientDetailContent() {
     ? whatsappLink(tutor.phone, `Olá ${tutor.name.trim()}, tudo bem?`)
     : null;
 
+  const requestDelete = (onConfirm: () => Promise<void>, title = 'Excluir registro?') => {
+    confirm({
+      title,
+      description: 'Esta ação não pode ser desfeita. O registro será removido permanentemente.',
+      variant: 'danger',
+      confirmLabel: 'Excluir',
+      onConfirm,
+    });
+  };
+
+  const openEditModal = () => open({
+    content: ({ close }) => (
+      <PatientModal
+        patient={patient}
+        onClose={close}
+        onSuccess={(updated) => { handleEditSuccess(updated); close(); }}
+      />
+    ),
+  });
+
+  const openUploadModal = () => open({
+    content: ({ close }) => (
+      <UploadExamModal
+        preselectedPatient={patient}
+        onClose={close}
+        onSuccess={() => { close(); void fetchExams(); }}
+      />
+    ),
+  });
+
+  const openAddWeightModal = () => open({
+    content: ({ close }) => (
+      <AddWeightModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchWeights(); }} />
+    ),
+  });
+
+  const openAddClinicalNoteModal = () => open({
+    content: ({ close }) => (
+      <AddClinicalNoteModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchClinicalNotes(); }} />
+    ),
+  });
+
+  const openAddVaccineModal = () => open({
+    content: ({ close }) => (
+      <AddVaccineModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchVaccines(); }} />
+    ),
+  });
+
+  const openAddNoteModal = () => open({
+    content: ({ close }) => (
+      <AddNoteModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchNotes(); }} />
+    ),
+  });
+
+  const openAddPrescriptionModal = () => open({
+    content: ({ close }) => (
+      <AddPrescriptionModal patientId={patient.id} onClose={close} onSuccess={() => { close(); void fetchPrescriptions(); }} />
+    ),
+  });
+
+  const openBudgetModal = () => open({
+    content: ({ close }) => <BudgetModal patient={patient} tutor={tutor} onClose={close} />,
+  });
+
   return (
     <>
-      <div className="flex items-center gap-4 mb-6">
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <Link href="/patients">
           <Button variant="ghost" size="icon"><ArrowLeft size={20} /></Button>
         </Link>
         <div className="flex-1">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">{patient.name}</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <h2 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-100 sm:text-3xl">{patient.name}</h2>
+          <p className="text-sm text-stone-500 dark:text-stone-400">
             {SPECIE_LABELS[patient.specie] ?? patient.specie}{patient.breed && ` · ${patient.breed}`}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setShowBudget(true)} title="Gerar orçamento de serviços">
+          <Button variant="outline" onClick={openBudgetModal} title="Gerar orçamento de serviços">
             <Receipt size={16} />
             Orçamento
           </Button>
-          <Button variant="outline" size="icon" onClick={() => setShowEditModal(true)} title="Editar"><Pencil size={16} /></Button>
-          <Button variant="outline" size="icon" onClick={() => setShowDeleteConfirm(true)} title="Excluir" className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200 dark:border-red-800">
+          <Button variant="outline" size="icon" onClick={openEditModal} title="Editar"><Pencil size={16} /></Button>
+          <Button variant="outline" size="icon" onClick={() => requestDelete(handleDelete, 'Excluir paciente?')} title="Excluir" className="text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900 border-red-600/30 dark:border-red-500/30">
             <Trash2 size={16} />
           </Button>
         </div>
       </div>
 
       {patient.restrictions && patient.restrictions.length > 0 && (
-        <div className="mb-6 flex items-start gap-3 rounded-xl border border-l-4 border-red-200 border-l-red-500 bg-red-50/70 px-4 py-3 dark:border-red-900/60 dark:border-l-red-500 dark:bg-red-950/25">
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-l-4 border-red-600/30 dark:border-red-500/30 border-l-danger bg-red-50/70 dark:bg-red-900/70 px-4 py-3">
           <AlertTriangle
             size={18}
-            className="mt-px shrink-0 text-red-600 dark:text-red-400"
+            className="mt-px shrink-0 text-red-600 dark:text-red-500"
           />
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1.5">
-            <span className="text-sm font-semibold text-red-900 dark:text-red-200">
+            <span className="text-sm font-semibold text-red-600 dark:text-red-500">
               Restrições
             </span>
             {patient.restrictions.map((restriction) => (
               <span
                 key={restriction}
-                className="rounded-md border border-red-300 bg-white px-2 py-0.5 text-xs font-medium text-red-900 dark:border-red-800 dark:bg-red-950/60 dark:text-red-100"
+                className="rounded-md border border-red-600/30 dark:border-red-500/30 bg-white dark:bg-stone-900 px-2 py-0.5 text-xs font-medium text-red-600 dark:text-red-500"
               >
                 {capitalize(restriction)}
               </span>
@@ -416,7 +460,7 @@ export function PatientDetailContent() {
         <InfoCard
           icon={PawPrint}
           label="Espécie / Raça"
-          value={<p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{SPECIE_LABELS[patient.specie] ?? patient.specie}</p>}
+          value={<p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">{SPECIE_LABELS[patient.specie] ?? patient.specie}</p>}
           sub={patient.breed}
         />
         <InfoCard
@@ -425,8 +469,8 @@ export function PatientDetailContent() {
           label="Nascimento"
           value={
             birthDateObj
-              ? <p className="text-sm font-semibold text-slate-900 dark:text-white">{birthDateObj.toLocaleDateString('pt-BR')}</p>
-              : <p className="text-sm text-slate-400 dark:text-slate-500">Não informado</p>
+              ? <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{birthDateObj.toLocaleDateString('pt-BR')}</p>
+              : <p className="text-sm text-stone-500/70 dark:text-stone-400/70">Não informado</p>
           }
           sub={birthDateObj ? calcAge(birthDateObj) : undefined}
         />
@@ -440,21 +484,21 @@ export function PatientDetailContent() {
                 : 'neutral'
           }
           label="Sexo"
-          value={<p className="text-sm font-semibold text-slate-900 dark:text-white">{patient.sex === 'MALE' ? 'Macho' : patient.sex === 'FEMALE' ? 'Fêmea' : 'Não informado'}</p>}
+          value={<p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{patient.sex === 'MALE' ? 'Macho' : patient.sex === 'FEMALE' ? 'Fêmea' : 'Não informado'}</p>}
           sub={patient.castration_date ? `Castrado em ${fmtDate(patient.castration_date)}` : 'Não castrado'}
         />
         <InfoCard
           icon={Cpu}
           tone={patient.microchip ? 'positive' : 'neutral'}
           label="Microchip"
-          value={<p className="text-sm font-semibold text-slate-900 dark:text-white">{patient.microchip ? 'Sim' : 'N/A'}</p>}
+          value={<p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{patient.microchip ? 'Sim' : 'N/A'}</p>}
           sub={patient.microchip ?? 'Não cadastrado'}
         />
         <InfoCard
           icon={Skull}
           tone={patient.death_date ? 'danger' : 'neutral'}
           label="Falecimento"
-          value={<p className="text-sm font-semibold text-slate-900 dark:text-white">{patient.death_date ? 'Sim' : 'N/A'}</p>}
+          value={<p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{patient.death_date ? 'Sim' : 'N/A'}</p>}
           sub={patient.death_date ? fmtDate(patient.death_date) : undefined}
         />
         <InfoCard
@@ -464,8 +508,8 @@ export function PatientDetailContent() {
           className="lg:col-span-2"
           value={
             tutor
-              ? <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{tutor.name}</p>
-              : <p className="text-sm text-slate-400 dark:text-slate-500">Não informado</p>
+              ? <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">{tutor.name}</p>
+              : <p className="text-sm text-stone-500/70 dark:text-stone-400/70">Não informado</p>
           }
           sub={
             tutor?.phone || tutor?.address ? (
@@ -479,7 +523,7 @@ export function PatientDetailContent() {
                         target="_blank"
                         rel="noopener noreferrer"
                         title={`Conversar com ${tutor.name} no WhatsApp`}
-                        className="shrink-0 text-green-600 hover:text-green-700 dark:text-green-500 dark:hover:text-green-400"
+                        className="shrink-0 text-emerald-700 dark:text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-500"
                       >
                         <WhatsAppIcon size={14} />
                       </a>
@@ -498,15 +542,15 @@ export function PatientDetailContent() {
       <SectionCard
         title="Próximas Atividades"
         subtitle="Agendamentos futuros para este paciente"
-        className="mb-4"
+        className="mb-6"
       >
         {upcomingEvents.length === 0 ? (
           <div className="py-6 text-center">
-            <CalendarClock size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-            <p className="text-sm text-slate-500 dark:text-slate-400">Nenhuma atividade agendada.</p>
+            <CalendarClock size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+            <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma atividade agendada.</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 dark:divide-slate-700">
+          <div className="divide-y divide-border">
             {upcomingEvents.map((ev) => {
               const typeStyle = EVENT_TYPE_MAP[ev.type];
               const parts = ev.date.split('-');
@@ -517,9 +561,9 @@ export function PatientDetailContent() {
                 <div key={ev.id} className="flex items-center gap-3 py-3 px-1">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${typeStyle.dot}`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{ev.title}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {dateLabel} · {ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{ev.title}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                      {dateLabel} · {ev.start_time}{ev.end_time ? ` – ${ev.end_time}` : ''}
                     </p>
                   </div>
                   <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border shrink-0 ${typeStyle.bg} ${typeStyle.color}`}>
@@ -532,9 +576,9 @@ export function PatientDetailContent() {
         )}
       </SectionCard>
 
-      <SectionCard title="Exames" subtitle="Exames vinculados a este paciente" className="mb-4"
+      <SectionCard title="Exames" subtitle="Exames vinculados a este paciente" className="mb-6"
         headerAction={
-          <Button onClick={() => setShowUploadModal(true)} className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 h-9">
+          <Button onClick={openUploadModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
             <Plus size={16} /> Adicionar Exame
           </Button>
         }
@@ -554,43 +598,43 @@ export function PatientDetailContent() {
           </div>
         ) : exams.length === 0 ? (
           <div className="py-8 text-center">
-            <Microscope size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-            <p className="text-sm text-slate-500 dark:text-slate-400">Nenhum exame encontrado.</p>
+            <Microscope size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+            <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum exame encontrado.</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 dark:divide-slate-700">
+          <div className="divide-y divide-border">
             {exams.map((exam) => (
               <div key={exam.id} className="flex items-center justify-between py-3 px-1 gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
-                    <Microscope size={15} className="text-blue-600 dark:text-blue-400" />
+                  <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                    <Microscope size={15} className="text-sky-700 dark:text-sky-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{exam.title ?? 'Exame'}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{exam.examDate ? fmtDate(exam.examDate) : fmtDate(exam.created_at)}</p>
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{exam.title ?? 'Exame'}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">{exam.examDate ? fmtDate(exam.examDate) : fmtDate(exam.created_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STUDY_STATUS_COLORS[exam.status] ?? ''}`}>
                     {STUDY_STATUS_LABELS[exam.status] ?? exam.status}
                   </span>
-                  <Link href={`/exams/detail?id=${exam.id}`}>
+                  <Link href={`/exams/${exam.id}`}>
                     <Button variant="ghost" size="icon" className="h-7 w-7"><FileText size={14} /></Button>
                   </Link>
                 </div>
               </div>
             ))}
             <div className="pt-3 pb-1 text-center">
-              <Link href="/exams" className="text-xs text-teal-600 dark:text-teal-400 hover:underline underline-offset-2">Ver todos os exames →</Link>
+              <Link href="/exams" className="text-xs text-teal-800 dark:text-teal-500 hover:underline underline-offset-2">Ver todos os exames →</Link>
             </div>
           </div>
         )}
       </SectionCard>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <SectionCard title="Histórico de Pesos" subtitle="Acompanhe a evolução do peso"
           headerAction={
-            <Button onClick={() => setShowAddWeight(true)} className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 h-9">
+            <Button onClick={openAddWeightModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Registrar Peso
             </Button>
           }
@@ -610,26 +654,26 @@ export function PatientDetailContent() {
             </div>
           ) : weightRecords.length === 0 ? (
             <div className="py-8 text-center">
-              <Scale size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-500 dark:text-slate-400">Nenhum registro de peso.</p>
+              <Scale size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum registro de peso.</p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-700">
+            <div className="divide-y divide-border">
               {weightRecords.map((rec) => {
                 const meta = rec.metadata as WeightMetadata;
                 return (
                   <div key={rec.id} className="flex items-center justify-between py-3 px-1 gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
-                        <Scale size={15} className="text-teal-600 dark:text-teal-400" />
+                      <div className="w-8 h-8 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
+                        <Scale size={15} className="text-teal-800 dark:text-teal-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white">{meta.value} {meta.unit === 'KG' ? 'kg' : 'g'}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{fmtDate(rec.date)}{byAuthor(rec)}</p>
-                        {rec.notes && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{rec.notes}</p>}
+                        <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{meta.value} {meta.unit === 'KG' ? 'kg' : 'g'}</p>
+                        <p className="text-xs text-stone-500 dark:text-stone-400">{fmtDate(rec.date)}{byAuthor(rec)}</p>
+                        {rec.notes && <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5">{rec.notes}</p>}
                       </div>
                     </div>
-                    <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchWeights) })} />
+                    <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchWeights))} />
                   </div>
                 );
               })}
@@ -639,7 +683,7 @@ export function PatientDetailContent() {
 
         <SectionCard title="Registros Clínicos" subtitle="Mais recentes no topo"
           headerAction={
-            <Button onClick={() => setShowAddClinicalNote(true)} className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 h-9">
+            <Button onClick={openAddClinicalNoteModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Novo Registro
             </Button>
           }
@@ -647,7 +691,7 @@ export function PatientDetailContent() {
           {clinicalLoading ? (
             <div className="flex flex-col gap-3 py-2">
               {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col gap-2">
+                <div key={i} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-4 w-36" />
                     <Skeleton className="h-3 w-20 ml-auto" />
@@ -659,8 +703,8 @@ export function PatientDetailContent() {
             </div>
           ) : clinicalNotes.length === 0 ? (
             <div className="py-8 text-center">
-              <FileText size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-500 dark:text-slate-400">Nenhum registro clínico.</p>
+              <FileText size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum registro clínico.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -671,12 +715,12 @@ export function PatientDetailContent() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{meta.title}</p>
-                          <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">{fmtDate(rec.date)}{byAuthor(rec)}</span>
+                          <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">{meta.title}</p>
+                          <span className="text-xs text-stone-500/70 dark:text-stone-400/70 shrink-0">{fmtDate(rec.date)}{byAuthor(rec)}</span>
                         </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{meta.description}</p>
+                        <p className="text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap">{meta.description}</p>
                       </div>
-                      <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchClinicalNotes) })} />
+                      <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchClinicalNotes))} />
                     </div>
                   </Card>
                 );
@@ -686,10 +730,10 @@ export function PatientDetailContent() {
         </SectionCard>
       </div>
 
-      <div className="space-y-4 mb-4">
+      <div className="space-y-4 mb-6">
         <SectionCard title="Vacinas" subtitle="Histórico de vacinação"
           headerAction={
-            <Button onClick={() => setShowAddVaccine(true)} className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 h-9">
+            <Button onClick={openAddVaccineModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Registrar Vacina
             </Button>
           }
@@ -697,7 +741,7 @@ export function PatientDetailContent() {
           {vaccinesLoading ? (
             <div className="flex flex-col gap-2 py-2">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3 py-2 border-b border-slate-100 dark:border-slate-700/50 last:border-0">
+                <div key={i} className="flex items-center gap-3 py-2 border-b border-stone-200/70 dark:border-stone-800/70 last:border-0">
                   <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
                   <div className="flex flex-col gap-1.5 flex-1">
                     <Skeleton className="h-3.5 w-36" />
@@ -710,46 +754,46 @@ export function PatientDetailContent() {
             </div>
           ) : vaccines.length === 0 ? (
             <div className="py-8 text-center">
-              <Syringe size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-500 dark:text-slate-400">Nenhuma vacina registrada.</p>
+              <Syringe size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma vacina registrada.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <tr className="border-b border-stone-200 dark:border-stone-800">
                     {['Vacina', 'Data', 'Dose', 'Lote', 'Próx. Revacinação', 'Dose Anterior', 'Aplicado por', ''].map((h) => (
-                      <th key={h} className="text-left py-2 px-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                      <th key={h} className="text-left py-2 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
+                <tbody className="divide-y divide-border/50">
                   {vaccines.map((rec) => {
                     const meta = rec.metadata as VaccineMetadata;
                     return (
-                      <tr key={rec.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                      <tr key={rec.id} className="hover:bg-stone-100/60 dark:hover:bg-stone-800/60 transition-colors">
                         <td className="py-3 px-3">
                           <div className="flex items-center gap-2">
-                            <ShieldCheck size={14} className="text-green-500 shrink-0" />
+                            <ShieldCheck size={14} className="text-emerald-700 dark:text-emerald-500 shrink-0" />
                             <div>
-                              <p className="font-medium text-slate-900 dark:text-white">{meta.vaccine_name}</p>
-                              <p className="text-xs font-mono text-slate-400 dark:text-slate-500">{meta.vaccine_code}</p>
+                              <p className="font-medium text-stone-900 dark:text-stone-100">{meta.vaccine_name}</p>
+                              <p className="text-xs font-mono text-stone-500/70 dark:text-stone-400/70">{meta.vaccine_code}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-3 text-slate-600 dark:text-slate-300 whitespace-nowrap">{fmtDate(rec.date)}<span className="block text-[11px] text-slate-400 dark:text-slate-500">{rec.recorded_by?.name ?? '—'}</span></td>
+                        <td className="py-3 px-3 text-stone-500 dark:text-stone-400 whitespace-nowrap">{fmtDate(rec.date)}<span className="block text-[11px] text-stone-500/70 dark:text-stone-400/70">{rec.recorded_by?.name ?? '—'}</span></td>
                         <td className="py-3 px-3">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">{meta.dose_number}</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500">{meta.dose_number}</span>
                         </td>
-                        <td className="py-3 px-3 text-xs font-mono text-slate-500 dark:text-slate-400">{meta.batch ?? '—'}</td>
-                        <td className="py-3 px-3 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                        <td className="py-3 px-3 text-xs font-mono text-stone-500 dark:text-stone-400">{meta.batch ?? '—'}</td>
+                        <td className="py-3 px-3 text-xs text-stone-500 dark:text-stone-400 whitespace-nowrap">
                           {meta.revaccination_date ? fmtDate(meta.revaccination_date) : '—'}
                         </td>
-                        <td className="py-3 px-12 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                        <td className="py-3 px-12 text-xs text-stone-500 dark:text-stone-400 whitespace-nowrap">
                           {meta.previous_dose_date ? fmtDate(meta.previous_dose_date) : '—'}
                         </td>
-                        <td className="py-3 px-3 text-xs text-slate-500 dark:text-slate-400">{meta.applied_by ?? '—'}</td>
-                        <td className="py-3 text-end px-3"><DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchVaccines) })} /></td>
+                        <td className="py-3 px-3 text-xs text-stone-500 dark:text-stone-400">{meta.applied_by ?? '—'}</td>
+                        <td className="py-3 text-end px-3"><DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchVaccines))} /></td>
                       </tr>
                     );
                   })}
@@ -761,7 +805,7 @@ export function PatientDetailContent() {
 
         <SectionCard title="Receituário" subtitle="Receitas e prescrições"
           headerAction={
-            <Button onClick={() => setShowAddPrescription(true)} className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 h-9">
+            <Button onClick={openAddPrescriptionModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Nova Receita
             </Button>
           }
@@ -769,12 +813,12 @@ export function PatientDetailContent() {
           {prescriptionsLoading ? (
             <div className="flex flex-col gap-3 py-2">
               {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col gap-2">
+                <div key={i} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 flex flex-col gap-2">
                   <div className="flex items-center gap-2 mb-1">
                     <Skeleton className="h-4 w-20" />
                     <Skeleton className="h-3 w-24 ml-auto" />
                   </div>
-                  <div className="pl-3 border-l-2 border-slate-200 dark:border-slate-700 flex flex-col gap-1.5">
+                  <div className="pl-3 border-l-2 border-stone-200 dark:border-stone-800 flex flex-col gap-1.5">
                     <Skeleton className="h-3.5 w-40" />
                     <Skeleton className="h-3 w-56" />
                   </div>
@@ -783,8 +827,8 @@ export function PatientDetailContent() {
             </div>
           ) : prescriptions.length === 0 ? (
             <div className="py-8 text-center">
-              <ClipboardList size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-500 dark:text-slate-400">Nenhuma receita registrada.</p>
+              <ClipboardList size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma receita registrada.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -798,29 +842,29 @@ export function PatientDetailContent() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <ClipboardList size={15} className="text-teal-600 dark:text-teal-400 shrink-0" />
-                          <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                          <ClipboardList size={15} className="text-teal-800 dark:text-teal-500 shrink-0" />
+                          <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">
                             {meta.include_date ? fmtDate(rec.date) : 'Receita'}
                           </span>
                           {!meta.include_date && (
-                            <span className="text-xs text-slate-400 dark:text-slate-500">{fmtDate(rec.date)}{byAuthor(rec)}</span>
+                            <span className="text-xs text-stone-500/70 dark:text-stone-400/70">{fmtDate(rec.date)}{byAuthor(rec)}</span>
                           )}
                         </div>
                         <div className="space-y-2">
                           {(meta.medications ?? []).map((med, i) => (
-                            <div key={i} className="pl-3 border-l-2 border-teal-200 dark:border-teal-700">
-                              <p className="text-sm font-medium text-slate-900 dark:text-white">
-                                <Pill size={12} className="inline mr-1.5 text-teal-500" />
+                            <div key={i} className="pl-3 border-l-2 border-teal-800/40 dark:border-teal-500/40">
+                              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                                <Pill size={12} className="inline mr-1.5 text-teal-800 dark:text-teal-500" />
                                 {med.drug}
-                                {med.form && <span className="text-slate-500 dark:text-slate-400 font-normal"> · {med.form}</span>}
-                                {med.quantity && <span className="text-slate-500 dark:text-slate-400 font-normal"> · {med.quantity}</span>}
+                                {med.form && <span className="text-stone-500 dark:text-stone-400 font-normal"> · {med.form}</span>}
+                                {med.quantity && <span className="text-stone-500 dark:text-stone-400 font-normal"> · {med.quantity}</span>}
                               </p>
                               {med.usage && (
-                                <span className="inline-block text-[10px] font-medium text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/30 rounded px-1.5 py-0.5 mt-0.5">
+                                <span className="inline-block text-[10px] font-medium text-teal-800 dark:text-teal-500 bg-teal-800/10 dark:bg-teal-500/10 rounded px-1.5 py-0.5 mt-0.5">
                                   {med.usage}
                                 </span>
                               )}
-                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{med.posology}</p>
+                              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{med.posology}</p>
                             </div>
                           ))}
                         </div>
@@ -848,11 +892,11 @@ export function PatientDetailContent() {
                               });
                             });
                           }}
-                          className="text-slate-400 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20"
+                          className="text-stone-500/70 dark:text-stone-400/70 hover:text-teal-800 dark:hover:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10"
                         >
                           <FileText size={14} />
                         </Button>
-                        <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchPrescriptions) })} />
+                        <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchPrescriptions))} />
                       </div>
                     </div>
                   </Card>
@@ -866,7 +910,7 @@ export function PatientDetailContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionCard title="Notas e Observações" subtitle="Observações gerais sobre o paciente"
           headerAction={
-            <Button onClick={() => setShowAddNote(true)} className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 h-9">
+            <Button onClick={openAddNoteModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
               <Plus size={16} /> Nova Nota
             </Button>
           }
@@ -886,8 +930,8 @@ export function PatientDetailContent() {
             </div>
           ) : notes.length === 0 ? (
             <div className="py-8 text-center">
-              <StickyNote size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-500 dark:text-slate-400">Nenhuma nota registrada.</p>
+              <StickyNote size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma nota registrada.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -898,10 +942,10 @@ export function PatientDetailContent() {
                     <div className="flex items-start gap-3">
                       <StickyNote size={16} className="text-yellow-500 shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{meta.text}</p>
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{fmtDateTime(rec.created_at)}{byAuthor(rec)}</p>
+                        <p className="text-sm text-stone-800 dark:text-stone-100 whitespace-pre-wrap">{meta.text}</p>
+                        <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-1">{fmtDateTime(rec.created_at)}{byAuthor(rec)}</p>
                       </div>
-                      <DeleteBtn onDelete={() => setDeleteConfirm({ onConfirm: () => handleDeleteRecord(rec.id, fetchNotes) })} />
+                      <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchNotes))} />
                     </div>
                   </Card>
                 );
@@ -914,7 +958,7 @@ export function PatientDetailContent() {
           headerAction={
             <>
               <input ref={fileInputRef} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleUploadDocument(f); e.target.value = ''; }} />
-              <Button onClick={() => fileInputRef.current?.click()} disabled={uploadingDoc} className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 h-9">
+              <Button onClick={() => fileInputRef.current?.click()} disabled={uploadingDoc} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
                 {uploadingDoc ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                 Enviar Documento
               </Button>
@@ -937,24 +981,24 @@ export function PatientDetailContent() {
             </div>
           ) : documents.length === 0 ? (
             <div
-              className="py-10 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-center cursor-pointer hover:border-teal-400 dark:hover:border-teal-600 transition-colors"
+              className="py-10 border-2 border-dashed border-stone-200 dark:border-stone-800 rounded-lg text-center cursor-pointer hover:border-teal-800/40 dark:hover:border-teal-500/40 transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
-              <Upload size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-500 dark:text-slate-400">Clique para enviar um documento</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">PDF, imagens, etc.</p>
+              <Upload size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Clique para enviar um documento</p>
+              <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-1">PDF, imagens, etc.</p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-700">
+            <div className="divide-y divide-border">
               {documents.map((doc) => (
                 <div key={doc.id} className="flex items-center justify-between py-3 px-1 gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
-                      <FileText size={15} className="text-slate-500 dark:text-slate-400" />
+                    <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0">
+                      <FileText size={15} className="text-stone-500 dark:text-stone-400" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{doc.fileName}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{fmtDate(doc.created_at)}</p>
+                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{doc.fileName}</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400">{fmtDate(doc.created_at)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -963,7 +1007,7 @@ export function PatientDetailContent() {
                       size="icon-sm"
                       onClick={() => { void handleViewDocument(doc); }}
                       disabled={loadingDocId === doc.id}
-                      className="text-slate-400 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20"
+                      className="text-stone-500/70 dark:text-stone-400/70 hover:text-teal-800 dark:hover:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10"
                       title={doc.mimeType.startsWith('image/') || doc.mimeType.includes('pdf') ? 'Visualizar' : 'Baixar'}
                     >
                       {loadingDocId === doc.id
@@ -975,8 +1019,8 @@ export function PatientDetailContent() {
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      onClick={() => setDeleteConfirm({ onConfirm: () => handleDeleteDocument(doc.id) })}
-                      className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      onClick={() => requestDelete(() => handleDeleteDocument(doc.id))}
+                      className="text-stone-500/70 dark:text-stone-400/70 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
                     >
                       <Trash2 size={14} />
                     </Button>
@@ -990,18 +1034,18 @@ export function PatientDetailContent() {
 
       {viewingDoc && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black/80">
-          <div className="flex items-center justify-between px-4 py-3 bg-teal-700 dark:bg-teal-800 shrink-0">
-            <p className="text-white font-medium text-sm truncate">{viewingDoc.fileName}</p>
+          <div className="flex items-center justify-between px-4 py-3 bg-teal-800 dark:bg-teal-500 shrink-0">
+            <p className="text-white dark:text-stone-950 font-medium text-sm truncate">{viewingDoc.fileName}</p>
             <div className="flex items-center gap-1 shrink-0">
               <a
                 href={viewingDoc.url}
                 download={viewingDoc.fileName}
                 title="Baixar"
-                className="inline-flex items-center justify-center rounded-md h-7 w-7 text-teal-100 hover:text-white hover:bg-teal-600 dark:hover:bg-teal-700 transition-colors"
+                className="inline-flex items-center justify-center rounded-md h-7 w-7 text-white/90 dark:text-stone-950/90 hover:text-white dark:hover:text-stone-950 hover:bg-teal-800 dark:hover:bg-teal-500 transition-colors"
               >
                 <Download size={16} />
               </a>
-              <Button variant="ghost" size="icon-sm" onClick={closeDocViewer} className="text-teal-100 hover:text-white hover:bg-teal-600 dark:hover:bg-teal-700">
+              <Button variant="ghost" size="icon-sm" onClick={closeDocViewer} className="text-white/90 dark:text-stone-950/90 hover:text-white dark:hover:text-stone-950 hover:bg-teal-800 dark:hover:bg-teal-500">
                 <X size={18} />
               </Button>
             </div>
@@ -1016,36 +1060,6 @@ export function PatientDetailContent() {
         </div>
       )}
 
-      {deleteConfirm && (
-        <ConfirmModal
-          title="Excluir registro?"
-          description="Esta ação não pode ser desfeita. O registro será removido permanentemente."
-          confirmLabel="Excluir"
-          loading={confirmDeleting}
-          onConfirm={() => { void handleConfirmDelete(); }}
-          onClose={() => setDeleteConfirm(null)}
-        />
-      )}
-
-      {showDeleteConfirm && (
-        <ConfirmModal
-          title="Excluir paciente?"
-          description={`Esta ação não pode ser desfeita. ${patient.name} será removido permanentemente.`}
-          confirmLabel="Excluir"
-          loading={deleting}
-          onConfirm={() => { void handleDelete(); }}
-          onClose={() => setShowDeleteConfirm(false)}
-        />
-      )}
-
-      {showEditModal && <PatientModal patient={patient} onClose={() => setShowEditModal(false)} onSuccess={handleEditSuccess} />}
-      {showUploadModal && <UploadExamModal preselectedPatient={patient} onClose={() => setShowUploadModal(false)} onSuccess={() => { setShowUploadModal(false); void fetchExams(); }} />}
-      {showAddWeight && <AddWeightModal patientId={patient.id} onClose={() => setShowAddWeight(false)} onSuccess={() => { setShowAddWeight(false); void fetchWeights(); }} />}
-      {showAddClinicalNote && <AddClinicalNoteModal patientId={patient.id} onClose={() => setShowAddClinicalNote(false)} onSuccess={() => { setShowAddClinicalNote(false); void fetchClinicalNotes(); }} />}
-      {showAddVaccine && <AddVaccineModal patientId={patient.id} onClose={() => setShowAddVaccine(false)} onSuccess={() => { setShowAddVaccine(false); void fetchVaccines(); }} />}
-      {showAddNote && <AddNoteModal patientId={patient.id} onClose={() => setShowAddNote(false)} onSuccess={() => { setShowAddNote(false); void fetchNotes(); }} />}
-      {showAddPrescription && <AddPrescriptionModal patientId={patient.id} onClose={() => setShowAddPrescription(false)} onSuccess={() => { setShowAddPrescription(false); void fetchPrescriptions(); }} />}
-      {showBudget && <BudgetModal patient={patient} tutor={tutor} onClose={() => setShowBudget(false)} />}
     </>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import {
@@ -16,6 +15,7 @@ import { DateInput } from '@/app/components/forms/date-input';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { TimeInput } from '@/app/components/forms/time-input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { monitoringService } from '@/services/monitoring.service';
 import type { PrescriptionTemplate } from '@/types/monitoring';
 
@@ -105,11 +105,19 @@ export function ApplyTemplateModal({
       maxWidth="xl"
     >
       {loading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 size={24} className="animate-spin text-teal-600" />
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-3 rounded-lg border border-stone-200 dark:border-stone-800"
+            >
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-28 mt-2" />
+            </div>
+          ))}
         </div>
       ) : templates.length === 0 ? (
-        <p className="text-sm text-slate-500 dark:text-slate-400 py-6 text-center">
+        <p className="text-sm text-stone-500 dark:text-stone-400 py-6 text-center">
           Nenhum modelo cadastrado ainda. Crie modelos na aba “Modelos de Prescrição”.
         </p>
       ) : (
@@ -136,8 +144,8 @@ export function ApplyTemplateModal({
                     key={index}
                     className={`p-3 rounded-lg border transition-colors ${
                       selection.checked
-                        ? 'border-teal-300 dark:border-teal-700 bg-teal-50/40 dark:bg-teal-900/10'
-                        : 'border-slate-200 dark:border-slate-700 opacity-60'
+                        ? 'border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10'
+                        : 'border-stone-200 dark:border-stone-800 opacity-60'
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -153,11 +161,11 @@ export function ApplyTemplateModal({
                             ),
                           )
                         }
-                        className="mt-1 rounded border-slate-300 dark:border-slate-600 text-teal-600 focus:ring-teal-500"
+                        className="mt-1 rounded border-stone-200 dark:border-stone-800 text-teal-800 dark:text-teal-500 focus:ring-teal-600 dark:focus:ring-teal-500"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
                             {item.name}
                           </p>
                           <span
@@ -166,7 +174,7 @@ export function ApplyTemplateModal({
                             {PRESCRIPTION_TYPE_MAP[item.type].label}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                           {FREQUENCY_LABELS[item.frequency]}
                           {item.frequency === 'RECURRING'
                             ? ` · a cada ${item.interval_hours}h por ${item.duration_days} dia(s)`
@@ -215,7 +223,7 @@ export function ApplyTemplateModal({
             </div>
           )}
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-500">{error}</p>}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
@@ -226,7 +234,7 @@ export function ApplyTemplateModal({
               onClick={() => void handleSubmit()}
               loading={saving}
               disabled={!template}
-              className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+              className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
             >
               Aplicar modelo
             </Button>

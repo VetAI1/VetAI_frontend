@@ -17,7 +17,7 @@ import {
   User,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { AddAppointmentModal } from './add-appointment-modal';
@@ -26,11 +26,13 @@ import { AddPaymentModal } from './add-payment-modal';
 import { TutorModal } from '@/app/(private)/tutors/components/tutor-modal';
 import { Card } from '@/app/components/common/card';
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS } from '@/constants';
+import { useModal } from '@/contexts/modal-context';
 import { appointmentsService } from '@/services/appointments.service';
 import { paymentsService } from '@/services/payments.service';
 import { tutorsService } from '@/services/tutors.service';
@@ -68,9 +70,9 @@ function fmtCpf(cpf: string): string {
 }
 
 export function TutorDetailContent() {
-  const searchParams = useSearchParams();
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const id = searchParams.get('id');
+  const id = params.slug;
 
   const [tutor, setTutor] = useState<Tutor | null>(null);
   const [loading, setLoading] = useState(true);
@@ -85,9 +87,7 @@ export function TutorDetailContent() {
   const [paidPayments, setPaidPayments] = useState<Payment[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
 
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showAddAppointment, setShowAddAppointment] = useState(false);
-  const [showAddPayment, setShowAddPayment] = useState(false);
+  const { open } = useModal();
 
   const [confirmDelete, setConfirmDelete] = useState<{ type: 'appointment' | 'payment'; id: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -213,13 +213,15 @@ export function TutorDetailContent() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <Header title="Detalhes do Tutor" showStorage={false} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
+      <div className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
+        <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+          <Header title="Detalhes do tutor" showStorage={false} />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
+          </div>
+          <Skeleton className="h-48 rounded-lg" />
+          <Skeleton className="h-48 rounded-lg" />
         </div>
-        <Skeleton className="h-48 rounded-lg" />
-        <Skeleton className="h-48 rounded-lg" />
       </div>
     );
   }
@@ -229,252 +231,274 @@ export function TutorDetailContent() {
   const petNameById = (patientId?: string) =>
     pets.find((p) => p.id === patientId)?.name ?? '—';
 
+  const openEditModal = () => open({
+    content: ({ close }) => (
+      <TutorModal
+        tutor={tutor}
+        onClose={close}
+        onSuccess={(updated) => { setTutor(updated); close(); }}
+      />
+    ),
+  });
+
+  const openAppointmentModal = () => open({
+    content: ({ close }) => (
+      <AddAppointmentModal
+        tutorId={id!}
+        pets={pets}
+        onClose={close}
+        onSuccess={(appt) => { setAppointments((prev) => [appt, ...prev]); close(); }}
+      />
+    ),
+  });
+
+  const openPaymentModal = () => open({
+    content: ({ close }) => (
+      <AddPaymentModal
+        tutorId={id!}
+        pets={pets}
+        onClose={close}
+        onSuccess={(payment) => {
+          if (payment.status === 'PENDING') {
+            setPendingPayments((prev) => [payment, ...prev]);
+          } else {
+            setPaidPayments((prev) => [payment, ...prev]);
+          }
+          close();
+        }}
+      />
+    ),
+  });
+
   return (
-    <div className="space-y-6">
-      <Header title="Detalhes do Tutor" showStorage={false} />
+    <div className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
+      <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+        <Header
+          title={tutor.name}
+          subtitle="Dados de contato, pacientes e movimentações"
+          showStorage={false}
+          headerAction={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={openEditModal}
+            >
+              <Pencil size={14} />
+              Editar
+            </Button>
+          }
+        />
 
-      {/* Back + actions */}
-      <div className="flex items-center justify-between gap-4">
-        <Link
-          href="/tutors"
-          className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Voltar para tutores
-        </Link>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowEditModal(true)}
-          className="gap-1.5"
-        >
-          <Pencil size={14} />
-          Editar
-        </Button>
-      </div>
-
-      {/* Info cards */}
-      <SectionCard title={tutor.name} subtitle="Informações do tutor">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <InfoItem icon={<User size={16} className="text-teal-600 dark:text-teal-400" />} iconBg="bg-teal-50 dark:bg-teal-900/30" label="CPF" value={fmtCpf(tutor.cpf)} />
-          <InfoItem icon={<Phone size={16} className="text-blue-600 dark:text-blue-400" />} iconBg="bg-blue-50 dark:bg-blue-900/30" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
-          <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? '—'} />
-          <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="Endereço" value={tutor.address ?? '—'} />
-        </div>
-      </SectionCard>
-
-      {/* Pets */}
-      <SectionCard
-        title={<span className="flex items-center gap-2"><PawPrint size={18} />Pets</span>}
-        subtitle={`${pets.length} pet${pets.length !== 1 ? 's' : ''} cadastrado${pets.length !== 1 ? 's' : ''}`}
-      >
-        {petsLoading ? (
-          <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 rounded" />)}</div>
-        ) : pets.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum pet cadastrado para este tutor.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {pets.map((pet) => (
-              <Link
-                key={pet.id}
-                href={`/patients/detail?id=${pet.id}`}
-                className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-teal-400 dark:hover:border-teal-600 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all group"
-              >
-                <div className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
-                  <PawPrint size={16} className="text-teal-600 dark:text-teal-400" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-medium text-slate-900 dark:text-white text-sm truncate group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">{pet.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </SectionCard>
-
-      {/* Agendamentos */}
-      <SectionCard
-        title={<span className="flex items-center gap-2"><CalendarClock size={18} />Atividades Agendadas</span>}
-        subtitle={`${upcomingAppointments.length} próxima${upcomingAppointments.length !== 1 ? 's' : ''}`}
-        headerAction={
-          <Button
-            size="sm"
-            onClick={() => setShowAddAppointment(true)}
-            className="gap-1.5 bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+        {/* Back + actions */}
+        <div className="flex items-center gap-4">
+          <Link
+            href="/tutors"
+            className="inline-flex items-center gap-1.5 text-sm text-stone-500 dark:text-stone-400 hover:text-teal-800 dark:hover:text-teal-500 transition-colors"
           >
-            <Plus size={14} />
-            Novo agendamento
-          </Button>
-        }
-      >
-        {appointmentsLoading ? (
-          <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
-        ) : upcomingAppointments.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum agendamento futuro.</p>
-        ) : (
-          <div className="space-y-2">
-            {upcomingAppointments.map((appt) => (
-              <AppointmentRow
-                key={appt.id}
-                appointment={appt}
-                petName={petNameById(appt.patient_id)}
-                onDelete={() => setConfirmDelete({ type: 'appointment', id: appt.id })}
-              />
-            ))}
-          </div>
-        )}
+            <ArrowLeft size={16} />
+          Voltar para tutores
+          </Link>
+        </div>
 
-        {pastAppointments.length > 0 && (
-          <details className="mt-4">
-            <summary className="cursor-pointer text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 select-none flex items-center gap-1.5 mb-2">
-              <History size={14} />
-              {pastAppointments.length} atividade{pastAppointments.length !== 1 ? 's' : ''} passada{pastAppointments.length !== 1 ? 's' : ''}
-            </summary>
-            <div className="space-y-2">
-              {pastAppointments.map((appt) => (
+        {/* Info cards */}
+        <SectionCard title="Informações de contato" subtitle="Dados cadastrados do tutor">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <InfoItem icon={<User size={16} className="text-teal-800 dark:text-teal-500" />} iconBg="bg-teal-800/10 dark:bg-teal-500/10" label="CPF" value={fmtCpf(tutor.cpf)} />
+            <InfoItem icon={<Phone size={16} className="text-sky-700 dark:text-sky-500" />} iconBg="bg-sky-50 dark:bg-sky-900" label="Telefone" value={tutor.phone ? formatPhone(tutor.phone) : '—'} />
+            <InfoItem icon={<Mail size={16} className="text-purple-600 dark:text-purple-400" />} iconBg="bg-purple-50 dark:bg-purple-900/30" label="E-mail" value={tutor.email ?? '—'} />
+            <InfoItem icon={<MapPin size={16} className="text-rose-600 dark:text-rose-400" />} iconBg="bg-rose-50 dark:bg-rose-900/30" label="Endereço" value={tutor.address ?? '—'} />
+          </div>
+        </SectionCard>
+
+        {/* Pets */}
+        <SectionCard
+          title={<span className="flex items-center gap-2"><PawPrint size={18} />Pets</span>}
+          subtitle={`${pets.length} pet${pets.length !== 1 ? 's' : ''} cadastrado${pets.length !== 1 ? 's' : ''}`}
+        >
+          {petsLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 rounded" />)}</div>
+          ) : pets.length === 0 ? (
+            <EmptyState
+              icon={PawPrint}
+              title="Nenhum pet cadastrado"
+              description="Os pacientes vinculados a este tutor aparecerão aqui."
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {pets.map((pet) => (
+                <Link
+                  key={pet.id}
+                  href={`/patients/${pet.id}`}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-teal-800/40 dark:hover:border-teal-500/40 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all group"
+                >
+                  <div className="w-9 h-9 rounded-full bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
+                    <PawPrint size={16} className="text-teal-800 dark:text-teal-500" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-stone-900 dark:text-stone-100 text-sm truncate group-hover:text-teal-800 dark:group-hover:text-teal-500 transition-colors">{pet.name}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">{SPECIE_LABELS[pet.specie]}{pet.breed ? ` · ${pet.breed}` : ''}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        {/* Agendamentos */}
+        <SectionCard
+          title={<span className="flex items-center gap-2"><CalendarClock size={18} />Atividades Agendadas</span>}
+          subtitle={`${upcomingAppointments.length} próxima${upcomingAppointments.length !== 1 ? 's' : ''}`}
+          headerAction={
+            <Button
+              size="sm"
+              onClick={openAppointmentModal}
+              className="gap-1.5 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
+            >
+              <Plus size={14} />
+            Novo agendamento
+            </Button>
+          }
+        >
+          {appointmentsLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
+          ) : upcomingAppointments.length === 0 ? (
+            <EmptyState
+              icon={CalendarClock}
+              title="Nenhum agendamento futuro"
+              description="Novos agendamentos aparecerão nesta seção."
+            />
+          ) : (
+            <div className="space-y-3">
+              {upcomingAppointments.map((appt) => (
                 <AppointmentRow
                   key={appt.id}
                   appointment={appt}
                   petName={petNameById(appt.patient_id)}
                   onDelete={() => setConfirmDelete({ type: 'appointment', id: appt.id })}
-                  muted
                 />
               ))}
             </div>
-          </details>
-        )}
-      </SectionCard>
+          )}
 
-      {/* Pagamentos pendentes */}
-      <SectionCard
-        title={<span className="flex items-center gap-2"><CreditCard size={18} />Pagamentos Pendentes</span>}
-        subtitle={pendingPayments.length > 0 ? `Total: ${fmtCurrency(totalPending)}` : 'Nenhum pendente'}
-        headerAction={
-          <Button
-            size="sm"
-            onClick={() => setShowAddPayment(true)}
-            className="gap-1.5 bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
-          >
-            <Plus size={14} />
+          {pastAppointments.length > 0 && (
+            <details className="mt-4">
+              <summary className="cursor-pointer text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 select-none flex items-center gap-1.5 mb-2">
+                <History size={14} />
+                {pastAppointments.length} atividade{pastAppointments.length !== 1 ? 's' : ''} passada{pastAppointments.length !== 1 ? 's' : ''}
+              </summary>
+              <div className="space-y-3">
+                {pastAppointments.map((appt) => (
+                  <AppointmentRow
+                    key={appt.id}
+                    appointment={appt}
+                    petName={petNameById(appt.patient_id)}
+                    onDelete={() => setConfirmDelete({ type: 'appointment', id: appt.id })}
+                    muted
+                  />
+                ))}
+              </div>
+            </details>
+          )}
+        </SectionCard>
+
+        {/* Pagamentos pendentes */}
+        <SectionCard
+          title={<span className="flex items-center gap-2"><CreditCard size={18} />Pagamentos Pendentes</span>}
+          subtitle={pendingPayments.length > 0 ? `Total: ${fmtCurrency(totalPending)}` : 'Nenhum pendente'}
+          headerAction={
+            <Button
+              size="sm"
+              onClick={openPaymentModal}
+              className="gap-1.5 bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
+            >
+              <Plus size={14} />
             Registrar cobrança
-          </Button>
-        }
-      >
-        {paymentsLoading ? (
-          <div className="space-y-2">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
-        ) : pendingPayments.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum pagamento pendente.</p>
-        ) : (
-          <div className="space-y-2">
-            {pendingPayments.map((payment) => (
-              <PaymentRow
-                key={payment.id}
-                payment={payment}
-                petName={petNameById(payment.patient_id)}
-                onMarkPaid={() => setConfirmMarkPaid(payment)}
-                onDelete={() => setConfirmDelete({ type: 'payment', id: payment.id })}
-              />
-            ))}
-          </div>
-        )}
-      </SectionCard>
-
-      {/* Histórico de compras */}
-      <SectionCard
-        title={<span className="flex items-center gap-2"><History size={18} />Histórico de Compras</span>}
-        subtitle={`${paidPayments.length} registro${paidPayments.length !== 1 ? 's' : ''}`}
-      >
-        {paymentsLoading ? (
-          <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
-        ) : paidPayments.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">Nenhum histórico de compras.</p>
-        ) : (
-          <div className="space-y-2">
-            {paidPayments.map((payment) => (
-              <PaymentRow
-                key={payment.id}
-                payment={payment}
-                petName={petNameById(payment.patient_id)}
-                onDelete={() => setConfirmDelete({ type: 'payment', id: payment.id })}
-              />
-            ))}
-          </div>
-        )}
-      </SectionCard>
-
-      {/* Modals */}
-      {showEditModal && tutor && (
-        <TutorModal
-          tutor={tutor}
-          onClose={() => setShowEditModal(false)}
-          onSuccess={(updated) => {
-            setTutor(updated);
-            setShowEditModal(false);
-          }}
-        />
-      )}
-
-      {showAddAppointment && id && (
-        <AddAppointmentModal
-          tutorId={id}
-          pets={pets}
-          onClose={() => setShowAddAppointment(false)}
-          onSuccess={(appt) => {
-            setAppointments((prev) => [appt, ...prev]);
-            setShowAddAppointment(false);
-          }}
-        />
-      )}
-
-      {showAddPayment && id && (
-        <AddPaymentModal
-          tutorId={id}
-          pets={pets}
-          onClose={() => setShowAddPayment(false)}
-          onSuccess={(payment) => {
-            if (payment.status === 'PENDING') {
-              setPendingPayments((prev) => [payment, ...prev]);
-            } else {
-              setPaidPayments((prev) => [payment, ...prev]);
-            }
-            setShowAddPayment(false);
-          }}
-        />
-      )}
-
-      {confirmDelete && (
-        <ConfirmModal
-          title={
-            confirmDelete.type === 'appointment'
-              ? 'Excluir agendamento'
-              : 'Excluir pagamento'
+            </Button>
           }
-          description="Esta ação não pode ser desfeita. Deseja continuar?"
-          confirmLabel="Excluir"
-          loading={deleting}
-          onConfirm={() => {
-            void (confirmDelete.type === 'appointment'
-              ? handleDeleteAppointment()
-              : handleDeletePayment());
-          }}
-          onClose={() => setConfirmDelete(null)}
-        />
-      )}
+        >
+          {paymentsLoading ? (
+            <div className="space-y-2">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
+          ) : pendingPayments.length === 0 ? (
+            <EmptyState
+              icon={CreditCard}
+              title="Nenhum pagamento pendente"
+              description="As cobranças pendentes aparecerão nesta seção."
+            />
+          ) : (
+            <div className="space-y-3">
+              {pendingPayments.map((payment) => (
+                <PaymentRow
+                  key={payment.id}
+                  payment={payment}
+                  petName={petNameById(payment.patient_id)}
+                  onMarkPaid={() => setConfirmMarkPaid(payment)}
+                  onDelete={() => setConfirmDelete({ type: 'payment', id: payment.id })}
+                />
+              ))}
+            </div>
+          )}
+        </SectionCard>
 
-      {confirmMarkPaid && (
-        <ConfirmModal
-          title="Confirmar pagamento"
-          description={`Marcar cobrança de ${fmtCurrency(confirmMarkPaid.amount)} como pago?`}
-          confirmLabel="Confirmar pagamento"
-          variant="default"
-          loading={markingPaid}
-          onConfirm={() => {
-            void handleMarkPaid();
-          }}
-          onClose={() => setConfirmMarkPaid(null)}
-        />
-      )}
+        {/* Histórico de compras */}
+        <SectionCard
+          title={<span className="flex items-center gap-2"><History size={18} />Histórico de Compras</span>}
+          subtitle={`${paidPayments.length} registro${paidPayments.length !== 1 ? 's' : ''}`}
+        >
+          {paymentsLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 rounded" />)}</div>
+          ) : paidPayments.length === 0 ? (
+            <EmptyState
+              icon={History}
+              title="Nenhum histórico de compras"
+              description="Os pagamentos concluídos aparecerão nesta seção."
+            />
+          ) : (
+            <div className="space-y-3">
+              {paidPayments.map((payment) => (
+                <PaymentRow
+                  key={payment.id}
+                  payment={payment}
+                  petName={petNameById(payment.patient_id)}
+                  onDelete={() => setConfirmDelete({ type: 'payment', id: payment.id })}
+                />
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        {confirmDelete && (
+          <ConfirmModal
+            title={
+              confirmDelete.type === 'appointment'
+                ? 'Excluir agendamento'
+                : 'Excluir pagamento'
+            }
+            description="Esta ação não pode ser desfeita. Deseja continuar?"
+            confirmLabel="Excluir"
+            loading={deleting}
+            onConfirm={() => {
+              void (confirmDelete.type === 'appointment'
+                ? handleDeleteAppointment()
+                : handleDeletePayment());
+            }}
+            onClose={() => setConfirmDelete(null)}
+          />
+        )}
+
+        {confirmMarkPaid && (
+          <ConfirmModal
+            title="Confirmar pagamento"
+            description={`Marcar cobrança de ${fmtCurrency(confirmMarkPaid.amount)} como pago?`}
+            confirmLabel="Confirmar pagamento"
+            variant="default"
+            loading={markingPaid}
+            onConfirm={() => {
+              void handleMarkPaid();
+            }}
+            onClose={() => setConfirmMarkPaid(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -498,8 +522,8 @@ function InfoItem({
         {icon}
       </div>
       <div className="min-w-0 pl-2">
-        <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+        <p className="text-xs text-stone-500 dark:text-stone-400">{label}</p>
+        <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
           {value}
         </p>
       </div>
@@ -522,12 +546,12 @@ function AppointmentRow({
   const statusColors = APPOINTMENT_STATUS_COLORS[appointment.status];
   return (
     <div
-      className={`flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 ${muted ? 'opacity-60' : ''}`}
+      className={`flex items-center gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800 ${muted ? 'opacity-60' : ''}`}
     >
       <div className={`w-2 h-2 rounded-full shrink-0 ${typeColors.dot}`} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-slate-900 dark:text-white truncate">
+          <span className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
             {appointment.title}
           </span>
           <span
@@ -541,7 +565,7 @@ function AppointmentRow({
             {APPOINTMENT_STATUS_LABELS[appointment.status]}
           </span>
         </div>
-        <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-3 mt-0.5 text-xs text-stone-500 dark:text-stone-400">
           <span className="flex items-center gap-1">
             <Calendar size={11} />
             {fmtDate(appointment.date)} às {appointment.start_time}
@@ -556,7 +580,7 @@ function AppointmentRow({
       </div>
       <button
         onClick={onDelete}
-        className="text-slate-400 hover:text-red-500 transition-colors p-1 shrink-0"
+        className="text-stone-500/70 dark:text-stone-400/70 hover:text-red-600 dark:hover:text-red-500 transition-colors p-1 shrink-0"
         aria-label="Excluir agendamento"
       >
         <Trash2 size={14} />
@@ -591,12 +615,12 @@ function PaymentRow({
 
   return (
     <div
-      className={`p-3 rounded-lg border ${isOverdue ? 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10' : 'border-slate-200 dark:border-slate-700'}`}
+      className={`p-3 rounded-lg border ${isOverdue ? 'border-red-600/30 dark:border-red-500/30 bg-red-50/50 dark:bg-red-900/50' : 'border-stone-200 dark:border-stone-800'}`}
     >
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">
+            <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">
               {fmtCurrency(payment.amount)}
             </span>
             <span
@@ -605,15 +629,15 @@ function PaymentRow({
               {PAYMENT_STATUS_LABELS[payment.status]}
             </span>
             {isOverdue && (
-              <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+              <span className="text-xs text-red-600 dark:text-red-500 font-medium">
                 Vencido
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 truncate">
             {itemsSummary}
           </p>
-          <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-400 dark:text-slate-500 flex-wrap">
+          <div className="flex items-center gap-3 mt-0.5 text-xs text-stone-500/70 dark:text-stone-400/70 flex-wrap">
             <span className="flex items-center gap-1">
               <Calendar size={11} />
               Vence: {fmtDate(payment.due_date)}
@@ -631,7 +655,7 @@ function PaymentRow({
           {payment.status === 'PENDING' && onMarkPaid && (
             <button
               onClick={onMarkPaid}
-              className="text-slate-400 hover:text-green-600 transition-colors p-1"
+              className="text-stone-500/70 dark:text-stone-400/70 hover:text-emerald-700 dark:hover:text-emerald-500 transition-colors p-1"
               aria-label="Marcar como pago"
             >
               <CheckCircle2 size={16} />
@@ -640,7 +664,7 @@ function PaymentRow({
           {onDelete && (
             <button
               onClick={onDelete}
-              className="text-slate-400 hover:text-red-500 transition-colors p-1"
+              className="text-stone-500/70 dark:text-stone-400/70 hover:text-red-600 dark:hover:text-red-500 transition-colors p-1"
               aria-label="Excluir cobrança"
             >
               <Trash2 size={14} />
@@ -650,14 +674,14 @@ function PaymentRow({
       </div>
       {payment.items.length > 1 && (
         <details className="mt-2">
-          <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 select-none">
+          <summary className="text-xs text-stone-500/70 dark:text-stone-400/70 cursor-pointer hover:text-stone-500 dark:hover:text-stone-400 select-none">
             Ver {payment.items.length} itens
           </summary>
-          <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-slate-200 dark:border-slate-600">
+          <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-stone-200 dark:border-stone-800">
             {payment.items.map((item, i) => (
               <div
                 key={i}
-                className="flex justify-between text-xs text-slate-500 dark:text-slate-400"
+                className="flex justify-between text-xs text-stone-500 dark:text-stone-400"
               >
                 <span>
                   {item.quantity > 1 ? `${item.quantity}× ` : ''}

@@ -1,16 +1,18 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Beaker, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Beaker, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Modal } from '@/app/components/common/modal';
 import { SectionCard } from '@/app/components/data/section-card';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   clinicalParameterSchema,
   type ClinicalParameterFormData,
@@ -144,7 +146,7 @@ function ParameterFormModal({
           <Button
             type="submit"
             loading={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Salvar
           </Button>
@@ -201,7 +203,7 @@ export function ParametersTab() {
       headerAction={
         <Button
           onClick={() => setShowForm(true)}
-          className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+          className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
         >
           <Plus size={16} />
           Novo parâmetro
@@ -209,32 +211,44 @@ export function ParametersTab() {
       }
     >
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-teal-600" />
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between gap-3 py-1"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-5 w-14 rounded-full" />
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-8 w-8" />
+                <Skeleton className="h-8 w-8" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : parameters.length === 0 ? (
-        <div className="text-center py-12">
-          <Beaker size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-          <p className="text-slate-500 dark:text-slate-400">Nenhum parâmetro cadastrado</p>
-        </div>
+        <EmptyState icon={Beaker} title="Nenhum parâmetro cadastrado" />
       ) : (
-        <div className="divide-y divide-slate-100 dark:divide-slate-700/60">
+        <div className="divide-y divide-stone-200/70 dark:divide-stone-800/70">
           {parameters.map((parameter) => (
             <div
               key={parameter.id}
               className="flex items-center justify-between gap-3 py-3"
             >
               <div className="min-w-0 flex items-center gap-2">
-                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
                   {parameter.name}
                   {parameter.unit && (
-                    <span className="text-slate-400 dark:text-slate-500 font-normal">
+                    <span className="text-stone-500/70 dark:text-stone-400/70 font-normal">
                       {' '}
                       ({parameter.unit})
                     </span>
                   )}
                 </p>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 shrink-0">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100 shrink-0">
                   {parameter.value_type === 'NUMBER' ? 'Número' : 'Texto'}
                 </span>
               </div>
@@ -244,8 +258,8 @@ export function ParametersTab() {
                   onClick={() => void toggleActive(parameter)}
                   className={`px-2 py-0.5 rounded-full text-[11px] font-semibold transition-colors ${
                     parameter.active
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                      : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                      ? 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500'
+                      : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
                   }`}
                   title="Clique para alternar"
                 >
@@ -264,7 +278,7 @@ export function ParametersTab() {
                   size="icon-sm"
                   onClick={() => setDeleting(parameter)}
                   title="Excluir"
-                  className="text-red-500 hover:text-red-600"
+                  className="text-red-600 dark:text-red-500"
                 >
                   <Trash2 size={14} />
                 </Button>

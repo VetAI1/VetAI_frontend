@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   BedDouble,
   CalendarClock,
-  Loader2,
   PawPrint,
   Plus,
   Search,
@@ -17,8 +16,11 @@ import { RISK_MAP, STATUS_MAP, daysSince, dayRangeISO, fmtDate, todayLocalISODat
 import { HospitalizeModal } from './hospitalize-modal';
 import { SummaryCards } from './summary-cards';
 
+import { EmptyState } from '@/app/components/common/empty-state';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   CLINICAL_STATUS_CLASSES,
   CLINICAL_STATUS_LABELS,
@@ -171,22 +173,22 @@ export function HospitalizedTab() {
     <div>
       <SummaryCards summary={summary} loading={summaryLoading} />
 
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-4 mb-6">
+      <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-4 mb-6">
         <div className="flex flex-col lg:flex-row gap-3 lg:items-end">
           <div className="flex-1 min-w-0">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-sm font-medium text-stone-800 dark:text-stone-100 mb-1.5">
               Buscar paciente
             </label>
             <div className="relative">
               <Search
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500/70 dark:text-stone-400/70"
               />
-              <input
+              <Input
                 type="text"
                 placeholder="Nome do paciente..."
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="pl-10"
               />
             </div>
           </div>
@@ -241,7 +243,7 @@ export function HospitalizedTab() {
           </div>
           <Button
             onClick={() => setShowHospitalize(true)}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700 shrink-0"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 shrink-0"
           >
             <Plus size={16} />
             Internar paciente
@@ -250,19 +252,43 @@ export function HospitalizedTab() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-teal-600" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="relative overflow-hidden bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 p-4 pl-6"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute inset-y-0 left-0 w-2 bg-stone-100 dark:bg-stone-800"
+              />
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Skeleton className="h-11 w-11 shrink-0" />
+                  <div className="space-y-1.5 min-w-0 flex-1">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-1.5 mb-3">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+              <div className="space-y-1.5">
+                <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-3 w-28" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : isEmpty ? (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-12 text-center">
-          <PawPrint size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-          <p className="text-slate-500 dark:text-slate-400 font-medium">
-            Nenhum animal internado no momento
-          </p>
-          <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
-            Clique em “Internar paciente” para registrar uma nova internação.
-          </p>
-        </div>
+        <EmptyState
+          icon={PawPrint}
+          title="Nenhum animal internado no momento"
+          description="Clique em “Internar paciente” para registrar uma nova internação."
+        />
       ) : (
         <>
           <div className="space-y-6">
@@ -272,10 +298,10 @@ export function HospitalizedTab() {
                   <span
                     className={`w-2.5 h-2.5 rounded-full ${STATUS_MAP[group.status].dot}`}
                   />
-                  <h2 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">
+                  <h2 className="text-sm font-bold uppercase tracking-wide text-stone-800 dark:text-stone-100">
                     {GROUP_LABELS[group.status]}
                   </h2>
-                  <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
+                  <span className="text-xs font-semibold text-stone-500/70 dark:text-stone-400/70">
                     ({group.items.length})
                   </span>
                 </div>
@@ -287,40 +313,40 @@ export function HospitalizedTab() {
                         key={hospitalization.id}
                         type="button"
                         onClick={() =>
-                          router.push(`/monitoring/detail?id=${hospitalization.id}`)
+                          router.push(`/monitoring/${hospitalization.id}`)
                         }
                         title={risk.label}
-                        className="relative overflow-hidden text-left bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all p-4 pl-6"
+                        className="relative overflow-hidden text-left bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-teal-800/25 dark:hover:border-teal-500/25 transition-colors p-4 pl-6"
                       >
                         <span
                           aria-hidden="true"
                           className={`absolute inset-y-0 left-0 w-2 ${risk.dot}`}
                         />
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 shrink-0">
+                        <span className="flex items-start justify-between gap-2 mb-3">
+                          <span className="flex items-center gap-3 min-w-0">
+                            <span className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
                               <Stethoscope size={22} />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-semibold text-slate-900 dark:text-white truncate">
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block font-semibold text-stone-900 dark:text-stone-100 truncate">
                                 {hospitalization.patient?.name}
-                              </p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                              </span>
+                              <span className="block text-xs text-stone-500 dark:text-stone-400 truncate">
                                 {hospitalization.patient?.breed || '—'}
-                              </p>
-                            </div>
-                          </div>
+                              </span>
+                            </span>
+                          </span>
                           {(hospitalization.patient?.restrictions?.length ?? 0) > 0 && (
                             <span
                               title={`Restrições: ${hospitalization.patient.restrictions?.join(', ')}`}
-                              className="text-amber-500 shrink-0"
+                              className="text-amber-600 dark:text-amber-400 shrink-0"
                             >
                               <AlertTriangle size={18} />
                             </span>
                           )}
-                        </div>
+                        </span>
 
-                        <div className="flex flex-wrap gap-1.5 mb-3">
+                        <span className="flex flex-wrap gap-1.5 mb-3">
                           {hospitalization.clinical_status && (
                             <span
                               className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${CLINICAL_STATUS_CLASSES[hospitalization.clinical_status]}`}
@@ -329,37 +355,37 @@ export function HospitalizedTab() {
                             </span>
                           )}
                           {cadenceFor(hospitalization)?.overdue && (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500">
                         Aferição atrasada
                             </span>
                           )}
-                        </div>
+                        </span>
 
-                        <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-                          <p
+                        <span className="flex flex-col gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+                          <span
                             className="flex items-center gap-1.5"
                             title="Veterinário de plantão"
                           >
-                            <Stethoscope size={13} className="text-slate-400 shrink-0" />
+                            <Stethoscope size={13} className="text-stone-500/70 dark:text-stone-400/70 shrink-0" />
                             <span className="truncate">
                               {hospitalization.on_duty_veterinarian?.name ??
                                 hospitalization.veterinarian?.name ??
                                 '—'}
                             </span>
-                          </p>
-                          <p className="flex items-center gap-1.5">
-                            <BedDouble size={13} className="text-slate-400 shrink-0" />
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <BedDouble size={13} className="text-stone-500/70 dark:text-stone-400/70 shrink-0" />
                             {hospitalization.box?.name ?? 'Sem box'}
-                          </p>
-                          <p className="flex items-center gap-1.5">
-                            <CalendarClock size={13} className="text-slate-400 shrink-0" />
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <CalendarClock size={13} className="text-stone-500/70 dark:text-stone-400/70 shrink-0" />
                             {daysSince(hospitalization.admitted_at)}{' '}
                             {daysSince(hospitalization.admitted_at) === 1 ? 'dia' : 'dias'} internado
                             {hospitalization.expected_discharge_at
                               ? ` · alta prevista ${fmtDate(hospitalization.expected_discharge_at)}`
                               : ''}
-                          </p>
-                        </div>
+                          </span>
+                        </span>
                       </button>
                     );
                   })}

@@ -1,64 +1,29 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { useTheme } from '@/contexts/theme-context';
-
 interface HeaderProps {
   title: string;
+  subtitle?: React.ReactNode;
   usedGB?: number;
   totalGB?: number;
   showStorage?: boolean;
   headerAction?: React.ReactNode;
 }
 
-export function Header({
-  title,
-  usedGB = 0,
-  totalGB = 0,
-  showStorage = true,
-  headerAction,
-}: HeaderProps) {
-  const percentage = (usedGB / totalGB) * 100;
-  const { theme, toggleTheme } = useTheme();
-
+export function Header({ title, subtitle, headerAction }: HeaderProps) {
   return (
-    <div className="mb-8 mt-16 md:mt-0">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex justify-between items-center w-full md:w-auto">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+    <div className="mb-6 mt-14 md:mt-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <div className="min-w-0">
+          <h1 className="text-2xl md:text-[28px] font-bold tracking-tight text-stone-900 dark:text-stone-100">
             {title}
           </h1>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleTheme}
-            className="md:hidden print:hidden"
-          >
-            {theme === 'dark' ? <Sun /> : <Moon />}
-          </Button>
-        </div>
-        <div className="flex items-center gap-3">
-          {headerAction}
-          {showStorage && (
-            <div className="flex flex-col gap-1 w-full md:w-[30%]">
-              <span className="whitespace-nowrap text-sm text-gray-500 dark:text-slate-400 font-medium text-center">
-                {usedGB}GB de {totalGB}GB usados
-              </span>
-              <Progress value={percentage} className="h-2.5" />
-            </div>
+          {subtitle && (
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{subtitle}</p>
           )}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleTheme}
-            className="hidden md:flex print:hidden"
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </Button>
         </div>
+        {headerAction && (
+          <div className="flex items-center gap-2 shrink-0">{headerAction}</div>
+        )}
       </div>
     </div>
   );

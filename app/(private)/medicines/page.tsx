@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { MedicineDetailModal } from './components/medicine-detail-modal';
 
 import { Card } from '@/app/components/common/card';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { SelectInput } from '@/app/components/forms/select-input';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -209,15 +210,15 @@ export default function MedicinesPage() {
   const isEmpty = !loading && medicines.length === 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Medicações" showStorage={false} />
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1 max-w-sm">
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500/70 dark:text-stone-400/70 pointer-events-none"
             />
             <Input
               placeholder="Buscar por nome..."
@@ -228,7 +229,7 @@ export default function MedicinesPage() {
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-500/70 dark:text-stone-400/70 hover:text-stone-900 dark:hover:text-stone-100"
               >
                 <X size={14} />
               </button>
@@ -252,14 +253,15 @@ export default function MedicinesPage() {
             ))}
           </div>
         ) : isEmpty ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-3">
-            <Pill size={36} className="text-slate-300 dark:text-slate-600" />
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              {search || filters.type
-                ? 'Nenhum medicamento encontrado.'
-                : 'Nenhum medicamento cadastrado ainda.'}
-            </p>
-          </div>
+          <EmptyState
+            title={
+              search || filters.type
+                ? 'Nenhum medicamento encontrado'
+                : 'Nenhum medicamento cadastrado ainda'
+            }
+            icon={Pill}
+            className="py-24"
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {medicines.map((medicine) => (
@@ -290,7 +292,7 @@ export default function MedicinesPage() {
                 onClick={() => setPage(p)}
                 className={
                   p === page
-                    ? 'bg-teal-600 text-white hover:bg-teal-700 border-teal-600'
+                    ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 border-teal-800 dark:border-teal-500'
                     : ''
                 }
               >
@@ -328,19 +330,19 @@ function MedicineCard({
 }) {
   return (
     <Card
-      className="p-4 cursor-pointer hover:shadow-md hover:border-teal-300 dark:hover:border-teal-600 transition-all duration-200 group"
+      className="p-4 cursor-pointer hover:shadow-md hover:border-teal-800/40 dark:hover:border-teal-500/40 transition-all duration-200 group"
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-lg bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center shrink-0 group-hover:bg-teal-200 dark:group-hover:bg-teal-900/50 transition-colors">
-          <Pill size={16} className="text-teal-600 dark:text-teal-400" />
+        <div className="w-9 h-9 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0 group-hover:bg-teal-800/10 dark:group-hover:bg-teal-500/10 transition-colors">
+          <Pill size={16} className="text-teal-800 dark:text-teal-500" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-white truncate group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
+          <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate group-hover:text-teal-800 dark:group-hover:text-teal-500 transition-colors">
             {medicine.name}
           </h3>
           {medicine.activeIngredients && (
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">
+            <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5 truncate">
               {medicine.activeIngredients}
             </p>
           )}
@@ -349,14 +351,14 @@ function MedicineCard({
 
       <div className="flex flex-wrap gap-1 mt-3">
         {medicine.classification && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 border border-teal-800/40 dark:border-teal-500/40">
             {medicine.classification}
           </span>
         )}
         {medicine.administrationRoutes?.slice(0, 2).map((r) => (
           <span
             key={r}
-            className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+            className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400"
           >
             {r}
           </span>
@@ -364,7 +366,7 @@ function MedicineCard({
       </div>
 
       {medicine.fullIndications && (
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-stone-500 dark:text-stone-400 mt-2 line-clamp-2 leading-relaxed">
           {medicine.fullIndications}
         </p>
       )}

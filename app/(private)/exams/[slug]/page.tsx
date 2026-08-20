@@ -3,19 +3,19 @@
 import { Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
 
-import { ExamDetailContent } from './components/exam-detail-content';
+import { ExamDetailContent } from '../../exams/detail/components/exam-detail-content';
 
 import { Header } from '@/app/components/layout/header';
 
 export default function ExamDetailPage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Detalhes do Exame" showStorage={false} />
         <Suspense
           fallback={
             <div className="flex items-center justify-center py-20">
-              <Loader2 size={32} className="animate-spin text-teal-600" />
+              <Loader2 size={32} className="animate-spin text-teal-800 dark:text-teal-500" />
             </div>
           }
         >

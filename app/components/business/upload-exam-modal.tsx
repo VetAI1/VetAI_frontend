@@ -1,7 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Upload, X } from 'lucide-react';
+import { CheckCircle2, FileUp, Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 
@@ -32,7 +32,6 @@ export function UploadExamModal({
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(
     preselectedPatient ?? null,
   );
-  const [showDropdown, setShowDropdown] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const {
@@ -43,6 +42,8 @@ export function UploadExamModal({
     loadNextPage: loadNextPatientPage,
     search: patientSearch,
     setSearch: setPatientSearch,
+    open: showDropdown,
+    setOpen: setShowDropdown,
   } = useAutoComplete<Patient>({
     fetcher: patientsService.list,
     pageSize: 8,
@@ -67,20 +68,13 @@ export function UploadExamModal({
   const title = watch('title');
   const examDate = watch('examDate');
   const file = watch('file');
+  const readyToUpload = Boolean(selectedPatient && title?.trim() && file);
 
   useEffect(() => {
     if (preselectedPatient) {
       setValue('patientId', preselectedPatient.id);
     }
   }, [preselectedPatient, setValue]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
 
   const handleFileChange = (selectedFile: File | null) => {
     if (!selectedFile) return;
@@ -103,136 +97,141 @@ export function UploadExamModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="relative w-full max-w-lg animate-in rounded-xl bg-white shadow-2xl fade-in zoom-in-95 duration-200 dark:bg-slate-800">
-        <div className="flex items-center justify-between border-b border-slate-200 p-5 dark:border-slate-700">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Enviar Exame
-            </h2>
-            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-              Faça o upload do PDF do exame para análise automática
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onClose}
-            className="text-slate-500"
-          >
-            <X size={18} />
-          </Button>
+    <div className="flex max-h-[calc(100dvh-2rem)] w-[min(calc(100vw-2rem),32rem)] flex-col overflow-hidden rounded-xl bg-white dark:bg-stone-900 shadow-[var(--shadow-card)]">
+      <div className="flex shrink-0 items-center justify-between border-b border-stone-200 dark:border-stone-800 p-5">
+        <div>
+          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+            Enviar Exame
+          </h2>
+          <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
+            Faça o upload do PDF do exame para análise automática
+          </p>
         </div>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onClose}
+          className="text-stone-500 dark:text-stone-400"
+        >
+          <X size={18} />
+        </Button>
+      </div>
 
-        <div className="space-y-4 p-5">
-          {!preselectedPatient && (
-            <Autocomplete
-              label="Paciente"
-              required
-              placeholder="Buscar paciente por nome..."
-              search={patientSearch}
-              onSearchChange={setPatientSearch}
-              items={patients}
-              getOptionLabel={(patient) => patient.name}
-              getOptionDescription={(patient) => patient.breed}
-              loading={loadingPatients}
-              loadingMore={loadingMorePatients}
-              hasMorePage={hasMorePatients}
-              onLoadNextPage={loadNextPatientPage}
-              open={showDropdown}
-              onOpenChange={setShowDropdown}
-              selectedOption={
-                selectedPatient
-                  ? {
-                    id: selectedPatient.id,
-                    label: selectedPatient.name,
-                    description: selectedPatient.breed,
-                  }
-                  : null
-              }
-              onSelect={(patient) => {
-                setSelectedPatient(patient);
-                setValue('patientId', patient.id, { shouldValidate: true });
-                setPatientSearch('');
-              }}
-              onClear={() => {
-                setSelectedPatient(null);
-                setValue('patientId', '', { shouldValidate: true });
-              }}
-              error={errors.patientId?.message}
-              emptyMessage="Nenhum paciente encontrado"
-            />
-          )}
-
-          {preselectedPatient && (
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Paciente
-              </label>
-              <div className="rounded-lg border border-teal-200 bg-teal-50 p-3 dark:border-teal-700 dark:bg-teal-900/20">
-                <span className="text-sm font-medium text-teal-800 dark:text-teal-300">
-                  {preselectedPatient.name}
-                </span>
-              </div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            <InputWithLabel
-              label="Título do exame"
-              required
-              value={title}
-              onChange={(e) =>
-                setValue('title', e.target.value, { shouldValidate: true })
-              }
-              placeholder="Ex: Hemograma Completo"
-              error={errors.title?.message}
-            />
-            <DateInput
-              label="Data do exame"
-              value={examDate}
-              onChange={(value) =>
-                setValue('examDate', value, { shouldValidate: true })
-              }
-              required
-              error={errors.examDate?.message}
-            />
-          </div>
-
-          <FileDropzone
-            label="Arquivo PDF do exame"
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+        <div className="flex items-center gap-2 rounded-lg bg-stone-100/70 px-3 py-2 text-xs font-medium text-stone-500 transition-colors dark:bg-stone-800/70 dark:text-stone-400">
+          <span
+            className={`grid size-5 place-items-center rounded-full transition-colors duration-200 ${readyToUpload ? 'bg-teal-800 text-white dark:bg-teal-500 dark:text-stone-950' : 'bg-white text-stone-500 dark:bg-stone-900 dark:text-stone-400'}`}
+          >
+            {readyToUpload ? <CheckCircle2 size={13} /> : <FileUp size={13} />}
+          </span>
+          {readyToUpload
+            ? 'Exame pronto para análise.'
+            : 'Selecione o paciente, informe o título e anexe o PDF.'}
+        </div>
+        {!preselectedPatient && (
+          <Autocomplete
+            label="Paciente"
             required
-            file={file}
-            accept="application/pdf"
-            helperText="Apenas arquivos PDF são aceitos"
-            error={errors.file?.message}
-            onFileSelect={handleFileChange}
+            placeholder="Buscar paciente por nome..."
+            search={patientSearch}
+            onSearchChange={setPatientSearch}
+            items={patients}
+            getOptionLabel={(patient) => patient.name}
+            getOptionDescription={(patient) => patient.breed}
+            loading={loadingPatients}
+            loadingMore={loadingMorePatients}
+            hasMorePage={hasMorePatients}
+            onLoadNextPage={loadNextPatientPage}
+            open={showDropdown}
+            onOpenChange={setShowDropdown}
+            selectedOption={
+              selectedPatient
+                ? {
+                  id: selectedPatient.id,
+                  label: selectedPatient.name,
+                  description: selectedPatient.breed,
+                }
+                : null
+            }
+            onSelect={(patient) => {
+              setSelectedPatient(patient);
+              setValue('patientId', patient.id, { shouldValidate: true });
+              setPatientSearch('');
+            }}
+            onClear={() => {
+              setSelectedPatient(null);
+              setValue('patientId', '', { shouldValidate: true });
+            }}
+            error={errors.patientId?.message}
+            emptyMessage="Nenhum paciente encontrado"
+          />
+        )}
+
+        {preselectedPatient && (
+          <div>
+            <label className="mb-2 block text-sm font-medium text-stone-900 dark:text-stone-100">
+              Paciente
+            </label>
+            <div className="rounded-lg border border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10 p-3">
+              <span className="text-sm font-medium text-teal-800 dark:text-teal-500">
+                {preselectedPatient.name}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <InputWithLabel
+            label="Título do exame"
+            required
+            value={title}
+            onChange={(e) =>
+              setValue('title', e.target.value, { shouldValidate: true })
+            }
+            placeholder="Ex: Hemograma Completo"
+            error={errors.title?.message}
+          />
+          <DateInput
+            label="Data do exame"
+            value={examDate}
+            onChange={(value) =>
+              setValue('examDate', value, { shouldValidate: true })
+            }
+            required
+            error={errors.examDate?.message}
           />
         </div>
 
-        <div className="flex items-center justify-end gap-3 border-t border-slate-200 px-5 py-4 dark:border-slate-700">
-          <Button variant="outline" onClick={onClose} disabled={uploading}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            loading={uploading}
-            className="min-w-[120px] bg-teal-600 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-800"
-          >
-            {uploading ? (
-              <>Enviando...</>
-            ) : (
-              <>
-                <Upload size={16} className="mr-2" />
-                Enviar Exame
-              </>
-            )}
-          </Button>
-        </div>
+        <FileDropzone
+          label="Arquivo PDF do exame"
+          required
+          file={file}
+          accept="application/pdf"
+          helperText="Apenas arquivos PDF são aceitos"
+          error={errors.file?.message}
+          onFileSelect={handleFileChange}
+        />
+      </div>
+
+      <div className="flex shrink-0 items-center justify-end gap-3 border-t border-stone-200 dark:border-stone-800 p-4">
+        <Button variant="outline" onClick={onClose} disabled={uploading}>
+          Cancelar
+        </Button>
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          loading={uploading}
+          disabled={!readyToUpload || uploading}
+          className="min-w-[120px] bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
+        >
+          {uploading ? (
+            <span className="flex items-center">Enviando...</span>
+          ) : (
+            <span className="flex items-center">
+              <Upload size={16} className="mr-2" />
+              Enviar Exame
+            </span>
+          )}
+        </Button>
       </div>
     </div>
   );

@@ -2,10 +2,10 @@
 
 import { Eye, Microscope, UploadIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 import { UploadExamModal } from '@/app/components/business/upload-exam-modal';
 import { Badge } from '@/app/components/common/badge';
+import { EmptyState } from '@/app/components/common/empty-state';
 import {
   DataTable,
   type DataTableColumn,
@@ -15,6 +15,7 @@ import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { STUDY_STATUS_MAP } from '@/constants';
+import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { studiesService } from '@/services/studies.service';
 import type { Study } from '@/types/study';
@@ -26,7 +27,7 @@ interface StudyFilters {
 }
 
 export default function ExamsPage() {
-  const [showUploadModal, setShowUploadModal] = useState(false);
+  const { open } = useModal();
 
   const {
     items: studies,
@@ -43,8 +44,21 @@ export default function ExamsPage() {
   });
 
   const handleUploadSuccess = (study: Study) => {
-    setShowUploadModal(false);
     prependItem(study);
+  };
+
+  const openUploadModal = () => {
+    open({
+      content: ({ close }) => (
+        <UploadExamModal
+          onClose={close}
+          onSuccess={(study) => {
+            handleUploadSuccess(study);
+            close();
+          }}
+        />
+      ),
+    });
   };
 
   const columns: DataTableColumn<Study>[] = [
@@ -52,7 +66,7 @@ export default function ExamsPage() {
       key: 'title',
       header: 'Título',
       render: (study) => (
-        <span className="text-slate-900 dark:text-white font-medium">
+        <span className="text-stone-900 dark:text-stone-100 font-medium">
           {study.title ?? 'Sem título'}
         </span>
       ),
@@ -61,7 +75,7 @@ export default function ExamsPage() {
       key: 'patient',
       header: 'Paciente',
       render: (study) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-stone-500 dark:text-stone-400">
           {study.patient?.name ?? '-'}
         </span>
       ),
@@ -81,7 +95,7 @@ export default function ExamsPage() {
       key: 'date',
       header: 'Data',
       render: (study) => (
-        <span className="text-slate-600 dark:text-slate-300">
+        <span className="text-stone-500 dark:text-stone-400">
           {study.examDate
             ? new Date(study.examDate).toLocaleDateString('pt-BR')
             : new Date(study.created_at).toLocaleDateString('pt-BR')}
@@ -94,9 +108,9 @@ export default function ExamsPage() {
       align: 'right',
       width: '80px',
       render: (study) => (
-        <Link href={`/exams/detail?id=${study.id}`}>
+        <Link href={`/exams/${study.id}`}>
           <Button variant="ghost" size="icon-sm" title="Ver detalhes">
-            <Eye size={16} className="text-slate-600 dark:text-slate-300" />
+            <Eye size={16} className="text-stone-500 dark:text-stone-400" />
           </Button>
         </Link>
       ),
@@ -104,8 +118,8 @@ export default function ExamsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="min-h-screen bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Header title="Exames" showStorage={false} />
 
         <SectionCard
@@ -119,8 +133,8 @@ export default function ExamsPage() {
           }
           headerAction={
             <Button
-              onClick={() => setShowUploadModal(true)}
-              className="bg-teal-600 dark:bg-teal-700 h-10 text-white hover:bg-teal-700 dark:hover:bg-teal-800"
+              onClick={openUploadModal}
+              className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-10"
             >
               <UploadIcon size={18} /> Enviar Exame
             </Button>
@@ -135,28 +149,15 @@ export default function ExamsPage() {
             onSearch={setSearch}
             searchPlaceholder="Buscar exames..."
             emptyState={
-              <div className="p-8 text-center">
-                <Microscope
-                  size={32}
-                  className="text-slate-300 dark:text-slate-600 mx-auto mb-2"
-                />
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
-                  {search
-                    ? 'Nenhum exame encontrado.'
-                    : 'Nenhum exame cadastrado ainda.'}
-                </p>
-              </div>
+              <EmptyState
+                icon={Microscope}
+                title={search ? 'Nenhum exame encontrado' : 'Nenhum exame cadastrado'}
+                description={search ? 'Revise a busca ou tente outro termo.' : 'Envie o primeiro exame para começar.'}
+              />
             }
           />
         </SectionCard>
       </div>
-
-      {showUploadModal && (
-        <UploadExamModal
-          onClose={() => setShowUploadModal(false)}
-          onSuccess={handleUploadSuccess}
-        />
-      )}
     </div>
   );
 }

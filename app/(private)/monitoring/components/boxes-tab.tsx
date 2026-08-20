@@ -1,15 +1,17 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { BedDouble, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { BedDouble, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 import { ConfirmModal } from '@/app/components/common/confirm-modal';
+import { EmptyState } from '@/app/components/common/empty-state';
 import { Modal } from '@/app/components/common/modal';
 import { SectionCard } from '@/app/components/data/section-card';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { boxSchema, type BoxFormData } from '@/schemas/monitoring';
 import { monitoringService } from '@/services/monitoring.service';
 import type { Box } from '@/types/monitoring';
@@ -91,7 +93,7 @@ function BoxFormModal({ box, onClose, onSuccess }: BoxFormModalProps) {
           <Button
             type="submit"
             loading={saving}
-            className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             Salvar
           </Button>
@@ -141,7 +143,7 @@ export function BoxesTab() {
       headerAction={
         <Button
           onClick={() => setShowForm(true)}
-          className="bg-teal-600 dark:bg-teal-700 text-white hover:bg-teal-700"
+          className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
         >
           <Plus size={16} />
           Novo box
@@ -149,23 +151,38 @@ export function BoxesTab() {
       }
     >
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-teal-600" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-4 rounded-lg border border-stone-200 dark:border-stone-800"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Skeleton className="h-5 w-5 shrink-0" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                <div className="flex gap-1 shrink-0">
+                  <Skeleton className="h-8 w-8" />
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              </div>
+              <Skeleton className="h-3 w-28 mt-2" />
+              <Skeleton className="h-4 w-24 mt-3" />
+            </div>
+          ))}
         </div>
       ) : boxes.length === 0 ? (
-        <div className="text-center py-12">
-          <BedDouble size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-          <p className="text-slate-500 dark:text-slate-400">Nenhum box cadastrado</p>
-        </div>
+        <EmptyState icon={BedDouble} title="Nenhum box cadastrado" />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {boxes.map((box) => (
             <div
               key={box.id}
-              className={`p-4 rounded-xl border transition-colors ${
+              className={`p-4 rounded-lg border transition-colors ${
                 box.occupied
-                  ? 'border-red-200 dark:border-red-900/50 bg-red-50/40 dark:bg-red-900/10'
-                  : 'border-green-200 dark:border-green-900/50 bg-green-50/40 dark:bg-green-900/10'
+                  ? 'border-red-600/30 dark:border-red-500/30 bg-red-50 dark:bg-red-900'
+                  : 'border-emerald-700/30 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-900'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
@@ -173,10 +190,10 @@ export function BoxesTab() {
                   <BedDouble
                     size={18}
                     className={
-                      'text-slate-900 dark:text-white'
+                      'text-stone-900 dark:text-stone-100'
                     }
                   />
-                  <p className="font-semibold text-slate-900 dark:text-white truncate">
+                  <p className="font-semibold text-stone-900 dark:text-stone-100 truncate">
                     {box.name}
                   </p>
                 </div>
@@ -195,22 +212,22 @@ export function BoxesTab() {
                     onClick={() => setDeleting(box)}
                     disabled={box.occupied}
                     title={box.occupied ? 'Box ocupado' : 'Excluir'}
-                    className="text-red-500 hover:text-red-600"
+                    className="text-red-600 dark:text-red-500"
                   >
                     <Trash2 size={14} />
                   </Button>
                 </div>
               </div>
               {box.description && (
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">
+                <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 truncate">
                   {box.description}
                 </p>
               )}
               <p
                 className={`text-xs font-medium mt-2 ${
                   box.occupied
-                    ? 'text-red-600 dark:text-red-400'
-                    : 'text-green-600 dark:text-green-400'
+                    ? 'text-red-600 dark:text-red-500'
+                    : 'text-emerald-700 dark:text-emerald-500'
                 }`}
               >
                 {box.occupied

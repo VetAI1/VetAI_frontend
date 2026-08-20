@@ -31,6 +31,7 @@ Key features include:
 - **Schemas**: camelCase with Schema suffix (e.g., `tutorSchema`, `loginSchema`)
 - **Types**: `NomeData` inferred via `yup.InferType` (e.g., `TutorFormData`)
 - **Route Groups**: `(public)` for unauthenticated, `(private)` for authenticated, `/admin` for admin section
+- **Class composition**: Use `cn` for short conditional class lists. For long, visually grouped class lists, use `cnLines` from `@/infra/utils`, passing one array per visual concern; it preserves `tailwind-merge` conflict resolution.
 
 ### Form Patterns
 
@@ -243,6 +244,38 @@ confirm({
 - `onConfirm` may be asynchronous; the confirmation stays open with its primary button loading until it finishes successfully.
 - An error thrown by `onConfirm` keeps the confirmation open. Handle user feedback, such as a toast, inside the callback.
 - Customize `icon`, button labels, outside-click behavior, and Escape behavior through the options object.
+
+### Design System & Styling Standards
+
+Use Tailwind's default color utilities directly in class strings. Keep CSS variables in `app/globals.css` only for design-specific values such as fonts, shadows, easing, radii and chart colors. Prefer explicit `dark:` variants when a component has a different dark-mode surface, text or border.
+
+#### Color hierarchy
+
+Use `gray` as the neutral scale:
+
+- `gray-900`: primary text and headings
+- `gray-700` / `gray-600`: secondary content and labels
+- `gray-500`: metadata, placeholders and icons
+- `gray-400`: disabled content and dark-mode metadata
+- `gray-300` / `gray-200`: inputs, dividers and borders
+- `gray-100` / `gray-50` / `white`: light surfaces
+- `gray-950` / `gray-900` / `gray-800` / `gray-700`: dark surfaces and controls
+- `gray-100` / `gray-400`: readable dark-mode text
+
+Use `teal` for primary actions and brand UI, `amber` for accents and warnings, `emerald` for success, `sky` for information, and `red` for errors or destructive actions. Use categorical colors (`indigo`, `violet`, `purple`, `rose`, `pink`, `orange`, `lime`, `cyan`, `fuchsia`) only for multi-item coding such as monitoring parameters and chart series. Do not change hex values inside chart, PDF or inline-style objects.
+
+When using a solid light color, pair it with a readable dark-mode value, for example `bg-gray-50 dark:bg-gray-950` or `text-gray-900 dark:text-gray-100`. Prefer the closest Tailwind shade over creating a new token.
+
+#### Layout standards
+
+- **Page container** (root of every screen, private + admin): `mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8` inside a `min-h-screen bg-background w-full` wrapper. Intentional narrower layouts may keep `max-w-5xl`/`max-w-6xl` but must keep `px-4 sm:px-6 lg:px-8`.
+- **Page header**: prefer the `Header` component (`<Header title="..." showStorage={false} />`). Custom headers follow `mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between`, title `text-2xl sm:text-3xl font-bold tracking-tight text-foreground`, subtitle `text-sm text-muted-foreground`.
+- **Cards**: `rounded-lg border border-border bg-card p-5` (compact cards may use `p-4`). Modal panels: `rounded-xl`. Badges/pills: `rounded-full`. Buttons/inputs: `rounded-md`.
+- **Gaps**: card grids `gap-4`; row lists `gap-3`; section stacks `space-y-6`; form fields `space-y-4`.
+- **Table rows**: `px-4 py-3`, header `text-[11px] font-semibold uppercase tracking-wider text-muted-foreground` (handled by `DataTable`).
+- **Fonts**: `font-display` (Space Grotesk) only for hero/greeting/key numbers; `font-data` (IBM Plex Mono) for technical values (codes, prices, times).
+- **Motion**: durations 150/200/250/300ms by frequency, ease `--ease-brand`; always respect `prefers-reduced-motion`.
+- **Skeleton**: use `<Skeleton>` (`bg-muted`) for all async data loads; `Loader2` is reserved for button/input loading states.
 
 ### Workflow Rules
 

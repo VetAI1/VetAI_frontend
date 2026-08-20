@@ -55,7 +55,7 @@ export default function AdminRoles() {
       key: 'name',
       header: 'Nome',
       render: (role) => (
-        <span className="font-medium text-slate-900 dark:text-white">
+        <span className="font-medium text-stone-900 dark:text-stone-100">
           {role.name}
         </span>
       ),
@@ -64,7 +64,7 @@ export default function AdminRoles() {
       key: 'description',
       header: 'Descrição',
       render: (role) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-stone-500 dark:text-stone-400">
           {role.description || '-'}
         </span>
       ),
@@ -99,7 +99,7 @@ export default function AdminRoles() {
             disabled={
               !canEdit || role.is_default || role.permissions?.includes('*')
             }
-            className="text-red-600"
+            className="text-red-600 dark:text-red-500"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -109,7 +109,7 @@ export default function AdminRoles() {
   ];
 
   return (
-    <div className="flex w-full flex-col gap-6 pb-12">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <Header title="Papel administrativo" showStorage={false} />
 
       <SectionCard
@@ -119,7 +119,7 @@ export default function AdminRoles() {
           <Button
             asChild
             disabled={!canEdit}
-            className="bg-teal-600 text-white hover:bg-teal-700"
+            className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
           >
             <Link href="/admin/roles/new">
               <Plus className="h-4 w-4" /> Novo papel

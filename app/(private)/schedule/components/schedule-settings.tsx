@@ -64,19 +64,19 @@ export function ScheduleSettings({
   }));
 
   return (
-    <div className="border-t border-slate-100 dark:border-slate-700 pt-3 mt-4">
+    <div className="border-t border-stone-200/70 dark:border-stone-800/70 pt-3 mt-4">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex items-center justify-between w-full text-left group"
       >
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
+        <span className="flex items-center gap-2 text-xs font-medium text-stone-500 dark:text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-100 transition-colors">
           <Settings2 size={13} />
           Configurações de exibição
-        </div>
+        </span>
         <ChevronDown
           size={13}
-          className={`text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`text-stone-500/70 dark:text-stone-400/70 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -84,12 +84,12 @@ export function ScheduleSettings({
         <div className="mt-3 flex flex-col gap-3">
           {/* Week interval */}
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">
+            <p className="text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-2">
               Intervalo da semana
             </p>
             <div className="flex items-center gap-2">
               <div className="flex flex-col gap-0.5 flex-1">
-                <label className="text-[10px] text-slate-400 dark:text-slate-500">
+                <label className="text-[10px] text-stone-500/70 dark:text-stone-400/70">
                   Início
                 </label>
                 <SelectInput
@@ -99,9 +99,9 @@ export function ScheduleSettings({
                   options={hourOptions.slice(0, 24)}
                 />
               </div>
-              <span className="text-xs text-slate-400 mt-3"> – </span>
+              <span className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-3"> – </span>
               <div className="flex flex-col gap-0.5 flex-1">
-                <label className="text-[10px] text-slate-400 dark:text-slate-500">
+                <label className="text-[10px] text-stone-500/70 dark:text-stone-400/70">
                   Fim
                 </label>
                 <SelectInput
@@ -112,7 +112,7 @@ export function ScheduleSettings({
                 />
               </div>
             </div>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">
+            <p className="text-[10px] text-stone-500/70 dark:text-stone-400/70 mt-1.5">
               Aplica-se à visualização semanal.
             </p>
           </div>

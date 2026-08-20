@@ -112,10 +112,10 @@ export function formatRange(range: VitalRange | null, unit: string): string {
 }
 
 export const EVALUATION_TEXT_COLORS: Record<VitalEvaluation, string> = {
-  normal: 'text-emerald-600 dark:text-emerald-400',
-  high: 'text-red-600 dark:text-red-400',
+  normal: 'text-emerald-700 dark:text-emerald-500',
+  high: 'text-red-600 dark:text-red-500',
   low: 'text-amber-600 dark:text-amber-400',
-  unknown: 'text-slate-500 dark:text-slate-400',
+  unknown: 'text-stone-500 dark:text-stone-400',
 };
 
 export const EVALUATION_LABELS: Record<VitalEvaluation, string> = {
@@ -221,9 +221,7 @@ export const CLINICAL_STATUS_LABELS = {
 } as const;
 
 export const CLINICAL_STATUS_CLASSES = {
-  STABLE:
-    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  UNSTABLE: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  AWAITING_TUTOR:
-    'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  STABLE: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
+  UNSTABLE: 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500',
+  AWAITING_TUTOR: 'bg-amber-50 dark:bg-amber-900 text-amber-600 dark:text-amber-400',
 } as const;

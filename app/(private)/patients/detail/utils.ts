@@ -8,11 +8,8 @@ export const STUDY_STATUS_LABELS: Record<string, string> = {
 };
 
 export const STUDY_STATUS_COLORS: Record<string, string> = {
-  PENDING:
-    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400',
-  PROCESSING:
-    'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-  COMPLETED:
-    'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-  FAILED: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
+  PENDING: 'bg-amber-50 dark:bg-amber-900 text-amber-600 dark:text-amber-400',
+  PROCESSING: 'bg-sky-50 dark:bg-sky-900 text-sky-700 dark:text-sky-500',
+  COMPLETED: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500',
+  FAILED: 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500',
 };

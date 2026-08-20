@@ -27,7 +27,7 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <Modal title={title} onClose={onClose} maxWidth="sm">
-      <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+      <p className="text-sm text-stone-500 dark:text-stone-400 mb-6">
         {description}
       </p>
       <div className="flex gap-3 justify-end">
@@ -35,13 +35,9 @@ export function ConfirmModal({
           {cancelLabel}
         </Button>
         <Button
+          variant={variant === 'danger' ? 'destructive' : 'default'}
           onClick={onConfirm}
           loading={loading}
-          className={
-            variant === 'danger'
-              ? 'bg-red-600 text-white hover:bg-red-700'
-              : 'bg-teal-600 text-white hover:bg-teal-700'
-          }
         >
           {confirmLabel}
         </Button>

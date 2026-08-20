@@ -54,14 +54,14 @@ export function VitalsChart({ specie, definition, records }: VitalsChartProps) {
 
   if (points.length === 0) {
     return (
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-4">
+      <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200/70 dark:border-stone-800/70 p-4">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
+          <h4 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
             {definition.label}
           </h4>
-          <span className="text-xs text-slate-400">{definition.unit}</span>
+          <span className="text-xs text-stone-500/70 dark:text-stone-400/70">{definition.unit}</span>
         </div>
-        <div className="flex items-center justify-center h-40 text-xs text-slate-400 dark:text-slate-500">
+        <div className="flex items-center justify-center h-40 text-xs text-stone-500/70 dark:text-stone-400/70">
           Sem registros para este parâmetro
         </div>
       </div>
@@ -143,12 +143,12 @@ export function VitalsChart({ specie, definition, records }: VitalsChartProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-4">
+    <div className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200/70 dark:border-stone-800/70 p-4">
       <div className="flex items-center justify-between mb-2">
-        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
+        <h4 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
           {definition.label}
         </h4>
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-stone-500/70 dark:text-stone-400/70">
           {range ? `${range.min}–${range.max} ${definition.unit}` : definition.unit}
         </span>
       </div>

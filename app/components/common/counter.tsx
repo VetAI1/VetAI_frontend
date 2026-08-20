@@ -13,11 +13,11 @@ interface CounterProps {
 
 export function Counter({
   target,
-  duration = 2000,
+  duration = 1400,
   suffix = '',
   prefix = '',
 }: CounterProps) {
-  const { ref, isVisible } = useReveal();
+  const { ref, isVisible, prefersReducedMotion } = useReveal();
   const [count, setCount] = useState(0);
   const hasAnimated = useRef(false);
 
@@ -25,11 +25,16 @@ export function Counter({
     if (!isVisible || hasAnimated.current) return;
     hasAnimated.current = true;
 
+    if (prefersReducedMotion) {
+      setCount(target);
+      return;
+    }
+
     const startTime = performance.now();
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
       setCount(Math.floor(eased * target));
 
       if (progress < 1) {
@@ -40,7 +45,7 @@ export function Counter({
     };
 
     requestAnimationFrame(animate);
-  }, [isVisible, target, duration]);
+  }, [isVisible, target, duration, prefersReducedMotion]);
 
   return (
     <span ref={ref}>

@@ -7,6 +7,17 @@ export interface UserAddress {
   cep: string;
 }
 
+export interface Account {
+  subscription: {
+    status: 'active' | 'incomplete' | 'past_due' | 'canceled' | 'trialing' | null;
+    blocked: boolean;
+  };
+  ai: {
+    available_credits: number;
+  };
+  features: string[];
+}
+
 export interface User {
   id: string;
   name: string;
@@ -21,6 +32,7 @@ cpf?: string;
   phone?: string;
   address?: UserAddress;
   hospital_id?: string;
+  account?: Account;
 }
 
 export interface TeamMember {
