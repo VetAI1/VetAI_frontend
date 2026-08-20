@@ -618,14 +618,26 @@ function RegisterForm() {
             {plansLoading ? (
               <p className="text-sm text-stone-500 dark:text-stone-400">Carregando planos...</p>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2">
+              <fieldset className="grid gap-4 md:grid-cols-2">
+                <legend className="sr-only">Selecione um plano</legend>
                 {plans.map((plan) => (
-                  <button
+                  <div
                     key={plan.id}
-                    type="button"
-                    onClick={() => setValue('planId', plan.id)}
-                    className={`rounded-2xl border p-5 text-left transition-colors ${planId === plan.id ? 'border-teal-800 dark:border-teal-500 bg-stone-100 dark:bg-stone-800 ring-1 ring-teal-600/25 dark:ring-teal-500/25' : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-teal-800/30 dark:hover:border-teal-500/30'}`}
+                    className={`relative rounded-2xl border p-5 text-left transition-colors ${planId === plan.id ? 'border-teal-800 dark:border-teal-500 bg-stone-100 dark:bg-stone-800 ring-1 ring-teal-600/25 dark:ring-teal-500/25' : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-teal-800/30 dark:hover:border-teal-500/30'}`}
                   >
+                    <input
+                      {...registerField('planId')}
+                      id={`plan-${plan.id}`}
+                      type="radio"
+                      value={plan.id}
+                      className="sr-only"
+                    />
+                    <label
+                      htmlFor={`plan-${plan.id}`}
+                      className="absolute inset-0 z-10 cursor-pointer rounded-2xl"
+                    >
+                      <span className="sr-only">Selecionar plano {plan.name}</span>
+                    </label>
                     <div className="flex justify-between gap-4">
                       <div>
                         <h2 className="font-semibold text-stone-900 dark:text-stone-100">
@@ -660,9 +672,9 @@ function RegisterForm() {
                         </li>
                       ))}
                     </ul>
-                  </button>
+                  </div>
                 ))}
-              </div>
+              </fieldset>
             )}
             {errors.planId?.message && (
               <p className="text-xs text-red-600 dark:text-red-500">

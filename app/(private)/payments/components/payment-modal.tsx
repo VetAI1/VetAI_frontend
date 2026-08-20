@@ -162,16 +162,16 @@ function TutorComboBox({
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-stone-100/60 dark:hover:bg-stone-800/60 transition-colors"
               >
                 <Check size={12} className="text-teal-800 dark:text-teal-500 opacity-0" />
-                <div className="min-w-0">
-                  <p className="text-stone-900 dark:text-stone-100 truncate">
+                <span className="flex min-w-0 flex-col">
+                  <span className="text-stone-900 dark:text-stone-100 truncate">
                     {t.name}
-                  </p>
+                  </span>
                   {t.phone && (
-                    <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                    <span className="text-xs text-stone-500 dark:text-stone-400 truncate">
                       {t.phone}
-                    </p>
+                    </span>
                   )}
-                </div>
+                </span>
               </button>
             ))
           )}
@@ -436,14 +436,14 @@ export function PaymentModal({
                       onClick={() => addFromCatalog(item)}
                       className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-colors text-left border-b border-stone-200/70 dark:border-stone-800/70 last:border-0"
                     >
-                      <div>
+                      <span>
                         <span className="font-medium text-stone-900 dark:text-stone-100">
                           {item.name}
                         </span>
                         <span className="ml-2 text-xs text-stone-500/70 dark:text-stone-400/70">
                           {CATALOG_CATEGORY_LABELS[item.category]}
                         </span>
-                      </div>
+                      </span>
                       <span className="text-teal-800 dark:text-teal-500 font-medium shrink-0 ml-3">
                         {fmtCurrency(item.price)}
                       </span>

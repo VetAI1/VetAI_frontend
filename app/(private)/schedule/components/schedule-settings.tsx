@@ -70,10 +70,10 @@ export function ScheduleSettings({
         onClick={() => setOpen((o) => !o)}
         className="flex items-center justify-between w-full text-left group"
       >
-        <div className="flex items-center gap-2 text-xs font-medium text-stone-500 dark:text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-100 transition-colors">
+        <span className="flex items-center gap-2 text-xs font-medium text-stone-500 dark:text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-100 transition-colors">
           <Settings2 size={13} />
           Configurações de exibição
-        </div>
+        </span>
         <ChevronDown
           size={13}
           className={`text-stone-500/70 dark:text-stone-400/70 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}

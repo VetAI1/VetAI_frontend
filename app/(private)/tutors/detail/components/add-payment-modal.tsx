@@ -235,14 +235,14 @@ export function AddPaymentModal({
                       onClick={() => addFromCatalog(item)}
                       className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-colors text-left border-b border-stone-200/70 dark:border-stone-800/70 last:border-0"
                     >
-                      <div>
+                      <span>
                         <span className="font-medium text-stone-900 dark:text-stone-100">
                           {item.name}
                         </span>
                         <span className="ml-2 text-xs text-stone-500/70 dark:text-stone-400/70">
                           {CATALOG_CATEGORY_LABELS[item.category]}
                         </span>
-                      </div>
+                      </span>
                       <span className="text-teal-800 dark:text-teal-500 font-medium shrink-0 ml-3">
                         {fmtCurrency(item.price)}
                       </span>

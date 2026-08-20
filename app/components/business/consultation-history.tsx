@@ -248,9 +248,9 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                 onClick={() => openConsultationDetail(consultation)}
                 className="group w-full rounded-lg border border-stone-200 dark:border-stone-800 p-4 text-left transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
               >
-                <div className="flex items-center justify-between">
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex items-center gap-2">
+                <span className="flex items-center justify-between">
+                  <span className="min-w-0 flex-1">
+                    <span className="mb-1 flex items-center gap-2">
                       <Badge
                         color={
                           consultation.status === 'COMPLETED' ? 'green' : 'blue'
@@ -265,33 +265,33 @@ export function ConsultationHistory({ onClose }: ConsultationHistoryProps) {
                           {consultation.diagnosis.diseases.length} diagnóstico(s)
                         </span>
                       )}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
                       <Clock size={12} />
                       <span>{formatDate(consultation.started_at)}</span>
-                    </div>
+                    </span>
                     {consultation.diagnosis?.selectedDiseaseName && (
-                      <div className="mt-1 flex items-center gap-1 text-xs text-teal-800 dark:text-teal-500">
+                      <span className="mt-1 flex items-center gap-1 text-xs text-teal-800 dark:text-teal-500">
                         <Star size={10} fill="currentColor" />
                         <span className="font-medium">
                           {consultation.diagnosis.selectedDiseaseName}
                         </span>
-                      </div>
+                      </span>
                     )}
                     {consultation.diagnosis?.diseases?.length > 0 &&
                       !consultation.diagnosis.selectedDiseaseName && (
-                      <p className="mt-1 truncate text-xs text-stone-500 dark:text-stone-400">
+                      <span className="mt-1 block truncate text-xs text-stone-500 dark:text-stone-400">
                         {consultation.diagnosis.diseases
                           .map((disease) => disease.name)
                           .join(', ')}
-                      </p>
+                      </span>
                     )}
-                  </div>
+                  </span>
                   <ChevronRight
                     size={16}
                     className="ml-2 shrink-0 text-stone-500/70 dark:text-stone-400/70 transition-colors group-hover:text-teal-800 dark:group-hover:text-teal-500"
                   />
-                </div>
+                </span>
               </button>
             ))}
           </div>

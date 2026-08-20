@@ -209,14 +209,14 @@ export function Autocomplete<TItem extends { id: string }>({
                         }}
                         className="h-auto w-full justify-between rounded-none border-b border-stone-200 dark:border-stone-800 px-3 py-2.5 text-sm text-stone-900 dark:text-stone-100 last:border-0 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-100"
                       >
-                        <div className="text-left">
-                          <p className="font-medium">{getOptionLabel(item)}</p>
+                        <span className="flex flex-col text-left">
+                          <span className="font-medium">{getOptionLabel(item)}</span>
                           {getOptionDescription?.(item) && (
-                            <p className="text-xs text-stone-500 dark:text-stone-400">
+                            <span className="text-xs text-stone-500 dark:text-stone-400">
                               {getOptionDescription(item)}
-                            </p>
+                            </span>
                           )}
-                        </div>
+                        </span>
                         {isSelected && <Check size={16} className="shrink-0 text-teal-800 dark:text-teal-500" />}
                       </Button>
                     );

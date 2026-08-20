@@ -40,15 +40,15 @@ export function TodayEventsList({
           <h2 className="text-base font-semibold text-stone-900 dark:text-stone-100 capitalize">
             {dateFormatted}
           </h2>
-          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-            {loading ? (
-              <Skeleton className="h-3 w-16" />
-            ) : sorted.length === 0 ? (
-              'Nenhum evento'
-            ) : (
-              `${sorted.length} evento${sorted.length > 1 ? 's' : ''}`
-            )}
-          </p>
+          {loading ? (
+            <Skeleton className="mt-0.5 h-3 w-16" />
+          ) : (
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+              {sorted.length === 0
+                ? 'Nenhum evento'
+                : `${sorted.length} evento${sorted.length > 1 ? 's' : ''}`}
+            </p>
+          )}
         </div>
         <button
           onClick={onAddClick}
@@ -87,37 +87,37 @@ export function TodayEventsList({
                 onClick={() => onEventClick(ev)}
                 className={`w-full text-left rounded-lg border p-3 transition-all hover:shadow-sm ${typeInfo.bg}`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
+                <span className="flex items-start justify-between gap-2">
+                  <span className="flex items-center gap-2 min-w-0">
                     <span
                       className={`w-2 h-2 rounded-full shrink-0 mt-0.5 ${typeInfo.dot}`}
                     />
-                    <p
+                    <span
                       className={`text-sm font-semibold truncate ${typeInfo.color}`}
                     >
                       {ev.title}
-                    </p>
-                  </div>
+                    </span>
+                  </span>
                   <span
                     className={`text-xs shrink-0 font-medium ${typeInfo.color}`}
                   >
                     {ev.startTime}
                     {ev.endTime ? ` – ${ev.endTime}` : ''}
                   </span>
-                </div>
+                </span>
                 {(ev.patientName ?? ev.tutorName) && (
-                  <div className="flex flex-col gap-0.5 mt-1.5 pl-4">
+                  <span className="flex flex-col gap-0.5 mt-1.5 pl-4">
                     {ev.patientName && (
-                      <div className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
+                      <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
                         <PawPrint size={11} /> {ev.patientName}
-                      </div>
+                      </span>
                     )}
                     {ev.tutorName && (
-                      <div className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
+                      <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
                         <User size={11} /> {ev.tutorName}
-                      </div>
+                      </span>
                     )}
-                  </div>
+                  </span>
                 )}
               </button>
             );

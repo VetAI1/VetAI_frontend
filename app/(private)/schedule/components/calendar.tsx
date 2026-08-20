@@ -62,17 +62,22 @@ export function Calendar({
           const isSelected = dateStr === selectedDate;
 
           return (
-            <button
+            <div
               key={dateStr}
-              onClick={() => onSelectDate(dateStr)}
               className={`relative h-[72px] flex flex-col items-start p-1.5 rounded-lg border text-left transition-colors ${
                 isSelected
                   ? 'bg-teal-800/10 dark:bg-teal-500/10 border-teal-800/40 dark:border-teal-500/40'
                   : 'border-transparent hover:bg-stone-100/60 dark:hover:bg-stone-800/60'
               }`}
             >
+              <button
+                type="button"
+                onClick={() => onSelectDate(dateStr)}
+                className="absolute inset-0 rounded-lg"
+                aria-label={`Selecionar dia ${day}`}
+              />
               <span
-                className={`text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full mb-0.5 ${
+                className={`relative z-10 pointer-events-none text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full mb-0.5 ${
                   isToday
                     ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950'
                     : 'text-stone-800 dark:text-stone-100'
@@ -81,7 +86,7 @@ export function Calendar({
                 {day}
               </span>
 
-              <div className="flex flex-col gap-0.5 w-full overflow-hidden">
+              <div className="relative z-10 flex flex-col gap-0.5 w-full overflow-hidden">
                 {dayEvents.slice(0, 2).map((ev) => {
                   const past = ev.date < today;
                   const bgColor = past
@@ -96,10 +101,7 @@ export function Calendar({
                   return (
                     <button
                       key={ev.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEventClick(ev);
-                      }}
+                      onClick={() => onEventClick(ev)}
                       className={`w-full truncate text-[10px] font-medium px-1 py-0.5 rounded flex items-center gap-1 border ${bgColor} ${textColor} hover:opacity-80 transition-opacity`}
                     >
                       <span
@@ -115,7 +117,7 @@ export function Calendar({
                   </span>
                 )}
               </div>
-            </button>
+            </div>
           );
         })}
       </div>

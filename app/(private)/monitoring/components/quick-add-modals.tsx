@@ -70,13 +70,13 @@ export function QuickAddChooserModal({
             onClick={() => onChoose(kind)}
             className="w-full flex items-center gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-teal-800 dark:hover:border-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-colors text-left"
           >
-            <div className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
+            <span className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
               <Icon size={18} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{label}</p>
-              <p className="text-xs text-stone-500 dark:text-stone-400">{description}</p>
-            </div>
+            </span>
+            <span className="flex flex-col">
+              <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">{label}</span>
+              <span className="text-xs text-stone-500 dark:text-stone-400">{description}</span>
+            </span>
           </button>
         ))}
       </div>

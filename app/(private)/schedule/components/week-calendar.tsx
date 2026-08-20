@@ -172,15 +172,15 @@ export function WeekCalendar({
                       className={`absolute left-0.5 right-0.5 rounded px-1.5 py-0.5 text-left overflow-hidden border z-10 hover:opacity-80 transition-opacity ${bgClass} ${colorClass}`}
                       style={{ top, height }}
                     >
-                      <p className="text-[10px] font-semibold leading-snug truncate">
+                      <span className="block text-[10px] font-semibold leading-snug truncate">
                         {ev.title}
-                      </p>
+                      </span>
                       {height >= 32 && (
-                        <p className="text-[9px] opacity-75 leading-snug truncate">
+                        <span className="block text-[9px] opacity-75 leading-snug truncate">
                           {ev.startTime}
                           {ev.endTime ? ` – ${ev.endTime}` : ''}
                           {ev.patientName ? ` · ${ev.patientName}` : ''}
-                        </p>
+                        </span>
                       )}
                     </button>
                   );

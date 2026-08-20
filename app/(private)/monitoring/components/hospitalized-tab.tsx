@@ -296,20 +296,20 @@ export function HospitalizedTab() {
                           aria-hidden="true"
                           className={`absolute inset-y-0 left-0 w-2 ${risk.dot}`}
                         />
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
+                        <span className="flex items-start justify-between gap-2 mb-3">
+                          <span className="flex items-center gap-3 min-w-0">
+                            <span className="p-2 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500 shrink-0">
                               <Stethoscope size={22} />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-semibold text-stone-900 dark:text-stone-100 truncate">
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block font-semibold text-stone-900 dark:text-stone-100 truncate">
                                 {hospitalization.patient?.name}
-                              </p>
-                              <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                              </span>
+                              <span className="block text-xs text-stone-500 dark:text-stone-400 truncate">
                                 {hospitalization.patient?.breed || '—'}
-                              </p>
-                            </div>
-                          </div>
+                              </span>
+                            </span>
+                          </span>
                           {(hospitalization.patient?.restrictions?.length ?? 0) > 0 && (
                             <span
                               title={`Restrições: ${hospitalization.patient.restrictions?.join(', ')}`}
@@ -318,9 +318,9 @@ export function HospitalizedTab() {
                               <AlertTriangle size={18} />
                             </span>
                           )}
-                        </div>
+                        </span>
 
-                        <div className="flex flex-wrap gap-1.5 mb-3">
+                        <span className="flex flex-wrap gap-1.5 mb-3">
                           {hospitalization.clinical_status && (
                             <span
                               className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${CLINICAL_STATUS_CLASSES[hospitalization.clinical_status]}`}
@@ -333,10 +333,10 @@ export function HospitalizedTab() {
                         Aferição atrasada
                             </span>
                           )}
-                        </div>
+                        </span>
 
-                        <div className="space-y-1.5 text-xs text-stone-500 dark:text-stone-400">
-                          <p
+                        <span className="flex flex-col gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+                          <span
                             className="flex items-center gap-1.5"
                             title="Veterinário de plantão"
                           >
@@ -346,20 +346,20 @@ export function HospitalizedTab() {
                                 hospitalization.veterinarian?.name ??
                                 '—'}
                             </span>
-                          </p>
-                          <p className="flex items-center gap-1.5">
+                          </span>
+                          <span className="flex items-center gap-1.5">
                             <BedDouble size={13} className="text-stone-500/70 dark:text-stone-400/70 shrink-0" />
                             {hospitalization.box?.name ?? 'Sem box'}
-                          </p>
-                          <p className="flex items-center gap-1.5">
+                          </span>
+                          <span className="flex items-center gap-1.5">
                             <CalendarClock size={13} className="text-stone-500/70 dark:text-stone-400/70 shrink-0" />
                             {daysSince(hospitalization.admitted_at)}{' '}
                             {daysSince(hospitalization.admitted_at) === 1 ? 'dia' : 'dias'} internado
                             {hospitalization.expected_discharge_at
                               ? ` · alta prevista ${fmtDate(hospitalization.expected_discharge_at)}`
                               : ''}
-                          </p>
-                        </div>
+                          </span>
+                        </span>
                       </button>
                     );
                   })}

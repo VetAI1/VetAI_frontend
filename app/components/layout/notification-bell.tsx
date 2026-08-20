@@ -148,22 +148,22 @@ export function NotificationBell() {
                     notification.read ? '' : 'bg-teal-800 dark:bg-teal-500/[0.04]'
                   }`}
                 >
-                  <div className="flex items-start gap-2">
+                  <span className="flex items-start gap-2">
                     {!notification.read && (
                       <span className="mt-1.5 w-2 h-2 rounded-full bg-teal-800 dark:bg-teal-500 shrink-0" />
                     )}
-                    <div className={notification.read ? 'pl-4' : ''}>
-                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                    <span className={`flex flex-col ${notification.read ? 'pl-4' : ''}`}>
+                      <span className="text-sm font-medium text-stone-900 dark:text-stone-100">
                         {notification.title}
-                      </p>
-                      <p className="text-xs text-stone-500 dark:text-stone-400">
+                      </span>
+                      <span className="text-xs text-stone-500 dark:text-stone-400">
                         {notification.message}
-                      </p>
-                      <p className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">
+                      </span>
+                      <span className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">
                         {timeAgo(notification.created_at)}
-                      </p>
-                    </div>
-                  </div>
+                      </span>
+                    </span>
+                  </span>
                 </button>
               ))
             )}
