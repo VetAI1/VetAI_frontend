@@ -115,6 +115,21 @@ function InviteRegistrationForm() {
             containerClassName="sm:col-span-2"
           />
           <InputWithLabel
+            label="CPF"
+            name="cpf"
+            control={control}
+            error={errors.cpf?.message}
+            onChange={(event) =>
+              setValue('cpf', formatCPF(event.target.value), {
+                shouldValidate: true,
+              })
+            }
+            inputMode="numeric"
+            maxLength={14}
+            containerClassName="sm:col-span-2"
+            required
+          />
+          <InputWithLabel
             label="Senha"
             type={showPassword ? 'text' : 'password'}
             name="password"
@@ -131,20 +146,6 @@ function InviteRegistrationForm() {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             }
-          />
-          <InputWithLabel
-            label="CPF"
-            name="cpf"
-            control={control}
-            error={errors.cpf?.message}
-            onChange={(event) =>
-              setValue('cpf', formatCPF(event.target.value), {
-                shouldValidate: true,
-              })
-            }
-            inputMode="numeric"
-            maxLength={14}
-            required
           />
           <InputWithLabel
             label="Confirmar senha"

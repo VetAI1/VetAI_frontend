@@ -20,6 +20,7 @@ import { AuthShell } from '@/app/components/common/auth-shell';
 import { PasswordStrength } from '@/app/components/common/password-strength';
 import { InputWithLabel } from '@/app/components/forms/input-with-label';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/infra/auth-context';
 import { billingService } from '@/services/billing.service';
 import type { RegisterPayload } from '@/types/auth';
@@ -307,7 +308,10 @@ function RegisterForm() {
             { label: 'Plano', done: step > 2, active: step === 2 },
             { label: 'Pagamento', done: false, active: step === 3 },
           ].map((item, index) => (
-            <li key={item.label} className="flex flex-1 items-center gap-3 last:flex-none">
+            <li
+              key={item.label}
+              className="flex flex-1 items-center gap-3 last:flex-none"
+            >
               <div
                 className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-bold transition-colors ${item.done || item.active ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950' : 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100'}`}
               >
@@ -328,7 +332,7 @@ function RegisterForm() {
 
       <form
         onSubmit={handleSubmit(submitRegistration)}
-        className="space-y-6"
+        className="space-y-6 pb-8"
       >
         {step === 1 && (
           <motion.div
@@ -388,19 +392,11 @@ function RegisterForm() {
                     maxLength={15}
                     required
                   />
-                  <div className="flex items-center gap-2 pt-2 sm:col-span-2">
-                    <input
-                      type="checkbox"
-                      id="isUserResponsible"
+                  <div className="pt-2 sm:col-span-2">
+                    <Checkbox
                       {...registerField('isUserResponsible')}
-                      className="size-4 rounded border-stone-300 dark:border-stone-700 accent-primary"
+                      label="Eu sou o responsável"
                     />
-                    <label
-                      htmlFor="isUserResponsible"
-                      className="cursor-pointer select-none text-sm font-semibold text-stone-900 dark:text-stone-100"
-                    >
-                          Eu sou o responsável
-                    </label>
                   </div>
                   {!isUserResponsible && (
                     <>
@@ -546,53 +542,56 @@ function RegisterForm() {
                   control={control}
                   error={errors.specialty?.message}
                   placeholder="Ex.: Clínico Geral"
+                  containerClassName="sm:col-span-2"
                 />
-                <InputWithLabel
-                  label="Senha"
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  control={control}
-                  error={errors.password?.message}
-                  autoComplete="new-password"
-                  required
-                  endAdornment={
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
-                    >
-                      {showPassword ? (
-                        <EyeOff size={18} />
-                      ) : (
-                        <Eye size={18} />
-                      )}
-                    </button>
-                  }
-                />
-                <InputWithLabel
-                  label="Confirmar senha"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  control={control}
-                  error={errors.confirmPassword?.message}
-                  autoComplete="new-password"
-                  required
-                  endAdornment={
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff size={18} />
-                      ) : (
-                        <Eye size={18} />
-                      )}
-                    </button>
-                  }
-                />
+                <div className="grid gap-5 sm:col-span-2 sm:grid-cols-2">
+                  <InputWithLabel
+                    label="Senha"
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    control={control}
+                    error={errors.password?.message}
+                    autoComplete="new-password"
+                    required
+                    endAdornment={
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    }
+                  />
+                  <InputWithLabel
+                    label="Confirmar senha"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    control={control}
+                    error={errors.confirmPassword?.message}
+                    autoComplete="new-password"
+                    required
+                    endAdornment={
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    }
+                  />
+                </div>
               </div>
               <PasswordStrength password={password} />
             </section>

@@ -14,6 +14,7 @@ import {
   Star,
   User,
 } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ConfirmFinishModal } from './components/confirm-finish-modal';
@@ -56,6 +57,7 @@ export default function Consultation() {
     suggestedTreatments,
     isFinished,
     summary,
+    error,
     sendMessage,
     finishConsultation,
     resetMessages,
@@ -65,6 +67,7 @@ export default function Consultation() {
   });
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
 
   const scrollToBottom = useCallback(() => {
     if (messagesContainerRef.current) {
@@ -348,99 +351,118 @@ export default function Consultation() {
                   ref={messagesContainerRef}
                   className="flex-1 overflow-y-auto space-y-4 mb-4 p-4 bg-stone-100 dark:bg-stone-800 rounded-lg scrollbar-thin"
                 >
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'} transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-2 group`}
-                    >
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                          message.role === 'user'
-                            ? 'bg-teal-800 dark:bg-teal-500 self-start'
-                            : 'bg-stone-100 dark:bg-stone-800'
-                        }`}
-                        style={
-                          message.role === 'user'
-                            ? { marginTop: '25px' }
-                            : undefined
-                        }
+                  <AnimatePresence initial={false}>
+                    {messages.map((message) => (
+                      <motion.div
+                        key={message.id}
+                        initial={reducedMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={reducedMotion ? {} : { opacity: 0, y: -8 }}
+                        transition={{ duration: reducedMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+                        className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'} group`}
                       >
-                        {message.role === 'user' ? (
-                          <User size={18} className="text-white" />
-                        ) : (
-                          <Bot size={18} className="text-white" />
-                        )}
-                      </div>
-
-                      <div
-                        className={`flex-1 max-w-[80%] ${message.role === 'user' ? 'text-right' : 'text-left'}`}
-                      >
-                        {message.role === 'user' && (
-                          <div
-                            className={`flex items-center gap-1 mb-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                          >
-                            <button
-                              onClick={() => handleCopyMessage(message.content)}
-                              className="p-1 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-                              title="Copiar mensagem"
-                            >
-                              <Copy
-                                size={12}
-                                className="text-stone-500 dark:text-stone-400"
-                              />
-                            </button>
-                            <button
-                              onClick={() =>
-                                handleResendMessage(message.content)
-                              }
-                              className="p-1 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-                              title="Reenviar mensagem"
-                              disabled={isLoading}
-                            >
-                              <RotateCcw
-                                size={12}
-                                className="text-stone-500 dark:text-stone-400"
-                              />
-                            </button>
-                          </div>
-                        )}
                         <div
-                          className={`inline-block p-3 rounded-lg ${
+                          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                             message.role === 'user'
-                              ? 'bg-teal-800 dark:bg-teal-500 text-white'
-                              : 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-stone-800'
+                              ? 'bg-teal-800 dark:bg-teal-500 self-start'
+                              : 'bg-stone-100 dark:bg-stone-800'
                           }`}
+                          style={
+                            message.role === 'user'
+                              ? { marginTop: '25px' }
+                              : undefined
+                          }
                         >
-                          {message.role === 'assistant' && message.isTyping ? (
-                            <TypingIndicator />
-                          ) : message.role === 'assistant' &&
+                          {message.role === 'user' ? (
+                            <User size={18} className="text-white" />
+                          ) : (
+                            <Bot size={18} className="text-white" />
+                          )}
+                        </div>
+
+                        <div
+                          className={`flex-1 max-w-[80%] ${message.role === 'user' ? 'text-right' : 'text-left'}`}
+                        >
+                          {message.role === 'user' && (
+                            <div
+                              className={`flex items-center gap-1 mb-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
+                              <button
+                                onClick={() => handleCopyMessage(message.content)}
+                                className="p-1 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                                title="Copiar mensagem"
+                              >
+                                <Copy
+                                  size={12}
+                                  className="text-stone-500 dark:text-stone-400"
+                                />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleResendMessage(message.content)
+                                }
+                                className="p-1 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                                title="Reenviar mensagem"
+                                disabled={isLoading}
+                              >
+                                <RotateCcw
+                                  size={12}
+                                  className="text-stone-500 dark:text-stone-400"
+                                />
+                              </button>
+                            </div>
+                          )}
+                          <div
+                            className={`inline-block p-3 rounded-lg ${
+                              message.role === 'user'
+                                ? 'bg-teal-800 dark:bg-teal-500 text-white'
+                                : 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-stone-800'
+                            }`}
+                          >
+                            {message.role === 'assistant' && message.isTyping ? (
+                              <TypingIndicator />
+                            ) : message.role === 'assistant' &&
                             message.isNew &&
                             message.content ? (
-                              <TypingEffect
-                                text={message.content}
-                                onTick={scrollToBottom}
-                              />
-                            ) : (
-                              <p className="text-sm whitespace-pre-wrap">
-                                {message.content}
-                              </p>
-                            )}
+                                <TypingEffect
+                                  text={message.content}
+                                  onTick={scrollToBottom}
+                                />
+                              ) : (
+                                <p className="text-sm whitespace-pre-wrap">
+                                  {message.content}
+                                </p>
+                              )}
+                          </div>
+                          <p
+                            className={`text-xs text-stone-500 dark:text-stone-400 mt-1 px-1 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
+                          >
+                            {message.timestamp.toLocaleTimeString('pt-BR', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
                         </div>
-                        <p
-                          className={`text-xs text-stone-500 dark:text-stone-400 mt-1 px-1 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
-                        >
-                          {message.timestamp.toLocaleTimeString('pt-BR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </div>
 
                 {!isFinished && !isFinishing && (
                   <div className="border-t border-stone-200 dark:border-stone-800 pt-4 mt-4">
+                    <AnimatePresence initial={false}>
+                      {error && (
+                        <motion.p
+                          initial={reducedMotion ? false : { opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={reducedMotion ? {} : { opacity: 0, y: -4 }}
+                          className="mb-3 flex items-center gap-2 rounded-md bg-red-50 px-3 py-2 text-xs font-medium text-red-600 dark:bg-red-950/40 dark:text-red-400"
+                        >
+                          <AlertCircle size={14} />
+                          {error}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
                     <div className="flex items-center gap-2">
                       <Input
                         placeholder="Digite sua mensagem..."
@@ -455,13 +477,18 @@ export default function Consultation() {
                         disabled={isLoading}
                         className="flex-1"
                       />
-                      <Button
-                        onClick={handleSendMessage}
-                        disabled={isLoading || !inputMessage.trim()}
-                        className="w-9 h-9 bg-teal-800 dark:bg-teal-500 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 text-white dark:text-stone-950 disabled:opacity-50 disabled:cursor-not-allowed"
+                      <motion.div
+                        animate={isLoading && !reducedMotion ? { scale: [1, 1.06, 1] } : { scale: 1 }}
+                        transition={{ duration: 0.8, repeat: isLoading ? Infinity : 0 }}
                       >
-                        <Send size={17} />
-                      </Button>
+                        <Button
+                          onClick={handleSendMessage}
+                          disabled={isLoading || !inputMessage.trim()}
+                          className="w-9 h-9 bg-teal-800 dark:bg-teal-500 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 text-white dark:text-stone-950 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Send size={17} />
+                        </Button>
+                      </motion.div>
                     </div>
                   </div>
                 )}

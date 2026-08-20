@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertTriangle, CreditCard, XCircle } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -12,6 +13,7 @@ import type { BillingStatus, Invoice, Plan } from '@/types/billing';
 import { formatCurrency } from '@/utils/format';
 
 export default function CanceledSubscriptionPage() {
+  const reducedMotion = useReducedMotion();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(
@@ -44,7 +46,15 @@ export default function CanceledSubscriptionPage() {
   return (
     <main className="min-h-screen w-full bg-[oklch(0.985_0.01_95)] dark:bg-stone-950">
       <section className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-        <div className="rounded-lg border border-red-600/30 dark:border-red-500/30 bg-white dark:bg-stone-900 p-5 sm:p-6">
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 14, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{
+            duration: reducedMotion ? 0 : 0.45,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="rounded-lg border border-red-600/30 dark:border-red-500/30 bg-white dark:bg-stone-900 p-5 sm:p-6"
+        >
           <XCircle className="h-10 w-10 text-red-600 dark:text-red-500" />
           <h1 className="mt-4 text-2xl font-bold text-stone-900 dark:text-stone-100">
             {billingStatus?.subscription?.status === 'canceled'
@@ -56,7 +66,7 @@ export default function CanceledSubscriptionPage() {
               ? 'O acesso ao VetAI está bloqueado. Quite as pendências abaixo e escolha um plano para criar uma nova assinatura.'
               : 'O acesso ao VetAI está bloqueado até a confirmação do pagamento. Você pode iniciar um novo Checkout caso o anterior tenha expirado ou sido abandonado.'}
           </p>
-        </div>
+        </motion.div>
 
         {loading && (
           <SectionCard title={<Skeleton className="h-6 w-52" />}>

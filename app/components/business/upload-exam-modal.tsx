@@ -1,7 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Upload, X } from 'lucide-react';
+import { CheckCircle2, FileUp, Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 
@@ -68,6 +68,7 @@ export function UploadExamModal({
   const title = watch('title');
   const examDate = watch('examDate');
   const file = watch('file');
+  const readyToUpload = Boolean(selectedPatient && title?.trim() && file);
 
   useEffect(() => {
     if (preselectedPatient) {
@@ -100,10 +101,10 @@ export function UploadExamModal({
       <div className="flex shrink-0 items-center justify-between border-b border-stone-200 dark:border-stone-800 p-5">
         <div>
           <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
-              Enviar Exame
+            Enviar Exame
           </h2>
           <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
-              Faça o upload do PDF do exame para análise automática
+            Faça o upload do PDF do exame para análise automática
           </p>
         </div>
         <Button
@@ -117,6 +118,16 @@ export function UploadExamModal({
       </div>
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+        <div className="flex items-center gap-2 rounded-lg bg-stone-100/70 px-3 py-2 text-xs font-medium text-stone-500 transition-colors dark:bg-stone-800/70 dark:text-stone-400">
+          <span
+            className={`grid size-5 place-items-center rounded-full transition-colors duration-200 ${readyToUpload ? 'bg-teal-800 text-white dark:bg-teal-500 dark:text-stone-950' : 'bg-white text-stone-500 dark:bg-stone-900 dark:text-stone-400'}`}
+          >
+            {readyToUpload ? <CheckCircle2 size={13} /> : <FileUp size={13} />}
+          </span>
+          {readyToUpload
+            ? 'Exame pronto para análise.'
+            : 'Selecione o paciente, informe o título e anexe o PDF.'}
+        </div>
         {!preselectedPatient && (
           <Autocomplete
             label="Paciente"
@@ -159,7 +170,7 @@ export function UploadExamModal({
         {preselectedPatient && (
           <div>
             <label className="mb-2 block text-sm font-medium text-stone-900 dark:text-stone-100">
-                Paciente
+              Paciente
             </label>
             <div className="rounded-lg border border-teal-800/40 dark:border-teal-500/40 bg-teal-800/10 dark:bg-teal-500/10 p-3">
               <span className="text-sm font-medium text-teal-800 dark:text-teal-500">
@@ -204,20 +215,21 @@ export function UploadExamModal({
 
       <div className="flex shrink-0 items-center justify-end gap-3 border-t border-stone-200 dark:border-stone-800 p-4">
         <Button variant="outline" onClick={onClose} disabled={uploading}>
-            Cancelar
+          Cancelar
         </Button>
         <Button
           onClick={handleSubmit(onSubmit)}
           loading={uploading}
+          disabled={!readyToUpload || uploading}
           className="min-w-[120px] bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90"
         >
           {uploading ? (
-            <>Enviando...</>
+            <span className="flex items-center">Enviando...</span>
           ) : (
-            <>
+            <span className="flex items-center">
               <Upload size={16} className="mr-2" />
-                Enviar Exame
-            </>
+              Enviar Exame
+            </span>
           )}
         </Button>
       </div>

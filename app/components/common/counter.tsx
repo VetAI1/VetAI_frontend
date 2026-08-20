@@ -13,7 +13,7 @@ interface CounterProps {
 
 export function Counter({
   target,
-  duration = 300,
+  duration = 1400,
   suffix = '',
   prefix = '',
 }: CounterProps) {
@@ -34,7 +34,7 @@ export function Counter({
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
       setCount(Math.floor(eased * target));
 
       if (progress < 1) {

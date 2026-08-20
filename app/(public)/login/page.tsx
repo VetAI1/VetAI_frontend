@@ -43,7 +43,7 @@ export default function LoginPage() {
       title="Bem-vindo de volta"
       description="Acesse sua conta e continue cuidando dos seus pacientes com o poder da inteligência artificial."
     >
-      <div>
+      <div className="pb-8">
         <span className="inline-flex items-center gap-2 rounded-full border border-teal-800/15 dark:border-teal-500/15 bg-teal-800/10 dark:bg-teal-500/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-teal-800 dark:text-teal-500">
           <ShieldCheck size={13} className="text-teal-800 dark:text-teal-500" />
           Acesso seguro
@@ -55,7 +55,7 @@ export default function LoginPage() {
           Digite suas credenciais para acessar o painel.
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-6">
           <div className="space-y-2">
             <InputWithLabel
               label="Email"

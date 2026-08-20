@@ -32,7 +32,7 @@ export interface InputWithLabelProps<
 
 const InputWithLabelInner = React.forwardRef<
   HTMLInputElement,
-  Omit<InputWithLabelProps, 'control' | 'name'> & {
+  Omit<InputWithLabelProps, 'control'> & {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
       }
@@ -52,12 +52,15 @@ const InputWithLabelInner = React.forwardRef<
         ref,
       ) {
         const [open, setOpen] = React.useState(false);
+        const generatedId = React.useId();
+        const inputId = props.id ?? generatedId;
 
         return (
           <div className={cn('w-full', containerClassName)}>
             {label && (
               <div className="mb-2 flex items-center gap-2">
                 <Label
+                  htmlFor={inputId}
                   {...(required ? { required } : {})}
                   className="text-sm font-semibold tracking-[-0.01em] text-stone-900 dark:text-stone-100"
                 >
@@ -87,6 +90,7 @@ const InputWithLabelInner = React.forwardRef<
             )}
             <div className="relative">
               <Input
+                id={inputId}
                 className={cn(
                   error &&
                     'border-red-600 dark:border-red-500 bg-red-600/5 dark:bg-red-500/5 focus-visible:border-red-600 dark:focus-visible:border-red-500 focus-visible:ring-red-600/20 dark:focus-visible:ring-red-500/20',
@@ -129,6 +133,7 @@ const InputWithLabel = React.forwardRef(
           control={control}
           render={({ field }) => (
             <InputWithLabelInner
+              {...(name ? { name } : {})}
               value={field.value ?? ''}
               onChange={(event) => {
                 field.onChange(event);
@@ -144,6 +149,7 @@ const InputWithLabel = React.forwardRef(
 
     return (
       <InputWithLabelInner
+        {...(name ? { name } : {})}
         value={value ?? ''}
         onChange={onChange ?? (() => {})}
         {...props}
