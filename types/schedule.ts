@@ -13,6 +13,11 @@ export interface ScheduleEvent {
   tutor_name?: string;
 }
 
+export interface ScheduleDateRange {
+  from: string;
+  to: string;
+}
+
 export const EVENT_TYPE_MAP: Record<
   EventType,
   { label: string; color: string; bg: string; dot: string }

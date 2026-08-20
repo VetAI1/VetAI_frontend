@@ -7,7 +7,7 @@ import {
   LayoutGrid,
   Plus,
 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { AddEventModal } from './components/add-event-modal';
 import { Calendar } from './components/calendar';
@@ -21,25 +21,25 @@ import {
 import type { ScheduleSettingsState } from './components/schedule-settings';
 import { TodayEventsList } from './components/today-events-list';
 import { WeekCalendar } from './components/week-calendar';
-import { MONTH_NAMES, toLocalDateStr } from './utils';
+import {
+  MONTH_NAMES,
+  addDays,
+  addMonths,
+  fromLocalDateStr,
+  getMonthRange,
+  getWeekRange,
+  getWeekStart,
+  toLocalDateStr,
+} from './utils';
 
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useModal } from '@/contexts/modal-context';
-import { scheduleService } from '@/services/schedule.service';
+import { useScheduleEvents } from '@/hooks/use-schedule-events';
 import type { ScheduleEvent } from '@/types/schedule';
 
 type ViewMode = 'month' | 'week';
-
-function getWeekStart(dateStr: string): Date {
-  const [y = 0, m = 0, d = 0] = dateStr.split('-').map(Number);
-  const date = new Date(y, m - 1, d);
-  const dayOfWeek = date.getDay(); // 0 = Sunday
-  const sunday = new Date(date);
-  sunday.setDate(date.getDate() - dayOfWeek);
-  return sunday;
-}
 
 function formatWeekRange(weekStart: Date): string {
   const weekEnd = new Date(weekStart);
@@ -76,73 +76,41 @@ function CalendarSkeleton() {
 
 export default function SchedulePage() {
   const todayStr = toLocalDateStr(new Date());
-  const now = new Date();
-
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [scheduleSettings, setScheduleSettings] =
     useState<ScheduleSettingsState>(() => loadScheduleSettings());
-  const [currentYear, setCurrentYear] = useState(now.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState(now.getMonth());
-  const [weekStart, setWeekStart] = useState<Date>(() =>
-    getWeekStart(todayStr),
-  );
-  const [events, setEvents] = useState<ScheduleEvent[]>([]);
-  const [loadingEvents, setLoadingEvents] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
+  const [selectedDate, setSelectedDate] = useState(todayStr);
   const { open } = useModal();
 
-  const loadEvents = useCallback(async () => {
-    setLoadingEvents(true);
-    try {
-      const nextEvents = await scheduleService.list({
-        size: 500,
-        sort: 'date',
-        direction: 'asc',
-      });
-      setEvents(nextEvents);
-    } finally {
-      setLoadingEvents(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadEvents();
-  }, [loadEvents]);
+  const activeDate = fromLocalDateStr(selectedDate);
+  const currentYear = activeDate.getFullYear();
+  const currentMonth = activeDate.getMonth();
+  const weekStart = getWeekStart(selectedDate);
+  const visibleRange =
+    viewMode === 'month'
+      ? getMonthRange(currentYear, currentMonth)
+      : getWeekRange(weekStart);
+  const { events, loading: loadingEvents, error, refresh } = useScheduleEvents(
+    visibleRange,
+  );
 
   function prevPeriod() {
-    if (viewMode === 'month') {
-      if (currentMonth === 0) {
-        setCurrentYear((y) => y - 1);
-        setCurrentMonth(11);
-      } else setCurrentMonth((m) => m - 1);
-    } else {
-      setWeekStart((ws) => {
-        const prev = new Date(ws);
-        prev.setDate(ws.getDate() - 7);
-        return prev;
-      });
-    }
+    setSelectedDate((date) =>
+      viewMode === 'month'
+        ? addMonths(date, -1)
+        : toLocalDateStr(addDays(fromLocalDateStr(date), -7)),
+    );
   }
 
   function nextPeriod() {
-    if (viewMode === 'month') {
-      if (currentMonth === 11) {
-        setCurrentYear((y) => y + 1);
-        setCurrentMonth(0);
-      } else setCurrentMonth((m) => m + 1);
-    } else {
-      setWeekStart((ws) => {
-        const next = new Date(ws);
-        next.setDate(ws.getDate() + 7);
-        return next;
-      });
-    }
+    setSelectedDate((date) =>
+      viewMode === 'month'
+        ? addMonths(date, 1)
+        : toLocalDateStr(addDays(fromLocalDateStr(date), 7)),
+    );
   }
 
   function handleSwitchView(mode: ViewMode) {
-    if (mode === 'week') {
-      setWeekStart(getWeekStart(todayStr));
-    }
     setViewMode(mode);
   }
 
@@ -150,8 +118,8 @@ export default function SchedulePage() {
     openAddModal(date ?? selectedDate);
   }
 
-  async function handleEventDeleted() {
-    await loadEvents();
+  function handleEventDeleted() {
+    refresh();
   }
 
   const openAddModal = (date: string, time?: string) => open({
@@ -160,7 +128,7 @@ export default function SchedulePage() {
         initialDate={date}
         initialTime={time}
         onClose={close}
-        onSave={async () => { await loadEvents(); close(); }}
+        onSave={() => { refresh(); close(); }}
         minHour={scheduleSettings.weekStartHour}
         maxHour={scheduleSettings.weekEndHour}
       />
@@ -172,7 +140,7 @@ export default function SchedulePage() {
       <AddEventModal
         event={event}
         onClose={close}
-        onSave={async () => { await loadEvents(); close(); }}
+        onSave={() => { refresh(); close(); }}
         minHour={scheduleSettings.weekStartHour}
         maxHour={scheduleSettings.weekEndHour}
       />
@@ -213,6 +181,7 @@ export default function SchedulePage() {
                 <button
                   onClick={prevPeriod}
                   className="rounded-md p-2 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
+                  aria-label="Período anterior"
                 >
                   <ChevronLeft
                     size={18}
@@ -227,6 +196,7 @@ export default function SchedulePage() {
                 <button
                   onClick={nextPeriod}
                   className="rounded-md p-2 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
+                  aria-label="Próximo período"
                 >
                   <ChevronRight
                     size={18}
@@ -238,6 +208,7 @@ export default function SchedulePage() {
               <div className="flex shrink-0 items-center overflow-hidden rounded-lg border border-stone-200 dark:border-stone-800">
                 <button
                   onClick={() => handleSwitchView('month')}
+                  aria-pressed={viewMode === 'month'}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${
                     viewMode === 'month'
                       ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950'
@@ -249,6 +220,7 @@ export default function SchedulePage() {
                 </button>
                 <button
                   onClick={() => handleSwitchView('week')}
+                  aria-pressed={viewMode === 'week'}
                   className={`flex items-center gap-1.5 border-l border-stone-200 dark:border-stone-800 px-3 py-1.5 text-xs font-semibold transition-colors ${
                     viewMode === 'week'
                       ? 'bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950'
@@ -261,30 +233,35 @@ export default function SchedulePage() {
               </div>
             </div>
 
-            {viewMode === 'month' ? (
-              loadingEvents ? (
-                <CalendarSkeleton />
-              ) : (
-                <Calendar
-                  year={currentYear}
-                  month={currentMonth}
-                  events={events}
-                  selectedDate={selectedDate}
-                  today={todayStr}
-                  onSelectDate={setSelectedDate}
-                  onAddClick={openAddModal}
-                  onEventClick={openDetailModal}
-                />
-              )
+            {error ? (
+              <div className="flex min-h-72 flex-col items-center justify-center gap-3 text-center">
+                <p role="alert" className="text-sm text-stone-500 dark:text-stone-400">
+                  Não foi possível carregar os eventos deste período.
+                </p>
+                <Button variant="outline" onClick={refresh}>Tentar novamente</Button>
+              </div>
             ) : loadingEvents ? (
               <CalendarSkeleton />
+            ) : viewMode === 'month' ? (
+              <Calendar
+                year={currentYear}
+                month={currentMonth}
+                events={events}
+                selectedDate={selectedDate}
+                today={todayStr}
+                onSelectDate={setSelectedDate}
+                onAddClick={openAddModal}
+                onEventClick={openDetailModal}
+              />
             ) : (
               <WeekCalendar
                 weekStart={weekStart}
                 events={events}
+                selectedDate={selectedDate}
                 today={todayStr}
                 startHour={scheduleSettings.weekStartHour}
                 endHour={scheduleSettings.weekEndHour}
+                onSelectDate={setSelectedDate}
                 onEventClick={openDetailModal}
                 onSlotClick={(date, time) => openAddModal(date, time)}
               />

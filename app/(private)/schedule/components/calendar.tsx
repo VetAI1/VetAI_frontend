@@ -1,8 +1,13 @@
 import { Plus } from 'lucide-react';
 
-import { DAY_NAMES, getDaysInMonth, getFirstDayOfMonth } from '../utils';
+import {
+  DAY_NAMES,
+  getDaysInMonth,
+  getFirstDayOfMonth,
+  getScheduleEventPresentation,
+  groupEventsByDate,
+} from '../utils';
 
-import { EVENT_TYPE_MAP } from '@/types/schedule';
 import type { ScheduleEvent } from '@/types/schedule';
 
 interface CalendarProps {
@@ -29,11 +34,7 @@ export function Calendar({
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month);
 
-  const eventsByDate: Record<string, ScheduleEvent[]> = {};
-  for (const e of events) {
-    if (!eventsByDate[e.date]) eventsByDate[e.date] = [];
-    eventsByDate[e.date]!.push(e);
-  }
+  const eventsByDate = groupEventsByDate(events);
 
   const cells: (number | null)[] = [
     ...Array<null>(firstDay).fill(null),
@@ -103,24 +104,15 @@ export function Calendar({
 
               <div className="relative z-10 flex flex-col gap-0.5 w-full overflow-hidden">
                 {dayEvents.slice(0, 2).map((ev) => {
-                  const past = ev.date < today;
-                  const bgColor = past
-                    ? 'bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-800'
-                    : `${EVENT_TYPE_MAP[ev.type].bg}`;
-                  const textColor = past
-                    ? 'text-stone-500/70 dark:text-stone-400/70'
-                    : EVENT_TYPE_MAP[ev.type].color;
-                  const dotColor = past
-                    ? 'bg-stone-300 dark:bg-stone-600'
-                    : EVENT_TYPE_MAP[ev.type].dot;
+                  const presentation = getScheduleEventPresentation(ev);
                   return (
                     <button
                       key={ev.id}
                       onClick={() => onEventClick(ev)}
-                      className={`w-full truncate text-[10px] font-medium px-1 py-0.5 rounded flex items-center gap-1 border ${bgColor} ${textColor} hover:opacity-80 transition-opacity`}
+                      className={`w-full truncate text-[10px] font-medium px-1 py-0.5 rounded flex items-center gap-1 border ${presentation.backgroundClass} ${presentation.textClass} hover:opacity-80 transition-opacity`}
                     >
                       <span
-                        className={`w-1 h-1 rounded-full shrink-0 ${dotColor}`}
+                        className={`w-1 h-1 rounded-full shrink-0 ${presentation.dotClass}`}
                       />
                       <span className="truncate">{ev.title}</span>
                     </button>
