@@ -1,48 +1,55 @@
 'use client';
 
-import {
-  PawPrint,
-  RefreshCcw,
-} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
+import { CreditsMeter } from './components/credits-meter';
+import { DistributionBars } from './components/distribution-bars';
+import { StatCard } from './components/stat-card';
+import { TodaySchedule } from './components/today-schedule';
+import { TrendChart } from './components/trend-chart';
+
 import { Badge } from '@/app/components/common/badge';
-import { Card } from '@/app/components/common/card';
 import { EmptyState } from '@/app/components/common/empty-state';
 import { DataTable } from '@/app/components/data/data-table';
 import { SectionCard } from '@/app/components/data/section-card';
-import { AnalyticsChart } from '@/components/AnalyticsChart';
-import { MetricCard } from '@/components/MetricCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SPECIE_LABELS, STUDY_STATUS_MAP } from '@/constants';
 import { useAuth } from '@/infra/auth-context';
-import { cn } from '@/infra/utils';
 import type { DashboardData } from '@/services/analytics.service';
 import { analyticsService } from '@/services/analytics.service';
+import { billingService } from '@/services/billing.service';
 import { scheduleService } from '@/services/schedule.service';
 import type { ScheduleEvent } from '@/types/schedule';
-import { EVENT_TYPE_MAP } from '@/types/schedule';
 import type { StudyStatus } from '@/types/study';
 
-const STATUS_MAP = STUDY_STATUS_MAP;
+/**
+ * Paleta categórica validada para as duas superfícies do app (branco e
+ * stone-900): banda de luminosidade, piso de croma, separação para daltonismo
+ * e contraste >= 3:1 passam em light e dark com estes mesmos três tons.
+ */
+const SERIES_COLORS = {
+  patients: '#0d9488',
+  consultations: '#d97706',
+  studies: '#0284c7',
+} as const;
 
-function fmtDate(val: string | undefined | null): string {
-  if (!val) return '-';
-  const d = new Date(val);
-  return isNaN(d.getTime()) ? '-' : d.toLocaleDateString('pt-BR');
+function fmtDate(value: string | undefined | null): string {
+  if (!value) return '-';
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? '-' : date.toLocaleDateString('pt-BR');
 }
 
 function todayIso(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
 function greeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return 'Bom dia';
-  if (h < 18) return 'Boa tarde';
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Bom dia';
+  if (hour < 18) return 'Boa tarde';
   return 'Boa noite';
 }
 
@@ -54,18 +61,47 @@ function todayLabel(): string {
   });
 }
 
+function sum(values: number[]): number {
+  return values.reduce((total, value) => total + value, 0);
+}
+
+/** Variação da metade mais recente da série contra a metade anterior. */
+function periodDelta(values: number[]): number | null {
+  if (values.length < 4) return null;
+  const half = Math.floor(values.length / 2);
+  const previous = sum(values.slice(0, half));
+  const current = sum(values.slice(half));
+  if (previous === 0) return current === 0 ? 0 : null;
+  return ((current - previous) / previous) * 100;
+}
+
+/** Rótulos vindos como dd/mm/yyyy viram "seg, 12" para caber no eixo. */
+function shortDayLabel(label: string): string {
+  const [day, month, year] = label.split('/');
+  if (!day || !month || !year) return label;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  if (isNaN(date.getTime())) return label;
+  const weekday = date.toLocaleDateString('pt-BR', { weekday: 'short' });
+  return `${weekday.replace('.', '')} ${day}`;
+}
+
 export default function Dashboard() {
   const router = useRouter();
   const { user } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [todayEvents, setTodayEvents] = useState<ScheduleEvent[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [credits, setCredits] = useState<{
+    available: number;
+    total: number;
+  } | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await analyticsService.getDashboard();
-      setData(res);
+      const result = await analyticsService.getDashboard();
+      setData(result);
     } catch (_) {
     } finally {
       setLoading(false);
@@ -73,22 +109,70 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
     async function loadTodayEvents() {
-      const events = await scheduleService.listByDate(todayIso());
-      setTodayEvents(events);
+      setEventsLoading(true);
+      try {
+        const events = await scheduleService.listByDate(todayIso());
+        setTodayEvents(events);
+      } catch (_) {
+        setTodayEvents([]);
+      } finally {
+        setEventsLoading(false);
+      }
     }
 
     void loadTodayEvents();
   }, []);
 
+  useEffect(() => {
+    async function loadCredits() {
+      try {
+        const result = await billingService.getAiCredits();
+        setCredits({
+          available: result.availableCredits,
+          total: result.totalCredits,
+        });
+      } catch (_) {
+        setCredits(null);
+      }
+    }
+
+    void loadCredits();
+  }, []);
+
   const patients = data?.latest_patients ?? [];
   const studies = data?.latest_studies ?? [];
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const growthLabels = data?.growth_overtime?.labels ?? [];
+  const patientSeries = data?.growth_overtime?.datasets?.[0]?.data ?? [];
+  const consultationSeries = data?.growth_overtime?.datasets?.[1]?.data ?? [];
 
   const firstName = user?.name?.split(' ')[0] ?? '';
+
+  const nextEvent = [...todayEvents]
+    .sort((a, b) => a.start_time.localeCompare(b.start_time))
+    .find((event) => {
+      const now = new Date();
+      const [hours, minutes] = event.start_time.split(':').map(Number);
+      return (hours ?? 0) * 60 + (minutes ?? 0) >= now.getHours() * 60 + now.getMinutes();
+    });
+
+  const trendSeries = [
+    {
+      label: 'Novos pacientes',
+      data: patientSeries,
+      color: SERIES_COLORS.patients,
+    },
+    {
+      label: 'Consultas',
+      data: consultationSeries,
+      color: SERIES_COLORS.consultations,
+    },
+  ];
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -98,158 +182,158 @@ export default function Dashboard() {
             {greeting()}
             {firstName ? `, ${firstName}` : ''}
           </h1>
-          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-            {todayLabel()} — acompanhe o resumo da clínica
+          <p className="mt-1 text-sm capitalize text-stone-500 dark:text-stone-400">
+            {todayLabel()}
           </p>
         </div>
         <Button variant="outline" onClick={fetchData} disabled={loading}>
-          <RefreshCcw className={cn('h-4 w-4', loading && 'animate-spin')} />
-          Atualizar
+          {loading ? 'Atualizando…' : 'Atualizar'}
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <MetricCard
-          title="Total de Pacientes"
-          value={data?.total_patients ?? 0}
+      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Novos pacientes"
+          value={sum(patientSeries)}
+          series={patientSeries}
+          color={SERIES_COLORS.patients}
+          delta={periodDelta(patientSeries)}
+          footnote={`${data?.total_patients ?? 0} pacientes no total`}
           loading={loading}
-          icon="PawPrint"
-          tone="primary"
-          tooltip="Número total de pacientes cadastrados na clínica."
         />
-        <MetricCard
-          title="Total de Exames"
-          value={data?.total_studies ?? 0}
+        <StatCard
+          label="Consultas"
+          value={sum(consultationSeries)}
+          series={consultationSeries}
+          color={SERIES_COLORS.consultations}
+          delta={periodDelta(consultationSeries)}
+          footnote={`${data?.total_consultations ?? 0} consultas no total`}
           loading={loading}
-          icon="Microscope"
-          tone="info"
-          tooltip="Total de exames realizados."
         />
-        <MetricCard
-          title="Hoje"
-          value={data?.total_consultations_today ?? 0}
-          loading={loading}
-          icon="Calendar"
-          tone="sun"
-          tooltip="Consultas agendadas ou realizadas no dia de hoje."
+        <StatCard
+          label="Agendamentos hoje"
+          value={todayEvents.length}
+          footnote={
+            nextEvent
+              ? `Próximo às ${nextEvent.start_time}`
+              : 'Nenhum compromisso restante'
+          }
+          loading={eventsLoading}
         />
-        <MetricCard
-          title="Total de Consultas"
-          value={data?.total_consultations ?? 0}
-          loading={loading}
-          icon="Stethoscope"
-          tone="success"
-          tooltip="Total histórico de consultas médicas concluídas."
+        <CreditsMeter
+          available={credits?.available ?? 0}
+          total={credits?.total ?? 0}
+          loading={credits === null}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {(loading || data?.growth_overtime) && (
-            <AnalyticsChart
-              type="line"
-              title="Crescimento ao Longo do Tempo"
-              subtitle="Comparativo de novos pacientes e consultas realizadas"
-              data={data?.growth_overtime ?? { labels: [], datasets: [] }}
-              className="lg:col-span-2"
-              height={310}
-              loading={loading}
-            />
-          )}
-
-          <SectionCard
-            title="Atividades de Hoje"
-            subtitle="Eventos agendados para o dia de hoje"
-          >
-            <div className="h-[260px] overflow-y-auto mt-2">
-              {loading ? (
-                <div className="flex flex-col gap-2">
-                  <Skeleton className="h-14 w-full rounded-lg" />
-                  <Skeleton className="h-14 w-full rounded-lg" />
-                  <Skeleton className="h-14 w-full rounded-lg" />
-                </div>
-              ) : todayEvents.length === 0 ? (
-                <EmptyState
-                  title="Nenhuma atividade para hoje"
-                  className="h-full"
-                />
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {todayEvents.map((event) => {
-                    const typeInfo = EVENT_TYPE_MAP[event.type];
-                    return (
-                      <div
-                        key={event.id}
-                        className={cn(
-                          'flex items-start gap-3 rounded-lg border p-3 text-sm',
-                          typeInfo.bg,
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            'mt-1.5 h-2 w-2 shrink-0 rounded-full',
-                            typeInfo.dot,
-                          )}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span
-                              className={cn(
-                                'font-medium truncate',
-                                typeInfo.color,
-                              )}
-                            >
-                              {event.title}
-                            </span>
-                            <span className="shrink-0 font-data text-xs text-stone-500 dark:text-stone-400">
-                              {event.start_time}
-                              {event.end_time ? ` – ${event.end_time}` : ''}
-                            </span>
-                          </div>
-                          {event.patient_name && (
-                            <p className="mt-0.5 truncate text-xs text-stone-500 dark:text-stone-400">
-                              {event.patient_name}
-                            </p>
-                          )}
-                          {event.description && (
-                            <p className="mt-0.5 truncate text-xs text-stone-500/80 dark:text-stone-400/80">
-                              {event.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+      <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <SectionCard
+          className="lg:col-span-2"
+          title="Movimento da clínica"
+          subtitle="Novos pacientes e consultas por dia"
+          headerAction={
+            <div className="flex flex-wrap gap-2">
+              {trendSeries.map((item) => (
+                <span
+                  key={item.label}
+                  className="flex items-center gap-2 rounded-full border border-stone-200 px-3 py-1.5 dark:border-stone-800"
+                >
+                  <span
+                    className="size-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: item.color }}
+                    aria-hidden="true"
+                  />
+                  <span className="text-xs font-semibold text-stone-900 dark:text-stone-100">
+                    {item.label}
+                  </span>
+                  <span className="font-data text-xs font-bold text-stone-500 dark:text-stone-400">
+                    {sum(item.data)}
+                  </span>
+                </span>
+              ))}
             </div>
-          </SectionCard>
-        </div>
-
-        {(loading || data?.patients_by_specie) && (
-          <AnalyticsChart
-            type="doughnut"
-            title="Distribuição por Espécie"
-            subtitle="Quais animais são mais atendidos"
-            data={data?.patients_by_specie ?? { labels: [], datasets: [] }}
+          }
+        >
+          <TrendChart
+            labels={growthLabels.map(shortDayLabel)}
+            series={trendSeries}
             loading={loading}
+            height={300}
           />
-        )}
-
-        {(loading || data?.consultations_status) && (
-          <AnalyticsChart
-            type="bar"
-            title="Status das Consultas"
-            subtitle="Acompanhamento do progresso clínico"
-            data={data?.consultations_status ?? { labels: [], datasets: [] }}
-            loading={loading}
-          />
-        )}
+        </SectionCard>
 
         <SectionCard
+          title="Agendamentos de hoje"
+          subtitle={
+            eventsLoading
+              ? 'Carregando a agenda'
+              : `${todayEvents.length} ${todayEvents.length === 1 ? 'compromisso' : 'compromissos'}`
+          }
+          headerAction={
+            <Button
+              variant="link"
+              size="sm"
+              className="h-auto p-0 text-teal-800 dark:text-teal-500"
+              onClick={() => router.push('/schedule')}
+            >
+              Ver agenda
+            </Button>
+          }
+          className="flex flex-col"
+        >
+          <div className="max-h-[340px] flex-1 overflow-y-auto pr-1">
+            <TodaySchedule events={todayEvents} loading={eventsLoading} />
+          </div>
+        </SectionCard>
+      </div>
+
+      <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <SectionCard
+          title="Pacientes por espécie"
+          subtitle="Quais animais a clínica mais atende"
+        >
+          <DistributionBars
+            labels={data?.patients_by_specie?.labels ?? []}
+            values={data?.patients_by_specie?.datasets?.[0]?.data ?? []}
+            color={SERIES_COLORS.patients}
+            loading={loading}
+            emptyTitle="Nenhum paciente cadastrado"
+          />
+        </SectionCard>
+
+        <SectionCard
+          title="Consultas por status"
+          subtitle="Onde os atendimentos estão parados"
+        >
+          <DistributionBars
+            labels={data?.consultations_status?.labels ?? []}
+            values={data?.consultations_status?.datasets?.[0]?.data ?? []}
+            color={SERIES_COLORS.consultations}
+            loading={loading}
+            emptyTitle="Nenhuma consulta registrada"
+          />
+        </SectionCard>
+
+        <SectionCard
+          title="Exames por status"
+          subtitle="Análises pendentes e concluídas"
+        >
+          <DistributionBars
+            labels={data?.studies_status?.labels ?? []}
+            values={data?.studies_status?.datasets?.[0]?.data ?? []}
+            color={SERIES_COLORS.studies}
+            loading={loading}
+            emptyTitle="Nenhum exame enviado"
+          />
+        </SectionCard>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <SectionCard
           title="Exames recentes"
-          subtitle="Últimos resultados enviados."
-          className="flex flex-col h-[440px]"
+          subtitle="Últimos resultados enviados"
+          className="flex h-[420px] flex-col"
         >
           <DataTable
             headers={['Data', 'Paciente', 'Título', 'Status', 'Ações']}
@@ -259,13 +343,13 @@ export default function Dashboard() {
               : {})}
           >
             {loading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i}>
+              Array.from({ length: 5 }).map((_, index) => (
+                <tr key={index}>
                   <td className="p-4"><Skeleton className="h-4 w-20" /></td>
                   <td className="p-4"><Skeleton className="h-4 w-28" /></td>
                   <td className="p-4"><Skeleton className="h-4 w-32" /></td>
                   <td className="p-4"><Skeleton className="h-5 w-20 rounded-full" /></td>
-                  <td className="p-4"><Skeleton className="h-4 w-10 ml-auto" /></td>
+                  <td className="p-4"><Skeleton className="ml-auto h-4 w-10" /></td>
                 </tr>
               ))
             ) : studies.length === 0 ? (
@@ -276,24 +360,23 @@ export default function Dashboard() {
               </tr>
             ) : (
               studies.map((study) => {
-                const statusInfo = STATUS_MAP[study.status as StudyStatus] ?? {
-                  label: study.status,
-                  color: 'yellow' as const,
-                };
+                const statusInfo = STUDY_STATUS_MAP[
+                  study.status as StudyStatus
+                ] ?? { label: study.status, color: 'yellow' as const };
                 return (
                   <tr
                     key={study.id}
-                    className="hover:bg-stone-100/40 dark:hover:bg-stone-800/40 transition-colors"
+                    className="transition-colors hover:bg-stone-100/40 dark:hover:bg-stone-800/40"
                   >
-                    <td className="p-4 text-stone-500 dark:text-stone-400 text-sm">
+                    <td className="p-4 text-sm text-stone-500 dark:text-stone-400">
                       {fmtDate(study.examDate ?? study.created_at)}
                     </td>
                     <td className="p-4">
-                      <span className="font-medium text-stone-900 dark:text-stone-100 text-sm">
+                      <span className="text-sm font-medium text-stone-900 dark:text-stone-100">
                         {study.patient?.name ?? '-'}
                       </span>
                     </td>
-                    <td className="p-4 text-stone-500 dark:text-stone-400 text-sm">
+                    <td className="p-4 text-sm text-stone-500 dark:text-stone-400">
                       {study.title ?? 'Sem título'}
                     </td>
                     <td className="p-4">
@@ -303,10 +386,8 @@ export default function Dashboard() {
                       <Button
                         variant="link"
                         size="sm"
-                        onClick={() =>
-                          router.push(`/exams/${study.id}`)
-                        }
-                        className="text-teal-800 dark:text-teal-500 h-auto p-0"
+                        onClick={() => router.push(`/exams/${study.id}`)}
+                        className="h-auto p-0 text-teal-800 dark:text-teal-500"
                       >
                         Abrir
                       </Button>
@@ -319,56 +400,56 @@ export default function Dashboard() {
         </SectionCard>
 
         <SectionCard
-          title="Últimos Pacientes"
-          subtitle="Pacientes adicionados recentemente"
-          className="flex flex-col h-[440px]"
+          title="Pacientes recentes"
+          subtitle="Cadastrados nos últimos dias"
+          className="flex h-[420px] flex-col"
         >
-          <div className="flex-1 overflow-y-auto min-h-0">
-            <div className="flex flex-col gap-3 mt-4">
-              {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <Card key={i} className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="w-10 h-10 rounded-full" />
-                        <div className="flex flex-col gap-1.5">
-                          <Skeleton className="h-4 w-28" />
-                          <Skeleton className="h-3 w-16" />
-                        </div>
-                      </div>
-                      <Skeleton className="h-3 w-16" />
-                    </div>
-                  </Card>
-                ))
-              ) : patients.length === 0 ? (
-                <EmptyState title="Nenhum paciente ainda" icon={PawPrint} />
-              ) : (
-                patients.map((patient) => (
-                  <Card key={patient.id} className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="grid size-10 shrink-0 place-items-center rounded-full bg-teal-800/10 dark:bg-teal-500/10 text-teal-800 dark:text-teal-500">
-                          <PawPrint size={18} />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-stone-900 dark:text-stone-100 text-sm">
-                            {patient.name}
-                          </h3>
-                          <p className="text-xs text-stone-500 dark:text-stone-400">
-                            {SPECIE_LABELS[
-                              patient.specie as keyof typeof SPECIE_LABELS
-                            ] ?? patient.specie}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="font-data text-xs text-stone-500 dark:text-stone-400">
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+            {loading ? (
+              <div className="flex flex-col">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="flex justify-between py-3.5">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                ))}
+              </div>
+            ) : patients.length === 0 ? (
+              <EmptyState title="Nenhum paciente ainda" className="h-full" />
+            ) : (
+              <ul className="flex flex-col">
+                {patients.map((patient, index) => (
+                  <li
+                    key={patient.id}
+                    className={
+                      index > 0
+                        ? 'border-t border-stone-200 dark:border-stone-800'
+                        : ''
+                    }
+                  >
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/patients/${patient.id}`)}
+                      className="flex w-full items-center justify-between gap-3 py-3.5 text-left transition-colors hover:bg-stone-100/40 dark:hover:bg-stone-800/40"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold text-stone-900 dark:text-stone-100">
+                          {patient.name}
+                        </span>
+                        <span className="block text-xs text-stone-500 dark:text-stone-400">
+                          {SPECIE_LABELS[
+                            patient.specie as keyof typeof SPECIE_LABELS
+                          ] ?? patient.specie}
+                        </span>
+                      </span>
+                      <span className="font-data shrink-0 text-xs text-stone-500 dark:text-stone-400">
                         {fmtDate(patient.created_at)}
                       </span>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </SectionCard>
       </div>

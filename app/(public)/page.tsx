@@ -1,28 +1,42 @@
 'use client';
 
 import {
+  Activity,
   ArrowRight,
+  BedDouble,
   BrainCircuit,
+  CalendarDays,
   ChartNoAxesCombined,
   Check,
   ChevronRight,
   ClipboardPlus,
+  CreditCard,
   FileText,
   HeartPulse,
+  Package,
   PawPrint,
+  Pill,
   Quote,
+  Route,
+  Scale,
   ShieldCheck,
   Sparkles,
   Stethoscope,
+  Syringe,
+  TriangleAlert,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { LandingNav } from './components/landing-nav';
 import { ProductShowcase } from './components/product-showcase';
 import { TextReveal } from './components/text-reveal';
 
 import { BrandLogo } from '@/app/components/brand/brand-logo';
 import { CopilotDemo } from '@/app/components/brand/copilot-demo';
+import { HospitalizationDemo } from '@/app/components/brand/hospitalization-demo';
+import { ManagementDemo } from '@/app/components/brand/management-demo';
+import { PrescriptionDemo } from '@/app/components/brand/prescription-demo';
 import { Shot } from '@/app/components/brand/shot';
 import { Counter } from '@/app/components/common/counter';
 import { Reveal } from '@/app/components/common/reveal';
@@ -127,38 +141,11 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[oklch(0.985_0.01_95)] dark:bg-stone-950 text-stone-900 dark:text-stone-100">
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-stone-200/80 dark:border-stone-800/80 bg-[oklch(0.985_0.01_95)]/85 dark:bg-stone-950/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8">
-          <Link href="/" aria-label="VetAI - início">
-            <BrandLogo />
-          </Link>
-          <div className="hidden items-center gap-7 lg:flex">
-            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#produto">
-              Produto
-            </a>
-            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#planos">
-              Planos
-            </a>
-            <a className="text-sm font-semibold text-stone-500 dark:text-stone-400 transition-colors hover:text-teal-800 dark:hover:text-teal-500" href="#relatos">
-              Relatos
-            </a>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button asChild variant="ghost" className="hidden sm:inline-flex">
-              <Link href="/login">Entrar</Link>
-            </Button>
-            <Button asChild size="sm" className="px-4 sm:px-5">
-              <Link href="/register">Criar conta <ArrowRight /></Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <LandingNav />
 
       <main>
         <section className="relative isolate pt-32 pb-16 sm:pt-40 md:pb-24">
           <div className="surface-pattern absolute inset-x-0 top-0 -z-10 h-[540px] opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-          <div className="absolute -z-10 right-[7%] top-32 hidden size-40 rounded-full border border-teal-800/15 dark:border-teal-500/15 bg-stone-100/50 dark:bg-stone-800/50 md:block" />
-          <div className="absolute -z-10 left-[8%] top-64 hidden size-12 rounded-full bg-amber-500/65 dark:bg-amber-400/65 md:block" />
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid items-center gap-14 lg:grid-cols-[1.02fr_0.98fr]">
               <div className="max-w-2xl">
@@ -248,15 +235,13 @@ export default function LandingPage() {
 
         <section id="produto" className="relative isolate overflow-hidden border-y border-stone-200 bg-[oklch(0.985_0.01_95)] py-24 dark:border-stone-800 dark:bg-stone-950 md:py-32">
           <div className="surface-pattern pointer-events-none absolute inset-0 z-0 opacity-50 [mask-image:linear-gradient(135deg,black,transparent_60%)]" />
-          <div className="pointer-events-none absolute -right-20 top-12 z-0 size-72 rounded-full border border-teal-800/15 dark:border-teal-500/15" />
-          <div className="pointer-events-none absolute left-[7%] top-28 z-0 size-5 rounded-full bg-amber-500/70 dark:bg-amber-400/70" />
           <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
             <Reveal direction="up"><SectionHeading eyebrow="Uma rotina mais fluida" title="Clínico na essência. Simples na rotina." description="Cada ferramenta foi organizada para apoiar a tomada de decisão e reduzir o trabalho repetitivo da equipe." /></Reveal>
             <div className="mt-14 grid gap-5 lg:grid-cols-3">
               {FEATURES.map((feature, index) => (
                 <Reveal key={feature.title} direction="up" delay={index * 80}>
                   <article className="group h-full rounded-[24px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-7 shadow-[var(--shadow-card)] transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-teal-800/25 dark:hover:border-teal-500/25">
-                    <div className={`grid size-12 place-items-center rounded-2xl ${index === 1 ? 'bg-amber-500 dark:bg-amber-400 text-amber-900 dark:text-amber-100' : 'bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500'}`}><feature.icon size={23} /></div>
+                    <div className="grid size-12 place-items-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500"><feature.icon size={23} /></div>
                     <p className="mt-7 text-xs font-bold uppercase tracking-[0.12em] text-teal-800 dark:text-teal-500">{feature.eyebrow}</p>
                     <h3 className="font-display mt-3 text-2xl font-bold tracking-[-0.05em] text-stone-900 dark:text-stone-100">{feature.title}</h3>
                     <p className="mt-3 text-sm leading-6 text-stone-500 dark:text-stone-400">{feature.description}</p>
@@ -273,11 +258,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="relative isolate overflow-hidden border-y border-amber-500/20 bg-amber-500/10 py-24 dark:border-amber-400/15 dark:bg-stone-900 md:py-32">
-          <div className="pointer-events-none absolute -left-20 bottom-4 z-0 size-72 rounded-full border border-amber-500/35 dark:border-amber-400/20" />
-          <div className="pointer-events-none absolute right-[8%] top-16 z-0 grid size-36 place-items-center rounded-full bg-teal-800/10 dark:bg-teal-500/10">
-            <span className="size-3 rounded-full bg-teal-800/60 dark:bg-teal-500/60" />
-          </div>
+        <section id="ia" className="relative isolate overflow-hidden border-y border-amber-500/20 bg-amber-500/10 py-24 dark:border-amber-400/15 dark:bg-stone-900 md:py-32">
           <div className="surface-pattern pointer-events-none absolute inset-y-0 right-0 z-0 w-1/2 opacity-40 [mask-image:linear-gradient(to_left,black,transparent)]" />
           <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
@@ -308,9 +289,187 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <section id="medicamentos" className="relative isolate overflow-hidden bg-white py-24 dark:bg-stone-950 md:py-32">
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+              <Reveal direction="up">
+                <div className="rounded-[24px] border border-stone-200 dark:border-stone-800 bg-[oklch(0.985_0.01_95)] dark:bg-stone-900 p-6 shadow-[var(--shadow-card)] sm:p-7">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-display text-2xl font-bold tracking-[-0.05em] text-stone-900 dark:text-stone-100">Meloxicam</p>
+                      <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">Anti-inflamatório não esteroidal</p>
+                    </div>
+                    <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500"><Pill size={21} /></span>
+                  </div>
+
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    {[
+                      { label: 'Dose cães', value: '0,1 mg/kg' },
+                      { label: 'Dose gatos', value: '0,05 mg/kg' },
+                      { label: 'Via', value: 'Oral, SC' },
+                      { label: 'Frequência', value: 'A cada 24h' },
+                    ].map((item) => (
+                      <div key={item.label} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 px-3.5 py-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">{item.label}</p>
+                        <p className="font-data mt-1 text-sm font-semibold text-stone-900 dark:text-stone-100">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 border-t border-stone-200 dark:border-stone-800 pt-5">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Contraindicações</p>
+                    <div className="mt-2.5 flex flex-wrap gap-2">
+                      {['Insuficiência renal', 'Gestação', 'Úlcera gástrica', 'Desidratação'].map((item) => (
+                        <span key={item} className="rounded-full bg-amber-500/15 dark:bg-amber-400/15 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">{item}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+
+              <Reveal direction="up" delay={120}>
+                <SectionHeading eyebrow="Bulário clínico" title="A bula certa, sem sair do atendimento." description="Consulte dose por espécie, vias de administração, contraindicações e apresentações enquanto conduz a consulta." />
+                <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                  {[
+                    { icon: Scale, title: 'Dose por espécie', text: 'Referências para cães, gatos, equinos e bovinos.' },
+                    { icon: Route, title: 'Vias e frequência', text: 'Como administrar e em qual intervalo.' },
+                    { icon: TriangleAlert, title: 'Alertas e cuidados', text: 'Contraindicações, efeitos adversos e superdose.' },
+                    { icon: Package, title: 'Apresentações', text: 'Concentrações disponíveis e armazenamento.' },
+                  ].map((item) => (
+                    <div key={item.title} className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+                      <item.icon className="text-teal-800 dark:text-teal-500" size={18} />
+                      <p className="mt-3 text-sm font-bold text-stone-900 dark:text-stone-100">{item.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-stone-500 dark:text-stone-400">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        <section id="gestao" className="relative isolate overflow-hidden border-y border-stone-200 bg-[oklch(0.985_0.01_95)] py-24 dark:border-stone-800 dark:bg-stone-950 md:py-32">
+          <div className="surface-pattern pointer-events-none absolute inset-0 z-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+            <Reveal direction="up">
+              <div className="mx-auto max-w-2xl text-center">
+                <span className="inline-flex items-center gap-2 rounded-full bg-stone-100 dark:bg-stone-800 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-stone-800 dark:text-stone-100">
+                  <span className="size-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
+                  Clínica organizada
+                </span>
+                <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100 sm:text-4xl md:text-5xl">
+                  <TextReveal text="Toda a operação em um lugar só." />
+                </h2>
+                <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-stone-500 dark:text-stone-400 md:text-lg">
+                  Pets, tutores, vacinas, pagamentos e agendamentos conversam entre si. O que você registra em um módulo aparece onde a equipe precisa.
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal direction="up" delay={120}>
+              <div className="mx-auto mt-14 max-w-4xl">
+                <ManagementDemo />
+              </div>
+            </Reveal>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { icon: PawPrint, title: 'Pets e tutores', text: 'Ficha completa, histórico e vínculo entre tutor e paciente.' },
+                { icon: Syringe, title: 'Vacinas', text: 'Carteira digital com controle de reforço e próxima dose.' },
+                { icon: CreditCard, title: 'Pagamentos', text: 'Cobranças, orçamentos e status financeiro por atendimento.' },
+                { icon: CalendarDays, title: 'Agendamentos', text: 'Agenda da equipe com confirmação e tipo de atendimento.' },
+              ].map((item, index) => (
+                <Reveal key={item.title} direction="up" delay={index * 70}>
+                  <div className="h-full rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+                    <span className="grid size-10 place-items-center rounded-xl bg-stone-100 dark:bg-stone-800 text-teal-800 dark:text-teal-500"><item.icon size={18} /></span>
+                    <p className="mt-4 text-sm font-bold text-stone-900 dark:text-stone-100">{item.title}</p>
+                    <p className="mt-1.5 text-xs leading-5 text-stone-500 dark:text-stone-400">{item.text}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="receita" className="relative isolate overflow-hidden bg-white py-24 dark:bg-stone-950 md:py-32">
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+              <Reveal direction="up">
+                <SectionHeading eyebrow="Receita em segundos" title="Prescreveu, está pronta para imprimir." description="Monte a prescrição no atendimento e o VetAI gera o documento timbrado. Só falta baixar o PDF." />
+                <div className="mt-8 space-y-5">
+                  {[
+                    { title: 'Escolha os medicamentos', text: 'Busque no bulário e a posologia já vem sugerida.' },
+                    { title: 'Ajuste a posologia', text: 'Dose, via, intervalo e duração conforme o caso.' },
+                    { title: 'Baixe o PDF', text: 'Timbrado da clínica, dados do paciente, CRMV e assinatura.' },
+                  ].map((step, index) => (
+                    <div key={step.title} className="flex gap-4">
+                      <span className="font-data grid size-8 shrink-0 place-items-center rounded-full border border-teal-800/20 dark:border-teal-500/20 text-xs font-bold text-teal-800 dark:text-teal-500">{index + 1}</span>
+                      <div>
+                        <h3 className="text-base font-bold text-stone-900 dark:text-stone-100">{step.title}</h3>
+                        <p className="mt-1 text-sm leading-6 text-stone-500 dark:text-stone-400">{step.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-stone-200 dark:border-stone-800 bg-[oklch(0.985_0.01_95)] dark:bg-stone-900 px-4 py-2 text-xs font-semibold text-stone-500 dark:text-stone-400">
+                  <FileText size={14} className="text-teal-800 dark:text-teal-500" />
+                  Também disponível para orçamentos e relatórios de internação
+                </div>
+              </Reveal>
+
+              <Reveal direction="up" delay={150}>
+                <Shot tilt="left" className="mx-auto w-full max-w-[520px]">
+                  <PrescriptionDemo />
+                </Shot>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        <section id="internacao" className="relative isolate overflow-hidden bg-stone-900 py-24 text-stone-100 md:py-32">
+          <div className="surface-pattern pointer-events-none absolute inset-y-0 left-0 z-0 w-1/2 opacity-20 [mask-image:linear-gradient(to_right,black,transparent)]" />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+              <Reveal direction="up">
+                <Shot tilt="right" className="mx-auto w-full max-w-[540px]">
+                  <HospitalizationDemo />
+                </Shot>
+              </Reveal>
+
+              <Reveal direction="up" delay={120}>
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-stone-100">
+                  <span className="size-1.5 rounded-full bg-amber-400" />
+                  Internação
+                </span>
+                <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] sm:text-4xl md:text-5xl">
+                  <TextReveal text="O plantão inteiro sabe o que já foi feito." />
+                </h2>
+                <p className="mt-5 max-w-xl text-base leading-7 text-stone-400 md:text-lg">
+                  Admissão, prescrição, mapa de execuções e sinais vitais no mesmo lugar. Quem entra no turno vê exatamente onde o cuidado parou.
+                </p>
+
+                <div className="mt-9 space-y-px overflow-hidden rounded-2xl border border-white/10">
+                  {[
+                    { icon: BedDouble, title: 'Admissão e box', text: 'Status, risco e evolução clínica desde a entrada.' },
+                    { icon: Syringe, title: 'Prescrição recorrente', text: 'Dose, intervalo e duração viram horários no mapa.' },
+                    { icon: Check, title: 'Execuções registradas', text: 'Cada dose aplicada fica marcada com autor e horário.' },
+                    { icon: Activity, title: 'Sinais vitais e alertas', text: 'Aferição no intervalo definido, com aviso de atraso.' },
+                  ].map((item) => (
+                    <div key={item.title} className="flex items-start gap-4 bg-white/[0.03] px-5 py-4">
+                      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/10 text-teal-400"><item.icon size={17} /></span>
+                      <div>
+                        <p className="text-sm font-bold text-stone-100">{item.title}</p>
+                        <p className="mt-1 text-xs leading-5 text-stone-400">{item.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
         <section id="planos" className="relative isolate overflow-hidden bg-white py-24 dark:bg-stone-950 md:py-32">
-          <div className="pointer-events-none absolute right-[9%] top-16 z-0 size-4 rounded-full bg-amber-500/70 dark:bg-amber-400/70" />
-          <div className="pointer-events-none absolute -right-16 bottom-8 z-0 size-64 rounded-full border border-teal-800/15 dark:border-teal-500/15" />
           <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
             <Reveal direction="up"><SectionHeading eyebrow="Planos que acompanham" title="Comece com a sua clínica. Cresça no seu ritmo." description="Escolha a estrutura que faz sentido hoje. Os planos crescem junto com a operação." /></Reveal>
             {plansLoading ? (
@@ -350,7 +509,6 @@ export default function LandingPage() {
 
         <section id="relatos" className="relative isolate overflow-hidden border-y border-stone-200 bg-[oklch(0.985_0.01_95)] py-24 dark:border-stone-800 dark:bg-stone-900 md:py-32">
           <div className="surface-pattern pointer-events-none absolute inset-y-0 left-0 z-0 w-1/2 opacity-35 [mask-image:linear-gradient(to_right,black,transparent)]" />
-          <div className="pointer-events-none absolute left-[8%] top-16 z-0 size-24 rounded-full border border-amber-500/30 dark:border-amber-400/20" />
           <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
             <Reveal direction="up"><SectionHeading eyebrow="Quem usa, sente" title="Mais presença para o que importa." /></Reveal>
             <div className="mt-14 grid gap-5 md:grid-cols-3">

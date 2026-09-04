@@ -54,6 +54,7 @@
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
+
 }
 
 @layer utilities {
@@ -256,4 +257,61 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/*
+  Fora de @layer de propósito: CSS sem camada vence qualquer @layer no cascade.
+  Dentro de `base` a utility `transition-colors` (camada utilities) sobrescrevia
+  a transição longa e o autofill voltava a pintar o fundo.
+
+  O Chrome ignora background-color no estado autofill e pinta por cima. Adiar a
+  transição indefinidamente impede essa pintura e deixa o bg do próprio campo
+  aparecer, sem recorrer a box-shadow inset — que sobrescreveria o anel de foco
+  (focus:ring-2, também box-shadow). border-color segue nos 150ms originais.
+*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s,
+    border-color 150ms !important;
+  -webkit-text-fill-color: var(--color-stone-900);
+  caret-color: var(--color-stone-900);
+}
+
+/* Firefox usa :autofill e respeita background-color com !important. */
+input:autofill,
+textarea:autofill,
+select:autofill {
+  background-color: var(--color-white) !important;
+  color: var(--color-stone-900);
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark select:-webkit-autofill,
+.dark select:-webkit-autofill:hover,
+.dark select:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-stone-100);
+  caret-color: var(--color-stone-100);
+}
+
+.dark input:autofill,
+.dark textarea:autofill,
+.dark select:autofill {
+  background-color: var(--color-stone-900) !important;
+  color: var(--color-stone-100);
 }
