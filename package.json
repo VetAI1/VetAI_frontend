@@ -10,7 +10,8 @@
     "format": "eslint --fix",
     "format:check": "eslint",
     "lint": "eslint",
-    "audit:contrast": "playwright test tests/contrast.spec.ts"
+    "audit:contrast": "playwright test tests/contrast.spec.ts",
+    "audit:responsive": "playwright test tests/responsive.spec.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

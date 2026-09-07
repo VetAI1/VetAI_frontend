@@ -25,70 +25,143 @@ export interface NavItem {
   badge?: string;
 }
 
-export const NAV_ITEMS: NavItem[] = [
-  { href: '/analytics/dashboard', icon: LayoutDashboard, label: 'Dashboard', shortLabel: 'Dashboard' },
-  { href: '/exams', icon: Microscope, label: 'Exames', shortLabel: 'Exames', permission: 'exams:view' },
+export interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+/**
+ * Navegação principal agrupada por área. A ordem das seções e dos itens é a
+ * mesma usada na sidebar e no menu "Mais" do mobile.
+ */
+export const NAV_SECTIONS: NavSection[] = [
   {
-    href: '/patients',
-    icon: PawPrint,
-    label: 'Pacientes',
-    shortLabel: 'Pacientes',
-    permission: 'patients:view',
+    title: 'Inteligência artificial',
+    items: [
+      {
+        href: '/exams',
+        icon: Microscope,
+        label: 'Exames',
+        shortLabel: 'Exames',
+        permission: 'exams:view',
+      },
+      {
+        href: '/consultation',
+        icon: MessageCircleQuestionMark,
+        label: 'Consulta',
+        shortLabel: 'Consulta',
+        permission: 'consultation:view',
+        badge: 'BETA',
+      },
+    ],
   },
   {
-    href: '/tutors',
-    icon: Users,
-    label: 'Tutores',
-    shortLabel: 'Tutores',
-    permission: 'tutors:view',
+    title: 'Operacional',
+    items: [
+      {
+        href: '/analytics/dashboard',
+        icon: LayoutDashboard,
+        label: 'Dashboard',
+        shortLabel: 'Dashboard',
+      },
+      {
+        href: '/patients',
+        icon: PawPrint,
+        label: 'Pacientes',
+        shortLabel: 'Pacientes',
+        permission: 'patients:view',
+      },
+      {
+        href: '/tutors',
+        icon: Users,
+        label: 'Tutores',
+        shortLabel: 'Tutores',
+        permission: 'tutors:view',
+      },
+      {
+        href: '/schedule',
+        icon: CalendarDays,
+        label: 'Agendamentos',
+        shortLabel: 'Agenda',
+        permission: 'schedule:view',
+      },
+      {
+        href: '/monitoring',
+        icon: SquareActivity,
+        label: 'Internação',
+        shortLabel: 'Internação',
+        permission: 'monitoring:view',
+      },
+      {
+        href: '/vaccines',
+        icon: Syringe,
+        label: 'Vacinas',
+        shortLabel: 'Vacinas',
+        permission: 'vaccines:view',
+      },
+      {
+        href: '/medicines',
+        icon: Pill,
+        label: 'Medicações',
+        shortLabel: 'Medicações',
+      },
+    ],
   },
   {
-    href: '/vaccines',
-    icon: Syringe,
-    label: 'Vacinas',
-    shortLabel: 'Vacinas',
-    permission: 'vaccines:view',
-  },
-  { href: '/medicines', icon: Pill, label: 'Medicações', shortLabel: 'Medicações' },
-  {
-    href: '/schedule',
-    icon: CalendarDays,
-    label: 'Agendamentos',
-    shortLabel: 'Agenda',
-    permission: 'schedule:view',
-  },
-  { href: '/payments', icon: CreditCard, label: 'Pagamentos', shortLabel: 'Pagamentos' },
-  { href: '/catalog', icon: BookOpen, label: 'Catálogo', shortLabel: 'Catálogo' },
-  {
-    href: '/monitoring',
-    icon: SquareActivity,
-    label: 'Internação',
-    shortLabel: 'Internação',
-    permission: 'monitoring:view',
+    title: 'Financeiro',
+    items: [
+      {
+        href: '/payments',
+        icon: CreditCard,
+        label: 'Pagamentos',
+        shortLabel: 'Pagamentos',
+      },
+      {
+        href: '/catalog',
+        icon: BookOpen,
+        label: 'Catálogo',
+        shortLabel: 'Catálogo',
+      },
+    ],
   },
   {
-    href: '/consultation',
-    icon: MessageCircleQuestionMark,
-    label: 'Consulta',
-    shortLabel: 'Consulta',
-    permission: 'consultation:view',
-    badge: 'BETA',
+    title: 'Administrativo',
+    items: [
+      {
+        href: '/settings',
+        icon: Settings,
+        label: 'Configurações',
+        shortLabel: 'Config.',
+        permission: 'settings:view',
+      },
+      {
+        href: '/admin/dashboard',
+        icon: ShieldCheck,
+        label: 'Administrativo',
+        shortLabel: 'Admin',
+      },
+    ],
   },
-  {
-    href: '/settings',
-    icon: Settings,
-    label: 'Configurações',
-    shortLabel: 'Config.',
-    permission: 'settings:view',
-  },
-  { href: '/admin/dashboard', icon: ShieldCheck, label: 'Administrativo', shortLabel: 'Admin' },
 ];
 
+/** Lista achatada, na ordem das seções. */
+export const NAV_ITEMS: NavItem[] = NAV_SECTIONS.flatMap(
+  (section) => section.items,
+);
+
+function navItem(href: string): NavItem {
+  const item = NAV_ITEMS.find((candidate) => candidate.href === href);
+  if (!item) {
+    throw new Error(`NavItem não encontrado para "${href}".`);
+  }
+  return item;
+}
+
 export const MOBILE_ESSENTIALS: NavItem[] = [
-  NAV_ITEMS[0]!,
-  NAV_ITEMS[1]!,
-  NAV_ITEMS[2]!,
-  NAV_ITEMS[6]!,
+  navItem('/analytics/dashboard'),
+  navItem('/exams'),
+  navItem('/patients'),
+  navItem('/schedule'),
 ];
 
 export const ADMIN_NAV_ITEMS: NavItem[] = [

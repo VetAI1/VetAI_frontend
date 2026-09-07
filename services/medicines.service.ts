@@ -8,7 +8,9 @@ function buildMedicineQuery(params?: MedicineQueryParams): string {
   if (params.page) sp.set('page', String(params.page));
   if (params.size) sp.set('size', String(params.size));
   if (params.search) sp.set('search', params.search);
-  if (params.type) sp.set('type', params.type);
+  // A API expõe o filtro de categoria como `classification` (MedicineQueryDto);
+  // enviar `type` fazia o ValidationPipe (whitelist) descartar o parâmetro.
+  if (params.type) sp.set('classification', params.type);
   const qs = sp.toString();
   return qs ? `?${qs}` : '';
 }

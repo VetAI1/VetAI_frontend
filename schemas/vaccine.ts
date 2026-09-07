@@ -46,13 +46,25 @@ export const uploadExamSchema = yup.object({
       const date = new Date(value);
       return !isNaN(date.getTime());
     }),
+  type: yup
+    .mixed<'LABORATORY' | 'IMAGING'>()
+    .oneOf(['LABORATORY', 'IMAGING'], 'Tipo de exame inválido')
+    .required('Tipo de exame é obrigatório'),
   file: yup
     .mixed<File>()
-    .required('Arquivo PDF é obrigatório')
-    .test('pdf-only', 'Apenas arquivos PDF são aceitos.', (value) => {
-      if (!(value instanceof File)) return false;
-      return value.type === 'application/pdf';
-    }),
+    .required('Arquivo do exame é obrigatório')
+    .test(
+      'accepted-type',
+      'Formato de arquivo não aceito para este tipo de exame.',
+      (value, context) => {
+        if (!(value instanceof File)) return false;
+        const accepted =
+          (context.parent as { type?: string }).type === 'IMAGING'
+            ? ['application/pdf', 'image/jpeg', 'image/png']
+            : ['application/pdf'];
+        return accepted.includes(value.type);
+      },
+    ),
 });
 
 export type VaccineDoseFormData = yup.InferType<typeof vaccineDoseSchema>;

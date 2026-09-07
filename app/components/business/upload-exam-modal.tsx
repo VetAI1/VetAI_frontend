@@ -1,7 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { CheckCircle2, FileUp, Upload, X } from 'lucide-react';
+import { CheckCircle2, FileUp, FlaskConical, Scan, Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 
@@ -11,12 +11,21 @@ import { FileDropzone } from '../forms/file-dropzone';
 import { InputWithLabel } from '../forms/input-with-label';
 
 import { Button } from '@/components/ui/button';
+import { STUDY_ACCEPTED_MIME_TYPES, STUDY_TYPE_MAP } from '@/constants';
 import { useAutoComplete } from '@/hooks/use-auto-complete';
 import { uploadExamSchema, type UploadExamFormData } from '@/schemas/vaccine';
 import { patientsService } from '@/services/patients.service';
 import { studiesService } from '@/services/studies.service';
 import type { Patient } from '@/types/patient';
-import type { Study } from '@/types/study';
+import type { Study, StudyType } from '@/types/study';
+
+const TYPE_OPTIONS: {
+  value: StudyType;
+  icon: typeof FlaskConical;
+}[] = [
+  { value: 'LABORATORY', icon: FlaskConical },
+  { value: 'IMAGING', icon: Scan },
+];
 
 interface UploadExamModalProps {
   onClose: () => void;
@@ -61,6 +70,7 @@ export function UploadExamModal({
     defaultValues: {
       patientId: preselectedPatient?.id ?? '',
       title: '',
+      type: 'LABORATORY',
       examDate: new Date().toISOString().slice(0, 10),
     },
   });
@@ -68,6 +78,8 @@ export function UploadExamModal({
   const title = watch('title');
   const examDate = watch('examDate');
   const file = watch('file');
+  const type = watch('type');
+  const isImaging = type === 'IMAGING';
   const readyToUpload = Boolean(selectedPatient && title?.trim() && file);
 
   useEffect(() => {
@@ -81,6 +93,14 @@ export function UploadExamModal({
     setValue('file', selectedFile, { shouldValidate: true });
   };
 
+  const handleTypeChange = (nextType: StudyType) => {
+    setValue('type', nextType, { shouldValidate: true });
+    // A file picked for the previous type may no longer be an accepted format.
+    if (file && !STUDY_ACCEPTED_MIME_TYPES[nextType].includes(file.type)) {
+      setValue('file', undefined as unknown as File, { shouldValidate: true });
+    }
+  };
+
   const onSubmit = async (data: UploadExamFormData) => {
     setUploading(true);
     try {
@@ -88,6 +108,7 @@ export function UploadExamModal({
         data.patientId,
         data.file,
         data.title.trim(),
+        data.type,
         data.examDate || undefined,
       );
       onSuccess(study);
@@ -104,7 +125,7 @@ export function UploadExamModal({
             Enviar Exame
           </h2>
           <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
-            Faça o upload do PDF do exame para análise automática
+            Faça o upload do exame para análise automática por IA
           </p>
         </div>
         <Button
@@ -126,8 +147,56 @@ export function UploadExamModal({
           </span>
           {readyToUpload
             ? 'Exame pronto para análise.'
-            : 'Selecione o paciente, informe o título e anexe o PDF.'}
+            : `Selecione o paciente, informe o título e anexe o ${isImaging ? 'arquivo' : 'PDF'}.`}
         </div>
+        <div>
+          <label className="mb-2 block text-sm font-medium text-stone-900 dark:text-stone-100">
+            Tipo de exame <span className="text-red-600 dark:text-red-500">*</span>
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            {TYPE_OPTIONS.map(({ value, icon: Icon }) => {
+              const isSelected = type === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => handleTypeChange(value)}
+                  aria-pressed={isSelected}
+                  className={`flex flex-col items-start gap-1 rounded-lg border p-3 text-left transition-colors ${
+                    isSelected
+                      ? 'border-teal-800 dark:border-teal-500 bg-teal-800/10 dark:bg-teal-500/10'
+                      : 'border-stone-200 dark:border-stone-800 hover:border-teal-800/40 dark:hover:border-teal-500/40'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Icon
+                      size={15}
+                      className={
+                        isSelected
+                          ? 'text-teal-800 dark:text-teal-500'
+                          : 'text-stone-500 dark:text-stone-400'
+                      }
+                    />
+                    <span
+                      className={`text-sm font-medium ${isSelected ? 'text-teal-800 dark:text-teal-500' : 'text-stone-900 dark:text-stone-100'}`}
+                    >
+                      {STUDY_TYPE_MAP[value].shortLabel}
+                    </span>
+                  </span>
+                  <span className="text-xs text-stone-500 dark:text-stone-400">
+                    {STUDY_TYPE_MAP[value].description}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {errors.type?.message && (
+            <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-500">
+              {errors.type.message}
+            </p>
+          )}
+        </div>
+
         {!preselectedPatient && (
           <Autocomplete
             label="Paciente"
@@ -188,7 +257,11 @@ export function UploadExamModal({
             onChange={(e) =>
               setValue('title', e.target.value, { shouldValidate: true })
             }
-            placeholder="Ex: Hemograma Completo"
+            placeholder={
+              isImaging
+                ? 'Ex: Radiografia Torácica'
+                : 'Ex: Hemograma Completo'
+            }
             error={errors.title?.message}
           />
           <DateInput
@@ -203,11 +276,15 @@ export function UploadExamModal({
         </div>
 
         <FileDropzone
-          label="Arquivo PDF do exame"
+          label={isImaging ? 'Arquivo do exame de imagem' : 'Arquivo PDF do exame'}
           required
           file={file}
-          accept="application/pdf"
-          helperText="Apenas arquivos PDF são aceitos"
+          accept={STUDY_ACCEPTED_MIME_TYPES[type]}
+          helperText={
+            isImaging
+              ? 'Laudo em PDF ou a própria imagem (JPG ou PNG)'
+              : 'Apenas arquivos PDF são aceitos'
+          }
           error={errors.file?.message}
           onFileSelect={handleFileChange}
         />

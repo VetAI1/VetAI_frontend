@@ -1,6 +1,6 @@
 'use client';
 
-import { Eye, Microscope, UploadIcon } from 'lucide-react';
+import { Eye, FlaskConical, Microscope, Scan, UploadIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { UploadExamModal } from '@/app/components/business/upload-exam-modal';
@@ -14,7 +14,7 @@ import { SectionCard } from '@/app/components/data/section-card';
 import { Header } from '@/app/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { STUDY_STATUS_MAP } from '@/constants';
+import { STUDY_STATUS_MAP, STUDY_TYPE_MAP } from '@/constants';
 import { useModal } from '@/contexts/modal-context';
 import { usePaginatedResource } from '@/hooks/use-paginated-resource';
 import { studiesService } from '@/services/studies.service';
@@ -79,6 +79,20 @@ export default function ExamsPage() {
           {study.patient?.name ?? '-'}
         </span>
       ),
+    },
+    {
+      key: 'type',
+      header: 'Tipo',
+      render: (study) => {
+        const isImaging = study.type === 'IMAGING';
+        const Icon = isImaging ? Scan : FlaskConical;
+        return (
+          <span className="inline-flex items-center gap-1.5 text-stone-500 dark:text-stone-400">
+            <Icon size={14} />
+            {STUDY_TYPE_MAP[study.type]?.shortLabel ?? study.type}
+          </span>
+        );
+      },
     },
     {
       key: 'status',

@@ -5,8 +5,10 @@ import {
   ArrowLeft,
   CheckCircle2,
   FileText,
+  Image as ImageIcon,
   Loader2,
   Microscope,
+  Scan,
   ShieldCheck,
   X,
 } from 'lucide-react';
@@ -15,13 +17,14 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { formatReference } from '../utils';
+import { ImagingReportView } from './imaging-report';
 
 import { Badge } from '@/app/components/common/badge';
 import { Card } from '@/app/components/common/card';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { STUDY_STATUS_MAP } from '@/constants';
+import { STUDY_STATUS_MAP, STUDY_TYPE_MAP } from '@/constants';
 import { studiesService } from '@/services/studies.service';
 import type { AlteredValueInfo, Study } from '@/types/study';
 
@@ -36,8 +39,9 @@ export function ExamDetailContent() {
   const [selectedValue, setSelectedValue] = useState<AlteredValueInfo | null>(
     null,
   );
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [loadingPdf, setLoadingPdf] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [fileMimeType, setFileMimeType] = useState<string>('application/pdf');
+  const [loadingFile, setLoadingFile] = useState(false);
 
   const fetchStudy = useCallback(async () => {
     if (!id) return;
@@ -75,32 +79,35 @@ export function ExamDetailContent() {
     return () => clearInterval(interval);
   }, [study?.id, study?.status]);
 
-  const hasAlteredValues =
-    study?.results.some((r) =>
-      r.values.some((v) => v.status === 'HIGHER' || v.status === 'LOWER'),
-    ) ?? false;
+  const isImaging = study?.type === 'IMAGING';
 
-  const openPdf = async () => {
+  const hasAlteredValues = isImaging
+    ? (study?.imaging?.findings.some((f) => f.status !== 'NORMAL') ?? false)
+    : (study?.results.some((r) =>
+      r.values.some((v) => v.status === 'HIGHER' || v.status === 'LOWER'),
+    ) ?? false);
+
+  const openFile = async () => {
     if (!id) return;
-    setLoadingPdf(true);
+    setLoadingFile(true);
     try {
-      const { pdfBase64 } = await studiesService.getPdf(id);
+      const { pdfBase64, mimeType } = await studiesService.getFile(id);
       const binary = atob(pdfBase64);
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      setPdfUrl(url);
+      const blob = new Blob([bytes], { type: mimeType });
+      setFileMimeType(mimeType);
+      setFileUrl(URL.createObjectURL(blob));
     } catch {
       // silently fail
     } finally {
-      setLoadingPdf(false);
+      setLoadingFile(false);
     }
   };
 
-  const closePdf = () => {
-    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    setPdfUrl(null);
+  const closeFile = () => {
+    if (fileUrl) URL.revokeObjectURL(fileUrl);
+    setFileUrl(null);
   };
 
   if (loading) {
@@ -195,13 +202,15 @@ export function ExamDetailContent() {
           <Button
             variant="outline"
             onClick={() => {
-              void openPdf();
+              void openFile();
             }}
-            disabled={loadingPdf}
+            disabled={loadingFile}
             className="gap-2 text-sm"
           >
-            {loadingPdf ? (
+            {loadingFile ? (
               <Loader2 size={16} className="animate-spin" />
+            ) : isImaging ? (
+              <ImageIcon size={16} />
             ) : (
               <FileText size={16} />
             )}
@@ -216,11 +225,32 @@ export function ExamDetailContent() {
               Prevenção
             </Button>
           )}
+          <Badge color="neutral">{STUDY_TYPE_MAP[study.type].shortLabel}</Badge>
           <Badge color={statusInfo.color}>{statusInfo.label}</Badge>
         </div>
       </div>
 
-      {study.results.length > 0 ? (
+      {isImaging ? (
+        study.imaging ? (
+          <ImagingReportView
+            imaging={study.imaging}
+            alteredValues={study.prevention?.alteredValues}
+            onSelectFinding={setSelectedValue}
+          />
+        ) : (
+          <Card className="p-8 text-center">
+            <Scan
+              size={32}
+              className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2"
+            />
+            <p className="text-stone-500 dark:text-stone-400">
+              {study.status === 'PENDING' || study.status === 'PROCESSING'
+                ? 'O exame de imagem está sendo analisado. O laudo aparecerá aqui em breve.'
+                : 'Nenhum laudo disponível para este exame de imagem.'}
+            </p>
+          </Card>
+        )
+      ) : study.results.length > 0 ? (
         study.results
           .filter(
             (result) =>
@@ -392,11 +422,11 @@ export function ExamDetailContent() {
         </Card>
       )}
 
-      {pdfUrl && (
+      {fileUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={closePdf}
+            onClick={closeFile}
           />
           <div className="relative flex flex-col bg-white dark:bg-stone-900 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh]">
             <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 dark:border-stone-800 shrink-0">
@@ -406,102 +436,122 @@ export function ExamDetailContent() {
               <Button
                 variant="ghost"
                 size="icon-sm"
-                onClick={closePdf}
+                onClick={closeFile}
                 className="text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 shrink-0"
               >
                 <X size={18} />
               </Button>
             </div>
-            <iframe
-              src={pdfUrl}
-              className="flex-1 w-full border-0 rounded-b-xl"
-              title="Visualizar exame"
-            />
-          </div>
-        </div>
-      )}
-
-      {selectedValue && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setSelectedValue(null)}
-          />
-          <div className="relative bg-white dark:bg-stone-900 rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-5 py-4 flex items-start justify-between gap-3 z-10">
-              <div>
-                <div className="flex items-center gap-2 mb-0.5">
-                  <AlertTriangle size={16} className="text-red-600 dark:text-red-500 shrink-0" />
-                  <h3 className="font-bold text-stone-900 dark:text-stone-100">
-                    {selectedValue.name}
-                  </h3>
-                  <Badge color="red">{selectedValue.status}</Badge>
-                </div>
-                <p className="text-sm text-red-600 dark:text-red-500 font-medium">
-                  {selectedValue.value}
-                  {selectedValue.unit ? ` ${selectedValue.unit}` : ''}
-                </p>
+            {fileMimeType.startsWith('image/') ? (
+              <div className="flex-1 overflow-auto rounded-b-xl bg-stone-100 p-4 dark:bg-stone-950">
+                <img
+                  src={fileUrl}
+                  alt={`Imagem do exame ${study.title ?? ''}`.trim()}
+                  className="mx-auto h-auto max-w-full object-contain"
+                />
               </div>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => setSelectedValue(null)}
-                className="text-stone-500 dark:text-stone-400 shrink-0"
-              >
-                <X size={18} />
-              </Button>
-            </div>
-
-            <div className="p-5 space-y-4">
-              {selectedValue.problems.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-500 mb-2">
-                    Problemas
-                  </p>
-                  <div className="space-y-2">
-                    {selectedValue.problems.map((p, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-900 border border-red-600/30 dark:border-red-500/30 rounded-lg"
-                      >
-                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-600 dark:bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">
-                          {i + 1}
-                        </span>
-                        <p className="text-sm text-stone-800 dark:text-stone-100 leading-relaxed">
-                          {p}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {selectedValue.recommendations.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-teal-800 dark:text-teal-500 mb-2">
-                    Recomendações
-                  </p>
-                  <div className="space-y-2">
-                    {selectedValue.recommendations.map((r, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-2 p-2.5 bg-teal-800/10 dark:bg-teal-500/10 border border-teal-800/40 dark:border-teal-500/40 rounded-lg"
-                      >
-                        <CheckCircle2
-                          size={15}
-                          className="text-teal-800 dark:text-teal-500 shrink-0 mt-0.5"
-                        />
-                        <p className="text-sm text-stone-800 dark:text-stone-100 leading-relaxed">
-                          {r}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            ) : (
+              <iframe
+                src={fileUrl}
+                className="flex-1 w-full border-0 rounded-b-xl"
+                title="Visualizar exame"
+              />
+            )}
           </div>
         </div>
       )}
+
+      {selectedValue && (() => {
+        const isAttention = selectedValue.status === 'Atenção';
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setSelectedValue(null)}
+            />
+            <div className="relative bg-white dark:bg-stone-900 rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-5 py-4 flex items-start justify-between gap-3 z-10">
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <AlertTriangle
+                      size={16}
+                      className={`shrink-0 ${isAttention ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-500'}`}
+                    />
+                    <h3 className="font-bold text-stone-900 dark:text-stone-100">
+                      {selectedValue.name}
+                    </h3>
+                    <Badge color={isAttention ? 'yellow' : 'red'}>
+                      {selectedValue.status}
+                    </Badge>
+                  </div>
+                  <p
+                    className={`text-sm font-medium ${isAttention ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-500'}`}
+                  >
+                    {selectedValue.value}
+                    {selectedValue.unit ? ` ${selectedValue.unit}` : ''}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setSelectedValue(null)}
+                  className="text-stone-500 dark:text-stone-400 shrink-0"
+                >
+                  <X size={18} />
+                </Button>
+              </div>
+
+              <div className="p-5 space-y-4">
+                {selectedValue.problems.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-500 mb-2">
+                    Problemas
+                    </p>
+                    <div className="space-y-2">
+                      {selectedValue.problems.map((p, i) => (
+                        <div
+                          key={i}
+                          className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-900 border border-red-600/30 dark:border-red-500/30 rounded-lg"
+                        >
+                          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-600 dark:bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">
+                            {i + 1}
+                          </span>
+                          <p className="text-sm text-stone-800 dark:text-stone-100 leading-relaxed">
+                            {p}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {selectedValue.recommendations.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-teal-800 dark:text-teal-500 mb-2">
+                    Recomendações
+                    </p>
+                    <div className="space-y-2">
+                      {selectedValue.recommendations.map((r, i) => (
+                        <div
+                          key={i}
+                          className="flex items-start gap-2 p-2.5 bg-teal-800/10 dark:bg-teal-500/10 border border-teal-800/40 dark:border-teal-500/40 rounded-lg"
+                        >
+                          <CheckCircle2
+                            size={15}
+                            className="text-teal-800 dark:text-teal-500 shrink-0 mt-0.5"
+                          />
+                          <p className="text-sm text-stone-800 dark:text-stone-100 leading-relaxed">
+                            {r}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </>
   );
 }

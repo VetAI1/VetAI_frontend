@@ -1,22 +1,32 @@
 import { httpClient, buildQuery } from '@/infra/http-client';
 import type { PaginatedResponse, QueryParams } from '@/types/common';
-import type { Study } from '@/types/study';
+import type { Study, StudyType } from '@/types/study';
 
 export const studiesService = {
-  list: (params?: QueryParams & { patient_id?: string }) => {
+  list: (params?: QueryParams & { patient_id?: string; type?: StudyType }) => {
     const base = buildQuery(params);
-    const patientParam = params?.patient_id
-      ? `${base ? '&' : '?'}patient_id=${params.patient_id}`
+    const extra: string[] = [];
+    if (params?.patient_id) extra.push(`patient_id=${params.patient_id}`);
+    if (params?.type) extra.push(`type=${params.type}`);
+    const extraParams = extra.length
+      ? `${base ? '&' : '?'}${extra.join('&')}`
       : '';
-    return httpClient<PaginatedResponse<Study>>(`study${base}${patientParam}`);
+    return httpClient<PaginatedResponse<Study>>(`study${base}${extraParams}`);
   },
 
   get: (id: string) => httpClient<Study>(`study/${id}`),
 
-  upload: (patientId: string, file: File, title: string, examDate?: string) => {
+  upload: (
+    patientId: string,
+    file: File,
+    title: string,
+    type: StudyType,
+    examDate?: string,
+  ) => {
     const formData = new FormData();
     formData.append('patient_id', patientId);
     formData.append('title', title);
+    formData.append('type', type);
     formData.append('file', file);
     if (examDate) formData.append('exam_date', examDate);
     return httpClient<Study>('study/upload', {
@@ -30,5 +40,6 @@ export const studiesService = {
       method: 'POST',
     }),
 
-  getPdf: (id: string) => httpClient<{ pdfBase64: string }>(`study/${id}/pdf`),
+  getFile: (id: string) =>
+    httpClient<{ pdfBase64: string; mimeType: string }>(`study/${id}/pdf`),
 };

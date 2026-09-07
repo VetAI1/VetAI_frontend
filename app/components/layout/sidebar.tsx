@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-import { NAV_ITEMS, type NavItem } from './navigation';
+import { NAV_SECTIONS, type NavItem, type NavSection } from './navigation';
 import { NotificationBell } from './notification-bell';
 
 import { BrandLogo } from '@/app/components/brand/brand-logo';
@@ -24,10 +24,13 @@ interface SidebarProps {
   className?: string;
   header?: ReactNode;
   homeHref?: string;
+  /** Lista plana, sem divisões (usada pela sidebar administrativa). */
   items?: NavItem[];
   onClose?: () => void;
   onNavigate?: () => void;
   renderFooter?: (classes: SidebarFooterClasses) => ReactNode;
+  /** Navegação agrupada por área. Ignorada quando `items` é informado. */
+  sections?: NavSection[];
   variant?: SidebarVariant;
 }
 
@@ -44,6 +47,7 @@ const sidebarStyles = {
       'text-stone-900/70 dark:text-stone-100/70 hover:bg-teal-50/60 dark:hover:bg-teal-900/60 hover:text-stone-900 dark:hover:text-stone-100',
     footerDestructive: 'text-red-600 dark:text-red-500 hover:bg-red-600/10 dark:hover:bg-red-500/10',
     headerBorder: 'border-stone-200 dark:border-stone-800',
+    sectionTitle: 'text-stone-500/70 dark:text-stone-400/70',
   },
   admin: {
     background: 'border-teal-100 dark:border-teal-900 bg-teal-50 dark:bg-teal-950',
@@ -58,6 +62,7 @@ const sidebarStyles = {
     footerDestructive:
       'text-stone-900/75 dark:text-stone-100/75 hover:bg-teal-100/60 dark:hover:bg-teal-900/60 hover:text-stone-900 dark:hover:text-stone-100',
     headerBorder: 'border-teal-100 dark:border-teal-900',
+    sectionTitle: 'text-stone-900/50 dark:text-stone-100/50',
   },
 } as const;
 
@@ -128,10 +133,11 @@ export function Sidebar({
   className,
   header,
   homeHref = '/analytics/dashboard',
-  items = NAV_ITEMS,
+  items,
   onClose,
   onNavigate,
   renderFooter,
+  sections = NAV_SECTIONS,
   variant = 'default',
 }: SidebarProps) {
   const pathname = usePathname();
@@ -139,6 +145,12 @@ export function Sidebar({
   const { theme, toggleTheme } = useTheme();
   const { logout, can } = useAuth();
   const styles = sidebarStyles[variant];
+
+  // `items` (lista plana) tem prioridade e é renderizada como um único grupo
+  // sem título, preservando o comportamento da sidebar administrativa.
+  const groups: { title?: string; items: NavItem[] }[] = items
+    ? [{ items }]
+    : sections;
 
   async function handleLogout() {
     await logout();
@@ -201,18 +213,32 @@ export function Sidebar({
         )}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {items.map((item) => (
-          <NavLink
-            key={item.href}
-            item={item}
-            isActive={
-              pathname === item.href || pathname.startsWith(`${item.href}/`)
-            }
-            isDisabled={item.permission ? !can(item.permission) : false}
-            variant={variant}
-            {...(onNavigate ? { onNavigate } : {})}
-          />
+      <nav className="flex-1 space-y-4 overflow-y-auto p-3">
+        {groups.map((group, index) => (
+          <div key={group.title ?? index} className="space-y-1">
+            {group.title && (
+              <p
+                className={cn(
+                  'px-3 pb-1 text-[11px] font-bold uppercase tracking-wider',
+                  styles.sectionTitle,
+                )}
+              >
+                {group.title}
+              </p>
+            )}
+            {group.items.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                isActive={
+                  pathname === item.href || pathname.startsWith(`${item.href}/`)
+                }
+                isDisabled={item.permission ? !can(item.permission) : false}
+                variant={variant}
+                {...(onNavigate ? { onNavigate } : {})}
+              />
+            ))}
+          </div>
         ))}
       </nav>
 

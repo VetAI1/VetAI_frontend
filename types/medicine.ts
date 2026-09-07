@@ -11,6 +11,14 @@ export interface ReferenceDose {
   general?: DoseEntry;
 }
 
+export interface MedicineReference {
+  title: string;
+  source: string;
+  url: string;
+  type?: string;
+  accessedAt?: string;
+}
+
 export interface Medicine {
   id: string;
   name: string;
@@ -31,6 +39,7 @@ export interface Medicine {
   clientInformation?: string;
   storage?: string;
   monitoring?: string;
+  references?: MedicineReference[];
   createdAt: string;
   updatedAt: string;
 }

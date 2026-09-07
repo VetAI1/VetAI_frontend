@@ -19,6 +19,7 @@ import {
   Plus,
   Receipt,
   Scale,
+  Scan,
   ShieldCheck,
   Skull,
   StickyNote,
@@ -51,7 +52,7 @@ import { WhatsAppIcon } from '@/app/components/common/whatsapp-icon';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SPECIE_LABELS } from '@/constants';
+import { SPECIE_LABELS, STUDY_TYPE_MAP } from '@/constants';
 import { useConfirmation } from '@/contexts/confirmation-context';
 import { useModal } from '@/contexts/modal-context';
 import { useAuth } from '@/infra/auth-context';
@@ -607,11 +608,17 @@ export function PatientDetailContent() {
               <div key={exam.id} className="flex items-center justify-between py-3 px-1 gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900 flex items-center justify-center shrink-0">
-                    <Microscope size={15} className="text-sky-700 dark:text-sky-500" />
+                    {exam.type === 'IMAGING' ? (
+                      <Scan size={15} className="text-sky-700 dark:text-sky-500" />
+                    ) : (
+                      <Microscope size={15} className="text-sky-700 dark:text-sky-500" />
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{exam.title ?? 'Exame'}</p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">{exam.examDate ? fmtDate(exam.examDate) : fmtDate(exam.created_at)}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                      {STUDY_TYPE_MAP[exam.type]?.shortLabel ?? exam.type} · {exam.examDate ? fmtDate(exam.examDate) : fmtDate(exam.created_at)}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">

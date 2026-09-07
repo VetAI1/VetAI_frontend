@@ -2,7 +2,12 @@ export { BRAZIL_STATES } from './address';
 export { AI_OPERATION_LABELS } from './billing';
 export { chartColor, chartFill } from './charts';
 export { SEX_LABELS, SPECIE_LABELS } from './species';
-export { STUDY_STATUS_MAP } from './study';
+export {
+  IMAGING_STATUS_MAP,
+  STUDY_ACCEPTED_MIME_TYPES,
+  STUDY_STATUS_MAP,
+  STUDY_TYPE_MAP,
+} from './study';
 export * from './monitoring';
 
 export const STORAGE_KEYS = {

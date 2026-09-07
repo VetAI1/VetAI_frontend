@@ -178,12 +178,15 @@ export function AddPrescriptionModal({
                 )}
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              {/* No celular o nome do medicamento ocupa a linha inteira; forma e
+                  quantidade dividem a linha seguinte. */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <Controller
                   name={`medications.${index}.drug`}
                   control={control}
                   render={({ field: medicationField }) => (
                     <InputWithLabel
+                      containerClassName="col-span-2 sm:col-span-1"
                       label="Medicamento"
                       required
                       placeholder="Ex: Amoxicilina"

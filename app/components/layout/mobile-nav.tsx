@@ -9,7 +9,7 @@ import {
   ADMIN_MOBILE_ESSENTIALS,
   ADMIN_NAV_ITEMS,
   MOBILE_ESSENTIALS,
-  NAV_ITEMS,
+  NAV_SECTIONS,
   type NavItem,
 } from './navigation';
 
@@ -34,8 +34,13 @@ export function MobileNav({
   const { theme, toggleTheme } = useTheme();
   const { logout, can } = useAuth();
 
-  const currentItems =
-    items ?? (variant === 'admin' ? ADMIN_NAV_ITEMS : NAV_ITEMS);
+  // Mesmas divisões da sidebar. Uma lista plana recebida por prop (ou a
+  // navegação administrativa) vira um único grupo sem título.
+  const currentGroups: { title?: string; items: NavItem[] }[] = items
+    ? [{ items }]
+    : variant === 'admin'
+      ? [{ items: ADMIN_NAV_ITEMS }]
+      : NAV_SECTIONS;
   const currentEssentials =
     essentials ??
     (variant === 'admin' ? ADMIN_MOBILE_ESSENTIALS : MOBILE_ESSENTIALS);
@@ -129,37 +134,54 @@ export function MobileNav({
               </button>
             </div>
 
-            <div className="space-y-1 p-3">
-              {currentItems
-                .filter((item) => !item.permission || can(item.permission))
-                .map((item) => {
-                  const Icon = item.icon;
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setSheetOpen(false)}
-                      className={cn(
-                        'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                        active
-                          ? 'bg-teal-50 dark:bg-teal-900 font-semibold text-teal-800 dark:text-teal-300'
-                          : 'text-stone-900/80 dark:text-stone-100/80 hover:bg-stone-100 dark:hover:bg-stone-800',
-                      )}
-                    >
-                      <Icon
-                        size={18}
-                        className={cn(active && 'text-teal-800 dark:text-teal-500')}
-                      />
-                      <span className="truncate">{item.label}</span>
-                      {item.badge && (
-                        <span className="ml-auto rounded-full bg-teal-800/10 dark:bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-800 dark:text-teal-500">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
+            <div className="space-y-4 p-3">
+              {currentGroups.map((group, groupIndex) => {
+                const visibleItems = group.items.filter(
+                  (item) => !item.permission || can(item.permission),
+                );
+                if (visibleItems.length === 0) return null;
+
+                return (
+                  <div
+                    key={group.title ?? groupIndex}
+                    className="space-y-1"
+                  >
+                    {group.title && (
+                      <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-stone-500/70 dark:text-stone-400/70">
+                        {group.title}
+                      </p>
+                    )}
+                    {visibleItems.map((item) => {
+                      const Icon = item.icon;
+                      const active = isActive(item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setSheetOpen(false)}
+                          className={cn(
+                            'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+                            active
+                              ? 'bg-teal-50 dark:bg-teal-900 font-semibold text-teal-800 dark:text-teal-300'
+                              : 'text-stone-900/80 dark:text-stone-100/80 hover:bg-stone-100 dark:hover:bg-stone-800',
+                          )}
+                        >
+                          <Icon
+                            size={18}
+                            className={cn(active && 'text-teal-800 dark:text-teal-500')}
+                          />
+                          <span className="truncate">{item.label}</span>
+                          {item.badge && (
+                            <span className="ml-auto rounded-full bg-teal-800/10 dark:bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-800 dark:text-teal-500">
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="space-y-1 border-t border-stone-200 dark:border-stone-800 p-3">

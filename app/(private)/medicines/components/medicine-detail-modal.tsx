@@ -3,11 +3,13 @@
 import {
   AlertTriangle,
   Archive,
+  BookMarked,
   BookOpen,
   Calculator,
   Clock,
   FlaskConical,
   Info,
+  ExternalLink,
   Layers,
   MessageSquare,
   Pill,
@@ -26,7 +28,12 @@ import { Modal } from '@/app/components/common/modal';
 import { TextBlock } from '@/app/components/common/text-block';
 import type { DoseEntry, Medicine, ReferenceDose } from '@/types/medicine';
 
-type Tab = 'sobre' | 'indicacoes' | 'administracao' | 'apresentacoes';
+type Tab =
+  | 'sobre'
+  | 'indicacoes'
+  | 'administracao'
+  | 'apresentacoes'
+  | 'referencias';
 type SpeciesKey = keyof ReferenceDose;
 
 function parseDoseRange(entry?: DoseEntry): { min: number; max: number } | null {
@@ -52,6 +59,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'indicacoes', label: 'Indicações' },
   { key: 'administracao', label: 'Administração' },
   { key: 'apresentacoes', label: 'Apresentações' },
+  { key: 'referencias', label: 'Referências' },
 ];
 
 const SPECIES_OPTIONS: { key: SpeciesKey; label: string }[] = [
@@ -103,7 +111,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
         </div>
 
         {/* Tabs */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 px-4 py-2 border-b border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 px-4 py-2 border-b border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800">
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -425,6 +433,73 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 borderColor="border-stone-200 dark:border-stone-800"
                 bgColor="bg-stone-100 dark:bg-stone-800"
               />
+            </>
+          )}
+
+          {/* â”€â”€ REFERÃŠNCIAS â”€â”€ */}
+          {activeTab === 'referencias' && (
+            <>
+              {(medicine.references?.length ?? 0) > 0 ? (
+                <>
+                  <div className="flex items-start gap-2.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 p-3">
+                    <Info size={15} className="mt-0.5 shrink-0 text-stone-500/70 dark:text-stone-400/70" />
+                    <p className="text-xs leading-relaxed text-stone-500 dark:text-stone-400">
+                      Fontes consultadas especificamente para <span className="font-semibold text-stone-800 dark:text-stone-100">{medicine.name}</span>.
+                      As doses de referência deste registro foram extraídas dos documentos abaixo.
+                    </p>
+                  </div>
+
+                  <ul className="space-y-2.5">
+                    {medicine.references!.map((reference, i) => (
+                      <li key={i}>
+                        <a
+                          href={reference.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-start gap-3 rounded-xl border border-stone-200 dark:border-stone-800 p-4 transition-colors hover:border-teal-800/40 dark:hover:border-teal-500/40 hover:bg-teal-800/5 dark:hover:bg-teal-500/5"
+                        >
+                          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-teal-800/10 dark:bg-teal-500/10">
+                            <BookMarked size={15} className="text-teal-800 dark:text-teal-500" />
+                          </span>
+
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold leading-snug text-stone-900 dark:text-stone-100 group-hover:text-teal-800 dark:group-hover:text-teal-500">
+                              {reference.title}
+                            </p>
+                            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
+                              {reference.source}
+                            </p>
+                            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                              {reference.type && (
+                                <span className="inline-flex items-center rounded-full border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 text-[11px] font-medium text-stone-500 dark:text-stone-400">
+                                  {reference.type}
+                                </span>
+                              )}
+                              {reference.accessedAt && (
+                                <span className="text-[11px] text-stone-500/70 dark:text-stone-400/70">
+                                  Consultado em {reference.accessedAt}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <ExternalLink
+                            size={14}
+                            className="mt-1 shrink-0 text-stone-500/50 dark:text-stone-400/50 group-hover:text-teal-800 dark:group-hover:text-teal-500"
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <div className="rounded-xl border border-dashed border-stone-200 dark:border-stone-800 p-6 text-center">
+                  <BookMarked size={24} className="mx-auto text-stone-500/50 dark:text-stone-400/50 mb-2" />
+                  <p className="text-sm text-stone-500/70 dark:text-stone-400/70">
+                    Nenhuma referência cadastrada para este medicamento.
+                  </p>
+                </div>
+              )}
             </>
           )}
 

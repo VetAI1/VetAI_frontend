@@ -7,7 +7,9 @@ import {
   ClipboardList,
   Lightbulb,
   Microscope,
+  Scan,
   ShieldCheck,
+  Stethoscope,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -18,6 +20,7 @@ import { Card } from '@/app/components/common/card';
 import { SectionCard } from '@/app/components/data/section-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { STUDY_TYPE_MAP } from '@/constants';
 import { studiesService } from '@/services/studies.service';
 import type { Study } from '@/types/study';
 
@@ -80,6 +83,7 @@ export function PreventionContent() {
   }
 
   const { prevention } = study;
+  const isImaging = study.type === 'IMAGING';
 
   if (!prevention) {
     return (
@@ -118,15 +122,50 @@ export function PreventionContent() {
             Análise de Prevenção
           </h2>
           <p className="text-sm text-stone-500 dark:text-stone-400">
-            {study.title ?? 'Exame'} — {study.patient?.name ?? '-'}
+            {study.title ?? 'Exame'} — {study.patient?.name ?? '-'} ·{' '}
+            {STUDY_TYPE_MAP[study.type].label}
           </p>
         </div>
       </div>
 
+      {isImaging && study.imaging && (
+        <SectionCard
+          title="Contexto do exame"
+          subtitle="Base de imagem utilizada para a análise preventiva"
+          className="mb-4"
+        >
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge color="neutral">
+                <Scan size={12} /> {study.imaging.modality}
+              </Badge>
+              {study.imaging.bodyRegion && (
+                <Badge color="neutral">{study.imaging.bodyRegion}</Badge>
+              )}
+            </div>
+            {study.imaging.impression && (
+              <div className="flex items-start gap-3 rounded-lg border border-stone-200 bg-stone-100/60 p-3 dark:border-stone-800 dark:bg-stone-800/60">
+                <Stethoscope
+                  size={16}
+                  className="mt-0.5 shrink-0 text-stone-500 dark:text-stone-400"
+                />
+                <p className="text-sm leading-relaxed text-stone-800 dark:text-stone-100">
+                  {study.imaging.impression}
+                </p>
+              </div>
+            )}
+          </div>
+        </SectionCard>
+      )}
+
       {prevention.generalDiagnosis && (
         <SectionCard
           title="Diagnóstico Geral"
-          subtitle="Avaliação clínica consolidada com base nos valores alterados"
+          subtitle={
+            isImaging
+              ? 'Avaliação clínica consolidada com base nos achados alterados'
+              : 'Avaliação clínica consolidada com base nos valores alterados'
+          }
           className="mb-4"
         >
           <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900 border border-amber-600/40 dark:border-amber-400/40 rounded-lg mt-1">
@@ -140,73 +179,104 @@ export function PreventionContent() {
 
       {prevention.alteredValues.length > 0 && (
         <SectionCard
-          title="Valores Alterados"
-          subtitle="Implicações clínicas por parâmetro"
+          title={isImaging ? 'Achados Alterados' : 'Valores Alterados'}
+          subtitle={
+            isImaging
+              ? 'Implicações clínicas por estrutura avaliada'
+              : 'Implicações clínicas por parâmetro'
+          }
           className="mb-4"
         >
           <div className="space-y-4">
-            {prevention.alteredValues.map((item, i) => (
-              <div
-                key={i}
-                className="border border-red-600/30 dark:border-red-500/30 rounded-lg overflow-hidden"
-              >
-                <div className="flex items-center justify-between px-4 py-3 bg-red-50 dark:bg-red-900">
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle
-                      size={16}
-                      className="text-red-600 dark:text-red-500 shrink-0"
-                    />
-                    <span className="font-semibold text-sm text-stone-900 dark:text-stone-100">
-                      {item.name}
-                    </span>
-                    <span className="text-sm text-red-600 dark:text-red-500 font-medium">
-                      {item.value}
-                      {item.unit ? ` ${item.unit}` : ''}
-                    </span>
+            {prevention.alteredValues.map((item, i) => {
+              const isAttention = item.status === 'Atenção';
+              return (
+                <div
+                  key={i}
+                  className={`rounded-lg overflow-hidden border ${isAttention ? 'border-amber-600/30 dark:border-amber-400/30' : 'border-red-600/30 dark:border-red-500/30'}`}
+                >
+                  <div
+                    className={`flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between ${isAttention ? 'bg-amber-50 dark:bg-amber-900' : 'bg-red-50 dark:bg-red-900'}`}
+                  >
+                    <div
+                      className={`flex gap-3 ${isImaging ? 'items-start' : 'items-center'} min-w-0`}
+                    >
+                      <AlertTriangle
+                        size={16}
+                        className={`shrink-0 ${isImaging ? 'mt-0.5' : ''} ${isAttention ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-500'}`}
+                      />
+                      {isImaging ? (
+                        <div className="min-w-0">
+                          <p className="font-semibold text-sm text-stone-900 dark:text-stone-100">
+                            {item.name}
+                            {item.unit ? ` · ${item.unit}` : ''}
+                          </p>
+                          <p
+                            className={`text-sm leading-relaxed ${isAttention ? 'text-amber-700 dark:text-amber-400' : 'text-red-600 dark:text-red-500'}`}
+                          >
+                            {item.value}
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="font-semibold text-sm text-stone-900 dark:text-stone-100">
+                            {item.name}
+                          </span>
+                          <span className="text-sm text-red-600 dark:text-red-500 font-medium">
+                            {item.value}
+                            {item.unit ? ` ${item.unit}` : ''}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    <Badge color={isAttention ? 'yellow' : 'red'}>
+                      {item.status}
+                    </Badge>
                   </div>
-                  <Badge color="red">
-                    {item.status === 'Alto' ? 'Alto' : 'Baixo'}
-                  </Badge>
+
+                  {item.problems.length > 0 && (
+                    <div className="px-4 pt-3 space-y-2">
+                      <p
+                        className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isAttention ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-500'}`}
+                      >
+                        {isImaging ? 'Riscos clínicos' : 'Problemas'}
+                      </p>
+                      {item.problems.map((problem, j) => (
+                        <div key={j} className="flex items-start gap-2">
+                          <span
+                            className={`flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold shrink-0 mt-0.5 ${isAttention ? 'bg-amber-50 dark:bg-amber-900 text-amber-600 dark:text-amber-400' : 'bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500'}`}
+                          >
+                            {j + 1}
+                          </span>
+                          <p className="text-sm text-stone-800 dark:text-stone-100 leading-relaxed">
+                            {problem}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {item.recommendations?.length > 0 && (
+                    <div className="px-4 pt-3 pb-3 space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-teal-800 dark:text-teal-500 mb-1">
+                        {isImaging ? 'Conduta recomendada' : 'Recomendações'}
+                      </p>
+                      {item.recommendations.map((rec, j) => (
+                        <div key={j} className="flex items-start gap-2">
+                          <CheckCircle2
+                            size={14}
+                            className="text-teal-800 dark:text-teal-500 shrink-0 mt-0.5"
+                          />
+                          <p className="text-sm text-stone-800 dark:text-stone-100 leading-relaxed">
+                            {rec}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-
-                {item.problems.length > 0 && (
-                  <div className="px-4 pt-3 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-500 mb-1">
-                      Problemas
-                    </p>
-                    {item.problems.map((problem, j) => (
-                      <div key={j} className="flex items-start gap-2">
-                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-500 text-xs font-bold shrink-0 mt-0.5">
-                          {j + 1}
-                        </span>
-                        <p className="text-sm text-stone-800 dark:text-stone-100 leading-relaxed">
-                          {problem}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {item.recommendations?.length > 0 && (
-                  <div className="px-4 pt-3 pb-3 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-teal-800 dark:text-teal-500 mb-1">
-                      Recomendações
-                    </p>
-                    {item.recommendations.map((rec, j) => (
-                      <div key={j} className="flex items-start gap-2">
-                        <CheckCircle2
-                          size={14}
-                          className="text-teal-800 dark:text-teal-500 shrink-0 mt-0.5"
-                        />
-                        <p className="text-sm text-stone-800 dark:text-stone-100 leading-relaxed">
-                          {rec}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </SectionCard>
       )}
@@ -214,7 +284,11 @@ export function PreventionContent() {
       {prevention.generalRecommendations?.length > 0 && (
         <SectionCard
           title="Recomendações Gerais"
-          subtitle="Considerando todos os valores alterados em conjunto"
+          subtitle={
+            isImaging
+              ? 'Considerando todos os achados alterados em conjunto'
+              : 'Considerando todos os valores alterados em conjunto'
+          }
         >
           <div className="space-y-2">
             {prevention.generalRecommendations.map((rec, i) => (
