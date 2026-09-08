@@ -75,6 +75,9 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const isInvite = false;
   const selectedPlanId = searchParams.get('plan_id');
+  // Link de teste: concede o plano por tempo limitado, sem passar por pagamento.
+  const trialToken = searchParams.get('trial');
+  const isTrial = Boolean(trialToken);
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -238,7 +241,7 @@ function RegisterForm() {
   async function submitRegistration() {
     const data = getValues();
     if (
-      !selectedPlan ||
+      (!selectedPlan && !isTrial) ||
       !data.hospitalName ||
       !data.hospitalPhone ||
       !data.cnpj ||
@@ -255,7 +258,9 @@ function RegisterForm() {
         cpf: data.cpf.replace(/\D/g, ''),
         password: data.password,
         crmv: data.crmv ?? '',
-        plan_id: selectedPlan.id,
+        ...(isTrial
+          ? { trial_token: trialToken! }
+          : { plan_id: selectedPlan!.id }),
         hospital_name: data.hospitalName,
         hospital_phone: data.hospitalPhone,
         cnpj: unmaskCNPJ(data.cnpj),
@@ -286,7 +291,7 @@ function RegisterForm() {
     }
   }
 
-  const totalSteps = 3;
+  const totalSteps = isTrial ? 1 : 3;
   const data = getValues();
 
   return (
@@ -303,11 +308,18 @@ function RegisterForm() {
 
       {!isInvite && (
         <ol className="mb-8 flex items-center gap-3">
-          {[
-            { label: 'Clínica e acesso', done: step > 1, active: step === 1 },
-            { label: 'Plano', done: step > 2, active: step === 2 },
-            { label: 'Pagamento', done: false, active: step === 3 },
-          ].map((item, index) => (
+          {(isTrial
+            ? [{ label: 'Clínica e acesso', done: false, active: step === 1 }]
+            : [
+              {
+                label: 'Clínica e acesso',
+                done: step > 1,
+                active: step === 1,
+              },
+              { label: 'Plano', done: step > 2, active: step === 2 },
+              { label: 'Pagamento', done: false, active: step === 3 },
+            ]
+          ).map((item, index) => (
             <li
               key={item.label}
               className="flex flex-1 items-center gap-3 last:flex-none"
@@ -770,6 +782,17 @@ function RegisterForm() {
               loading={loading}
             >
                   Aceitar convite
+            </Button>
+          ) : isTrial ? (
+            <Button
+              type="button"
+              onClick={() => {
+                if (validateAccountAndClinic()) void submitRegistration();
+              }}
+              loading={loading}
+            >
+                  Criar conta
+              <ChevronRight size={16} />
             </Button>
           ) : step < totalSteps ? (
             <Button

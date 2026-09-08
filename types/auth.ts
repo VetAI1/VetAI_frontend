@@ -66,6 +66,7 @@ export interface RegisterPayload {
   crmv?: string;
   specialty?: string;
   invite_token?: string;
+  trial_token?: string;
   plan_id?: string;
   hospital_name?: string;
   hospital_phone?: string;
