@@ -134,7 +134,7 @@ export function AuthExamAnimation() {
 
   return (
     <div
-      className="w-full max-w-md"
+      className="w-full max-w-md xl:max-w-lg"
       role="img"
       aria-label="Demonstração: envio de um exame em PDF, análise por inteligência artificial, extração dos resultados e sugestão de diagnóstico e tratamentos."
     >
@@ -165,7 +165,7 @@ export function AuthExamAnimation() {
           </AnimatePresence>
         </div>
 
-        <div className="relative mt-4 h-[248px] overflow-hidden">
+        <div className="relative mt-4 h-[248px] overflow-hidden xl:h-[300px]">
           <AnimatePresence mode="wait">
             {stage === 'upload' && (
               <motion.div
