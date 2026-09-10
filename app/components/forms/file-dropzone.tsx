@@ -14,6 +14,10 @@ interface FileDropzoneProps {
   helperText?: string;
   error?: string | undefined;
   onFileSelect: (file: File | null) => void;
+  // Exames de imagem tem varias incidencias que so se interpretam em conjunto.
+  multiple?: boolean;
+  files?: File[] | undefined;
+  onFilesSelect?: (files: File[]) => void;
 }
 
 export function FileDropzone({
@@ -24,10 +28,24 @@ export function FileDropzone({
   helperText,
   error,
   onFileSelect,
+  multiple,
+  files,
+  onFilesSelect,
 }: FileDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const reducedMotion = useReducedMotion();
+
+  const selected = multiple ? (files ?? []) : file ? [file] : [];
+  const hasSelection = selected.length > 0;
+
+  const handleSelection = (fileList: FileList | null) => {
+    if (multiple) {
+      onFilesSelect?.(Array.from(fileList ?? []));
+      return;
+    }
+    onFileSelect(fileList?.[0] ?? null);
+  };
 
   return (
     <FieldShell label={label} required={required} error={error}>
@@ -35,7 +53,7 @@ export function FileDropzone({
         className={`relative cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors duration-200 ${
           isDragging
             ? 'border-teal-800 dark:border-teal-500 bg-stone-100 dark:bg-stone-800'
-            : file
+            : hasSelection
               ? 'border-teal-800/50 dark:border-teal-500/50 bg-stone-100/60 dark:bg-stone-800/60'
               : 'border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-teal-800/50 dark:hover:border-teal-500/50 hover:bg-stone-100/60 dark:hover:bg-stone-800/60'
         }`}
@@ -48,19 +66,20 @@ export function FileDropzone({
         onDrop={(event) => {
           event.preventDefault();
           setIsDragging(false);
-          onFileSelect(event.dataTransfer.files?.[0] ?? null);
+          handleSelection(event.dataTransfer.files);
         }}
       >
         <input
           ref={inputRef}
           type="file"
           accept={accept}
+          multiple={multiple}
           className="hidden"
-          onChange={(event) => onFileSelect(event.target.files?.[0] ?? null)}
+          onChange={(event) => handleSelection(event.target.files)}
         />
 
         <AnimatePresence mode="wait" initial={false}>
-          {file ? (
+          {hasSelection ? (
             <motion.div
               key="selected-file"
               initial={reducedMotion ? false : { opacity: 0, scale: 0.96 }}
@@ -75,10 +94,17 @@ export function FileDropzone({
               />
               <div className="min-w-0 text-left">
                 <p className="truncate text-sm font-semibold text-stone-800 dark:text-stone-100">
-                  {file.name}
+                  {selected.length > 1
+                    ? `${selected.length} arquivos selecionados`
+                    : selected[0]!.name}
                 </p>
                 <p className="text-xs text-stone-500 dark:text-stone-400">
-                  {(file.size / 1024 / 1024).toFixed(2)} MB · Clique para trocar
+                  {(
+                    selected.reduce((total, item) => total + item.size, 0) /
+                    1024 /
+                    1024
+                  ).toFixed(2)}{' '}
+                  MB · Clique para trocar
                 </p>
               </div>
             </motion.div>
@@ -95,7 +121,9 @@ export function FileDropzone({
                 className="mx-auto mb-2 text-stone-500 dark:text-stone-400"
               />
               <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
-                Arraste o arquivo aqui ou clique para selecionar
+                {multiple
+                  ? 'Arraste os arquivos aqui ou clique para selecionar'
+                  : 'Arraste o arquivo aqui ou clique para selecionar'}
               </p>
               {helperText && (
                 <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">

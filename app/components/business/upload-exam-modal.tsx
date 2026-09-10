@@ -78,9 +78,14 @@ export function UploadExamModal({
   const title = watch('title');
   const examDate = watch('examDate');
   const file = watch('file');
+  const files = watch('files');
   const type = watch('type');
   const isImaging = type === 'IMAGING';
-  const readyToUpload = Boolean(selectedPatient && title?.trim() && file);
+  const readyToUpload = Boolean(
+    selectedPatient &&
+      title?.trim() &&
+      (isImaging ? files?.length : Boolean(file)),
+  );
 
   useEffect(() => {
     if (preselectedPatient) {
@@ -91,6 +96,15 @@ export function UploadExamModal({
   const handleFileChange = (selectedFile: File | null) => {
     if (!selectedFile) return;
     setValue('file', selectedFile, { shouldValidate: true });
+    setValue('files', [selectedFile]);
+  };
+
+  const handleFilesChange = (selectedFiles: File[]) => {
+    if (selectedFiles.length === 0) return;
+    setValue('files', selectedFiles);
+    // `file` continua sendo a primeira imagem para aproveitar a validacao de
+    // formato ja existente no schema.
+    setValue('file', selectedFiles[0]!, { shouldValidate: true });
   };
 
   const handleTypeChange = (nextType: StudyType) => {
@@ -98,6 +112,11 @@ export function UploadExamModal({
     // A file picked for the previous type may no longer be an accepted format.
     if (file && !STUDY_ACCEPTED_MIME_TYPES[nextType].includes(file.type)) {
       setValue('file', undefined as unknown as File, { shouldValidate: true });
+      setValue('files', []);
+    }
+    // Sair de imagem para laboratorio descarta as incidencias extras.
+    if (nextType !== 'IMAGING' && (files?.length ?? 0) > 1) {
+      setValue('files', file ? [file] : []);
     }
   };
 
@@ -106,7 +125,7 @@ export function UploadExamModal({
     try {
       const study = await studiesService.upload(
         data.patientId,
-        data.file,
+        isImaging && data.files?.length ? data.files : data.file,
         data.title.trim(),
         data.type,
         data.examDate || undefined,
@@ -287,6 +306,9 @@ export function UploadExamModal({
           }
           error={errors.file?.message}
           onFileSelect={handleFileChange}
+          multiple={isImaging}
+          files={files}
+          onFilesSelect={handleFilesChange}
         />
       </div>
 

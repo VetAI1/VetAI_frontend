@@ -8,9 +8,7 @@ import {
   ClipboardList,
   Cpu,
   Download,
-  Eye,
   FileText,
-  Loader2,
   Mars,
   Microscope,
   PawPrint,
@@ -25,7 +23,6 @@ import {
   StickyNote,
   Syringe,
   Trash2,
-  Upload,
   User,
   Venus,
   X,
@@ -43,6 +40,7 @@ import { AddWeightModal } from './add-weight-modal';
 import { BudgetModal } from './budget-modal';
 import { DeleteBtn } from './delete-btn';
 import { InfoCard } from './info-card';
+import { PatientGalleryCard } from './patient-gallery-card';
 import { buildPrescriptionPdf } from '../utils/prescription-pdf';
 
 import { PatientModal } from '@/app/components/business/patient-modal';
@@ -56,7 +54,6 @@ import { SPECIE_LABELS, STUDY_TYPE_MAP } from '@/constants';
 import { useConfirmation } from '@/contexts/confirmation-context';
 import { useModal } from '@/contexts/modal-context';
 import { useAuth } from '@/infra/auth-context';
-import { documentsService } from '@/services/documents.service';
 import { healthRecordsService } from '@/services/health-records.service';
 import { hospitalsService } from '@/services/hospitals.service';
 import { patientsService } from '@/services/patients.service';
@@ -67,7 +64,6 @@ import type {
   ClinicalNoteMetadata,
   HealthRecord,
   NoteMetadata,
-  PatientDocument,
   PrescriptionMetadata,
   VaccineMetadata,
   WeightMetadata,
@@ -100,9 +96,7 @@ export function PatientDetailContent() {
 
   const { confirm } = useConfirmation();
   const { open } = useModal();
-  const [uploadingDoc, setUploadingDoc] = useState(false);
   const [viewingDoc, setViewingDoc] = useState<{ url: string; mimeType: string; fileName: string } | null>(null);
-  const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
 
   const [exams, setExams] = useState<Study[]>([]);
   const [weightRecords, setWeightRecords] = useState<HealthRecord[]>([]);
@@ -110,7 +104,6 @@ export function PatientDetailContent() {
   const [vaccines, setVaccines] = useState<HealthRecord[]>([]);
   const [notes, setNotes] = useState<HealthRecord[]>([]);
   const [prescriptions, setPrescriptions] = useState<HealthRecord[]>([]);
-  const [documents, setDocuments] = useState<PatientDocument[]>([]);
 
   const [upcomingEvents, setUpcomingEvents] = useState<ScheduleEvent[]>([]);
 
@@ -120,9 +113,7 @@ export function PatientDetailContent() {
   const [vaccinesLoading, setVaccinesLoading] = useState(false);
   const [notesLoading, setNotesLoading] = useState(false);
   const [prescriptionsLoading, setPrescriptionsLoading] = useState(false);
-  const [docsLoading, setDocsLoading] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const viewerIframeRef = useRef<HTMLIFrameElement>(null);
 
   const fetchPatient = useCallback(async () => {
@@ -189,15 +180,6 @@ export function PatientDetailContent() {
     } catch { /* silently fail */ } finally { setPrescriptionsLoading(false); }
   }, [id]);
 
-  const fetchDocuments = useCallback(async () => {
-    if (!id) return;
-    setDocsLoading(true);
-    try {
-      const res = await documentsService.list(id);
-      setDocuments(res);
-    } catch { /* silently fail */ } finally { setDocsLoading(false); }
-  }, [id]);
-
   useEffect(() => { void fetchPatient(); }, [fetchPatient]);
 
   useEffect(() => {
@@ -220,7 +202,6 @@ export function PatientDetailContent() {
   useEffect(() => { void fetchVaccines(); }, [fetchVaccines]);
   useEffect(() => { void fetchNotes(); }, [fetchNotes]);
   useEffect(() => { void fetchPrescriptions(); }, [fetchPrescriptions]);
-  useEffect(() => { void fetchDocuments(); }, [fetchDocuments]);
   useEffect(() => { hospitalsService.get().then(setHospital).catch(() => null); }, []);
 
   const handleDelete = async () => {
@@ -240,40 +221,6 @@ export function PatientDetailContent() {
     if (!id) return;
     await healthRecordsService.delete(id, recordId);
     refetch();
-  };
-
-  const handleUploadDocument = async (file: File) => {
-    if (!id) return;
-    setUploadingDoc(true);
-    try {
-      await documentsService.upload(id, file);
-      void fetchDocuments();
-    } catch { /* silently fail */ } finally { setUploadingDoc(false); }
-  };
-
-  const handleDeleteDocument = async (docId: string) => {
-    if (!id) return;
-    await documentsService.delete(id, docId);
-    void fetchDocuments();
-  };
-
-  const handleViewDocument = async (doc: { id: string; fileName: string; mimeType: string }) => {
-    if (!id) return;
-    setLoadingDocId(doc.id);
-    try {
-      const { url, mimeType } = await documentsService.download(id, doc.id);
-      const isPdf = mimeType.includes('pdf');
-      const isImage = mimeType.startsWith('image/');
-      if (isPdf || isImage) {
-        setViewingDoc({ url, mimeType, fileName: doc.fileName });
-      } else {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = doc.fileName;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-      }
-    } catch { /* silently fail */ } finally { setLoadingDocId(null); }
   };
 
   const closeDocViewer = () => {
@@ -961,82 +908,11 @@ export function PatientDetailContent() {
           )}
         </SectionCard>
 
-        <SectionCard title="Documentos" subtitle="Arquivos e documentos do paciente"
-          headerAction={
-            <>
-              <input ref={fileInputRef} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleUploadDocument(f); e.target.value = ''; }} />
-              <Button onClick={() => fileInputRef.current?.click()} disabled={uploadingDoc} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
-                {uploadingDoc ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                Enviar Documento
-              </Button>
-            </>
-          }
-        >
-          {docsLoading ? (
-            <div className="flex flex-col gap-2 py-2">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3 py-2">
-                  <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
-                  <div className="flex flex-col gap-1.5 flex-1">
-                    <Skeleton className="h-3.5 w-48" />
-                    <Skeleton className="h-3 w-20" />
-                  </div>
-                  <Skeleton className="w-7 h-7 rounded-lg" />
-                  <Skeleton className="w-7 h-7 rounded-lg" />
-                </div>
-              ))}
-            </div>
-          ) : documents.length === 0 ? (
-            <div
-              className="py-10 border-2 border-dashed border-stone-200 dark:border-stone-800 rounded-lg text-center cursor-pointer hover:border-teal-800/40 dark:hover:border-teal-500/40 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
-              <p className="text-sm text-stone-500 dark:text-stone-400">Clique para enviar um documento</p>
-              <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-1">PDF, imagens, etc.</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-border">
-              {documents.map((doc) => (
-                <div key={doc.id} className="flex items-center justify-between py-3 px-1 gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0">
-                      <FileText size={15} className="text-stone-500 dark:text-stone-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{doc.fileName}</p>
-                      <p className="text-xs text-stone-500 dark:text-stone-400">{fmtDate(doc.created_at)}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => { void handleViewDocument(doc); }}
-                      disabled={loadingDocId === doc.id}
-                      className="text-stone-500/70 dark:text-stone-400/70 hover:text-teal-800 dark:hover:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10"
-                      title={doc.mimeType.startsWith('image/') || doc.mimeType.includes('pdf') ? 'Visualizar' : 'Baixar'}
-                    >
-                      {loadingDocId === doc.id
-                        ? <Loader2 size={14} className="animate-spin" />
-                        : doc.mimeType.startsWith('image/') || doc.mimeType.includes('pdf')
-                          ? <Eye size={14} />
-                          : <Download size={14} />}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => requestDelete(() => handleDeleteDocument(doc.id))}
-                      className="text-stone-500/70 dark:text-stone-400/70 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900"
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </SectionCard>
+        <PatientGalleryCard
+          patientId={id}
+          onView={setViewingDoc}
+          onRequestDelete={requestDelete}
+        />
       </div>
 
       {viewingDoc && (

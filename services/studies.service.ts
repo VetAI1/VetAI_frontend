@@ -18,7 +18,7 @@ export const studiesService = {
 
   upload: (
     patientId: string,
-    file: File,
+    files: File | File[],
     title: string,
     type: StudyType,
     examDate?: string,
@@ -27,7 +27,10 @@ export const studiesService = {
     formData.append('patient_id', patientId);
     formData.append('title', title);
     formData.append('type', type);
-    formData.append('file', file);
+    // Exames de imagem podem ter varias incidencias analisadas em conjunto.
+    for (const file of Array.isArray(files) ? files : [files]) {
+      formData.append('files', file);
+    }
     if (examDate) formData.append('exam_date', examDate);
     return httpClient<Study>('study/upload', {
       method: 'POST',

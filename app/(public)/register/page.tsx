@@ -44,6 +44,7 @@ interface RegisterPageFormData {
   crmv?: string;
   specialty?: string;
   planId?: string;
+  isIndependent?: boolean;
   hospitalName?: string;
   hospitalPhone?: string;
   cnpj?: string;
@@ -103,6 +104,9 @@ function RegisterForm() {
   const password = watch('password', '');
   const planId = watch('planId');
   const isUserResponsible = watch('isUserResponsible');
+  // Veterinario autonomo nao tem razao social, CNPJ nem responsavel tecnico
+  // distinto — o cadastro passa a representar o proprio profissional.
+  const isIndependent = watch('isIndependent');
   const selectedPlan = plans.find((plan) => plan.id === planId);
 
   useEffect(() => {
@@ -123,11 +127,13 @@ function RegisterForm() {
       ['confirmPassword', 'Confirmação de senha é obrigatória'],
     ];
 
-    requiredFields.push(
-      ['hospitalName', 'Nome da clínica é obrigatório'],
-      ['hospitalPhone', 'Telefone da clínica é obrigatório'],
-      ['cnpj', 'CNPJ é obrigatório'],
-    );
+    requiredFields.push(['hospitalPhone', 'Telefone é obrigatório']);
+    if (!data.isIndependent) {
+      requiredFields.push(
+        ['hospitalName', 'Nome da clínica é obrigatório'],
+        ['cnpj', 'CNPJ é obrigatório'],
+      );
+    }
 
     requiredFields.forEach(([field, message]) => {
       if (!data[field]) {
@@ -141,7 +147,7 @@ function RegisterForm() {
       hasError = true;
     }
 
-    if (data.cnpj && !validateCNPJ(data.cnpj)) {
+    if (!data.isIndependent && data.cnpj && !validateCNPJ(data.cnpj)) {
       setError('cnpj', { message: 'CNPJ inválido' });
       hasError = true;
     }
@@ -163,7 +169,7 @@ function RegisterForm() {
       setError('address.zipCode', { message: 'CEP inválido' });
       hasError = true;
     }
-    if (!data.isUserResponsible) {
+    if (!data.isIndependent && !data.isUserResponsible) {
       if (!data.responsible?.name) {
         setError('responsible.name', { message: 'Responsável é obrigatório' });
         hasError = true;
@@ -242,13 +248,13 @@ function RegisterForm() {
     const data = getValues();
     if (
       (!selectedPlan && !isTrial) ||
-      !data.hospitalName ||
       !data.hospitalPhone ||
-      !data.cnpj ||
-      !data.address
+      !data.address ||
+      (!data.isIndependent && (!data.hospitalName || !data.cnpj))
     )
       return;
-    if (!data.isUserResponsible && !data.responsible) return;
+    if (!data.isIndependent && !data.isUserResponsible && !data.responsible)
+      return;
 
     setLoading(true);
     try {
@@ -261,9 +267,14 @@ function RegisterForm() {
         ...(isTrial
           ? { trial_token: trialToken! }
           : { plan_id: selectedPlan!.id }),
-        hospital_name: data.hospitalName,
+        hospital_type: data.isIndependent ? 'independent' : 'clinic',
         hospital_phone: data.hospitalPhone,
-        cnpj: unmaskCNPJ(data.cnpj),
+        ...(data.isIndependent
+          ? {}
+          : {
+            hospital_name: data.hospitalName,
+            cnpj: unmaskCNPJ(data.cnpj!),
+          }),
         ...(data.specialty?.trim() ? { specialty: data.specialty.trim() } : {}),
         address: {
           zip_code: unmaskCEP(data.address.zipCode ?? ''),
@@ -276,14 +287,18 @@ function RegisterForm() {
             ? { complement: data.address.complement }
             : {}),
         },
-        responsible: {
-          name: data.isUserResponsible
-            ? data.name
-            : (data.responsible?.name ?? ''),
-          crmv: data.isUserResponsible
-            ? (data.crmv ?? '')
-            : (data.responsible?.crmv ?? ''),
-        },
+        ...(data.isIndependent
+          ? {}
+          : {
+            responsible: {
+              name: data.isUserResponsible
+                ? data.name
+                : (data.responsible?.name ?? ''),
+              crmv: data.isUserResponsible
+                ? (data.crmv ?? '')
+                : (data.responsible?.crmv ?? ''),
+            },
+          }),
       };
       await register(payload);
     } finally {
@@ -298,7 +313,13 @@ function RegisterForm() {
     <AuthShell
       workspaceClassName="max-w-3xl lg:my-0"
       surface="plain"
-      title={isInvite ? 'Você foi convidado' : 'Cadastre sua clínica'}
+      title={
+        isInvite
+          ? 'Você foi convidado'
+          : isIndependent
+            ? 'Crie sua conta profissional'
+            : 'Cadastre sua clínica'
+      }
       description={
         isInvite
           ? 'Crie sua conta para entrar na equipe da clínica.'
@@ -356,39 +377,59 @@ function RegisterForm() {
           >
             <div>
               <h1 className="font-display text-3xl font-bold tracking-[-0.06em] text-stone-900 dark:text-stone-100">
-                {isInvite ? 'Criar sua conta' : 'Dados da clínica e acesso'}
+                {isInvite
+                  ? 'Criar sua conta'
+                  : isIndependent
+                    ? 'Seus dados e acesso'
+                    : 'Dados da clínica e acesso'}
               </h1>
               <p className="mt-2 text-stone-500 dark:text-stone-400">
                 {isInvite
                   ? 'Preencha seus dados para aceitar o convite.'
-                  : 'Estas informações identificam sua clínica e seu responsável.'}
+                  : isIndependent
+                    ? 'Estas informações identificam você como profissional.'
+                    : 'Estas informações identificam sua clínica e seu responsável.'}
               </p>
             </div>
 
             {!isInvite && (
               <section className="space-y-6">
+                <div className="rounded-2xl border border-stone-200 dark:border-stone-800 p-4">
+                  <Checkbox
+                    {...registerField('isIndependent')}
+                    label="Sou veterinário autônomo (não tenho clínica)"
+                  />
+                  <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+                    Seus dados profissionais serão usados no cabeçalho das
+                    receitas no lugar dos da clínica.
+                  </p>
+                </div>
                 <div className="grid gap-5 sm:grid-cols-2">
+                  {!isIndependent && (
+                    <>
+                      <InputWithLabel
+                        label="Nome da clínica"
+                        name="hospitalName"
+                        control={control}
+                        error={errors.hospitalName?.message}
+                        required
+                      />
+                      <InputWithLabel
+                        label="CNPJ"
+                        name="cnpj"
+                        control={control}
+                        error={errors.cnpj?.message}
+                        onChange={(event) =>
+                          setValue('cnpj', formatCNPJ(event.target.value))
+                        }
+                        autoCapitalize="characters"
+                        maxLength={18}
+                        required
+                      />
+                    </>
+                  )}
                   <InputWithLabel
-                    label="Nome da clínica"
-                    name="hospitalName"
-                    control={control}
-                    error={errors.hospitalName?.message}
-                    required
-                  />
-                  <InputWithLabel
-                    label="CNPJ"
-                    name="cnpj"
-                    control={control}
-                    error={errors.cnpj?.message}
-                    onChange={(event) =>
-                      setValue('cnpj', formatCNPJ(event.target.value))
-                    }
-                    autoCapitalize="characters"
-                    maxLength={18}
-                    required
-                  />
-                  <InputWithLabel
-                    label="Telefone da clínica"
+                    label={isIndependent ? 'Telefone' : 'Telefone da clínica'}
                     name="hospitalPhone"
                     control={control}
                     error={errors.hospitalPhone?.message}
@@ -404,13 +445,15 @@ function RegisterForm() {
                     maxLength={15}
                     required
                   />
-                  <div className="pt-2 sm:col-span-2">
-                    <Checkbox
-                      {...registerField('isUserResponsible')}
-                      label="Eu sou o responsável"
-                    />
-                  </div>
-                  {!isUserResponsible && (
+                  {!isIndependent && (
+                    <div className="pt-2 sm:col-span-2">
+                      <Checkbox
+                        {...registerField('isUserResponsible')}
+                        label="Eu sou o responsável"
+                      />
+                    </div>
+                  )}
+                  {!isIndependent && !isUserResponsible && (
                     <>
                       <InputWithLabel
                         label="Nome do responsável"
@@ -431,7 +474,7 @@ function RegisterForm() {
                 </div>
                 <div className="border-t border-stone-200 dark:border-stone-800 pt-6">
                   <h2 className="mb-4 text-base font-semibold text-stone-900 dark:text-stone-100">
-                        Endereço da clínica
+                    {isIndependent ? 'Endereço' : 'Endereço da clínica'}
                   </h2>
                   <div className="grid gap-5 sm:grid-cols-3">
                     <InputWithLabel
@@ -716,13 +759,13 @@ function RegisterForm() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
                 <h2 className="font-semibold text-stone-900 dark:text-stone-100">
-                      Clínica
+                  {data.isIndependent ? 'Profissional' : 'Clínica'}
                 </h2>
                 <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
-                  {data.hospitalName}
+                  {data.isIndependent ? data.name : data.hospitalName}
                 </p>
                 <p className="text-sm text-stone-500 dark:text-stone-400">
-                  {data.cnpj}
+                  {data.isIndependent ? data.crmv : data.cnpj}
                 </p>
                 {data.hospitalPhone && (
                   <p className="text-sm text-stone-500 dark:text-stone-400">

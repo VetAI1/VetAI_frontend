@@ -67,6 +67,7 @@ export interface RegisterPayload {
   specialty?: string;
   invite_token?: string;
   trial_token?: string;
+  hospital_type?: 'clinic' | 'independent';
   plan_id?: string;
   hospital_name?: string;
   hospital_phone?: string;

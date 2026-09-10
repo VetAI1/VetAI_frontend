@@ -96,3 +96,13 @@ export interface PatientDocument {
   mimeType: string;
   created_at: string;
 }
+
+export interface GalleryItem {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  source: 'patient' | 'study';
+  studyId?: string;
+  studyTitle?: string;
+  createdAt?: string;
+}

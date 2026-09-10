@@ -65,6 +65,9 @@ export const uploadExamSchema = yup.object({
         return accepted.includes(value.type);
       },
     ),
+  // Exames de imagem aceitam varias incidencias; `file` guarda a primeira para
+  // reaproveitar a validacao de formato acima.
+  files: yup.mixed<File[]>().optional(),
 });
 
 export type VaccineDoseFormData = yup.InferType<typeof vaccineDoseSchema>;
