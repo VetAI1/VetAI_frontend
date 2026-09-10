@@ -207,7 +207,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                     {medicine.administrationRoutes!.map((r) => (
                       <span
                         key={r}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-500 border border-emerald-700/30 dark:border-emerald-500/30"
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-800"
                       >
                         {r}
                       </span>
@@ -247,7 +247,7 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                       return (
                         <div
                           key={key}
-                          className="flex flex-col gap-1 p-3 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-900/20"
+                          className="flex flex-col gap-1 p-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800"
                         >
                           <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500/70 dark:text-stone-400/70">
                             {label}
@@ -291,9 +291,9 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                 icon={Info}
                 label="Observações de Dosagem"
                 value={medicine.dosageNotes}
-                iconColor="text-sky-700 dark:text-sky-500"
-                borderColor="border-sky-700/30 dark:border-sky-500/30"
-                bgColor="bg-sky-50 dark:bg-sky-900"
+                iconColor="text-stone-500/70 dark:text-stone-400/70"
+                borderColor="border-stone-200 dark:border-stone-800"
+                bgColor="bg-stone-100 dark:bg-stone-800"
               />
 
               {/* Dose calculator */}
@@ -331,12 +331,13 @@ export function MedicineDetailModal({ medicine, onClose }: MedicineDetailModalPr
                       </label>
                       <div className="relative">
                         <input
-                          type="number"
-                          min="0.1"
-                          step="0.1"
+                          type="text"
+                          inputMode="numeric"
                           placeholder="Ex: 12"
                           value={weight}
-                          onChange={(e) => setWeight(e.target.value)}
+                          onChange={(e) =>
+                            setWeight(e.target.value.replace(/\D/g, ''))
+                          }
                           className="w-full rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3 py-2 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-500/70 dark:placeholder:text-stone-400/70 focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-500 pr-10"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-500/70 dark:text-stone-400/70 font-medium">

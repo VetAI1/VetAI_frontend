@@ -78,6 +78,23 @@ import { capitalize } from '@/utils/format';
 import { formatPhone } from '@/utils/masks';
 import { whatsappLink } from '@/utils/phone';
 
+type PatientTab =
+  | 'overview'
+  | 'exams'
+  | 'clinical'
+  | 'vaccines'
+  | 'prescriptions'
+  | 'gallery';
+
+const PATIENT_TABS: { key: PatientTab; label: string }[] = [
+  { key: 'overview', label: 'Visão geral' },
+  { key: 'exams', label: 'Exames' },
+  { key: 'clinical', label: 'Clínico' },
+  { key: 'vaccines', label: 'Vacinas' },
+  { key: 'prescriptions', label: 'Receituário' },
+  { key: 'gallery', label: 'Galeria' },
+];
+
 // Autoria do registro clínico, exibida junto da data em cada bloco.
 function byAuthor(record: HealthRecord): string {
   return record.recorded_by ? ` · por ${record.recorded_by.name}` : '';
@@ -96,6 +113,7 @@ export function PatientDetailContent() {
 
   const { confirm } = useConfirmation();
   const { open } = useModal();
+  const [activeTab, setActiveTab] = useState<PatientTab>('overview');
   const [viewingDoc, setViewingDoc] = useState<{ url: string; mimeType: string; fileName: string } | null>(null);
 
   const [exams, setExams] = useState<Study[]>([]);
@@ -487,204 +505,273 @@ export function PatientDetailContent() {
         />
       </div>
 
-      <SectionCard
-        title="Próximas Atividades"
-        subtitle="Agendamentos futuros para este paciente"
-        className="mb-6"
-      >
-        {upcomingEvents.length === 0 ? (
-          <div className="py-6 text-center">
-            <CalendarClock size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
-            <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma atividade agendada.</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-border">
-            {upcomingEvents.map((ev) => {
-              const typeStyle = EVENT_TYPE_MAP[ev.type];
-              const parts = ev.date.split('-');
-              const dateLabel = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])).toLocaleDateString('pt-BR', {
-                weekday: 'short', day: '2-digit', month: 'short',
-              });
-              return (
-                <div key={ev.id} className="flex items-center gap-3 py-3 px-1">
-                  <div className={`w-2 h-2 rounded-full shrink-0 ${typeStyle.dot}`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{ev.title}</p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">
-                      {dateLabel} · {ev.start_time}{ev.end_time ? ` – ${ev.end_time}` : ''}
-                    </p>
-                  </div>
-                  <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border shrink-0 ${typeStyle.bg} ${typeStyle.color}`}>
-                    {typeStyle.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </SectionCard>
+      <div className="mb-6 flex gap-1 overflow-x-auto border-b border-stone-200 dark:border-stone-800">
+        {PATIENT_TABS.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveTab(tab.key)}
+            className={`shrink-0 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+              activeTab === tab.key
+                ? 'border-teal-800 text-teal-800 dark:border-teal-500 dark:text-teal-500'
+                : 'border-transparent text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      <SectionCard title="Exames" subtitle="Exames vinculados a este paciente" className="mb-6"
-        headerAction={
-          <Button onClick={openUploadModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
-            <Plus size={16} /> Adicionar Exame
-          </Button>
-        }
-      >
-        {examsLoading ? (
-          <div className="flex flex-col gap-2 py-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 py-2">
-                <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
-                <div className="flex flex-col gap-1.5 flex-1">
-                  <Skeleton className="h-3.5 w-40" />
-                  <Skeleton className="h-3 w-24" />
-                </div>
-                <Skeleton className="h-5 w-16 rounded-full" />
+      {activeTab === 'overview' && (
+        <>
+          <SectionCard
+            title="Próximas Atividades"
+            subtitle="Agendamentos futuros para este paciente"
+            className="mb-6"
+          >
+            {upcomingEvents.length === 0 ? (
+              <div className="py-6 text-center">
+                <CalendarClock size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+                <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma atividade agendada.</p>
               </div>
-            ))}
-          </div>
-        ) : exams.length === 0 ? (
-          <div className="py-8 text-center">
-            <Microscope size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
-            <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum exame encontrado.</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-border">
-            {exams.map((exam) => (
-              <div key={exam.id} className="flex items-center justify-between py-3 px-1 gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900 flex items-center justify-center shrink-0">
-                    {exam.type === 'IMAGING' ? (
-                      <Scan size={15} className="text-sky-700 dark:text-sky-500" />
-                    ) : (
-                      <Microscope size={15} className="text-sky-700 dark:text-sky-500" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{exam.title ?? 'Exame'}</p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">
-                      {STUDY_TYPE_MAP[exam.type]?.shortLabel ?? exam.type} · {exam.examDate ? fmtDate(exam.examDate) : fmtDate(exam.created_at)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STUDY_STATUS_COLORS[exam.status] ?? ''}`}>
-                    {STUDY_STATUS_LABELS[exam.status] ?? exam.status}
-                  </span>
-                  <Link href={`/exams/${exam.id}`}>
-                    <Button variant="ghost" size="icon" className="h-7 w-7"><FileText size={14} /></Button>
-                  </Link>
-                </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {upcomingEvents.map((ev) => {
+                  const typeStyle = EVENT_TYPE_MAP[ev.type];
+                  const parts = ev.date.split('-');
+                  const dateLabel = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])).toLocaleDateString('pt-BR', {
+                    weekday: 'short', day: '2-digit', month: 'short',
+                  });
+                  return (
+                    <div key={ev.id} className="flex items-center gap-3 py-3 px-1">
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${typeStyle.dot}`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{ev.title}</p>
+                        <p className="text-xs text-stone-500 dark:text-stone-400">
+                          {dateLabel} · {ev.start_time}{ev.end_time ? ` – ${ev.end_time}` : ''}
+                        </p>
+                      </div>
+                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border shrink-0 ${typeStyle.bg} ${typeStyle.color}`}>
+                        {typeStyle.label}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-            <div className="pt-3 pb-1 text-center">
-              <Link href="/exams" className="text-xs text-teal-800 dark:text-teal-500 hover:underline underline-offset-2">Ver todos os exames →</Link>
-            </div>
-          </div>
-        )}
-      </SectionCard>
+            )}
+          </SectionCard>
+          <SectionCard title="Histórico de Pesos" subtitle="Acompanhe a evolução do peso"
+            headerAction={
+              <Button onClick={openAddWeightModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+                <Plus size={16} /> Registrar Peso
+              </Button>
+            }
+          >
+            {weightsLoading ? (
+              <div className="flex flex-col gap-2 py-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 py-2">
+                    <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                    <Skeleton className="w-7 h-7 rounded-lg" />
+                  </div>
+                ))}
+              </div>
+            ) : weightRecords.length === 0 ? (
+              <div className="py-8 text-center">
+                <Scale size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+                <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum registro de peso.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {weightRecords.map((rec) => {
+                  const meta = rec.metadata as WeightMetadata;
+                  return (
+                    <div key={rec.id} className="flex items-center justify-between py-3 px-1 gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
+                          <Scale size={15} className="text-teal-800 dark:text-teal-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{meta.value} {meta.unit === 'KG' ? 'kg' : 'g'}</p>
+                          <p className="text-xs text-stone-500 dark:text-stone-400">{fmtDate(rec.date)}{byAuthor(rec)}</p>
+                          {rec.notes && <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5">{rec.notes}</p>}
+                        </div>
+                      </div>
+                      <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchWeights))} />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </SectionCard>
+        </>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <SectionCard title="Histórico de Pesos" subtitle="Acompanhe a evolução do peso"
+      {activeTab === 'exams' && <>
+        <SectionCard title="Exames" subtitle="Exames vinculados a este paciente" className="mb-6"
           headerAction={
-            <Button onClick={openAddWeightModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
-              <Plus size={16} /> Registrar Peso
+            <Button onClick={openUploadModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+              <Plus size={16} /> Adicionar Exame
             </Button>
           }
         >
-          {weightsLoading ? (
+          {examsLoading ? (
             <div className="flex flex-col gap-2 py-2">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 py-2">
                   <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
                   <div className="flex flex-col gap-1.5 flex-1">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-3.5 w-40" />
+                    <Skeleton className="h-3 w-24" />
                   </div>
-                  <Skeleton className="w-7 h-7 rounded-lg" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
                 </div>
               ))}
             </div>
-          ) : weightRecords.length === 0 ? (
+          ) : exams.length === 0 ? (
             <div className="py-8 text-center">
-              <Scale size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
-              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum registro de peso.</p>
+              <Microscope size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum exame encontrado.</p>
             </div>
           ) : (
             <div className="divide-y divide-border">
-              {weightRecords.map((rec) => {
-                const meta = rec.metadata as WeightMetadata;
-                return (
-                  <div key={rec.id} className="flex items-center justify-between py-3 px-1 gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-teal-800/10 dark:bg-teal-500/10 flex items-center justify-center shrink-0">
-                        <Scale size={15} className="text-teal-800 dark:text-teal-500" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{meta.value} {meta.unit === 'KG' ? 'kg' : 'g'}</p>
-                        <p className="text-xs text-stone-500 dark:text-stone-400">{fmtDate(rec.date)}{byAuthor(rec)}</p>
-                        {rec.notes && <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-0.5">{rec.notes}</p>}
-                      </div>
+              {exams.map((exam) => (
+                <div key={exam.id} className="flex items-center justify-between py-3 px-1 gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                      {exam.type === 'IMAGING' ? (
+                        <Scan size={15} className="text-sky-700 dark:text-sky-500" />
+                      ) : (
+                        <Microscope size={15} className="text-sky-700 dark:text-sky-500" />
+                      )}
                     </div>
-                    <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchWeights))} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{exam.title ?? 'Exame'}</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400">
+                        {STUDY_TYPE_MAP[exam.type]?.shortLabel ?? exam.type} · {exam.examDate ? fmtDate(exam.examDate) : fmtDate(exam.created_at)}
+                      </p>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </SectionCard>
-
-        <SectionCard title="Registros Clínicos" subtitle="Mais recentes no topo"
-          headerAction={
-            <Button onClick={openAddClinicalNoteModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
-              <Plus size={16} /> Novo Registro
-            </Button>
-          }
-        >
-          {clinicalLoading ? (
-            <div className="flex flex-col gap-3 py-2">
-              {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-4 w-36" />
-                    <Skeleton className="h-3 w-20 ml-auto" />
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STUDY_STATUS_COLORS[exam.status] ?? ''}`}>
+                      {STUDY_STATUS_LABELS[exam.status] ?? exam.status}
+                    </span>
+                    <Link href={`/exams/${exam.id}`}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7"><FileText size={14} /></Button>
+                    </Link>
                   </div>
-                  <Skeleton className="h-3 w-full" />
-                  <Skeleton className="h-3 w-4/5" />
                 </div>
               ))}
-            </div>
-          ) : clinicalNotes.length === 0 ? (
-            <div className="py-8 text-center">
-              <FileText size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
-              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum registro clínico.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {clinicalNotes.map((rec) => {
-                const meta = rec.metadata as ClinicalNoteMetadata;
-                return (
-                  <Card key={rec.id} className="p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">{meta.title}</p>
-                          <span className="text-xs text-stone-500/70 dark:text-stone-400/70 shrink-0">{fmtDate(rec.date)}{byAuthor(rec)}</span>
-                        </div>
-                        <p className="text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap">{meta.description}</p>
-                      </div>
-                      <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchClinicalNotes))} />
-                    </div>
-                  </Card>
-                );
-              })}
+              <div className="pt-3 pb-1 text-center">
+                <Link href="/exams" className="text-xs text-teal-800 dark:text-teal-500 hover:underline underline-offset-2">Ver todos os exames →</Link>
+              </div>
             </div>
           )}
         </SectionCard>
-      </div>
+      </>}
 
-      <div className="space-y-4 mb-6">
+      {activeTab === 'clinical' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          <SectionCard title="Registros Clínicos" subtitle="Mais recentes no topo"
+            headerAction={
+              <Button onClick={openAddClinicalNoteModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+                <Plus size={16} /> Novo Registro
+              </Button>
+            }
+          >
+            {clinicalLoading ? (
+              <div className="flex flex-col gap-3 py-2">
+                {Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-4 w-36" />
+                      <Skeleton className="h-3 w-20 ml-auto" />
+                    </div>
+                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-3 w-4/5" />
+                  </div>
+                ))}
+              </div>
+            ) : clinicalNotes.length === 0 ? (
+              <div className="py-8 text-center">
+                <FileText size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+                <p className="text-sm text-stone-500 dark:text-stone-400">Nenhum registro clínico.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {clinicalNotes.map((rec) => {
+                  const meta = rec.metadata as ClinicalNoteMetadata;
+                  return (
+                    <Card key={rec.id} className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">{meta.title}</p>
+                            <span className="text-xs text-stone-500/70 dark:text-stone-400/70 shrink-0">{fmtDate(rec.date)}{byAuthor(rec)}</span>
+                          </div>
+                          <p className="text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap">{meta.description}</p>
+                        </div>
+                        <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchClinicalNotes))} />
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </SectionCard>
+          <SectionCard title="Notas e Observações" subtitle="Observações gerais sobre o paciente"
+            headerAction={
+              <Button onClick={openAddNoteModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
+                <Plus size={16} /> Nova Nota
+              </Button>
+            }
+          >
+            {notesLoading ? (
+              <div className="flex flex-col gap-3 py-2">
+                {Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="p-4 rounded-xl border border-yellow-200 dark:border-yellow-800/40 bg-yellow-50/50 dark:bg-yellow-900/10 flex gap-3">
+                    <Skeleton className="w-5 h-5 rounded shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <Skeleton className="h-3.5 w-full" />
+                      <Skeleton className="h-3.5 w-4/5" />
+                      <Skeleton className="h-3 w-24 mt-1" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : notes.length === 0 ? (
+              <div className="py-8 text-center">
+                <StickyNote size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
+                <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma nota registrada.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {notes.map((rec) => {
+                  const meta = rec.metadata as NoteMetadata;
+                  return (
+                    <Card key={rec.id} className="p-4 bg-yellow-50/50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-800/40">
+                      <div className="flex items-start gap-3">
+                        <StickyNote size={16} className="text-yellow-500 shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-stone-800 dark:text-stone-100 whitespace-pre-wrap">{meta.text}</p>
+                          <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-1">{fmtDateTime(rec.created_at)}{byAuthor(rec)}</p>
+                        </div>
+                        <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchNotes))} />
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </SectionCard>
+        </div>
+      )}
+
+      {activeTab === 'vaccines' && <>
         <SectionCard title="Vacinas" subtitle="Histórico de vacinação"
           headerAction={
             <Button onClick={openAddVaccineModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
@@ -756,7 +843,9 @@ export function PatientDetailContent() {
             </div>
           )}
         </SectionCard>
+      </>}
 
+      {activeTab === 'prescriptions' && <>
         <SectionCard title="Receituário" subtitle="Receitas e prescrições"
           headerAction={
             <Button onClick={openAddPrescriptionModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
@@ -859,61 +948,14 @@ export function PatientDetailContent() {
             </div>
           )}
         </SectionCard>
-      </div>
+      </>}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionCard title="Notas e Observações" subtitle="Observações gerais sobre o paciente"
-          headerAction={
-            <Button onClick={openAddNoteModal} className="bg-teal-800 dark:bg-teal-500 text-white dark:text-stone-950 hover:bg-teal-800/90 dark:hover:bg-teal-500/90 h-9">
-              <Plus size={16} /> Nova Nota
-            </Button>
-          }
-        >
-          {notesLoading ? (
-            <div className="flex flex-col gap-3 py-2">
-              {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="p-4 rounded-xl border border-yellow-200 dark:border-yellow-800/40 bg-yellow-50/50 dark:bg-yellow-900/10 flex gap-3">
-                  <Skeleton className="w-5 h-5 rounded shrink-0 mt-0.5" />
-                  <div className="flex flex-col gap-1.5 flex-1">
-                    <Skeleton className="h-3.5 w-full" />
-                    <Skeleton className="h-3.5 w-4/5" />
-                    <Skeleton className="h-3 w-24 mt-1" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : notes.length === 0 ? (
-            <div className="py-8 text-center">
-              <StickyNote size={32} className="text-stone-500/50 dark:text-stone-400/50 mx-auto mb-2" />
-              <p className="text-sm text-stone-500 dark:text-stone-400">Nenhuma nota registrada.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {notes.map((rec) => {
-                const meta = rec.metadata as NoteMetadata;
-                return (
-                  <Card key={rec.id} className="p-4 bg-yellow-50/50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-800/40">
-                    <div className="flex items-start gap-3">
-                      <StickyNote size={16} className="text-yellow-500 shrink-0 mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-stone-800 dark:text-stone-100 whitespace-pre-wrap">{meta.text}</p>
-                        <p className="text-xs text-stone-500/70 dark:text-stone-400/70 mt-1">{fmtDateTime(rec.created_at)}{byAuthor(rec)}</p>
-                      </div>
-                      <DeleteBtn onDelete={() => requestDelete(() => handleDeleteRecord(rec.id, fetchNotes))} />
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </SectionCard>
-
+      {activeTab === 'gallery' && <>
         <PatientGalleryCard
           patientId={id}
-          onView={setViewingDoc}
           onRequestDelete={requestDelete}
         />
-      </div>
+      </>}
 
       {viewingDoc && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black/80">
